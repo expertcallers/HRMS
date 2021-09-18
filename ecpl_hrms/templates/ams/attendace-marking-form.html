@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div>
+    <form action="" method="POST" enctype="multipart/form-data">
+         {% csrf_token %}
+        <label for="">Date</label>
+        <input type="Text" name="date" id="" readonly value="9/4/2021">
+        <label for="">Categories</label>
+        <select name="leave_type" id="">
+            <option value="P">Present</option>
+            <option value="AB">Absent</option>
+            <option value="PL">Paid Leave</option>
+            <option value="TRNG">Training</option>
+            <option value="SL">Sick Leave</option>
+            <option value="TRNS">Transfer</option>
+            <option value="ML">Maternity Leave</option>
+            <option value="NCNS">No Call No Show</option>
+            <option value="Bench">Bench</option>
+            <option value="LOP">Loss of Pay</option>
+            <option value="NH">National Holiday</option>
+            <option value="OFF">OFF</option>
+            <option value="ATT">Attrition</option>
+            <option value="HD">Half Day</option>
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+</body>
+</html>

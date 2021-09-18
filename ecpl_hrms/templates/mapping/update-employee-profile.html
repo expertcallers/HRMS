@@ -1,0 +1,23 @@
+{% extends 'mapping/base-mapping.html' %}
+{% block main %}
+
+<div class="container" style="margin-top:50px;">
+   <div class="row">
+       <div class="col-lg-4">
+           <div>
+               <form action="/mapping/update-employee-profile" method="POST" enctype="multipart/form-data">
+                   {% csrf_token %}
+                   <p>Select Employee</p>
+                   <select name="emp_id" id="">
+                       {% for e in employees %}
+                       <option value="{{e.emp_id}}">{{e.emp_name}} : {{e.emp_id}} : {{e.emp_process}}</option>
+                       {% endfor %}
+                   </select>
+                   <br><br>
+                   <button type="submit" class="btn btn-primary">Submit</button>
+               </form>
+           </div>
+       </div>
+   </div>
+</div>
+{% endblock %}

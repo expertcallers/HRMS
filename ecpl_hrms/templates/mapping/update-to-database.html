@@ -1,0 +1,78 @@
+{% extends 'mapping/base-mapping.html' %}
+{% block main %}
+
+<div class="container" style="margin-top:50px;">
+   <div class="row">
+       <div class="col-lg-4">
+           <div>
+               <h4>Current Profile</h4>
+               <p>Emp Name</p>
+               <h6>{{emp.emp_name}}</h6>
+               <p>Emp ID</p>
+               <h6>{{emp.emp_id}}</h6>
+               <p>Designation</p>
+               <h6>{{emp.emp_desi}}</h6>
+               <p>Process</p>
+               <h6>{{emp.emp_process}}</h6>
+               <p>RM1</p>
+               <h6>{{emp.emp_rm1}}</h6>
+               <p>RM2</p>
+               <h6>{{emp.emp_rm2}}</h6>
+               <p>RM3</p>
+               <h6>{{emp.emp_rm3}}</h6>
+
+           </div>
+       </div>
+       <div class="col-lg-4">
+           <div>
+               <h4>Update Profile</h4>
+               <form action="/mapping/update-to-system" method="POST" enctype="multipart/form-data">
+                   {% csrf_token %}
+                   <p>Emp Name</p>
+                   <input type="text" value="{{emp.emp_name}}" name="emp_name" class="form-control" required>
+                   <p>Emp ID</p>
+                   <input type="number" value="{{emp.emp_id}}" name="emp_id" class="form-control" required>
+                   <p>Designation</p>
+                   <select name="emp_desi" id="" required class="form-control">
+                       <option value="{{emp.emp_desi}}">{{emp.emp_desi}}</option>
+                       {% for d in desis %}
+                       <option value="{{d}}">{{d}}</option>
+                       {% endfor %}
+                   </select>
+                   <p>Process</p>
+                   <select name="emp_process" id="" required class="form-control">
+                       <option value="{{emp.emp_process}}">{{emp.emp_process}}</option>
+                       {% for t in teams %}
+                       <option value="{{t}}">{{t}}</option>
+                       {% endfor %}
+                   </select>
+                   <p>RM 1</p>
+                   <select name="emp_rm1" id="" required class="form-control">
+                       <option value="{{emp.emp_rm1}}">{{emp.emp_rm1}}</option>
+                       {% for t in rm1s %}
+                       <option value="{{t}}">{{t}}</option>
+                       {% endfor %}
+                   </select>
+                   <p>RM 2</p>
+                   <select name="emp_rm2" id="" required class="form-control">
+                       <option value="{{emp.emp_rm2}}">{{emp.emp_rm2}}</option>
+                       {% for t in rm2s %}
+                       <option value="{{t}}">{{t}}</option>
+                       {% endfor %}
+                   </select>
+                   <p>RM 3</p>
+                   <select name="emp_rm3" id="" required class="form-control">
+                       <option value="{{emp.emp_rm3}}">{{emp.emp_rm3}}</option>
+                       {% for t in rm3s %}
+                       <option value="{{t}}">{{t}}</option>
+                       {% endfor %}
+                   </select>
+                   <br>
+                   <input type="hidden" name="id" id="" value="{{emp.id}}">
+                   <button type="submit" class="btn btn-primary">Submit</button>
+               </form>
+           </div>
+       </div>
+   </div>
+</div>
+{% endblock %}

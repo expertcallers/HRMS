@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ECPL AMS</title>
+</head>
+<body>
+<h2>Home Page</h2>
+{% for t in team %}
+    <p><a href="/ams/employee-details/{{t.emp_id}}">{{t.emp_name}}</a></p>
+{% endfor %}
+</body>
+</html>

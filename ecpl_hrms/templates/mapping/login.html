@@ -1,0 +1,27 @@
+{% extends 'mapping/base-mapping.html' %}
+{% load crispy_forms_tags %}
+{% block main %}
+{% load static %}
+<div class="container" style="margin-top:5%;">
+    <div class="row">
+        <div class="col-lg-4" style="margin-top:10%">
+            <h4 style="color: #01a7f1">ECPL - Employee Mapping</h4>
+            <small style="float:right">Login here</small>
+            <form action="/mapping/login" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{form|crispy}}
+                <br>
+                <button type="submit" class="btn btn-primary" style="margin-bottom:50px">Login</button>
+            </form>
+            {{m}}
+        </div>
+        <div class="col-lg-2"></div>
+        <div class="col-lg-6">
+            <div>
+                <img src="{% static 'assets/images/custom/ecpl-banner.jpg' %}" alt="" class="img-fluid" style="box-shadow: 1px 1px 10px #7f7f7f;">
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
