@@ -18,8 +18,13 @@ from .views import *
 
 urlpatterns = [
     path('',loginPage),
+    path('login',loginAndRedirect),
     path('team-dashboard',teamDashboard),
     path('index',indexPage),
     path('employee-details/<int:pk>',employeeDetails),
-    path('mark-attendace/<int:pk>',markAttendance),
+
+    path('agent-dashboard',agentDashBoard),
+    path('tl-dashboard',tlDashboard),
+    path('apply-attendance',applyAttendace),
+    path('rm-approval/<int:id>',rmApproval),
 ]

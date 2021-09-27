@@ -17,6 +17,9 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
+    # Add user and Profile
+    path('create-user',createUserandProfile),
+
     path('home',employeeMapping),
     path('login',mappingLogin),
     path('team-wise',teamWiseData),

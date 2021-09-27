@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en" dir="ltr">
 {% load static %}
+{% load crispy_forms_tags %}
 <!-- soccer/project/login.html  07 Jan 2020 03:42:43 GMT -->
 <head>
 <meta charset="UTF-8">
@@ -9,7 +10,7 @@
 
 <link rel="icon" href="favicon.ico" type="image/x-icon"/>
 
-<title>:: Soccer :: Login</title>
+<title>ECPL AMS</title>
 
 <!-- Bootstrap Core and vandor -->
 <link rel="stylesheet" href="{% static 'assets/plugins/bootstrap/css/bootstrap.min.css' %}" />
@@ -29,28 +30,35 @@
             <div class="text-center mb-2">
                 <a class="header-brand" href="index-2.html">ECPL AMS</a>
             </div>
-            <div class="card-body">
-                <div class="card-title">Login to your Team</div>
-                <div class="form-group">
-                    <select class="custom-select">
-                        <option>Gubagoo</option>
+            <form action="/ams/login" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div class="card-title">Login to your Team</div>
+                    <div class="form-group">
+                        <select class="custom-select" name="team" required>
+                            {% for team in teams %}
+                            <option value="{{team}}">{{team}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        {{form|crispy}}
+                    </div>
 
-                    </select>
+                    <div class="form-footer">
+                        <button class="btn btn-primary btn-block">Sign In</button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-                </div>
-
-                <div class="form-footer">
-                    <a href="/ams/team-dashboard" class="btn btn-primary btn-block" title="">Sign in</a>
-                </div>
-            </div>
+            </form>
             <div class="text-center text-muted">
                 Don't have account yet? <a href="register.html">Sign up</a>
+                <div>
+                    {% if messages %}
+                        {% for message in messages %}
+                            <p style="color: #fd0a0a;font-weight: bold;">{{message}}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
             </div>
         </div>        
     </div>
