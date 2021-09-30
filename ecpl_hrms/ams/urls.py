@@ -19,6 +19,7 @@ from .views import *
 urlpatterns = [
     path('',loginPage),
     path('login',loginAndRedirect),
+    path('logout',logoutView),
     path('team-dashboard',teamDashboard),
     path('index',indexPage),
     path('employee-details/<int:pk>',employeeDetails),

@@ -4,7 +4,7 @@
 <div class="container" style="margin-top:50px;">
    <div class="row">
        <div class="col-lg-4">
-           <div>
+           <!--<div>
                <h4>Current Profile</h4>
                <p>Emp Name</p>
                <h6>{{emp.emp_name}}</h6>
@@ -21,7 +21,7 @@
                <p>RM3</p>
                <h6>{{emp.emp_rm3}}</h6>
 
-           </div>
+           </div> -->
        </div>
        <div class="col-lg-4">
            <div>
@@ -29,16 +29,11 @@
                <form action="/mapping/update-to-system" method="POST" enctype="multipart/form-data">
                    {% csrf_token %}
                    <p>Emp Name</p>
-                   <input type="text" value="{{emp.emp_name}}" name="emp_name" class="form-control" required>
+                   <input type="text" value="{{emp.emp_name}}" name="emp_name" class="form-control" readonly>
                    <p>Emp ID</p>
-                   <input type="number" value="{{emp.emp_id}}" name="emp_id" class="form-control" required>
+                   <input type="number" value="{{emp.emp_id}}" name="emp_id" class="form-control" readonly>
                    <p>Designation</p>
-                   <select name="emp_desi" id="" required class="form-control">
-                       <option value="{{emp.emp_desi}}">{{emp.emp_desi}}</option>
-                       {% for d in desis %}
-                       <option value="{{d}}">{{d}}</option>
-                       {% endfor %}
-                   </select>
+                   <input type="text" value="{{emp.emp_desi}}" name="emp_desi" class="form-control" readonly>
                    <p>Process</p>
                    <select name="emp_process" id="" required class="form-control">
                        <option value="{{emp.emp_process}}">{{emp.emp_process}}</option>

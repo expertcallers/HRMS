@@ -1,0 +1,27 @@
+{% extends 'mapping/base-mapping.html' %}
+{% block main %}
+
+<div class="container" style="margin-top:50px;">
+    <div class="row">
+        <div class="col-lg-6">
+            <div>
+                <form action="/mapping/update-team-rm2" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <label for="">Team</label>
+                    <input type="text" name="team" value="{{team}}" class="form-control" readonly>
+                    <label for="">RM 2</label>
+                    <input type="text" name="rm2" value="{{rm2}}" class="form-control" readonly>
+                    <label for="">New RM2</label>
+                    <select name="new_rm2" id="" class="form-control">
+                        {% for r in rms %}
+                        <option value="{{r.emp_name}}" class="form-control">{{r.emp_name}} {{r.emp_id}}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

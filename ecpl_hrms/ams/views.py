@@ -37,12 +37,15 @@ def loginAndRedirect(request):
             m = 'Invalid Credentials !'
             return render(request, 'ams/login.html', {'form': form, 'm': m})
 
+def logoutView(request):
+    logout(request)
+    return redirect('/ams')
 def teamDashboard(request):
     return render(request,'ams/team-dashboard.html')
 
 def agentDashBoard(request):
     today = date.today()
-    #today = '2021-9-24'
+    #today = '2021-9-28'
     emp_name = request.user.profile.emp_name
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id = emp_id)
@@ -67,14 +70,30 @@ def tlDashboard(request):
     today = date.today()
     today = str(today)
     att_details = EcplCalander.objects.filter(date = today,rm1=emp_name)
+    all_active = Profile.objects.filter(emp_rm1=emp_name).order_by('emp_name')
+    all_present = EcplCalander.objects.filter(rm1=emp_name,date=today,applied_status=True,att_applied='present').order_by('emp_name')
+
+    #Unmarked Employees
+    emps = Profile.objects.filter(emp_rm1=emp_name)
+    unmarked_emps = []
+    for i in emps:
+        um = EcplCalander.objects.filter(emp_id = i.emp_id,date = today,applied_status=True)
+        if um:
+            print('marked',i.emp_name)
+        else:
+            print('unmarked',i.emp_name)
+            unmarked_emps.append(i)
+    print(unmarked_emps)
 
     #counts
     emp_count = Profile.objects.filter(emp_rm1=emp_name).count()
-    active_today = EcplCalander.objects.filter(rm1=emp_name,date=today).count()
+    active_today = EcplCalander.objects.filter(rm1=emp_name,date=today,applied_status=True,att_applied='present').count()
     unmarked_today = emp_count-active_today
 
     data = {'emp_name': emp_name, 'emp': emp,'cal':cal, 'att_details':att_details,
             'emp_count':emp_count,'active_today':active_today,'unmarked_today':unmarked_today,
+            'all_active':all_active,'all_present':all_present,'unmarked_emps':unmarked_emps,
+
             }
     return render(request, 'ams/rm-dashboard.html', data)
 

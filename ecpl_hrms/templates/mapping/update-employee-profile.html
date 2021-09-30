@@ -3,7 +3,7 @@
 
 <div class="container" style="margin-top:50px;">
    <div class="row">
-       <div class="col-lg-4">
+       <div class="col-lg-6">
            <div>
                <form action="/mapping/update-employee-profile" method="POST" enctype="multipart/form-data">
                    {% csrf_token %}
@@ -17,6 +17,19 @@
                    <button type="submit" class="btn btn-primary">Submit</button>
                </form>
            </div>
+       </div>
+       <div class="col-lg-4">
+           <form action="/mapping/update-team-rm" method="POST" enctype="multipart/form-data">
+                   {% csrf_token %}
+                   <p>Select Team</p>
+                   <select name="team" id="">
+                       {% for t in teams %}
+                       <option value="{{t}}">{{t}}</option>
+                       {% endfor %}
+                   </select>
+                   <br><br>
+                   <button type="submit" class="btn btn-primary">Submit</button>
+           </form>
        </div>
    </div>
 </div>

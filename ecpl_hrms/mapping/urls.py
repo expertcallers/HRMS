@@ -21,9 +21,23 @@ urlpatterns = [
     path('create-user',createUserandProfile),
 
     path('home',employeeMapping),
+    path('emp-id',empIDwiseData),
     path('login',mappingLogin),
     path('team-wise',teamWiseData),
     path('update-employee-profile',updateEmployeeProfile),
     path('update-to-system',updateToSystem),
+    path('update-team-rm',updateTeamRms),
+
+    path('update-rm1/<str:team>/<str:rm1>',updateRM1forTeam),
+    path('update-team-rm1',updateTeamRm1),
+    # Team RM2
+    path('update-rm2/<str:team>/<str:rm2>',updateRM2forTeam),
+    path('update-team-rm2',updateTeamRm2),
+    # Team RM3
+    path('update-rm3/<str:team>/<str:rm3>',updateRM3forTeam),
+    path('update-team-rm3',updateTeamRm3),
+
+
+
 
     ]
