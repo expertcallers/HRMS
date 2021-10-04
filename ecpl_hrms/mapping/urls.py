@@ -37,6 +37,7 @@ urlpatterns = [
     path('update-rm3/<str:team>/<str:rm3>',updateRM3forTeam),
     path('update-team-rm3',updateTeamRm3),
 
+    path('correct-process',correct_process),
 
 
 

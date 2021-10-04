@@ -197,3 +197,16 @@ def createUserandProfile(request):
             print('created'+ i.emp_name)
 
 
+
+
+def correct_process(request):
+
+    e = Employee.objects.all()
+    for i in e:
+
+        process = str(i.emp_process)
+        i.emp_process = process
+        i.save()
+        print(i.emp_process)
+
+
