@@ -23,6 +23,7 @@ urlpatterns = [
     path('home',employeeMapping),
     path('emp-id',empIDwiseData),
     path('login',mappingLogin),
+    path('logout',mappingLogout),
     path('team-wise',teamWiseData),
     path('update-employee-profile',updateEmployeeProfile),
     path('update-to-system',updateToSystem),
@@ -38,6 +39,8 @@ urlpatterns = [
     path('update-team-rm3',updateTeamRm3),
 
     path('correct-process',correct_process),
+    path('export-mapping',exportMapping),
+    path('create-users',createUsers),
 
 
 

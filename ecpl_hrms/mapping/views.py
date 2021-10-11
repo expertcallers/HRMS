@@ -1,6 +1,8 @@
+from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import *
 from itertools import chain
@@ -9,12 +11,19 @@ from itertools import chain
 @login_required
 def employeeMapping(request):
     if request.method == 'POST':
+
         emp_name = request.POST['emp_name']
         employees = Employee.objects.filter(emp_name__icontains=emp_name)
+        if employees:
+            messages.info(request,'Search Result')
+        else:
+            messages.info(request,'The requested employee not found')
+
         teams = Employee.objects.values_list('emp_process',flat=True).distinct()
-        data = {'employees': employees,'teams':teams}
+        data = {'employees': employees,'teams':teams,'emp_name':emp_name,}
         return render(request, 'mapping/index.html', data)
     else:
+
         employees = Employee.objects.all()
         teams = Employee.objects.values_list('emp_process', flat=True).distinct()
         data = {'employees':employees,'teams':teams}
@@ -37,11 +46,17 @@ def mappingLogin(request):
         logout(request)
         form = AuthenticationForm()
         return render(request, 'mapping/login.html', {'form': form})
+
+
+def mappingLogout(request):
+    logout(request)
+    return redirect('/mapping/login')
 @login_required
 def teamWiseData(request):
     if request.method == 'POST':
         team = request.POST['team']
         employees = Employee.objects.filter(emp_process=team)
+        messages.info(request, 'Search Result')
         teams = Employee.objects.values_list('emp_process',flat=True).distinct()
         data = {'employees': employees,'teams':teams}
         return render(request, 'mapping/index.html', data)
@@ -55,8 +70,13 @@ def empIDwiseData(request):
     if request.method == 'POST':
         emp_id = request.POST['emp_id']
         employees = Employee.objects.filter(emp_id=emp_id)
+        if employees:
+            messages.info(request,'Search Result')
+        else:
+            messages.info(request,'The requested employee not found')
+
         teams = Employee.objects.values_list('emp_process',flat=True).distinct()
-        data = {'employees': employees,'teams':teams}
+        data = {'employees': employees,'teams':teams,'emp_id':emp_id}
         return render(request, 'mapping/index.html', data)
     else:
         pass
@@ -100,6 +120,7 @@ def updateToSystem(request):
         emp.emp_rm2 = emp_rm2
         emp.emp_rm3 = emp_rm3
         emp.save()
+        messages.info(request,'Employee Profile updated successfully !')
         return redirect('/mapping/home')
     else:
         return redirect('/mapping/login')
@@ -138,7 +159,8 @@ def updateTeamRm1(request):
         for i in rm:
             i.emp_rm1 = new_rm1
             i.save()
-        return redirect('/mapping/update-employee-profile')
+        messages.info(request, 'Team RM1 updated successfully !')
+        return redirect('/mapping/home')
 
 # rm2
 def updateRM2forTeam(request,rm2,team):
@@ -156,7 +178,8 @@ def updateTeamRm2(request):
         for i in rm:
             i.emp_rm2 = new_rm2
             i.save()
-        return redirect('/mapping/update-employee-profile')
+        messages.info(request, 'Team RM2 updated successfully !')
+        return redirect('/mapping/home')
 
 # rm3
 def updateRM3forTeam(request,rm3,team):
@@ -174,8 +197,8 @@ def updateTeamRm3(request):
         for i in rm:
             i.emp_rm3 = new_rm3
             i.save()
-        return redirect('/mapping/update-employee-profile')
-
+        messages.info(request, 'Team RM3 updated successfully !')
+        return redirect('/mapping/home')
 
 
 def createUserandProfile(request):
@@ -207,6 +230,68 @@ def correct_process(request):
         process = str(i.emp_process)
         i.emp_process = process
         i.save()
-        print(i.emp_process)
+#        print(i.emp_process)
 
 
+def exportMapping(request):
+    import xlwt
+
+    if request.method == 'POST':
+        team = request.POST['team']
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="mapping.xls"'
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet('Users Data')  # this will make a sheet named Users Data
+        # Sheet header, first row
+        row_num = 0
+        font_style = xlwt.XFStyle()
+        font_style.font.bold = True
+        columns = [
+                    'Emp ID','Emp Name','Designation','RM 1','RM 2','RM 3','Team'
+                  ]
+
+        for col_num in range(len(columns)):
+            ws.write(row_num, col_num, columns[col_num], font_style)  # at 0 row 0 column
+
+        # Sheet body, remaining rows
+        font_style = xlwt.XFStyle()
+
+        if team =='all':
+            rows = Employee.objects.all().values_list(
+            'emp_id', 'emp_name', 'emp_desi', 'emp_rm1', 'emp_rm2', 'emp_rm3', 'emp_process'
+            )
+        else:
+            rows = Employee.objects.filter(emp_process = team).values_list(
+                'emp_id', 'emp_name', 'emp_desi', 'emp_rm1', 'emp_rm2', 'emp_rm3', 'emp_process'
+                )
+
+        import datetime
+        rows = [[x.strftime("%Y-%m-%d %H:%M") if isinstance(x, datetime.datetime) else x for x in row] for row in
+                rows]
+
+        for row in rows:
+            row_num += 1
+            for col_num in range(len(row)):
+                ws.write(row_num, col_num, row[col_num], font_style)
+
+        wb.save(response)
+
+        return response
+
+
+# create USer
+
+def createUsers(request):
+
+    empobj = Employee.objects.exclude(emp_desi__in = ['Patrolling officer','Client Relationship Officer'])
+
+    for i in empobj:
+        user=User.objects.filter(username=i.emp_id)
+        if user.exists():
+            print(i.emp_name+' '+'exist')
+            pass
+        else:
+            pwd = str(i.emp_id) + 'ecpluser'
+            user = User.objects.create_user(id=i.emp_id,username=i.emp_id,password=pwd)
+
+            print('User created')

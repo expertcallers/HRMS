@@ -1,56 +1,96 @@
 {% extends 'mapping/base-mapping.html' %}
 {% block main %}
 
-<div class="container" style="margin-top:100px;">
+
+<div class="container" style="margin-top:50px;">
+    <div style="margin-bottom:50px">
+        <h4>Verify Employee Profile</h4>
+    </div>
+    <div>
+        <p>Search Here :</p>
+    </div>
     <div class="row">
 
-        <div class="col-lg-3">
-            <div style="margin:20% 0px">
+        <div class="col-lg-2">
+            <div style="margin:10% 0px">
                 <form action="/mapping/home" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <h5>Search By Name</h5>
-                    <input type="text" name="emp_name" class="form-control">
+                    <h5>Employee Name</h5>
+                    <input type="text" name="emp_name" class="form-control" required value="{{emp_name}}">
                     <br>
-                    <button class="btn btn-primary" type="submit">Search</button>
+                    <button class="btn btn-info" type="submit">Search</button>
                 </form>
             </div>
         </div>
-        <div class="col-lg-3">
-            <div style="margin:20% 0px">
+        <div class="col-lg-1">
+            <center>OR</center>
+        </div>
+        <div class="col-lg-2">
+            <div style="margin:10% 0px">
                 <form action="/mapping/emp-id" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <h5>Search By Emp ID</h5>
-                    <input type="number" name="emp_id" class="form-control">
+                    <h5>Emp ID</h5>
+                    <input type="number" name="emp_id" class="form-control" required value="{{emp_id}}">
                     <br>
-                    <button class="btn btn-primary" type="submit">Search</button>
+                    <button class="btn btn-info" type="submit">Search</button>
                 </form>
             </div>
         </div>
-        <div class="col-lg-3">
-            <div style="margin:20% 0px">
+        <div class="col-lg-1">
+            <center>OR</center>
+        </div>
+        <div class="col-lg-2">
+            <div style="margin:10% 0px">
                 <form action="/mapping/team-wise" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                    <h5>Search By Team</h5>
+                    <h5>Team</h5>
                     <select name="team" id="" class="form-control">
                         {% for t in teams %}
                         <option value="{{t}}">{{t}}</option>
                         {% endfor %}
                     </select>
                     <br>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-info">Search</button>
                 </form>
             </div>
         </div>
-        <div class="col-lg-3">
-            <div style="margin:20% 0px">
-               <p>Update Employee Details</p>
-                <a href="/mapping/update-employee-profile">Update</a>
+        <div class="col-lg-1"></div>
+        <div class="col-lg-3" style="margin-top:-100px">
+            <div style="margin:2% 0px">
+                <div>
+                    <h5 >Update RM1, RM2, RM3 and Team</h5>
+                    <a href="/mapping/update-employee-profile">Click Here</a>
+                </div>
+            </div>
+            <div style="margin-top:50px">
+                <div>
+                    <h4>Export Current Mapping</h4>
+                    <form action="/mapping/export-mapping" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <label for="">Select Team</label>
+                        <select name="team" id="" class="form-control">
+                            <option value="all">All</option>
+                            {% for t in teams %}
+                            <option value="{{t}}">{{t}}</option>
+                            {% endfor %}
+                        </select>
+                        <br>
+                        <button class="btn btn-secondary">Export</button>
+                    </form>
+                </div>
             </div>
         </div>
+    </div>
+</div>
 
-
-        <div class="col-lg-1"></div>
+<div class="container-lg" style="margin-top:50px">
+    <div class="row">
         <div class="col-lg-9">
+            <center style="margin-bottom:50px">
+                {% for m in messages %}
+                    <p style="color: darkgreen;font-size: 23px;background: #d3d3d347;">{{m}}</p>
+                {% endfor %}
+            </center>
             <div>
                 <table class="table">
                 <tr>
@@ -73,8 +113,11 @@
                     <td>{{e.emp_process}}</td>
                 </tr>
             {% endfor %}
-        </table>
+            </table>
             </div>
+        </div>
+        <div class="col-lg-3">
+
         </div>
     </div>
 </div>
