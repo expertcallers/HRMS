@@ -21,7 +21,7 @@ class Profile(models.Model):
     emp_rm2 = models.CharField(max_length=200)
     emp_rm3 = models.CharField(max_length=200)
     emp_process = models.CharField(max_length=200)
-    extra_id = models.IntegerField()
+    extra_id = models.IntegerField(default=1)
 
     def __str__(self):
         return self.emp_name
