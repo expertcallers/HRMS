@@ -32,11 +32,15 @@ def employeeMapping(request):
 def mappingLogin(request):
 
     if request.method == 'POST':
+
         form = AuthenticationForm(data=request.POST)  # Login form
         if form.is_valid():
             # login the user
             user = form.get_user()
             login(request, user)
+            if request.user.profile.pc == False:
+                return redirect('/mapping/change-password')
+
             return redirect('/mapping/home')
         else:
             form = AuthenticationForm()
@@ -60,6 +64,11 @@ def change_password(request):
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
             messages.success(request, 'Your password was successfully updated!')
+
+            user = request.user
+            user.profile.pc = True
+            user.save()
+            user.profile.save()
             logout(request)
             return redirect('/mapping/login')
         else:

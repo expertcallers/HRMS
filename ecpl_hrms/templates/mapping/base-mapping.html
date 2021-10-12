@@ -25,9 +25,12 @@
             </div>
               <div>
                   {% if user.is_authenticated %}
+                  {% if user.profile.pc == True %}
                   <a href="/mapping/home" style="margin:0px 20px">Home</a>
+
                   <a href="/mapping/logout" style="margin:0px 20px">logout</a>
                   <a href="/mapping/change-password" style="margin:0px 20px">Change Password</a>
+                  {% endif %}
                   {% endif %}
               </div>
           </div>
