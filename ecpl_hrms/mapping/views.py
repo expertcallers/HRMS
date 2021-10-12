@@ -245,7 +245,7 @@ def updateTeamRm3(request):
 
 
 def createUserandProfile(request):
-    emp = Employee.objects.all()
+    emp = Employee.objects.exclude(emp_desi__in = ['Patrolling officer','Client Relationship Officer'])
     for i in emp:
         user = User.objects.filter(username=i.emp_id)
         if user.exists():
