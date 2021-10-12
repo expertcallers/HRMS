@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+import datetime
 
 # Create your models here.
 
@@ -25,5 +26,25 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.emp_name
+
+
+class MappingHistory(models.Model):
+    date = models.DateField(default=datetime.date.today)
+    updated_by = models.CharField(max_length=50)
+    emp_name = models.CharField(max_length=50,null=True)
+    emp_id = models.IntegerField(null=True)
+    rm1 = models.CharField(max_length=50,null=True)
+    rm2 = models.CharField(max_length=50, null=True)
+    rm3 = models.CharField(max_length=50, null=True)
+    team = models.CharField(max_length=100,null=True)
+
+
+class MappingHistoryTeam(models.Model):
+    date = models.DateField(default=datetime.date.today)
+    updated_by = models.CharField(max_length=50)
+    team = models.CharField(max_length=100, null=True)
+    category = models.CharField(max_length=50)
+    new_value = models.CharField(max_length=100)
+
 
 

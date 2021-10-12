@@ -19,14 +19,15 @@
             </button>
                 {% if user.is_authenticated %}
               <span class="navbar-text" style="margin-left:100px;">Welcome</span>
-                {% endif %}
-              <span class="navbar-text" style="color:darkgreen;margin-left:20px;">{{request.user.profile.emp_name}}</span>
+              <span class="navbar-text" style="color:darkgreen;margin-left:20px;font-size:20px">{{request.user.profile.emp_name}}</span>
+              {% endif %}
             <div class="collapse navbar-collapse" id="navbarNav" style="margin-left:100px;">
             </div>
               <div>
                   {% if user.is_authenticated %}
                   <a href="/mapping/home" style="margin:0px 20px">Home</a>
                   <a href="/mapping/logout" style="margin:0px 20px">logout</a>
+                  <a href="/mapping/change-password" style="margin:0px 20px">Change Password</a>
                   {% endif %}
               </div>
           </div>

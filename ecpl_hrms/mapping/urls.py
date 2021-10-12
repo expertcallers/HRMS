@@ -22,8 +22,11 @@ urlpatterns = [
 
     path('home',employeeMapping),
     path('emp-id',empIDwiseData),
+
     path('login',mappingLogin),
     path('logout',mappingLogout),
+    path('change-password',change_password),
+
     path('team-wise',teamWiseData),
     path('update-employee-profile',updateEmployeeProfile),
     path('update-to-system',updateToSystem),

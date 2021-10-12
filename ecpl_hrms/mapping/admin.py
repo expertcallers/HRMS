@@ -4,3 +4,5 @@ from .models import *
 
 admin.site.register(Profile)
 admin.site.register(Employee)
+admin.site.register(MappingHistory)
+admin.site.register(MappingHistoryTeam)

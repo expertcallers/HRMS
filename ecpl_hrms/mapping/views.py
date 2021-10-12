@@ -1,7 +1,7 @@
 from django.contrib import messages
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import *
@@ -51,6 +51,24 @@ def mappingLogin(request):
 def mappingLogout(request):
     logout(request)
     return redirect('/mapping/login')
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+            logout(request)
+            return redirect('/mapping/login')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request,'mapping/change-password.html', {'form': form})
+
+
 @login_required
 def teamWiseData(request):
     if request.method == 'POST':
@@ -103,6 +121,7 @@ def updateEmployeeProfile(request):
 @login_required
 def updateToSystem(request):
     if request.method == 'POST':
+        userr = request.user.profile.emp_name
         emp_name = request.POST['emp_name']
         emp_id = request.POST['emp_id']
         emp_desi = request.POST['emp_desi']
@@ -110,6 +129,8 @@ def updateToSystem(request):
         emp_rm1 = request.POST['emp_rm1']
         emp_rm2 = request.POST['emp_rm2']
         emp_rm3 = request.POST['emp_rm3']
+        history = emp_rm1 +"/" + emp_rm2+"/" + emp_rm3
+
         id = request.POST['id']
         emp = Employee.objects.get(id=id)
         emp.emp_name = emp_name
@@ -120,6 +141,9 @@ def updateToSystem(request):
         emp.emp_rm2 = emp_rm2
         emp.emp_rm3 = emp_rm3
         emp.save()
+        mh = MappingHistory.objects.create(
+            updated_by = userr,emp_name = emp_name, emp_id=emp_id, rm1=emp_rm1, rm2=emp_rm2, rm3=emp_rm3, team = emp_process)
+        mh.save()
         messages.info(request,'Employee Profile updated successfully !')
         return redirect('/mapping/home')
     else:
@@ -151,6 +175,7 @@ def updateRM1forTeam(request,rm1,team):
 
 def updateTeamRm1(request):
     if request.method == 'POST':
+        userr = request.user.profile.emp_name
         team = request.POST['team']
         rm1 = request.POST['rm1']
         new_rm1 = request.POST['new_rm1']
@@ -159,6 +184,8 @@ def updateTeamRm1(request):
         for i in rm:
             i.emp_rm1 = new_rm1
             i.save()
+        mh = MappingHistoryTeam.objects.create(updated_by = userr,team = team,category = "RM 1", new_value = new_rm1)
+        mh.save()
         messages.info(request, 'Team RM1 updated successfully !')
         return redirect('/mapping/home')
 
@@ -170,6 +197,7 @@ def updateRM2forTeam(request,rm2,team):
 
 def updateTeamRm2(request):
     if request.method == 'POST':
+        userr = request.user.profile.emp_name
         team = request.POST['team']
         rm2 = request.POST['rm2']
         new_rm2 = request.POST['new_rm2']
@@ -178,6 +206,8 @@ def updateTeamRm2(request):
         for i in rm:
             i.emp_rm2 = new_rm2
             i.save()
+        mh = MappingHistoryTeam.objects.create(updated_by=userr, team=team, category="RM 2", new_value=new_rm2)
+        mh.save()
         messages.info(request, 'Team RM2 updated successfully !')
         return redirect('/mapping/home')
 
@@ -189,6 +219,7 @@ def updateRM3forTeam(request,rm3,team):
 
 def updateTeamRm3(request):
     if request.method == 'POST':
+        userr = request.user.profile.emp_name
         team = request.POST['team']
         rm3 = request.POST['rm3']
         new_rm3 = request.POST['new_rm3']
@@ -197,6 +228,9 @@ def updateTeamRm3(request):
         for i in rm:
             i.emp_rm3 = new_rm3
             i.save()
+
+        mh = MappingHistoryTeam.objects.create(updated_by=userr, team=team, category="RM 3", new_value=new_rm3)
+        mh.save()
         messages.info(request, 'Team RM3 updated successfully !')
         return redirect('/mapping/home')
 
