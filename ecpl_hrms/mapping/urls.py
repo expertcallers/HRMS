@@ -19,7 +19,6 @@ from .views import *
 urlpatterns = [
     # Add user and Profile
     path('create-user',createUserandProfile),
-
     path('home',employeeMapping),
     path('emp-id',empIDwiseData),
 
@@ -43,8 +42,5 @@ urlpatterns = [
 
     path('correct-process',correct_process),
     path('export-mapping',exportMapping),
-    path('create-users',createUsers),
-
-
 
     ]

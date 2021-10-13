@@ -106,7 +106,11 @@ def empIDwiseData(request):
         data = {'employees': employees,'teams':teams,'emp_id':emp_id}
         return render(request, 'mapping/index.html', data)
     else:
-        pass
+        print('this')
+        employees = Employee.objects.all()
+        teams = Employee.objects.values_list('emp_process', flat=True).distinct()
+        data = {'employees': employees, 'teams': teams}
+        return render(request, 'mapping/index.html', data)
 
 
 @login_required
@@ -245,7 +249,8 @@ def updateTeamRm3(request):
 
 
 def createUserandProfile(request):
-    emp = Employee.objects.exclude(emp_desi__in = ['Patrolling officer','Client Relationship Officer'])
+
+    emp = Employee.objects.all()
     for i in emp:
         user = User.objects.filter(username=i.emp_id)
         if user.exists():
@@ -321,20 +326,3 @@ def exportMapping(request):
 
         return response
 
-
-# create USer
-
-def createUsers(request):
-
-    empobj = Employee.objects.exclude(emp_desi__in = ['Patrolling officer','Client Relationship Officer'])
-
-    for i in empobj:
-        user=User.objects.filter(username=i.emp_id)
-        if user.exists():
-            print(i.emp_name+' '+'exist')
-            pass
-        else:
-            pwd = str(i.emp_id) + 'ecpluser'
-            user = User.objects.create_user(id=i.emp_id,username=i.emp_id,password=pwd)
-
-            print('User created')

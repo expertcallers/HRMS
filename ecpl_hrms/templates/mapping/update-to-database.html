@@ -3,27 +3,7 @@
 
 <div class="container" style="margin-top:50px;">
    <div class="row">
-       <div class="col-lg-4">
-           <!--<div>
-               <h4>Current Profile</h4>
-               <p>Emp Name</p>
-               <h6>{{emp.emp_name}}</h6>
-               <p>Emp ID</p>
-               <h6>{{emp.emp_id}}</h6>
-               <p>Designation</p>
-               <h6>{{emp.emp_desi}}</h6>
-               <p>Process</p>
-               <h6>{{emp.emp_process}}</h6>
-               <p>RM1</p>
-               <h6>{{emp.emp_rm1}}</h6>
-               <p>RM2</p>
-               <h6>{{emp.emp_rm2}}</h6>
-               <p>RM3</p>
-               <h6>{{emp.emp_rm3}}</h6>
-
-           </div> -->
-       </div>
-       <div class="col-lg-4">
+       <div class="col-lg-6" style="background: lightgrey;padding: 50px 60px;box-shadow: 2px 2px 10px lightgrey;">
            <div>
                <h4>Update Profile</h4>
                <form action="/mapping/update-to-system" method="POST" enctype="multipart/form-data">
@@ -64,7 +44,7 @@
                    </select>
                    <br>
                    <input type="hidden" name="id" id="" value="{{emp.id}}">
-                   <button type="submit" class="btn btn-primary">Submit</button>
+                   <button type="submit" class="btn btn-secondary">Submit</button>
                </form>
            </div>
        </div>

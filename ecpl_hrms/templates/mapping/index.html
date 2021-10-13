@@ -1,120 +1,131 @@
 {% extends 'mapping/base-mapping.html' %}
 {% block main %}
 
-
-<div class="container" style="margin-top:50px;">
-    <div style="margin-bottom:50px">
-        <h4>Verify Employee Profile</h4>
-    </div>
-    <div>
-        <p>Search Here :</p>
-    </div>
+<div class="container-fluid">
     <div class="row">
-
-        <div class="col-lg-2">
-            <div style="margin:10% 0px">
-                <form action="/mapping/home" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <h5>Employee Name</h5>
-                    <input type="text" name="emp_name" class="form-control" required value="{{emp_name}}">
-                    <br>
-                    <button class="btn btn-info" type="submit">Search</button>
-                </form>
-            </div>
-        </div>
-        <div class="col-lg-1">
-            <center>OR</center>
-        </div>
-        <div class="col-lg-2">
-            <div style="margin:10% 0px">
-                <form action="/mapping/emp-id" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <h5>Emp ID</h5>
-                    <input type="number" name="emp_id" class="form-control" required value="{{emp_id}}">
-                    <br>
-                    <button class="btn btn-info" type="submit">Search</button>
-                </form>
-            </div>
-        </div>
-        <div class="col-lg-1">
-            <center>OR</center>
-        </div>
-        <div class="col-lg-2">
-            <div style="margin:10% 0px">
-                <form action="/mapping/team-wise" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                    <h5>Team</h5>
-                    <select name="team" id="" class="form-control">
-                        {% for t in teams %}
-                        <option value="{{t}}">{{t}}</option>
-                        {% endfor %}
-                    </select>
-                    <br>
-                    <button type="submit" class="btn btn-info">Search</button>
-                </form>
-            </div>
-        </div>
-        <div class="col-lg-1"></div>
-        <div class="col-lg-3" style="margin-top:-100px">
-            <div style="margin:2% 0px">
+        <div class="col-lg-3" style="background: #d3d3d399;padding: 0px;margin: 0px;min-height:1200px">
+            <div style="margin:10px 20px;">
+                <div style="margin:50px 0px;">
+                    <h4><b><u>Features</u></b></h4>
+                </div>
                 <div>
-                    <h5 >Update RM1, RM2, RM3 and Team</h5>
-                    <a href="/mapping/update-employee-profile">Click Here</a>
+                    <div>
+                        <i class="fa fa-address-card" aria-hidden="true" style="font-size: 24px;"></i>
+                        <h5>Update RM1, RM2, RM3 and Team</h5>
+                        <a href="/mapping/update-employee-profile">Click Here</a>
+                    </div>
+                </div>
+                <div style="margin-top:50px">
+                    <div>
+                        <i class="fa fa-download" aria-hidden="true" style="font-size: 24px;"></i>
+                        <h5>Export Current Mapping</h5>
+                        <form action="/mapping/export-mapping" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <label for="">Select Team</label>
+                            <select name="team" id="" class="form-control">
+                                <option value="all">All</option>
+                                {% for t in teams %}
+                                <option value="{{t}}">{{t}}</option>
+                                {% endfor %}
+                            </select>
+                            <br>
+                            <button class="btn btn-secondary">Export</button>
+                        </form>
+                    </div>
                 </div>
             </div>
-            <div style="margin-top:50px">
-                <div>
-                    <h4>Export Current Mapping</h4>
-                    <form action="/mapping/export-mapping" method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <label for="">Select Team</label>
-                        <select name="team" id="" class="form-control">
-                            <option value="all">All</option>
-                            {% for t in teams %}
-                            <option value="{{t}}">{{t}}</option>
-                            {% endfor %}
-                        </select>
-                        <br>
-                        <button class="btn btn-secondary">Export</button>
-                    </form>
+        </div>
+        <div class="col-lg-9" style="background: whitesmoke;margin: 0px;padding: 0px;">
+
+
+            <div style="padding:50px;">
+                <center>
+                    <h4>Verify Employee Mapping</h4>
+                    <p>Search Here :</p>
+                </center>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="mapping_search">
+                            <form action="/mapping/home" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h5>Employee Name</h5>
+                                <input type="text" name="emp_name" class="form-control" required value="{{emp_name}}">
+                                <br>
+                                <button class="btn btn-secondary" type="submit">Search</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="mapping_search">
+                            <form action="/mapping/emp-id" method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <h5>Emp ID</h5>
+                                <input type="number" name="emp_id" class="form-control" required value="{{emp_id}}">
+                                <br>
+                                <button class="btn btn-secondary" type="submit">Search</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="mapping_search">
+                            <form action="/mapping/team-wise" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                                <h5>Team</h5>
+                                <select name="team" id="" class="form-control">
+                                    {% for t in teams %}
+                                    <option value="{{t}}">{{t}}</option>
+                                    {% endfor %}
+                                </select>
+                                <br>
+                                <button type="submit" class="btn btn-secondary">Search</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div>
+                <center style="margin-bottom:50px">
+                {% for m in messages %}
+                    <p style="color: white;font-size: 23px;background: #6c757d;max-width: 90%;padding: 10px;">{{m}}</p>
+                {% endfor %}
+                </center>
+                <div style="padding: 10px 10px;margin:0px 60px;background: #dcdcdc2e;">
+                    <table class="table">
+                    <tr>
+                        <th>Emp Name</th>
+                        <th>Emp ID</th>
+                        <th>Designation</th>
+                        <th>RM1</th>
+                        <th>RM2</th>
+                        <th>RM3</th>
+                        <th>Process</th>
+                    </tr>
+                {% for e in employees %}
+                    <tr>
+                        <td>{{e.emp_name}}</td>
+                        <td>{{e.emp_id}}</td>
+                        <td>{{e.emp_desi}}</td>
+                        <td>{{e.emp_rm1}}</td>
+                        <td>{{e.emp_rm2}}</td>
+                        <td>{{e.emp_rm3}}</td>
+                        <td>{{e.emp_process}}</td>
+                    </tr>
+                {% endfor %}
+                </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+
+
 <div class="container-lg" style="margin-top:50px">
     <div class="row">
         <div class="col-lg-9">
-            <center style="margin-bottom:50px">
-                {% for m in messages %}
-                    <p style="color: darkgreen;font-size: 23px;background: #d3d3d347;">{{m}}</p>
-                {% endfor %}
-            </center>
-            <div>
-                <table class="table">
-                <tr>
-                    <th>Emp Name</th>
-                    <th>Emp ID</th>
-                    <th>Designation</th>
-                    <th>RM1</th>
-                    <th>RM2</th>
-                    <th>RM3</th>
-                    <th>Process</th>
-                </tr>
-            {% for e in employees %}
-                <tr>
-                    <td>{{e.emp_name}}</td>
-                    <td>{{e.emp_id}}</td>
-                    <td>{{e.emp_desi}}</td>
-                    <td>{{e.emp_rm1}}</td>
-                    <td>{{e.emp_rm2}}</td>
-                    <td>{{e.emp_rm3}}</td>
-                    <td>{{e.emp_process}}</td>
-                </tr>
-            {% endfor %}
-            </table>
-            </div>
+
         </div>
         <div class="col-lg-3">
 
