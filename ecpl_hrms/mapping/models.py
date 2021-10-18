@@ -12,6 +12,7 @@ class Employee(models.Model):
     emp_rm2 = models.CharField(max_length=200)
     emp_rm3 = models.CharField(max_length=200)
     emp_process = models.CharField(max_length=200)
+    id_extra = models.IntegerField(null=True)
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
