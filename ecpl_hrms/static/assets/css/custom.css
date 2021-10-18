@@ -19,3 +19,8 @@ a {
     font-size: 16px;
     font-weight: bold;
 }
+.btn-primary {
+    margin-bottom: 50px;
+    background: #1c7ba8;
+    border-color: #1c7ba8;
+}
