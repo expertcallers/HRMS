@@ -35,8 +35,14 @@
 
 <div id="main_content">
     <div id="left-sidebar" class="sidebar ">
-        <h5 class="brand-name">ECPL<a href="javascript:void(0)" class="menu_option float-right"><i class="icon-grid font-16" data-toggle="tooltip" data-placement="left" title="Grid & List Toggle"></i></a></h5>
+        <h5 class="brand-name">ExpertCallers<a href="javascript:void(0)" class="menu_option float-right"><i class="icon-grid font-16" data-toggle="tooltip" data-placement="left" title="Grid & List Toggle"></i></a></h5>
         <nav id="left-sidebar-nav" class="sidebar-nav">
+            <div style="margin-top:50px">
+                <p>{{emp.emp_name}}</p>
+                <p>{{emp.emp_id}}</p>
+                <p>{{emp.emp_desi}}</p>
+            </div>
+            <!--
             <ul class="metismenu">
                 <li class="g_heading">Project</li>
                 <li class="active"><a href="index-2.html"><i class="fa fa-dashboard"></i><span>Dashboard</span></a></li>                        
@@ -67,6 +73,7 @@
                 <li><a href="javascript:void(0)"><i class="fa fa-support"></i><span>Need Help?</span></a></li>
                 <li><a href="javascript:void(0)"><i class="fa fa-tag"></i><span>ContactUs</span></a></li>
             </ul>
+            -->
         </nav>        
     </div>
 
@@ -80,7 +87,7 @@
                     </div>
                     <div class="right">
                         <div style="margin-right:10px">
-                            <a href="/ams/logout" style="color:white">Logout</a>
+
                         </div>
                         <div class="input-icon xs-hide mr-4">
                             <input type="text" class="form-control" placeholder="Search for...">
@@ -135,12 +142,7 @@
                                 <a class="nav-link icon d-none d-md-flex btn btn-default btn-icon ml-2" data-toggle="dropdown"><i class="fa fa-user"></i></a>
                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
                                     <a class="dropdown-item" href="page-profile.html"><i class="dropdown-icon fe fe-user"></i> Profile</a>
-                                    <a class="dropdown-item" href="app-setting.html"><i class="dropdown-icon fe fe-settings"></i> Settings</a>
-                                    <a class="dropdown-item" href="javascript:void(0)"><span class="float-right"><span class="badge badge-primary">6</span></span><i class="dropdown-icon fe fe-mail"></i> Inbox</a>
-                                    <a class="dropdown-item" href="javascript:void(0)"><i class="dropdown-icon fe fe-send"></i> Message</a>
-                                    <div class="dropdown-divider"></div>
-                                    <a class="dropdown-item" href="javascript:void(0)"><i class="dropdown-icon fe fe-help-circle"></i> Need help?</a>
-                                    <a class="dropdown-item" href="login.html"><i class="dropdown-icon fe fe-log-out"></i> Sign out</a>
+                                    <a class="dropdown-item" href="/ams/logout"><i class="dropdown-icon fe fe-log-out"></i> Logout</a>
                                 </div>
                             </div>
                         </div>
@@ -153,11 +155,16 @@
                 <div class="row clearfix">
                     <div class="col-lg-12">
                         <div class="mb-4">
-                            <h4>Welcome {{emp_name}} !</h4>
+
                         </div>                        
                     </div>
                 </div>
                 <div class="row clearfix row-deck">
+                    <div class="col-xl-4 col-lg-4 col-md-6">
+                        <h4>Welcome {{emp_name}} !</h4>
+                    </div>
+                    <div class="col-xl-2 col-lg-4 col-md-6"></div>
+
                     <div class="col-xl-2 col-lg-4 col-md-6">
                         <div class="card">
                             <div class="card-header">
@@ -189,6 +196,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="row clearfix row-deck">
                     <div class="col-xl-6 col-lg-6">
                         <div class="card">
@@ -208,7 +216,16 @@
                                         <label for="">Attendance</label>
                                         <select name="att_applied" id="">
                                             <option value="present">Present</option>
+                                            <option value="Absent">Absent</option>
+                                            <option value="OFF">OFF</option>
+                                            <option value="HD">Half Day</option>
+                                            <option value="PL">PL</option>
+                                            <option value="Trng">Training</option>
+                                            <option value="SL">Sick Leave</option>
+                                            <option value="ML">Maternity Leave</option>
+                                            <option value="Holiday">Holiday</option>
                                         </select>
+
                                         <input type="hidden" name="rm1" value="{{emp.emp_rm1}}">
                                         <input type="hidden" name="rm2" value="{{emp.emp_rm2}}">
                                         <input type="hidden" name="rm3" value="{{emp.emp_rm3}}">
@@ -253,15 +270,7 @@
             <footer class="footer">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-md-6 col-sm-12">
-                            <a href="templateshub.net">Expert Callers Pvt Ltd</a>
-                        </div>
-                        <div class="col-md-6 col-sm-12 text-md-right">
-                            <ul class="list-inline mb-0">
-                                <li class="list-inline-item"><a href="doc/index.html">Documentation</a></li>
-                                <li class="list-inline-item"><a href="javascript:void(0)">FAQ</a></li>
-                            </ul>
-                        </div>
+
                     </div>
                 </div>
             </footer>

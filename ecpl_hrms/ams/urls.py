@@ -20,6 +20,7 @@ urlpatterns = [
     path('',loginPage),
     path('login',loginAndRedirect),
     path('logout',logoutView),
+    path('change-password',change_password),
     path('team-dashboard',teamDashboard),
     path('index',indexPage),
     path('employee-details/<int:pk>',employeeDetails),
@@ -28,4 +29,5 @@ urlpatterns = [
     path('tl-dashboard',tlDashboard),
     path('apply-attendance',applyAttendace),
     path('rm-approval/<int:id>',rmApproval),
+
 ]
