@@ -35,8 +35,21 @@
 
 <div id="main_content">
     <div id="left-sidebar" class="sidebar ">
-        <h5 class="brand-name">ExpertCallers<a href="javascript:void(0)" class="menu_option float-right"><i class="icon-grid font-16" data-toggle="tooltip" data-placement="left" title="Grid & List Toggle"></i></a></h5>
+        <div>
+            <img src="{% static 'assets/images/ecpl-logo-new.png' %}" alt="">
+        </div>
         <nav id="left-sidebar-nav" class="sidebar-nav">
+            <div style="margin-top:50px;">
+                <small>Name</small>
+                <p style="font-weight: bold;color: #3e4554e3;">{{emp.emp_name}}</p>
+                <small>Emp ID</small>
+                <p style="font-weight: bold;color: #3e4554e3;">{{emp.emp_id}}</p>
+                <small>Designation</small>
+                <p style="font-weight: bold;color: #3e4554e3;">{{emp.emp_desi}}</p>
+            </div>
+            <div>
+
+            </div>
             <!--
             <ul class="metismenu">
                 <li class="g_heading">Project</li>
@@ -77,8 +90,8 @@
             <div class="container-fluid">
                 <div class="page-header">
                     <div class="left">
-                        <a href="javascript:void(0)" class="icon menu_toggle mr-3"><i class="fa  fa-align-left"></i></a>
-                        <h1 class="page-title" style="color:white !important ">{{emp.emp_process}}</h1 class="page-title" >
+                        <a href="javascript:void(0)" class="icon menu_toggle mr-3"><i class="fa  fa-align-left" style="color:#fff"></i></a>
+                        <h1 class="page-title" style="color:white !important ">{{emp.emp_process}}</h1>
                     </div>
                     <div class="right">
                         <div style="margin-right:10px">
@@ -138,7 +151,6 @@
                             <div class="dropdown d-flex">
                                 <a class="nav-link icon d-none d-md-flex btn btn-default btn-icon ml-2" data-toggle="dropdown"><i class="fa fa-user"></i></a>
                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                    <a class="dropdown-item" href="#"><i class="dropdown-icon fe fe-user"></i> Profile</a>
                                     <a class="dropdown-item" href="/ams/logout"><i class="dropdown-icon fe fe-log-out"></i> Sign out</a>
                                 </div>
                             </div>
@@ -150,9 +162,9 @@
         <div class="section-body mt-3">
             <div class="container-fluid">
                 <div class="row clearfix">
-                    <div class="col-lg-12">
+                    <div class="col-lg-12" style="margin:50px 0px;">
                         <div class="mb-4">
-                            <h4>Welcome {{emp_name}} !</h4>
+                            <span>Welcome</span><h4>{{emp_name}} !</h4>
                         </div>                        
                     </div>
                 </div>
@@ -187,8 +199,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row clearfix row-deck">
                     <div class="col-xl-2 col-lg-4 col-md-6">
                         <div class="card">
                             <div class="card-header">
@@ -211,6 +221,7 @@
                             </div>
                         </div>
                     </div>
+                    <!--
                     <div class="col-xl-2 col-lg-4 col-md-6">
                         <div class="card">
                             <div class="card-header">
@@ -222,6 +233,7 @@
                             </div>
                         </div>
                     </div>
+                    -->
                     <div class="col-xl-2 col-lg-4 col-md-6">
                         <div class="card">
                             <div class="card-header">
@@ -247,10 +259,11 @@
                                         {% csrf_token %}
                                         <table>
                                             <tr>
-                                                <td>{{c.emp_name}}</td>
-                                                <td>{{c.date}}</td>
-                                                <td>{{c.att_applied}}</td>
+                                                <td>{{c.emp_name}} <span style="margin:0px 10px">/</span></td>
+                                                <td>{{c.date}}<span style="margin:0px 10px">/</span></td>
+                                                <td>{{c.att_applied}}<span style="margin:0px 10px">/</span></td>
                                                 <td>
+                                                    <span style="margin:0px 20px;"></span>
                                                     <select name="att_approved" id="">
                                                         <option value="approved">Approved</option>
                                                         <option value="denied">Denied</option>
@@ -259,7 +272,7 @@
                                                 <td>
                                                     <input type="hidden" name="date" value="{{c.date}}">
                                                     <input type="hidden" name="emp_id" value="{{c.emp_id}}">
-                                                    <button type="submit">Apply</button>
+                                                    <button type="submit" class="btn btn-secondary" style="font-size: 10px;margin-left: 10px;">Apply</button>
                                                 </td>
                                             </tr>
                                         </table>
@@ -274,16 +287,17 @@
                     <div class="col-xl-12 col-lg-12">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Today</h3>
+                                <h3 class="card-title">Today's Report</h3>
                             </div>
                             <div class="card-body">
                                 <div>
-                                    <table class="tbl">
+                                    <table class="table table-condensed" style="background: #283041;color: white;">
                                         <tr>
                                             <th>Emp Name</th>
                                             <th>Emp ID</th>
                                             <th>Applied</th>
                                             <th>Status</th>
+
                                         </tr>
                                         {% for i in att_details %}
                                         <tr>
@@ -291,6 +305,7 @@
                                             <td>{{i.emp_id}}</td>
                                             <td>{{i.att_applied}}</td>
                                             <td>{{i.att_approved}}</td>
+
                                         </tr>
                                         {% endfor %}
                                     </table>
@@ -299,7 +314,7 @@
                         </div>
                     </div>
                 </div>
-                <div style="margin-top:500px;">
+                <div style="margin-top:50px;">
 
                 </div>
                 <div class="row clearfix row-deck">
@@ -328,12 +343,27 @@
                                 <h3 class="card-title">Present Employees</h3>
                             </div>
                             <div class="card-body">
-                                <div class="row">
-                                    {% for i in all_present %}
-                                        <div class="col-lg-2">
-                                            <p>{{i.emp_name}}</p>
-                                        </div>
-                                    {% endfor %}
+                                <div>
+                                    <table class="table table-condensed" style="background: #283041;color: white;">
+                                        <tr>
+                                            <th>Emp Name</th>
+                                            <th>Applied</th>
+                                            <th>Status</th>
+                                            <th>Applied Time</th>
+                                            <th>Approved Time</th>
+                                        </tr>
+                                        {% for i in all_present %}
+                                        <tr>
+                                            <td><p>{{i.emp_name}}</p></td>
+                                            <td><p>{{i.att_applied}}</p></td>
+                                            <td><p>{{i.att_approved}}</p></td>
+                                            <td><p>{{i.applied_on}}</p></td>
+                                            <td><p>{{i.approved_on}}</p></td>
+                                        </tr>
+                                        {% endfor %}
+
+                                    </table>
+
                                 </div>
                             </div>
                         </div>

@@ -28,7 +28,8 @@
     <div class="auth_left">
         <div class="card">
             <div class="text-center mb-2">
-                <a class="header-brand" href="index-2.html">ECPL AMS</a>
+                <img src="{% static 'assets/images/ecpl-logo-new.png' %}" alt="">
+                <p style="color: #1c7ba8;font-weight: 600;">Attendance Management System</p>
             </div>
             <form action="/ams/login" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}

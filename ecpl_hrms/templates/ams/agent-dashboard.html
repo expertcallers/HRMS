@@ -35,12 +35,17 @@
 
 <div id="main_content">
     <div id="left-sidebar" class="sidebar ">
-        <h5 class="brand-name">ExpertCallers<a href="javascript:void(0)" class="menu_option float-right"><i class="icon-grid font-16" data-toggle="tooltip" data-placement="left" title="Grid & List Toggle"></i></a></h5>
+        <div>
+            <img src="{% static 'assets/images/ecpl-logo-new.png' %}" alt="">
+        </div>
         <nav id="left-sidebar-nav" class="sidebar-nav">
-            <div style="margin-top:50px">
-                <p>{{emp.emp_name}}</p>
-                <p>{{emp.emp_id}}</p>
-                <p>{{emp.emp_desi}}</p>
+            <div style="margin-top:50px;">
+                <small>Name</small>
+                <p style="font-weight: bold;color: #3e4554e3;">{{emp.emp_name}}</p>
+                <small>Emp ID</small>
+                <p style="font-weight: bold;color: #3e4554e3;">{{emp.emp_id}}</p>
+                <small>Designation</small>
+                <p style="font-weight: bold;color: #3e4554e3;">{{emp.emp_desi}}</p>
             </div>
             <!--
             <ul class="metismenu">
@@ -82,7 +87,7 @@
             <div class="container-fluid">
                 <div class="page-header">
                     <div class="left">
-                        <a href="javascript:void(0)" class="icon menu_toggle mr-3"><i class="fa  fa-align-left"></i></a>
+                        <a href="javascript:void(0)" class="icon menu_toggle mr-3"><i class="fa  fa-align-left" style="color:#fff"></i></a>
                         <h1 class="page-title" style="color:white !important">{{emp.emp_process}}</h1>
                     </div>
                     <div class="right">
@@ -97,6 +102,7 @@
                             <div class="dropdown d-flex">
                                 <a class="nav-link icon d-none d-md-flex btn btn-default btn-icon ml-2" data-toggle="dropdown"><i class="fa fa-bell"></i><span class="badge badge-primary nav-unread"></span></a>
                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                    <!--
                                     <ul class="list-unstyled feeds_widget">
                                         <li>
                                             <div class="feeds-left"><i class="fa fa-check"></i></div>
@@ -134,6 +140,7 @@
                                             </div>
                                         </li>
                                     </ul>
+                                    -->
                                     <div class="dropdown-divider"></div>
                                     <a href="javascript:void(0)" class="dropdown-item text-center text-muted-dark readall">Mark all as read</a>
                                 </div>
@@ -141,7 +148,6 @@
                             <div class="dropdown d-flex">
                                 <a class="nav-link icon d-none d-md-flex btn btn-default btn-icon ml-2" data-toggle="dropdown"><i class="fa fa-user"></i></a>
                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                    <a class="dropdown-item" href="page-profile.html"><i class="dropdown-icon fe fe-user"></i> Profile</a>
                                     <a class="dropdown-item" href="/ams/logout"><i class="dropdown-icon fe fe-log-out"></i> Logout</a>
                                 </div>
                             </div>
@@ -161,7 +167,10 @@
                 </div>
                 <div class="row clearfix row-deck">
                     <div class="col-xl-4 col-lg-4 col-md-6">
-                        <h4>Welcome {{emp_name}} !</h4>
+                        <div style="margin:50px 0px;">
+                            <span>Welcome</span>
+                            <h4>{{emp_name}} !</h4>
+                        </div>
                     </div>
                     <div class="col-xl-2 col-lg-4 col-md-6"></div>
 
@@ -217,19 +226,20 @@
                                         <select name="att_applied" id="">
                                             <option value="present">Present</option>
                                             <option value="Absent">Absent</option>
-                                            <option value="OFF">OFF</option>
-                                            <option value="HD">Half Day</option>
+                                            <option value="Week OFF">Week OFF</option>
+                                            <option value="Comp OFF">Comp OFF</option>
+                                            <option value="Half Day">Half Day</option>
                                             <option value="PL">PL</option>
-                                            <option value="Trng">Training</option>
-                                            <option value="SL">Sick Leave</option>
-                                            <option value="ML">Maternity Leave</option>
+                                            <option value="Training">Training</option>
+                                            <option value="Sick Leave">Sick Leave</option>
+                                            <option value="Maternity Leave">Maternity Leave</option>
                                             <option value="Holiday">Holiday</option>
                                         </select>
 
                                         <input type="hidden" name="rm1" value="{{emp.emp_rm1}}">
                                         <input type="hidden" name="rm2" value="{{emp.emp_rm2}}">
                                         <input type="hidden" name="rm3" value="{{emp.emp_rm3}}">
-                                        <button type="submit">Apply</button>
+                                        <button type="submit" class="btn btn-secondary" style="font-size: 10px;margin-left: 10px;">Apply</button>
                                     </form>
                                     {% endif %}
                                 </div>
@@ -247,6 +257,7 @@
                                         <tr>
                                             <th>Date</th>
                                             <th>Attendance</th>
+                                            <th>Reviewed By</th>
                                         </tr>
                                     {% for c in cal %}
                                         <tr>
@@ -256,6 +267,7 @@
                                             {% else %}
                                             <td>{{c.att_approved}}</td>
                                             {% endif %}
+                                            <td>{{c.appoved_by}}</td>
                                         </tr>
                                     {% endfor %}
                                      </table>

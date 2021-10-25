@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
@@ -107,8 +109,8 @@ def tlDashboard(request):
     today = str(today)
     att_details = EcplCalander.objects.filter(date = today,rm1=emp_name)
     all_active = Profile.objects.filter(emp_rm1=emp_name).order_by('emp_name')
-    all_present = EcplCalander.objects.filter(Q(rm1=emp_name) ,Q(date=today),Q(applied_status=True),Q(att_applied='present') |
-                               Q(att_applied='HD')).order_by('emp_name')
+    all_present = EcplCalander.objects.filter(Q(rm1=emp_name) ,Q(date=today),Q(applied_status=True),Q(att_approved='approved'),Q(att_applied='present') |
+                               Q(att_applied='Hald Day')).order_by('emp_name')
 
     #Unmarked Employees
     emps = Profile.objects.filter(emp_rm1=emp_name)
@@ -159,11 +161,12 @@ def applyAttendace(request):
         emp_id = request.user.profile.emp_id
         emp_name = request.user.profile.emp_name
         team = request.user.profile.emp_process
-
+        now = datetime.now()
         cal = EcplCalander.objects.create(
             team = team, date = date, emp_name = emp_name, emp_id = emp_id,
             att_applied = att_applied,applied_by = emp_id,applied_status = True,
-            rm1 = rm1, rm2 = rm2, rm3 = rm3
+            rm1 = rm1, rm2 = rm2, rm3 = rm3,
+            applied_on = now
         )
         cal.save()
 
@@ -173,12 +176,16 @@ def applyAttendace(request):
 
 def rmApproval(request,id):
     if request.method == 'POST':
+        usr = request.user.profile.emp_name
         id =id
-
+        now = datetime.now()
         att_approved = request.POST['att_approved']
         cal = EcplCalander.objects.get(id=id)
         cal.att_approved = att_approved
         cal.approved_status = True
+        cal.approved_on=now
+        cal.appoved_by = usr
+
         cal.save()
 
         return redirect('/ams/tl-dashboard')
