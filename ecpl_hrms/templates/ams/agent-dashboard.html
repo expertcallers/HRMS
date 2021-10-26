@@ -225,7 +225,6 @@
                                         <label for="">Attendance</label>
                                         <select name="att_applied" id="">
                                             <option value="present">Present</option>
-                                            <option value="Absent">Absent</option>
                                             <option value="Week OFF">Week OFF</option>
                                             <option value="Comp OFF">Comp OFF</option>
                                             <option value="Half Day">Half Day</option>
@@ -256,12 +255,14 @@
                                     <table class="tbl">
                                         <tr>
                                             <th>Date</th>
-                                            <th>Attendance</th>
+                                            <th>Applied For</th>
+                                            <th>Status</th>
                                             <th>Reviewed By</th>
                                         </tr>
                                     {% for c in cal %}
                                         <tr>
                                             <td>{{c.date}}</td>
+                                            <td>{{c.att_applied}}</td>
                                             {% if c.approved_status == False %}
                                                 <td>Pending</td>
                                             {% else %}

@@ -5,6 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import *
+
 from itertools import chain
 
 # Create your views here.
@@ -106,7 +107,7 @@ def empIDwiseData(request):
         data = {'employees': employees,'teams':teams,'emp_id':emp_id}
         return render(request, 'mapping/index.html', data)
     else:
-        print('this')
+
         employees = Employee.objects.all()
         teams = Employee.objects.values_list('emp_process', flat=True).distinct()
         data = {'employees': employees, 'teams': teams}
@@ -325,4 +326,12 @@ def exportMapping(request):
         wb.save(response)
 
         return response
+
+def nameChanger(request):
+    emp_new_rm1 = 'Harish Kumar S'
+    emp = Employee.objects.filter(emp_rm1='Harish Kumar',emp_process='Gubagoo')
+    for i in emp:
+        i.emp_rm1 = emp_new_rm1
+        i.save()
+
 

@@ -241,7 +241,7 @@
                             </div>
                             <div class="card-body">
                                 <h5 class="number mb-0 font-32 counter">{{leaves_today}}</h5>
-                                <span class="font-12"><a href="#">View All</a></span>
+                                <span class="font-12"><a href="#Leaves">View All</a></span>
                             </div>
                         </div>
                     </div>
@@ -383,6 +383,40 @@
                                             <p>{{i.emp_name}}</p>
                                         </div>
                                     {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row clearfix row-deck">
+                    <div class="col-xl-12 col-lg-12">
+                        <div class="card" id="Leaves">
+                            <div class="card-header">
+                                <h3 class="card-title">Leaves</h3>
+                            </div>
+                            <div class="card-body">
+                                <div>
+                                    <table class="table table-condensed" style="background: #283041;color: white;">
+                                        <tr>
+                                            <th>Emp Name</th>
+                                            <th>Applied</th>
+                                            <th>Status</th>
+                                            <th>Applied Time</th>
+                                            <th>Approved Time</th>
+                                        </tr>
+                                        {% for i in all_leaves %}
+                                        <tr>
+                                            <td><p>{{i.emp_name}}</p></td>
+                                            <td><p>{{i.att_applied}}</p></td>
+                                            <td><p>{{i.att_approved}}</p></td>
+                                            <td><p>{{i.applied_on}}</p></td>
+                                            <td><p>{{i.approved_on}}</p></td>
+                                        </tr>
+                                        {% endfor %}
+
+                                    </table>
+
                                 </div>
                             </div>
                         </div>

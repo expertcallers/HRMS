@@ -6,8 +6,10 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.shortcuts import render, redirect
 from .models import *
 from calendar import Calendar, monthrange
-from mapping.models import Profile
 from django.contrib import messages
+from django.apps import apps
+Employee = apps.get_model('mapping', 'Employee')
+
 c = Calendar()
 from datetime import date
 from django.db.models import Q
@@ -17,7 +19,7 @@ from django.db.models import Q
 # Create your views here.
 def loginPage(request):
     form = AuthenticationForm()
-    teams = Profile.objects.values_list('emp_process', flat=True).distinct()
+    teams = Employee.objects.values_list('emp_process', flat=True).distinct()
     data = {'teams':teams,'form':form}
     return render(request,'ams/login.html',data)
 
@@ -39,15 +41,12 @@ def loginAndRedirect(request):
                 return redirect('/ams')
             if request.user.profile.emp_desi == 'Team Leader - GB':
                 return redirect('/ams/tl-dashboard')
-            if request.user.profile.emp_desi == 'Assistant Manager (GB)':
-                return redirect('/ams/tl-dashboard')
-
             else:
                 return redirect('/ams/agent-dashboard')
         else:
             form = AuthenticationForm()
             messages.info(request,'Invalid Credentials')
-            teams = Profile.objects.values_list('emp_process', flat=True).distinct()
+            teams = Employee.objects.values_list('emp_process', flat=True).distinct()
             data = {'teams': teams, 'form': form}
             return render(request, 'ams/login.html', data)
 
@@ -86,7 +85,7 @@ def agentDashBoard(request):
     #today = '2021-9-28'
     emp_name = request.user.profile.emp_name
     emp_id = request.user.profile.emp_id
-    emp = Profile.objects.get(emp_id = emp_id)
+    emp = Employee.objects.get(emp_id = emp_id)
     try:
         cal_day = EcplCalander.objects.get(date=today,applied_status=True,emp_id=emp_id)
         today = 'Applied'
@@ -101,19 +100,19 @@ def agentDashBoard(request):
 def tlDashboard(request):
     emp_name = request.user.profile.emp_name
     emp_id = request.user.profile.emp_id
-    emp = Profile.objects.get(emp_id=emp_id)
+    emp = Employee.objects.get(emp_id=emp_id)
     cal = EcplCalander.objects.filter(approved_status=False,rm1=emp_name)
 
     # details
     today = date.today()
     today = str(today)
     att_details = EcplCalander.objects.filter(date = today,rm1=emp_name)
-    all_active = Profile.objects.filter(emp_rm1=emp_name).order_by('emp_name')
+    all_active = Employee.objects.filter(emp_rm1=emp_name).order_by('emp_name')
     all_present = EcplCalander.objects.filter(Q(rm1=emp_name) ,Q(date=today),Q(applied_status=True),Q(att_approved='approved'),Q(att_applied='present') |
                                Q(att_applied='Hald Day')).order_by('emp_name')
 
     #Unmarked Employees
-    emps = Profile.objects.filter(emp_rm1=emp_name)
+    emps = Employee.objects.filter(emp_rm1=emp_name)
     unmarked_emps = []
     for i in emps:
         um = EcplCalander.objects.filter(emp_id = i.emp_id,date = today,applied_status=True)
@@ -122,17 +121,25 @@ def tlDashboard(request):
         else:
             unmarked_emps.append(i)
 
+    # Leaves
+    all_leaves = EcplCalander.objects.filter(Q(rm1=emp_name), Q(date=today), Q(applied_status=True),
+                                              Q(att_approved='approved'), Q(att_applied='PL') |
+                                              Q(att_applied='Hald Day') | Q(att_applied='Sick Leave') | Q(att_applied='Maternity Leave')).order_by('emp_name')
 
+    leaves_today = EcplCalander.objects.filter(Q(rm1=emp_name), Q(date=today), Q(applied_status=True),
+                                             Q(att_approved='approved'), Q(att_applied='PL') |
+                                             Q(att_applied='Hald Day') | Q(att_applied='Sick Leave') | Q(
+            att_applied='Maternity Leave')).count()
     #counts
-    emp_count = Profile.objects.filter(emp_rm1=emp_name).count()
-    active_today = EcplCalander.objects.filter(Q(rm1=emp_name) ,Q(date=today),Q(applied_status=True),Q(att_applied='present') |
+    emp_count = Employee.objects.filter(emp_rm1=emp_name).count()
+    active_today = EcplCalander.objects.filter(Q(rm1=emp_name) ,Q(date=today),Q(applied_status=True),Q(att_approved='approved'),Q(att_applied='present') |
                                Q(att_applied='HD')).count()
     unmarked_today = emp_count-active_today
 
     data = {'emp_name': emp_name, 'emp': emp,'cal':cal, 'att_details':att_details,
             'emp_count':emp_count,'active_today':active_today,'unmarked_today':unmarked_today,
             'all_active':all_active,'all_present':all_present,'unmarked_emps':unmarked_emps,
-
+            'all_leaves':all_leaves,'leaves_today':leaves_today
             }
     return render(request, 'ams/rm-dashboard.html', data)
 
@@ -140,13 +147,13 @@ def tlDashboard(request):
 
 def indexPage(request):
     team_name = 'Gubagoo'
-    emp_team_obj = Profile.objects.filter(emp_process = team_name)
+    emp_team_obj = Employee.objects.filter(emp_process = team_name)
     data = {'team':emp_team_obj}
     return render(request,'ams/index.html',data)
 
 def employeeDetails(request,pk):
     emp_id = pk
-    emp_obj = Profile.objects.get(emp_id = emp_id)
+    emp_obj = Employee.objects.get(emp_id = emp_id)
     data = {'employee':emp_obj}
     return render(request, 'ams/employee-details.html', data)
 

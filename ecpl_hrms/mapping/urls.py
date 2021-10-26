@@ -43,4 +43,6 @@ urlpatterns = [
     path('correct-process',correct_process),
     path('export-mapping',exportMapping),
 
+    path('name-changer',nameChanger),
+
     ]

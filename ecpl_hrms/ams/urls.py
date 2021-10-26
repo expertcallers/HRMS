@@ -30,4 +30,6 @@ urlpatterns = [
     path('apply-attendance',applyAttendace),
     path('rm-approval/<int:id>',rmApproval),
 
+
+
 ]
