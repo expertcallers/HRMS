@@ -257,6 +257,7 @@
                                             <th>Date</th>
                                             <th>Applied For</th>
                                             <th>Status</th>
+                                            <th>Actual Status</th>
                                             <th>Reviewed By</th>
                                         </tr>
                                     {% for c in cal %}
@@ -268,6 +269,7 @@
                                             {% else %}
                                             <td>{{c.att_approved}}</td>
                                             {% endif %}
+                                            <td>{{c.att_actual}}</td>
                                             <td>{{c.appoved_by}}</td>
                                         </tr>
                                     {% endfor %}
@@ -279,14 +281,21 @@
                 </div>
             </div>
         </div>
-        <div class="section-body">
-            <footer class="footer">
+        <div class="section-body" style="padding:50px 0px">
                 <div class="container-fluid">
-                    <div class="row">
-
+                    <h4>Month Calendar</h4>
+                    <div>
+                        {% for c in month_cal %}
+                                    <span>{{c.dt}}</span>
+                                    {% if c.st == 'Unmarked' %}
+                                    <span style="color:red">{{c.st}}</span>
+                                    {% else %}
+                                    <span style="color:Green">{{c.st}}</span>
+                                    {% endif %}
+                                    <span style="margin:0px 20px">//</span>
+                        {% endfor %}
                     </div>
                 </div>
-            </footer>
         </div>
     </div>    
 </div>

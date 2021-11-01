@@ -33,6 +33,19 @@
                         </form>
                     </div>
                 </div>
+                <div style="margin:50px 0px">
+                    <h6><b><u>Last Updated Employee</u></b></h6>
+                    <div style="margin:0px 40px">
+                        {% for e in emp %}
+                        <small>Emp Name</small>
+                        <p>{{e.emp_name}}</p>
+                        <small>Emp ID</small>
+                        <p>{{e.emp_id}}</p>
+                        <small>Team</small>
+                        <p>{{e.emp_process}}</p>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-lg-9" style="background: whitesmoke;margin: 0px;padding: 0px;">

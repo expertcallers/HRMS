@@ -5,6 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import *
+from django.db.models import Avg, Max, Min, Sum
 
 from itertools import chain
 
@@ -20,14 +21,20 @@ def employeeMapping(request):
         else:
             messages.info(request,'The requested employee not found')
 
+        ## Largest Employee ID
+        emp = Employee.objects.all().order_by('-emp_id')[:1]
+
         teams = Employee.objects.values_list('emp_process',flat=True).distinct()
-        data = {'employees': employees,'teams':teams,'emp_name':emp_name,}
+        data = {'employees': employees,'teams':teams,'emp_name':emp_name,'emp':emp}
         return render(request, 'mapping/index.html', data)
     else:
 
+        ## Largest Employee ID
+        emp = Employee.objects.all().order_by('-emp_id')[:1]
+        print(emp)
         employees = Employee.objects.all()
         teams = Employee.objects.values_list('emp_process', flat=True).distinct()
-        data = {'employees':employees,'teams':teams}
+        data = {'employees':employees,'teams':teams,'emp':emp}
         return render(request,'mapping/index.html',data)
 
 def mappingLogin(request):
