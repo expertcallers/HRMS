@@ -31,7 +31,7 @@ def employeeMapping(request):
 
         ## Largest Employee ID
         emp = Employee.objects.all().order_by('-emp_id')[:1]
-        print(emp)
+
         employees = Employee.objects.all()
         teams = Employee.objects.values_list('emp_process', flat=True).distinct()
         data = {'employees':employees,'teams':teams,'emp':emp}
