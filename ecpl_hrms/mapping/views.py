@@ -342,3 +342,16 @@ def nameChanger(request):
         i.save()
 
 
+
+def searchForEmployee(request):
+    emp_id = request.POST['emp_id']
+    try:
+        emp = Employee.objects.get(emp_id=emp_id)
+        messages.info(request, 'Employee Found, Please select Below !')
+    except Employee.DoesNotExist:
+        messages.info(request,'Not Found, Please search below !')
+        emp=None
+    employees = Employee.objects.all().order_by('emp_name')
+    teams = Employee.objects.values_list('emp_process', flat=True).distinct()
+    data = {'emp':emp,'employees':employees,'teams':teams}
+    return render(request,'mapping/update-employee-profile.html',data)

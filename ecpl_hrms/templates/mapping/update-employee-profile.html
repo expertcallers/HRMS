@@ -8,10 +8,26 @@
                <h4>Edit Employee Profile</h4>
            </div>
            <div>
+               <form action="/mapping/update-employee-profile/empid-search" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                   <label>Search By Emp ID</label>
+                   <input type="number" name="emp_id" required>
+                   <button type="submit">Search</button>
+               </form>
+           </div>
+           <div style="margin:30px;">
+                {% for m in messages %}
+                    <p style="color: #db291b;font-size: 18px;font-weight: bold;">{{m}}</p>
+                {% endfor %}
+           </div>
+           <div>
                <form action="/mapping/update-employee-profile" method="POST" enctype="multipart/form-data">
                    {% csrf_token %}
                    <p>Select Employee</p>
                    <select name="emp_id" id="">
+                       {% if emp.emp_name != None %}
+                       <option value="{{emp.emp_id}}">{{emp.emp_name}} : {{emp.emp_id}} : {{emp.emp_process}}</option>
+                       {% endif %}
                        {% for e in employees %}
                        <option value="{{e.emp_id}}">{{e.emp_name}} : {{e.emp_id}} : {{e.emp_process}}</option>
                        {% endfor %}

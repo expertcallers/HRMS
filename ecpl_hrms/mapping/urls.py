@@ -28,6 +28,7 @@ urlpatterns = [
 
     path('team-wise',teamWiseData),
     path('update-employee-profile',updateEmployeeProfile),
+    path('update-employee-profile/empid-search',searchForEmployee),
     path('update-to-system',updateToSystem),
     path('update-team-rm',updateTeamRms),
 
