@@ -29,6 +29,7 @@ class EcplCalander(models.Model):
     emp_id = models.IntegerField()
     att_applied = models.CharField(max_length=100)
     att_approved = models.CharField(max_length=100,null=True)
+    att_actual = models.CharField(max_length=50,null=True)
     applied_on = models.DateTimeField(null=True)
     approved_on = models.DateTimeField(null=True)
     applied_by = models.CharField(max_length=300)

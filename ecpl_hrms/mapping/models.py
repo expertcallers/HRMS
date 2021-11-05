@@ -40,6 +40,9 @@ class MappingHistory(models.Model):
     rm3 = models.CharField(max_length=50, null=True)
     team = models.CharField(max_length=100,null=True)
 
+    def __str__(self):
+        return self.date
+
 
 class MappingHistoryTeam(models.Model):
     date = models.DateField(default=datetime.date.today)
@@ -47,6 +50,9 @@ class MappingHistoryTeam(models.Model):
     team = models.CharField(max_length=100, null=True)
     category = models.CharField(max_length=50)
     new_value = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.date
 
 
 

@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
@@ -7,6 +6,8 @@ from django.shortcuts import render, redirect
 from .models import *
 from calendar import Calendar, monthrange
 from django.contrib import messages
+from datetime import date, timedelta
+import calendar
 from django.apps import apps
 Employee = apps.get_model('mapping', 'Employee')
 
@@ -82,19 +83,59 @@ def teamDashboard(request):
 
 def agentDashBoard(request):
     today = date.today()
-    #today = '2021-9-28'
+    yesterday = today - timedelta(days=1)
     emp_name = request.user.profile.emp_name
     emp_id = request.user.profile.emp_id
     emp = Employee.objects.get(emp_id = emp_id)
     try:
         cal_day = EcplCalander.objects.get(date=today,applied_status=True,emp_id=emp_id)
+        tdy_date = today
         today = 'Applied'
     except EcplCalander.DoesNotExist:
         today = str(today)
 
+    try:
+        cal_yday = EcplCalander.objects.get(date=yesterday, applied_status=True, emp_id=emp_id)
+        yst_date = yesterday
+        yesterday = 'Applied'
+
+    except EcplCalander.DoesNotExist:
+        yesterday = str(yesterday)
+
     #attendance status
     cal = EcplCalander.objects.filter(emp_id=emp_id).order_by('-date')[:3]
-    data = {'emp_name':emp_name,'emp':emp,'date':today,'cal':cal}
+
+    # Month view
+    ########### Month View ############
+    month_days = []
+    todays_date = date.today()
+    year = todays_date.year
+    month = todays_date.month
+    a, num_days = calendar.monthrange(year, month)
+    start_date = date(year, month, 1)
+    end_date = date(year, month, num_days)
+    delta = timedelta(days=1)
+    while start_date <= end_date:
+        month_days.append(start_date.strftime("%Y-%m-%d"))
+        start_date += delta
+
+    month_cal = []
+    for i in month_days:
+
+        dict = {}
+        try:
+            st = EcplCalander.objects.get(Q(date=i),Q(emp_name = emp_name), Q(att_approved='approved')|Q(att_approved='denied')).att_actual
+
+        except EcplCalander.DoesNotExist:
+            st = 'Unmarked'
+        dict['dt'] = i
+        dict['st'] = st
+        month_cal.append(dict)
+
+
+    data = {'emp_name':emp_name,'emp':emp,'date':today,'yesterday':yesterday,'cal':cal,'month_cal':month_cal,
+            'yst_date':yst_date,'tdy_date':tdy_date}
+
     return render(request,'ams/agent-dashboard.html',data)
 
 def tlDashboard(request):
@@ -135,6 +176,9 @@ def tlDashboard(request):
     active_today = EcplCalander.objects.filter(Q(rm1=emp_name) ,Q(date=today),Q(applied_status=True),Q(att_approved='approved'),Q(att_applied='present') |
                                Q(att_applied='HD')).count()
     unmarked_today = emp_count-active_today
+
+
+
 
     data = {'emp_name': emp_name, 'emp': emp,'cal':cal, 'att_details':att_details,
             'emp_count':emp_count,'active_today':active_today,'unmarked_today':unmarked_today,
@@ -187,12 +231,13 @@ def rmApproval(request,id):
         id =id
         now = datetime.now()
         att_approved = request.POST['att_approved']
+        att_actual = request.POST['att_actual']
         cal = EcplCalander.objects.get(id=id)
         cal.att_approved = att_approved
         cal.approved_status = True
         cal.approved_on=now
         cal.appoved_by = usr
-
+        cal.att_actual = att_actual
         cal.save()
 
         return redirect('/ams/tl-dashboard')
