@@ -5,7 +5,7 @@ import datetime
 # Create your models here.
 
 class Employee(models.Model):
-    emp_id = models.IntegerField()
+    emp_id = models.CharField(max_length=200,null=True)
     emp_name = models.CharField(max_length=200)
     emp_desi = models.CharField(max_length=200)
     emp_rm1 = models.CharField(max_length=200)
