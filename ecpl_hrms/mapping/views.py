@@ -264,7 +264,7 @@ def createUserandProfile(request):
         if user.exists():
             pass
         else:
-            user = User.objects.create_user(id=i.emp_id, username=i.emp_id, password=str(i.emp_id))
+            user = User.objects.create_user(id=i.id, username=i.emp_id, password=str(i.emp_id))
 
             profile = Profile.objects.create(
                 emp_id = i.emp_id,emp_name = i.emp_name, emp_desi = i.emp_desi,
