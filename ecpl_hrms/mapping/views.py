@@ -262,7 +262,7 @@ def createUserandProfile(request):
     for i in emp:
         user = User.objects.filter(username=i.emp_id)
         if user.exists():
-            print(i.emp_name + ' ' + 'exist')
+            pass
         else:
             user = User.objects.create_user(id=i.emp_id, username=i.emp_id, password=str(i.emp_id))
 
@@ -273,7 +273,7 @@ def createUserandProfile(request):
                                           )
             profile.save()
             user.save()
-            print('created'+ i.emp_name)
+
 
 
 
