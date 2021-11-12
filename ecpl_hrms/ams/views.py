@@ -40,7 +40,7 @@ def loginAndRedirect(request):
                 logout(request)
                 messages.info(request,'Invalid Team')
                 return redirect('/ams')
-            if request.user.profile.emp_desi == 'Team Leader - GB':
+            if request.user.profile.emp_desi == 'Team Leader - GB' or request.user.profile.emp_desi == 'Head-CC':
                 return redirect('/ams/tl-dashboard')
             else:
                 return redirect('/ams/agent-dashboard')
@@ -84,6 +84,8 @@ def teamDashboard(request):
 def agentDashBoard(request):
     today = date.today()
     yesterday = today - timedelta(days=1)
+    dby_date = yesterday - timedelta(days=1)
+
     emp_name = request.user.profile.emp_name
     emp_id = request.user.profile.emp_id
     emp = Employee.objects.get(emp_id = emp_id)
@@ -93,6 +95,7 @@ def agentDashBoard(request):
         today = 'Applied'
     except EcplCalander.DoesNotExist:
         today = str(today)
+        tdy_date = today
 
     try:
         cal_yday = EcplCalander.objects.get(date=yesterday, applied_status=True, emp_id=emp_id)
@@ -100,7 +103,18 @@ def agentDashBoard(request):
         yesterday = 'Applied'
 
     except EcplCalander.DoesNotExist:
+        yst_date = yesterday
         yesterday = str(yesterday)
+
+    try:
+        dby = EcplCalander.objects.get(date=dby_date, applied_status=True, emp_id=emp_id)
+        dby_date = dby_date
+        day_befor_yest = 'Applied'
+    except EcplCalander.DoesNotExist:
+        dby_date = dby_date
+        day_befor_yest = str(dby_date)
+
+
 
     #attendance status
     cal = EcplCalander.objects.filter(emp_id=emp_id).order_by('-date')[:3]
@@ -133,10 +147,12 @@ def agentDashBoard(request):
         month_cal.append(dict)
 
 
-    data = {'emp_name':emp_name,'emp':emp,'date':today,'yesterday':yesterday,'cal':cal,'month_cal':month_cal,
-            'yst_date':yst_date,'tdy_date':tdy_date}
 
-    return render(request,'ams/agent-dashboard.html',data)
+    data = {'emp_name':emp_name,'emp':emp,'date':today,'yesterday':yesterday,'cal':cal,'month_cal':month_cal,
+            'yst_date':yst_date,'tdy_date':tdy_date,
+            'dby_date':dby_date,'day_befor_yest':day_befor_yest}
+
+    return render(request,'ams/agent-dashboard-new.html',data)
 
 def tlDashboard(request):
     emp_name = request.user.profile.emp_name

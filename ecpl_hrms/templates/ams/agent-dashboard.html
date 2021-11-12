@@ -235,6 +235,38 @@
                                     {% endif %}
                                 </div>
                             </div>
+
+                            <div class="card-body">
+                                <div>
+                                    {% if day_befor_yest == 'Applied' %}
+                                        <p><span style="margin-right:20px">{{dby_date}}</span>Applied Already</p>
+                                    {% else %}
+
+                                    <form action="/ams/apply-attendance" method="POST" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <label for="">Date</label>
+                                        <input type="text" name="date" id="" readonly value="{{day_befor_yest}}">
+                                        <label for="">Attendance</label>
+                                        <select name="att_applied" id="">
+                                            <option value="present">Present</option>
+                                            <option value="Week OFF">Week OFF</option>
+                                            <option value="Comp OFF">Comp OFF</option>
+                                            <option value="Half Day">Half Day</option>
+                                            <option value="PL">PL</option>
+                                            <option value="Training">Training</option>
+                                            <option value="Sick Leave">Sick Leave</option>
+                                            <option value="Maternity Leave">Maternity Leave</option>
+                                            <option value="Holiday">Holiday</option>
+                                        </select>
+
+                                        <input type="hidden" name="rm1" value="{{emp.emp_rm1}}">
+                                        <input type="hidden" name="rm2" value="{{emp.emp_rm2}}">
+                                        <input type="hidden" name="rm3" value="{{emp.emp_rm3}}">
+                                        <button type="submit" class="btn btn-secondary" style="font-size: 10px;margin-left: 10px;">Apply</button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-xl-6 col-lg-6">
@@ -276,21 +308,24 @@
         <div class="section-body" style="padding:50px 0px">
                 <div class="container-fluid">
                     <h4>Month Calendar</h4>
-                    <div>
+                    <div class="row">
                         {% for c in month_cal %}
+                            <div class="col-md-2">
                                     <span>{{c.dt}}</span>
                                     {% if c.st == 'Unmarked' %}
                                     <span style="color:red">{{c.st}}</span>
                                     {% else %}
                                     <span style="color:Green">{{c.st}}</span>
                                     {% endif %}
-                                    <span style="margin:0px 20px">//</span>
+                            </div>
                         {% endfor %}
                     </div>
                 </div>
         </div>
     </div>    
 </div>
+
+
 
 
 <script src="{% static 'assets/bundles/lib.vendor.bundle.js' %}"></script>
