@@ -363,15 +363,19 @@
                             <div class="col-md-2 mydate">
                                     <h6>{{c.dt}}</h6>
                                     {% if c.st == 'Unmarked' %}
-                                    <p class="red">{{c.st}}</p>
+                                    <p class="grey">{{c.st}}</p>
                                     {% elif c.st == 'Holiday' %}
                                     <p class="black">{{c.st}}</p>
                                     {% elif c.st == 'Week OFF' %}
                                     <p class="blue">{{c.st}}</p>
                                     {% elif c.st == 'Comp OFF' %}
                                     <p class="blue">{{c.st}}</p>
-                                    {% else %}
+                                    {% elif c.st == 'Absent' %}
+                                    <p class="red">{{c.st}}</p>
+                                    {% elif c.st == 'Present' %}
                                     <p class="green">{{c.st}}</p>
+                                    {% else %}
+                                    <p class="grey">{{c.st}}</p>
                                     {% endif %}
                             </div>
                         {% endfor %}
