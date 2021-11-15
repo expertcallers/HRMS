@@ -29,6 +29,7 @@ urlpatterns = [
     path('tl-dashboard',tlDashboard),
     path('apply-attendance',applyAttendace),
     path('rm-approval/<int:id>',rmApproval),
+    path('view-att-requests',attRequests),
 
 
 

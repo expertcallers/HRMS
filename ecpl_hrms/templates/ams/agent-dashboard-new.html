@@ -1,37 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    {% load static %}
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- Meta, title, CSS, favicons, etc. -->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-	 <link rel="icon" href="images/expertcallers-icon.png" type="image/ico" />
-
-    <title>ECPL Attendance Management | Dashboard</title>
-
-    <!-- Bootstrap -->
-    <link href="{% static 'assets/vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="{% static 'assets/vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
-    <!-- NProgress -->
-    <link href="{% static 'assets/vendors/nprogress/nprogress.css" rel="stylesheet' %}">
-    <!-- iCheck -->
-    <link href="{% static 'assets/vendors/iCheck/skins/flat/green.css" rel="stylesheet' %}">
-	
-    <!-- bootstrap-progressbar -->
-    <link href="{% static 'assets/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css' %}" rel="stylesheet">
-    <!-- JQVMap -->
-    <link href="{% static 'assets/vendors/jqvmap/dist/jqvmap.min.css' %}" rel="stylesheet"/>
-    <!-- bootstrap-daterangepicker -->
-    <link href="{% static 'assets/vendors/bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet">
-
-    <!-- Custom Theme Style -->
-    <link href="{% static 'assets/build/css/custom.css' %}" rel="stylesheet">
-  </head>
-
-  <body class="nav-md">
+{% extends 'ams/base.html' %}
+{% block main %}
+{% load static %}
     <div class="container body">
       <div class="main_container">
         <div class="col-md-3 left_col">
@@ -66,7 +35,7 @@
               <div class="menu_section">
                 <ul class="nav side-menu">
                   <li class="active"><a href=""><i class="fa fa-laptop"></i> Dashboard</a></li>
-                  <li><a href="settings.html"><i class="fa fa-gear"></i> Settings</a></li>
+                  <!--<li><a href="/ams-settings"><i class="fa fa-gear"></i> Settings</a></li>-->
                 </ul>
               </div>
 
@@ -100,7 +69,7 @@
                     <a class="dropdown-item"  href="/ams/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
                   </div>
                 </li>
-
+                <!--
                 <li role="presentation" class="nav-item dropdown open">
                   <a href="javascript:;" class="dropdown-toggle info-number" id="navbarDropdown1" data-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-envelope-o"></i>
@@ -154,7 +123,9 @@
                           Film festivals used to be do-or-die moments for movie makers. They were where...
                         </span>
                       </a>
-                    </li><!-- 
+                    </li>
+                    -->
+                    <!--
                     <li class="nav-item">
                       <div class="text-center">
                         <a class="dropdown-item">
@@ -181,7 +152,7 @@
             <div class="col-md-6">
               <div class="welcome">
                 <p>Welcome</p>
-                <h3>{{emp.emp_name}} <span>!</span></h3>
+                <h3>{{emp.emp_name}} <span></span></h3>
               </div>
               <div class="card mt-5">
                 <div class="card-header">
@@ -429,46 +400,4 @@
       </div>
     </div>
 
-    <!-- jQuery -->
-    <script src="{% static 'assets/vendors/jquery/dist/jquery.min.js' %}"></script>
-    <!-- Bootstrap -->
-    <script src="{% static 'assets/vendors/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
-    <!-- FastClick -->
-    <script src="{% static 'assets/vendors/fastclick/lib/fastclick.js' %}"></script>
-    <!-- NProgress -->
-    <script src="{% static 'assets/vendors/nprogress/nprogress.js' %}"></script>
-    <!-- Chart.js -->
-    <script src="{% static 'assets/vendors/Chart.js/dist/Chart.min.js' %}"></script>
-    <!-- gauge.js -->
-    <script src="{% static 'assets/vendors/gauge.js/dist/gauge.min.js' %}"></script>
-    <!-- bootstrap-progressbar -->
-    <script src="{% static 'assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js' %}"></script>
-    <!-- iCheck -->
-    <script src="{% static 'assets/vendors/iCheck/icheck.min.js' %}"></script>
-    <!-- Skycons -->
-    <script src="{% static 'assets/vendors/skycons/skycons.js' %}"></script>
-    <!-- Flot -->
-    <script src="{% static 'assets/vendors/Flot/jquery.flot.js' %}"></script>
-    <script src="{% static 'assets/vendors/Flot/jquery.flot.pie.js' %}"></script>
-    <script src="{% static 'assets/vendors/Flot/jquery.flot.time.js' %}"></script>
-    <script src="{% static 'assets/vendors/Flot/jquery.flot.stack.js' %}"></script>
-    <script src="{% static 'assets/vendors/Flot/jquery.flot.resize.js' %}"></script>
-    <!-- Flot plugins -->
-    <script src="{% static 'assets/vendors/flot.orderbars/js/jquery.flot.orderBars.js' %}"></script>
-    <script src="{% static 'assets/vendors/flot-spline/js/jquery.flot.spline.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/flot.curvedlines/curvedLines.js' %}"></script>
-    <!-- DateJS -->
-    <script src="{% static 'assets/vendors/DateJS/build/date.js' %}"></script>
-    <!-- JQVMap -->
-    <script src="{% static 'assets/vendors/jqvmap/dist/jquery.vmap.js' %}"></script>
-    <script src="{% static 'assets/vendors/jqvmap/dist/maps/jquery.vmap.world.js' %}"></script>
-    <script src="{% static 'assets/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js' %}"></script>
-    <!-- bootstrap-daterangepicker -->
-    <script src="{% static 'assets/vendors/moment/min/moment.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
-
-    <!-- Custom Theme Scripts -->
-    <script src="{% static 'assets/build/js/custom.min.js' %}"></script>
-	
-  </body>
-</html>
+{% endblock %}

@@ -28,6 +28,8 @@ def loginAndRedirect(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)  # Login form
         team = request.POST['team']
+        manager_list = ['Associate Director','Assistant Manager','Team Leader','Operations Manager','Trainer','Command Centre Head','Process Trainer','Learning and Development Head','Service Delivery Manager','Trainer Sales',
+                        'Team Leader - GB','Head-CC']
         if form.is_valid():
             # login the user
             user = form.get_user()
@@ -40,7 +42,8 @@ def loginAndRedirect(request):
                 logout(request)
                 messages.info(request,'Invalid Team')
                 return redirect('/ams')
-            if request.user.profile.emp_desi == 'Team Leader - GB' or request.user.profile.emp_desi == 'Head-CC':
+
+            if request.user.profile.emp_desi in manager_list:
                 return redirect('/ams/tl-dashboard')
             else:
                 return redirect('/ams/agent-dashboard')
@@ -114,8 +117,6 @@ def agentDashBoard(request):
         dby_date = dby_date
         day_befor_yest = str(dby_date)
 
-
-
     #attendance status
     cal = EcplCalander.objects.filter(emp_id=emp_id).order_by('-date')[:3]
 
@@ -159,6 +160,7 @@ def tlDashboard(request):
     emp_id = request.user.profile.emp_id
     emp = Employee.objects.get(emp_id=emp_id)
     cal = EcplCalander.objects.filter(approved_status=False,rm1=emp_name)
+    total_req = cal.count()
 
     # details
     today = date.today()
@@ -166,7 +168,7 @@ def tlDashboard(request):
     att_details = EcplCalander.objects.filter(date = today,rm1=emp_name)
     all_active = Employee.objects.filter(emp_rm1=emp_name).order_by('emp_name')
     all_present = EcplCalander.objects.filter(Q(rm1=emp_name) ,Q(date=today),Q(applied_status=True),Q(att_approved='approved'),Q(att_applied='present') |
-                               Q(att_applied='Hald Day')).order_by('emp_name')
+                               Q(att_applied='Half Day')).order_by('emp_name')
 
     #Unmarked Employees
     emps = Employee.objects.filter(emp_rm1=emp_name)
@@ -199,9 +201,9 @@ def tlDashboard(request):
     data = {'emp_name': emp_name, 'emp': emp,'cal':cal, 'att_details':att_details,
             'emp_count':emp_count,'active_today':active_today,'unmarked_today':unmarked_today,
             'all_active':all_active,'all_present':all_present,'unmarked_emps':unmarked_emps,
-            'all_leaves':all_leaves,'leaves_today':leaves_today
+            'all_leaves':all_leaves,'leaves_today':leaves_today,'total_req':total_req
             }
-    return render(request, 'ams/rm-dashboard.html', data)
+    return render(request, 'ams/rm-dashboard-new.html', data)
 
 
 
@@ -227,13 +229,14 @@ def applyAttendace(request):
         rm3 = request.POST['rm3']
         emp_id = request.user.profile.emp_id
         emp_name = request.user.profile.emp_name
+        emp_desi = request.user.profile.emp_desi
         team = request.user.profile.emp_process
         now = datetime.now()
         cal = EcplCalander.objects.create(
             team = team, date = date, emp_name = emp_name, emp_id = emp_id,
             att_applied = att_applied,applied_by = emp_id,applied_status = True,
             rm1 = rm1, rm2 = rm2, rm3 = rm3,
-            applied_on = now
+            applied_on = now, emp_desi = emp_desi,
         )
         cal.save()
 
@@ -257,4 +260,15 @@ def rmApproval(request,id):
         cal.save()
 
         return redirect('/ams/tl-dashboard')
+
+
+def attRequests(request):
+
+    emp_name = request.user.profile.emp_name
+    id = request.user.profile.emp_id
+    cal = EcplCalander.objects.filter(approved_status=False, rm1=emp_name)
+    emp = Employee.objects.get(emp_id=id)
+
+    data = {'cal':cal,'emp':emp}
+    return render(request,'ams/req_att.html',data)
 
