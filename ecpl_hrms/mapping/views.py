@@ -153,6 +153,16 @@ def updateToSystem(request):
         history = emp_rm1 +"/" + emp_rm2+"/" + emp_rm3
 
         id = request.POST['id']
+        pfl = Profile.objects.get(emp_id = emp_id)
+        pfl.emp_name = emp_name
+        pfl.emp_id = emp_id
+        pfl.emp_desi = emp_desi
+        pfl.emp_process = emp_process
+        pfl.emp_rm1 = emp_rm1
+        pfl.emp_rm2 = emp_rm2
+        pfl.emp_rm3 = emp_rm3
+        pfl.save()
+
         emp = Employee.objects.get(id=id)
         emp.emp_name = emp_name
         emp.emp_id = emp_id
@@ -163,7 +173,9 @@ def updateToSystem(request):
         emp.emp_rm3 = emp_rm3
         emp.save()
         mh = MappingHistory.objects.create(
-            updated_by = userr,emp_name = emp_name, emp_id=emp_id, rm1=emp_rm1, rm2=emp_rm2, rm3=emp_rm3, team = emp_process)
+            updated_by = userr,emp_name = emp_name, emp_id=emp_id, rm1=emp_rm1, rm2=emp_rm2, rm3=emp_rm3, team = emp_process,
+            history=history,
+            )
         mh.save()
         messages.info(request,'Employee Profile updated successfully !')
         return redirect('/mapping/home')
@@ -205,6 +217,12 @@ def updateTeamRm1(request):
         for i in rm:
             i.emp_rm1 = new_rm1
             i.save()
+
+        pfl = Profile.objects.filter(emp_process = team, emp_rm1 = rm1)
+        for j in pfl:
+            j.emp_rm1 = new_rm1
+            j.save()
+
         mh = MappingHistoryTeam.objects.create(updated_by = userr,team = team,category = "RM 1", new_value = new_rm1)
         mh.save()
         messages.info(request, 'Team RM1 updated successfully !')
@@ -227,6 +245,12 @@ def updateTeamRm2(request):
         for i in rm:
             i.emp_rm2 = new_rm2
             i.save()
+
+        pfl = Profile.objects.filter(emp_process=team, emp_rm2 = rm2)
+        for j in pfl:
+            j.emp_rm2 = new_rm2
+            j.save()
+
         mh = MappingHistoryTeam.objects.create(updated_by=userr, team=team, category="RM 2", new_value=new_rm2)
         mh.save()
         messages.info(request, 'Team RM2 updated successfully !')
@@ -249,6 +273,11 @@ def updateTeamRm3(request):
         for i in rm:
             i.emp_rm3 = new_rm3
             i.save()
+
+        pfl = Profile.objects.filter(emp_process=team, emp_rm3 = rm3)
+        for j in pfl:
+            j.emp_rm3 = new_rm3
+            j.save()
 
         mh = MappingHistoryTeam.objects.create(updated_by=userr, team=team, category="RM 3", new_value=new_rm3)
         mh.save()

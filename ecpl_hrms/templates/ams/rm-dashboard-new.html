@@ -38,11 +38,11 @@
                   <li class="active"><a><i class="fa fa-clock-o"></i>Attendance <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li class="current-page"><a href="index.html">Dashboard</a></li>
-                      <li><a href="all_emp.html">Active Employees</a></li>
-                      <li><a href="req_att.html">Attendace Requests</a></li>
+                      <!--<li><a href="all_emp.html">Active Employees</a></li>-->
+                      <li><a href="/ams/view-att-requests">Attendace Requests</a></li>
                     </ul>
                   </li>
-                  <li><a href="settings.html"><i class="fa fa-gear"></i> Settings</a></li>
+                  <!--<li><a href="settings.html"><i class="fa fa-gear"></i> Settings</a></li>-->
                 </ul>
               </div>
 
@@ -51,7 +51,7 @@
 
             <!-- /menu footer buttons -->
             <div class="sidebar-footer hidden-small">
-              <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+              <a data-toggle="tooltip" data-placement="top" title="Logout" href="/ams/logout">
                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
               </a>
             </div>
@@ -73,11 +73,11 @@
                     <img src="{% static 'assets/images/img.jpg' %}" alt="">{{emp.emp_name}}
                   </a>
                   <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item"  href="login.html"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
+                    <a class="dropdown-item"  href="/ams/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
                   </div>
                 </li>
 
-                <li role="presentation" class="nav-item dropdown open">
+                <!--<li role="presentation" class="nav-item dropdown open">
                   <a href="javascript:;" class="dropdown-toggle info-number" id="navbarDropdown1" data-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-envelope-o"></i>
                     <span class="badge bg-green">6</span>
@@ -130,7 +130,7 @@
                           Film festivals used to be do-or-die moments for movie makers. They were where...
                         </span>
                       </a>
-                    </li><!-- 
+                    </li>
                     <li class="nav-item">
                       <div class="text-center">
                         <a class="dropdown-item">
@@ -138,9 +138,9 @@
                           <i class="fa fa-angle-right"></i>
                         </a>
                       </div>
-                    </li> -->
+                    </li>
                   </ul>
-                </li>
+                </li>-->
               </ul>
             </nav>
           </div>
@@ -201,7 +201,7 @@
                     </div>      
                     <div class="card-body">
                       <h1 style="margin: 0px !important;">{{emp_count}}</h1>
-                      <a href="all_emp.html" class="btn btn-sm btn-dark">view all</a>
+                      <!--<a href="all_emp.html" class="btn btn-sm btn-dark">view all</a>-->
                     </div>              
                   </div>
                 </div>
@@ -219,11 +219,12 @@
                 <div class="col-md-2">
                   <div class="card topcards">
                     <div class="card-header">
-                      <h2>Leaves Today</h2>
+                      <!--<h2>Leaves Today</h2>-->
                     </div>      
                     <div class="card-body">
-                      <h1 style="margin: 0px !important;">{{leaves_today}}</h1>
-                    </div>              
+                      <!--<h1 style="margin: 0px !important;">{{leaves_today}}</h1>-->
+
+                    </div>
                   </div>
                 </div>
               </div>
@@ -231,7 +232,7 @@
           </div>
 
           <div class="row mt-3">
-            <div class="col-md-6">
+            <div class="col-md-12">
               <div class="card">
                 <div class="card-header">
                   <h2>Todays Report</h2>
@@ -242,7 +243,10 @@
                         <tr>
                           <th>Name</th>
                           <th>Employee ID</th>
-                          <th>Status</th>
+                          <th>Applied On</th>
+                          <th>Applied For</th>
+                          <th>Approved On</th>
+                          <th>Actual Status</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -250,7 +254,10 @@
                         <tr>
                           <td>{{i.emp_name}}</td>
                           <td>{{i.emp_id}}</td>
-                          <td>{{i.att_approved}}</td>
+                          <td>{{i.applied_on}}</td>
+                          <td>{{i.att_applied}}</td>
+                          <td>{{i.approved_on}}</td>
+                          <td>{{i.att_actual}}</td>
                         </tr>
                         {% endfor %}
                       </tbody>
@@ -258,8 +265,8 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-6">
-              <div class="card">
+            <div class="col-md-4">
+              <!--<div class="card">
                 <div class="card-header">
                   <h2>Leaves Today</h2>
                 </div>
@@ -281,7 +288,7 @@
                       </tbody>
                     </table>
                 </div>
-              </div>
+              </div>-->
             </div>
           </div>
 

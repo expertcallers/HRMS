@@ -39,6 +39,7 @@ class MappingHistory(models.Model):
     rm2 = models.CharField(max_length=50, null=True)
     rm3 = models.CharField(max_length=50, null=True)
     team = models.CharField(max_length=100,null=True)
+    history = models.CharField(max_length=200,null=True)
 
     def __str__(self):
         return self.date
