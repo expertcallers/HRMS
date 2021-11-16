@@ -16,7 +16,7 @@ class Employee(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    emp_id = models.IntegerField()
+    emp_id = models.CharField(max_length=100,null=True)
     emp_name = models.CharField(max_length=200)
     emp_desi = models.CharField(max_length=200)
     emp_rm1 = models.CharField(max_length=200)
