@@ -308,7 +308,7 @@ def createUserandProfile(request):
             profile = Profile.objects.create(
                 emp_id = i.emp_id,emp_name = i.emp_name, emp_desi = i.emp_desi,
                 emp_rm1 = i.emp_rm1, emp_rm2 = i.emp_rm2, emp_rm3 = i.emp_rm3,
-                emp_process = i.emp_process, user_id = i.emp_id
+                emp_process = i.emp_process, user_id = i.id
                                           )
             profile.save()
             user.save()
