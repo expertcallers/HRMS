@@ -10,15 +10,18 @@ from datetime import date, timedelta
 import calendar
 from django.apps import apps
 Employee = apps.get_model('mapping', 'Employee')
+Profile = apps.get_model('mapping','Profile')
 
 c = Calendar()
 from datetime import date
 from django.db.models import Q
 
-
+manager_list = ['Associate Director','Assistant Manager','Team Leader','Operations Manager','Trainer','Command Centre Head','Process Trainer','Learning and Development Head','Service Delivery Manager','Trainer Sales',
+                        'Team Leader - GB','Head-CC']
 
 # Create your views here.
 def loginPage(request):
+    logout(request)
     form = AuthenticationForm()
     teams = Employee.objects.values_list('emp_process', flat=True).distinct()
     data = {'teams':teams,'form':form}
@@ -28,8 +31,7 @@ def loginAndRedirect(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)  # Login form
         team = request.POST['team']
-        manager_list = ['Associate Director','Assistant Manager','Team Leader','Operations Manager','Trainer','Command Centre Head','Process Trainer','Learning and Development Head','Service Delivery Manager','Trainer Sales',
-                        'Team Leader - GB','Head-CC']
+
         if form.is_valid():
             # login the user
             user = form.get_user()
@@ -53,6 +55,12 @@ def loginAndRedirect(request):
             teams = Employee.objects.values_list('emp_process', flat=True).distinct()
             data = {'teams': teams, 'form': form}
             return render(request, 'ams/login.html', data)
+    else:
+        logout(request)
+        form = AuthenticationForm()
+        teams = Employee.objects.values_list('emp_process', flat=True).distinct()
+        data = {'teams': teams, 'form': form}
+        return render(request, 'ams/login.html', data)
 
 
 def logoutView(request):
@@ -84,6 +92,7 @@ def change_password(request):
 def teamDashboard(request):
     return render(request,'ams/team-dashboard.html')
 
+@login_required
 def agentDashBoard(request):
     today = date.today()
     yesterday = today - timedelta(days=1)
@@ -139,14 +148,13 @@ def agentDashBoard(request):
 
         dict = {}
         try:
-            st = EcplCalander.objects.get(Q(date=i),Q(emp_name = emp_name), Q(att_approved='approved')|Q(att_approved='denied')).att_actual
+            st = EcplCalander.objects.get(Q(date=i),Q(emp_name = emp_name)).att_actual
 
         except EcplCalander.DoesNotExist:
             st = 'Unmarked'
         dict['dt'] = i
         dict['st'] = st
         month_cal.append(dict)
-
 
 
     data = {'emp_name':emp_name,'emp':emp,'date':today,'yesterday':yesterday,'cal':cal,'month_cal':month_cal,
@@ -259,7 +267,7 @@ def rmApproval(request,id):
         cal.att_actual = att_actual
         cal.save()
 
-        return redirect('/ams/tl-dashboard')
+        return redirect('/ams/view-att-requests')
 
 
 def attRequests(request):
@@ -272,3 +280,33 @@ def attRequests(request):
     data = {'cal':cal,'emp':emp}
     return render(request,'ams/req_att.html',data)
 
+
+def agentSettings(request):
+    emp_id = request.user.profile.emp_id
+    emp = Employee.objects.get(emp_id=emp_id)
+    form = PasswordChangeForm(request.user)
+    data = {'emp':emp,'form':form}
+    return render(request,'ams/agent-settings.html',data)
+
+def rmSettings(request):
+    emp_id = request.user.profile.emp_id
+    emp = Employee.objects.get(emp_id=emp_id)
+    form = PasswordChangeForm(request.user)
+    data = {'emp':emp,'form':form}
+    return render(request,'ams/rm-settings.html',data)
+
+def uploadImageToDB(request):
+    if request.method=='POST':
+        user_image = request.FILES['user-img']
+        id = request.POST['id']
+        prof = Profile.objects.get(id=id)
+        prof.img = user_image
+        prof.save()
+
+        if request.user.profile.emp_desi in manager_list:
+            return redirect('/ams/tl-dashboard')
+        else:
+            return redirect('/ams/agent-dashboard')
+
+    else:
+        pass

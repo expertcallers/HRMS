@@ -24,12 +24,14 @@ urlpatterns = [
     path('team-dashboard',teamDashboard),
     path('index',indexPage),
     path('employee-details/<int:pk>',employeeDetails),
-
     path('agent-dashboard',agentDashBoard),
     path('tl-dashboard',tlDashboard),
     path('apply-attendance',applyAttendace),
     path('rm-approval/<int:id>',rmApproval),
     path('view-att-requests',attRequests),
+    path('ams-agent-settings',agentSettings),
+    path('rm-settings',rmSettings),
+    path('upload-image',uploadImageToDB),
 
 
 

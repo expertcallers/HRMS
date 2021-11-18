@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
@@ -40,6 +41,8 @@ class EcplCalander(models.Model):
     rm1 = models.CharField(max_length=200,null=True)
     rm2 = models.CharField(max_length=200, null=True)
     rm3 = models.CharField(max_length=200, null=True)
+
+
 
 
 
