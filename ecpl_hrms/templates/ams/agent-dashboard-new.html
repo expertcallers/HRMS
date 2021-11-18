@@ -11,19 +11,19 @@
                 <img src="{% static 'assets/images/expertcallers-icon.png' %}" class="imgsm" style="width: 100%">
               </a>
             </div>
-
             <div class="clearfix"></div>
 
             <!-- menu profile quick info -->
             <div class="profile clearfix">
               <div class="profile_pic mb-2">
-                <img src="{% static 'assets/images/user.png' %}" alt="..." class="img-circle profile_img">
+                <img src="{{user.profile.img.url}}" class="img-circle profile_img">
               </div>
               <div class="profile_info">
                 <h2>{{emp.emp_name}}</h2>
                 <h2>ID: {{emp.emp_id}}</h2>
                 <h2>Designation: <br> {{emp.emp_desi}}</h2>
                 <h2>Team: {{emp.emp_process}}</h2>
+                <br>
               </div>
             </div>
             <!-- /menu profile quick info -->
@@ -35,10 +35,9 @@
               <div class="menu_section">
                 <ul class="nav side-menu">
                   <li class="active"><a href=""><i class="fa fa-laptop"></i> Dashboard</a></li>
-                  <!--<li><a href="/ams-settings"><i class="fa fa-gear"></i> Settings</a></li>-->
+                  <li><a href="/ams/ams-agent-settings"><i class="fa fa-gear"></i> Settings</a></li>
                 </ul>
               </div>
-
             </div>
             <!-- /sidebar menu -->
 
@@ -68,73 +67,6 @@
                   <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item"  href="/ams/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
                   </div>
-                </li>
-                <!--
-                <li role="presentation" class="nav-item dropdown open">
-                  <a href="javascript:;" class="dropdown-toggle info-number" id="navbarDropdown1" data-toggle="dropdown" aria-expanded="false">
-                    <i class="fa fa-envelope-o"></i>
-                    <span class="badge bg-green">6</span>
-                  </a>
-                  <ul class="dropdown-menu list-unstyled msg_list" role="menu" aria-labelledby="navbarDropdown1">
-                    <li class="nav-item">
-                      <a class="dropdown-item">
-                        <span class="image"><img src="images/img.jpg" alt="Profile Image" /></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="dropdown-item">
-                        <span class="image"><img src="images/img.jpg" alt="Profile Image" /></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="dropdown-item">
-                        <span class="image"><img src="images/img.jpg" alt="Profile Image" /></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="dropdown-item">
-                        <span class="image"><img src="images/img.jpg" alt="Profile Image" /></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                      </a>
-                    </li>
-                    -->
-                    <!--
-                    <li class="nav-item">
-                      <div class="text-center">
-                        <a class="dropdown-item">
-                          <strong>See All Alerts</strong>
-                          <i class="fa fa-angle-right"></i>
-                        </a>
-                      </div>
-                    </li> -->
-                  </ul>
                 </li>
               </ul>
             </nav>
@@ -358,28 +290,7 @@
                       <h2>Month Calender</h2>
                     </div>
                     <div class="card-body">
-                      <div class="row">
-                        {% for c in month_cal %}
-                            <div class="col-md-2 mydate">
-                                    <h6>{{c.dt}}</h6>
-                                    {% if c.st == 'Unmarked' %}
-                                    <p class="grey">{{c.st}}</p>
-                                    {% elif c.st == 'Holiday' %}
-                                    <p class="black">{{c.st}}</p>
-                                    {% elif c.st == 'Week OFF' %}
-                                    <p class="blue">{{c.st}}</p>
-                                    {% elif c.st == 'Comp OFF' %}
-                                    <p class="blue">{{c.st}}</p>
-                                    {% elif c.st == 'Absent' %}
-                                    <p class="red">{{c.st}}</p>
-                                    {% elif c.st == 'present' %}
-                                    <p class="green">{{c.st}}</p>
-                                    {% else %}
-                                    <p class="grey">{{c.st}}</p>
-                                    {% endif %}
-                            </div>
-                        {% endfor %}
-                      </div>
+                      <div class="monthly" id="mycalendar"></div>
                     </div>
                   </div>
                 </div>
@@ -405,3 +316,4 @@
     </div>
 
 {% endblock %}
+

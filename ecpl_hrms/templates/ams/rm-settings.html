@@ -1,0 +1,65 @@
+{% extends 'ams/base-rm.html' %}
+{% block main %}
+{% load static %}
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <!-- top tiles -->
+          <div class="row" >
+        </div>
+          <!-- /top tiles -->
+          <div class="row welcometop">
+            <div class="col-md-12">
+              <div class="welcome">
+                <p>Welcome</p>
+                <h3>{{emp.emp_name}} <span></span></h3>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card mt-5">
+                <div class="card-header">
+                  <h2>Change Password</h2>
+                </div>
+                <div class="card-body">
+                  {% load crispy_forms_tags %}
+                  <form method="post" action="/mapping/change-password" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      {{ form|crispy }}
+                        <br><br>
+                      <button type="submit" class="btn btn-primary">Save changes</button>
+                    </form>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <h2>Profile Image</h2>
+                </div>
+                <div class="card-body"> 
+                  <div class="row">
+                    <form action="/ams/upload-image" method="POST" style="width: 100%;" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      <div class="col-md-8">
+                        <div class="form-group">
+                          <label for="pimg">Select the Profile Picture:</label>
+                          <input type="file" name="user-img" class="form-control" required>
+                          <input type="hidden" name="id" value="{{user.profile.id}}">
+                        </div>
+                      </div>
+                      <div class="col-md-4 mt-4">
+                        <button type="submit" class="btn btn-dark form-control">Upload</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+      </div>
+    </div>
+{% endblock %}

@@ -24,22 +24,22 @@
                    <p>RM 1</p>
                    <select name="emp_rm1" id="" required class="form-control">
                        <option value="{{emp.emp_rm1}}">{{emp.emp_rm1}}</option>
-                       {% for t in rm1s %}
-                       <option value="{{t}}">{{t}}</option>
+                       {% for t in rms %}
+                       <option value="{{t.emp_name}}">{{t.emp_name}} / {{t.emp_id}}</option>
                        {% endfor %}
                    </select>
                    <p>RM 2</p>
                    <select name="emp_rm2" id="" required class="form-control">
                        <option value="{{emp.emp_rm2}}">{{emp.emp_rm2}}</option>
-                       {% for t in rm2s %}
-                       <option value="{{t}}">{{t}}</option>
+                       {% for t in rms %}
+                       <option value="{{t.emp_name}}">{{t.emp_name}} / {{t.emp_id}}</option>
                        {% endfor %}
                    </select>
                    <p>RM 3</p>
                    <select name="emp_rm3" id="" required class="form-control">
                        <option value="{{emp.emp_rm3}}">{{emp.emp_rm3}}</option>
-                       {% for t in rm3s %}
-                       <option value="{{t}}">{{t}}</option>
+                       {% for t in rms %}
+                       <option value="{{t.emp_name}}">{{t.emp_name}} / {{t.emp_id}}</option>
                        {% endfor %}
                    </select>
                    <br>

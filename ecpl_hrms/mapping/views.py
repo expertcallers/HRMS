@@ -5,9 +5,12 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import *
-from django.db.models import Avg, Max, Min, Sum
+from django.db.models import Avg, Max, Min, Sum, Q
 
 from itertools import chain
+
+manager_list = ['Associate Director','Assistant Manager','Team Leader','Operations Manager','Trainer','Command Centre Head','Process Trainer','Learning and Development Head','Service Delivery Manager','Trainer Sales',
+                        'Team Leader - GB','Head-CC']
 
 # Create your views here.
 @login_required
@@ -72,13 +75,12 @@ def change_password(request):
             user = form.save()
             update_session_auth_hash(request, user)  # Important!
             messages.success(request, 'Your password was successfully updated!')
-
             user = request.user
             user.profile.pc = True
             user.save()
             user.profile.save()
             logout(request)
-            return redirect('/mapping/login')
+            return redirect('/')
         else:
             messages.error(request, 'Please correct the error below.')
     else:
@@ -128,10 +130,18 @@ def updateEmployeeProfile(request):
         emp = Employee.objects.get(emp_id = emp_id)
         teams = Employee.objects.values_list('emp_process', flat=True).distinct()
         desis = Employee.objects.values_list('emp_desi', flat=True).distinct()
+
+
         rm1s = Employee.objects.values_list('emp_rm1',flat=True).distinct()
         rm2s = Employee.objects.values_list('emp_rm2',flat=True).distinct()
         rm3s = Employee.objects.values_list('emp_rm3',flat=True).distinct()
-        data = {'emp':emp,'teams':teams,'desis':desis,'rm1s':rm1s,'rm2s':rm2s,'rm3s':rm3s}
+
+        rms = Employee.objects.filter(emp_desi__in = manager_list)
+
+        data = {'emp':emp,'teams':teams,'desis':desis,'rm1s':rm1s,'rm2s':rm2s,'rm3s':rm3s,
+
+                'rms':rms}
+
         return render(request,'mapping/update-to-database.html',data)
     else:
         employees = Employee.objects.all().order_by('emp_name')
@@ -314,9 +324,6 @@ def createUserandProfile(request):
             user.save()
 
 
-
-
-
 def correct_process(request):
 
     e = Employee.objects.all()
@@ -379,7 +386,6 @@ def nameChanger(request):
     for i in emp:
         i.emp_rm1 = emp_new_rm1
         i.save()
-
 
 
 def searchForEmployee(request):
