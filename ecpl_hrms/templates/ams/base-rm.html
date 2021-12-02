@@ -41,7 +41,11 @@
     <!-- The follwing two tags to be added Can be added to base file-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+    </style>
   </head>
   <body class="nav-md">
   <div class="container body">
@@ -128,8 +132,6 @@
 
 {% endblock %}
 
-<!-- jQuery -->
-    <script src="{% static 'assets/vendors/jquery/dist/jquery.min.js' %}"></script>
     <!-- Bootstrap -->
     <script src="{% static 'assets/vendors/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
     <!-- FastClick -->
@@ -242,7 +244,7 @@
             legend: {
                 x: 'center',
                 y: 'bottom',
-                data: ['Present', 'Absent', 'Leave', 'Company Off', 'Week Off', 'Unmarked', 'Half Day']
+                data: ['Present', 'Absent', 'Company Off', 'Week Off', 'Unmarked', 'Half Day','Holiday']
             },
             toolbox: {
                 show: true,
@@ -270,7 +272,7 @@
                 }
             },
             calculable: true,
-            color:["green","red","#f39c12","grey","black","brown", "blue"],
+            color:["green","red","grey","black","brown", "blue",'violet'],
             series: [{
                 name: 'ECPL',
                 type: 'pie',
@@ -283,20 +285,20 @@
                     value: {{absent_count}},
                     name: 'Absent'
                 }, {
-                    value: 0,
-                    name: 'Leave'
-                }, {
                     value: {{comp_off_count}},
                     name: 'Company Off'
                 }, {
                     value: {{week_off_count}},
                     name: 'Week Off'
                 },{
-                    value: 6,
+                    value: {{unmarked_count}},
                     name: 'Unmarked'
                 }, {
-                    value: 0,
+                    value: {{half_day_count}},
                     name: 'Half Day'
+                },{
+                    value: {{holiday_count}},
+                    name: 'Holiday'
                 }]
             }]
         });

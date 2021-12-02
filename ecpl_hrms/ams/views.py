@@ -222,7 +222,9 @@ def tlDashboard(request):
     week_off_count = EcplCalander.objects.filter(Q(rm1=emp_name), Q(date=today), Q(att_actual='Week OFF')).count()
     comp_off_count = EcplCalander.objects.filter(Q(rm1=emp_name), Q(date=today), Q(att_actual='Comp OFF')).count()
     half_day_count = EcplCalander.objects.filter(Q(rm1=emp_name), Q(date=today), Q(att_actual='Half Day')).count()
-    unmarked_count = unmarked_today
+
+    holiday_count = EcplCalander.objects.filter(Q(rm1=emp_name), Q(date=today), Q(att_actual='Holiday')).count()
+    unmarked_count = emp_count - (present_count + absent_count + week_off_count + comp_off_count + half_day_count + holiday_count)
 
     # Mapping Tickets >>
 
@@ -232,8 +234,11 @@ def tlDashboard(request):
             'emp_count':emp_count,'active_today':active_today,'unmarked_today':unmarked_today,
             'all_active':all_active,'all_present':all_present,'unmarked_emps':unmarked_emps,
             'all_leaves':all_leaves,'leaves_today':leaves_today,'total_req':total_req,
+
             'present_count':present_count,'absent_count':absent_count,'week_off_count':week_off_count,
-            'comp_off_count':comp_off_count,'half_day_count':half_day_count,
+            'comp_off_count':comp_off_count,'half_day_count':half_day_count,'holiday_count':holiday_count,
+            'unmarked_count':unmarked_count,
+
             'map_tickets_counts':map_tickets_counts
             }
     return render(request, 'ams/rm-dashboard-new.html', data)
@@ -623,6 +628,24 @@ def approveMappingTicket(request):
         ticket.approved_by = usr_name
         ticket.approved_date = td
         ticket.save()
+        emp_id = ticket.emp_id
+        emp = Employee.objects.get(emp_id=emp_id)
+        prof = Profile.objects.get(emp_id=emp_id)
+
+        emp.emp_rm1 = ticket.new_rm1
+        emp.emp_rm2 = ticket.new_rm2
+        emp.emp_rm3 = ticket.new_rm3
+        emp.emp_process = ticket.new_process
+
+        emp.save()
+
+        prof.emp_rm1 = ticket.new_rm1
+        prof.emp_rm2 = ticket.new_rm2
+        prof.emp_rm3 = ticket.new_rm3
+        prof.emp_process = ticket.new_process
+        prof.save()
+
+
         return redirect('/ams/view-mapping-tickets')
     else:
         return redirect('/ams/logout')

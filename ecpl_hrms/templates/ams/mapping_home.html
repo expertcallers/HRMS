@@ -180,7 +180,7 @@
         <!-- /page content -->
     <!-- Modal -->
     {% for e in employees %}
-    <div class="modal fade" id="e{{e.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="e{{e.id}}" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
         <form action="/ams/create-mapping-ticket" method="POST" enctype="multipart/form-data">
@@ -205,8 +205,8 @@
                 <div class="col-md-4">
                   <div class="form-group">
 
-                    <label for="rm1">RM1</label>
-                    <select class="form-control select2" name="new_rm1" id="rm1">
+                    <label for="rm1_{{e.id}}">RM1</label>
+                    <select class="form-control select2" name="new_rm1" id="rm1_{{e.id}}">
                       <option value="{{e.emp_rm1}}">{{e.emp_rm1}}</option>
                       {% for r in rms %}
                       <option value="{{r.emp_name}}">{{r.emp_name}} / {{r.emp_id}}</option>
@@ -216,8 +216,8 @@
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="rm2">RM2</label>
-                    <select class="form-control select2" name="new_rm2" id="rm2">
+                    <label for="rm2_{{e.id}}">RM2</label>
+                    <select class="form-control select2" name="new_rm2" id="rm2_{{e.id}}">
                       <option value="{{e.emp_rm2}}">{{e.emp_rm2}}</option>
                       {% for r in rms %}
                       <option value="{{r.emp_name}}">{{r.emp_name}} / {{r.emp_id}}</option>
@@ -227,8 +227,8 @@
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="rm1">RM3</label>
-                    <select class="form-control select2" name="new_rm3" id="rm3">
+                    <label for="rm3_{{e.id}}">RM3</label>
+                    <select class="form-control select2" name="new_rm3" id="rm3_{{e.id}}">
                       <option value="{{e.emp_rm3}}">{{e.emp_rm3}}</option>
                       {% for r in rms %}
                       <option value="{{r.emp_name}}">{{r.emp_name}} / {{r.emp_id}}</option>
@@ -238,14 +238,14 @@
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="eff_from">Effective From:</label>
-                    <input type="date" name="effective_date" class="form-control" id="eff_from" required>
+                    <label for="eff_from_{{e.id}}">Effective From:</label>
+                    <input type="date" name="effective_date" class="form-control" id="eff_from_{{e.id}}" required>
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="pro">Process</label>
-                    <select class="form-control select2" name="new_process" id="pro">
+                    <label for="pro_{{e.id}}">Process</label>
+                    <select class="form-control select2" name="new_process" id="pro_{{e.id}}">
                       <option value="{{e.emp_process}}">{{e.emp_process}}</option>
                       {% for t in teams %}
                       <option value="{{t}}">{{t}}</option>
