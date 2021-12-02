@@ -4,3 +4,5 @@ from .models import *
 admin.site.register(Employees)
 admin.site.register(Attendace)
 admin.site.register(EcplCalander)
+admin.site.register(Onboarding)
+admin.site.register(MappingTickets)

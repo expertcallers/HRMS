@@ -1,0 +1,220 @@
+{% extends 'ams/base.html' %}
+{% block main %}
+{% load static %}
+    <div class="container body">
+      <div class="main_container">
+        <div class="col-md-3 left_col">
+          <div class="left_col scroll-view">
+            <div class="navbar nav_title clearfix" style="border: 0; background-color: #fff;">
+              <a href="index.html" class="site_title">
+                <img src="{% static 'assets/images/ecpl-logo-new.png' %}" class="imgmd" style="width: 100%">
+                <img src="{% static 'assets/images/expertcallers-icon.png' %}" class="imgsm" style="width: 100%">
+              </a>
+            </div>
+            <div class="clearfix"></div>
+
+            <!-- menu profile quick info -->
+            <div class="profile clearfix">
+              <div class="profile_pic mb-2">
+                <img src="{{user.profile.img.url}}" class="img-circle profile_img">
+              </div>
+              <div class="profile_info">
+                <h2>{{emp.emp_name}}</h2>
+                <h2>ID: {{emp.emp_id}}</h2>
+                <h2>Designation: <br> {{emp.emp_desi}}</h2>
+                <h2>Team: {{emp.emp_process}}</h2>
+                <br>
+              </div>
+            </div>
+            <!-- /menu profile quick info -->
+
+            <br />
+
+            <!-- sidebar menu -->
+            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+              <div class="menu_section">
+                <ul class="nav side-menu">
+                  <li><a href="/ams/dashboard-redirect/{{emp.id}}"><i class="fa fa-home"></i> Dashboard</a></li>
+                  <li><a href="/ams/ams-update-attendance"><i class="fa fa-calendar"></i>Attendance</a></li>
+                </ul>
+              </div>
+            </div>
+            <!-- /sidebar menu -->
+
+            <!-- /menu footer buttons -->
+            <div class="sidebar-footer hidden-small">
+              <a data-toggle="tooltip" data-placement="top" title="Logout" href="/ams/logout">
+                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+              </a>
+            </div>
+            <!-- /menu footer buttons -->
+          </div>
+        </div>
+
+
+        <!-- top navigation -->
+        <div class="top_nav">
+          <div class="nav_menu">
+              <div class="nav toggle">
+                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+              </div>
+              <nav class="nav navbar-nav">
+              <ul class=" navbar-right">
+                <li class="nav-item dropdown open" style="padding-left: 15px;">
+                  <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
+                    <img src="{{user.profile.img.url}}" alt="">{{emp.emp_name}}
+                  </a>
+                  <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item"  href="/ams/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
+                  </div>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <!-- top tiles -->
+          <div class="row" >
+        </div>
+          <!-- /top tiles -->
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card mt-5">
+                <div class="card-header">
+                  <h2>Attendance</h2>
+                </div>
+                <div class="card-body">
+                  {% if day_befor_yest == 'Applied' %}
+                    <p>
+                      <span style="margin-right:20px">{{dby_date}}</span>Applied Already
+                      <i class="fa fa-check" style="color: green; font-size: 20px;"></i>
+                    </p>
+                  {% else %}
+                  <form action="/ams/apply-attendance" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-md-5">
+                        <div class="form-group">
+                          <label for="date">Date</label>
+                          <input type="text" id="date" name="date" class="form-control" value="{{day_befor_yest}}" readonly>
+                        </div>
+                      </div>
+                      <div class="col-md-5">
+                        <div class="form-group">
+                          <label for="catt">Attendance</label>
+                          <select class="form-control attendancemark" id="catt" name="att_applied">
+                            <option value="present">Present</option>
+                            <option value="Week OFF">Week OFF</option>
+                            <option value="Comp OFF">Comp OFF</option>
+                            <option value="Half Day">Half Day</option>
+                            <option value="Holiday">Holiday</option>
+                          </select>
+                        </div>
+                        <div>
+                          <input type="hidden" name="rm1" value="{{emp.emp_rm1}}">
+                          <input type="hidden" name="rm2" value="{{emp.emp_rm2}}">
+                          <input type="hidden" name="rm3" value="{{emp.emp_rm3}}">
+                        </div>
+                      </div>
+                      <div class="col-md-2" style="margin-top: 1.6rem!important;">
+                        <button type="submit" class="form-control btn btn-dark" onclick="return confirm('Are you sure you want to proceed?');">Apply</button>
+                      </div>
+                    </div>
+                  </form>
+                  {% endif %}
+                  {% if yesterday == 'Applied' %}
+                    <p><span style="margin-right:20px">{{yst_date}}</span>Applied Already
+                    <i class="fa fa-check" style="color: green; font-size: 20px;"></i></p>
+                  {% else %}
+                  <form action="/ams/apply-attendance" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-md-5">
+                        <div class="form-group">
+                          <label for="date">Date</label>
+                          <input type="text" id="date" name="date" class="form-control" value="{{yesterday}}" readonly>
+                        </div>
+                      </div>
+                      <div class="col-md-5">
+                        <div class="form-group">
+                          <label for="catt">Attendance</label>
+                          <select class="form-control attendancemark" id="catt" name="att_applied">
+                            <option value="present">Present</option>
+                            <option value="Week OFF">Week OFF</option>
+                            <option value="Comp OFF">Comp OFF</option>
+                            <option value="Half Day">Half Day</option>
+                            <option value="Holiday">Holiday</option>
+                          </select>
+                        </div>
+                        <div>
+                          <input type="hidden" name="rm1" value="{{emp.emp_rm1}}">
+                          <input type="hidden" name="rm2" value="{{emp.emp_rm2}}">
+                          <input type="hidden" name="rm3" value="{{emp.emp_rm3}}">
+                        </div>
+                      </div>
+                      <div class="col-md-2" style="margin-top: 1.6rem!important;">
+                        <button type="submit" class="form-control btn btn-dark" onclick="return confirm('Are you sure you want to proceed?');">Apply</button>
+                      </div>
+                    </div>
+                  </form>
+                  {% endif %}
+
+                  {% if date == 'Applied' %}
+                    <p><span style="margin-right:20px">{{tdy_date}}</span>Applied Already
+                    <i class="fa fa-check" style="color: green; font-size: 20px;"></i></p>
+                  {% else %}
+                  <form action="/ams/apply-attendance" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-md-5">
+                        <div class="form-group">
+                          <label for="date">Date</label>
+                          <input type="text" id="date" name="date" class="form-control" value="{{date}}" readonly>
+                        </div>
+                      </div>
+                      <div class="col-md-5">
+                        <div class="form-group">
+                          <label for="catt">Attendance</label>
+                          <select class="form-control attendancemark" id="catt" name="att_applied">
+                            <option value="present">Present</option>
+                            <option value="Week OFF">Week OFF</option>
+                            <option value="Comp OFF">Comp OFF</option>
+                            <option value="Half Day">Half Day</option>
+                            <option value="Holiday">Holiday</option>
+                          </select>
+                        </div>
+                        <div>
+                          <input type="hidden" name="rm1" value="{{emp.emp_rm1}}">
+                          <input type="hidden" name="rm2" value="{{emp.emp_rm2}}">
+                          <input type="hidden" name="rm3" value="{{emp.emp_rm3}}">
+                        </div>
+                      </div>
+                      <div class="col-md-2" style="margin-top: 1.6rem!important;">
+                        <button type="submit" class="form-control btn btn-dark" onclick="return confirm('Are you sure you want to proceed?');">Apply</button>
+                      </div>
+                    </div>
+                  </form>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <footer>
+          <div class="text-center">
+            ECPL CC Team
+          </div>
+          <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+      </div>
+    </div>
+
+{% endblock %}
+

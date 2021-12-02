@@ -1,0 +1,28 @@
+{% block sidebar %}
+<!-- sidebar menu -->
+<div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+              <div class="menu_section">
+                <ul class="nav side-menu">
+                  <li><a href="/ams/hr-dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
+                  <li><a><i class="fa fa-user"></i> User Management <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="/ams/onboarding">On Boarding</a></li>
+                      <li><a href="/ams/add-new-user">Add User</a></li>
+                      <li><a href="/ams/viewusers">View Users</a></li>
+                    </ul>
+                  </li>
+                  <li><a><i class="fa fa-users"></i> Team Management <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="newteam">Add Team</a></li>
+                      <li><a href="viewteam">View Teams</a></li>
+                    </ul>
+                  </li>
+                  <li><a href="setting"><i class="fa fa-gear"></i> Settings</a></li>
+                  <li><a href="/ams/ams-update-attendance"><i class="fa fa-calendar"></i>Attendance</a></li>
+                  <li><a href="/ams/view-mapping-tickets"><i class="fa fa-calendar"></i>Tickets</a></li>
+                </ul>
+              </div>
+
+            </div>
+<!-- /sidebar menu -->
+{% endblock %}

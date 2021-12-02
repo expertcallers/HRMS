@@ -1,0 +1,425 @@
+{% extends 'ams/base_hr.html' %}
+
+{% block main %}
+  {% load static %}
+    <div class="container body">
+      <div class="main_container">
+        <div class="col-md-3 left_col">
+          <div class="left_col scroll-view">
+            <div class="navbar nav_title clearfix" style="border: 0; background-color: #fff;">
+              <a href="index.html" class="site_title">
+                <img src="{% static 'assets/images/ecpl-logo-new.png' %}" class="imgmd" style="width: 100%">
+                <img src="{% static 'assets/images/expertcallers-icon.png' %}" class="imgsm" style="width: 100%">
+              </a>
+            </div>
+            <div class="clearfix"></div>
+            <!-- menu profile quick info -->
+            <div class="profile clearfix">
+              <div class="profile_pic mb-2">
+                <img src="{{request.user.profile.img.url}}" alt="..." class="img-circle profile_img">
+              </div>
+              <div class="profile_info">
+                <h2>{{emp.emp_name}}</h2>
+                <h2>ID: {{emp.emp_id}}</h2>
+                <h2>{{emp.emp_desi}}</h2>
+                <h2>{{emp.emp_process}}</h2>
+              </div>
+            </div>
+            <!-- /menu profile quick info -->
+
+            <br />
+
+            {% include 'ams/sidebar-menu_hr.html' %}
+
+            <!-- /menu footer buttons -->
+            <div class="sidebar-footer hidden-small">
+              <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
+                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+              </a>
+            </div>
+            <!-- /menu footer buttons -->
+          </div>
+        </div>
+
+        
+        <!-- top navigation -->
+        <div class="top_nav">
+          <div class="nav_menu">
+              <div class="nav toggle">
+                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+              </div>
+              <nav class="nav navbar-nav">
+              <ul class=" navbar-right">
+                <li class="nav-item dropdown open" style="padding-left: 15px;">
+                  <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
+                    <img src="{% static 'assets/images/img.jpg' %}" alt="">Employee Name
+                  </a>
+                  <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item"  href="login.html"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
+                  </div>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+        <!-- /top navigation -->
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <!-- top tiles -->
+            <div class="row" >
+            </div>
+            <!-- /top tiles -->
+
+          <div class="page-title">
+            <div class="title_left">
+              <h3>Onboarding</h3>
+            </div>
+          </div>
+          <div class="row mb-5">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <h2>Onboarding</h2>
+                </div>
+                <div class="card-body">
+                  <form method="post" action="/ams/onboarding" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-md-12">
+                        <h4>Personal Details</h4>
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_name">Name(As per Aadhar)</label>
+                          <input type="text" name="emp_name" id="emp_name" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_dob">Date Of Birth (DD/MM/YYYY)</label>
+                          <input type="date" name="emp_dob" id="emp_dob" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_desg">Designation (Refer offer letter and mention)</label>
+                          <input type="text" name="emp_desg" id="emp_desg" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pro">Process (Refer offer letter and mention)</label>
+                          <input type="text" name="emp_pro" id="emp_pro" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pan">PAN Number</label>
+                          <input type="text" name="emp_pan" id="emp_pan" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_aad">Aadhar Number</label>
+                          <input type="number" name="emp_aad" id="emp_aad" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_fat">Father's Name</label>
+                          <input type="text" name="emp_fat" id="emp_fat" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_mar">Marital Status</label>
+                          <select name="emp_mar" id="emp_mar" class="form-control" required>
+                            <option value="Single">Single</option>
+                            <option value="Married">Married</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_email">Email Address</label>
+                          <input type="email" name="emp_email" id="emp_email" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_ph">Contact Number</label>
+                          <input type="number" name="emp_ph" id="emp_ph" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_add">Present Address</label>
+                          <textarea name="emp_add" id="emp_add" class="form-control" rows="4" required></textarea>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pre_add">Permanent Address</label>
+                          <textarea name="emp_pre_add" id="emp_pre_add" class="form-control" rows="4" required></textarea>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_alph">Alternate Contact Number</label>
+                          <input type="text" name="emp_alph" id="emp_alph" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_blo">Blood Group</label>
+                          <input type="text" name="emp_blo" id="emp_blo" class="form-control" required>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-md-12">
+                        <h4>Emergency Contact</h4>
+                        <p>Person to be contacted in case of emergency.</p>
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_emer_name">Name</label>
+                          <input type="text" name="emp_emer_name" id="emp_emer_name" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_emer_ph">Phone Number</label>
+                          <input type="number" name="emp_emer_ph" id="emp_emer_ph" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_emer_add">Addres</label>
+                          <textarea name="emp_emer_add" id="emp_emer_add" class="form-control" rows="4" required></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-md-12">
+                        <h4>Qualification Details</h4>
+                        <!-- <p>Person to be contacted in case of emergency.</p> -->
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_high_qua">Highest Qualification</label>
+                          <select name="emp_high_qua" id="emp_high_qua" class="form-control select2" required>
+                            <option value="10th">10th</option>
+                            <option value="12th/PUC">12th/PUC</option>
+                            <option value="Under Graduate">Under Graduate</option>
+                            <option value="Post Graduate(Masters)">Post Graduate(Masters)</option>
+
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_cou">Course</label>
+                          <input type="text" name="emp_cou" id="emp_cou" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_ins">Institution Name</label>
+                          <input type="text" name="emp_ins" id="emp_ins" class="form-control" required>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-md-12">
+                        <h4>Previous Work / Experience</h4>
+                        <!-- <p>Person to be contacted in case of emergency.</p> -->
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_exp">Experience in Years</label>
+                          <input type="number" name="emp_exp" id="emp_exp" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_ind">Industry (Ex : Agriculture/IT/BPO)</label>
+                          <select name="emp_ind" id="emp_ind" class="form-control select2" required>
+                            <option value="BPO">BPO</option>
+                            <option value="IT">IT</option>
+                            <option value="Agriculture">Agriculture</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pre_org">Name of previous organisation</label>
+                          <input type="text" name="emp_pre_org" id="emp_pre_org" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pre_desg">Previous Designation</label>
+                          <input type="text" name="emp_pre_desg" id="emp_pre_desg" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pre_empl">Period of Employment</label>
+                          <input type="text" name="emp_pre_empl" id="emp_pre_empl" class="form-control" required>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-md-12">
+                        <h4>Bank Account Details</h4>
+                        <!-- <p>Person to be contacted in case of emergency.</p> -->
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_bank_name">Account Holder Name</label>
+                          <input type="text" name="emp_bank_name" id="emp_bank_name" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_bank_no">Account Number</label>
+                          <input type="number" name="emp_bank_no" id="emp_bank_no" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_bank_ifsc">IFSC Code</label>
+                          <input type="text" name="emp_bank_ifsc" id="emp_bank_ifsc" class="form-control" required>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-md-12">
+                        <h4>Upload Documents</h4>
+                        <!-- <p>Person to be contacted in case of emergency.</p> -->
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_up_aad">Aadhar Card (Front and Back page)</label>
+                          <input type="file" name="emp_up_aad" id="emp_up_aad" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_up_pan">PAN Card</label>
+                          <input type="file" name="emp_up_pan" id="emp_up_pan" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_up_id">ID Proof Document - Passport/DL/Voters ID/Other (Government Approved)</label>
+                          <input type="file" name="emp_up_id" id="emp_up_id" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_up_edu">Educational Documents</label>
+                          <input type="file" name="emp_up_edu" id="emp_up_edu" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_up_cer">Certificates of work experience (If any)</label>
+                          <input type="file" name="emp_up_cer" id="emp_up_cer" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_up_bank">Cancelled cheque/passbook/bank statement (to validate your account details)</label>
+                          <input type="file" name="emp_up_bank" id="emp_up_bank" class="form-control" required>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- <div class="row mt-4">
+                      <div class="col-md-12">
+                        <h4>Needs / Requirements</h4>
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_req_lap">Do you have your own system/laptop to work?</label>
+                          <select name="emp_req_lap" id="emp_req_lap" class="form-control">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_req_sys">Do you require a system to be provided from the company?</label>
+                          <select name="emp_req_sys" id="emp_req_sys" class="form-control">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_req_lap">Do you have WiFi/Broadband services at home? (If yes, the amount can be claimed/will be reimbursed by submitting the broadband bill every month. ONLY IF WORK FROM HOME)</label>
+                          <select name="emp_req_lap" id="emp_req_lap" class="form-control">
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div> -->
+                    <div class="row mb-5 mt-4">
+                      <div class="col-md-12">
+                        <button type="submit" onclick="confirm('Are you sure you want to proceed?')" class="btn btn-success form-control">Submit</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+        <!-- /page content -->
+
+
+
+    <!-- Start New Designation Pop-Up -->
+      <div class="modal fade" id="add_desg" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Add New Designation</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form method="" action="" enctype="">
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="new_desg">Designation Name</label>
+                      <input type="text" name="new_desg" id="new_desg" class="form-control">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    <!-- End New Designation Pop-Up -->
+{% endblock %}

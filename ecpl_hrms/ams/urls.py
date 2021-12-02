@@ -20,18 +20,31 @@ urlpatterns = [
     path('',loginPage),
     path('login',loginAndRedirect),
     path('logout',logoutView),
+    path('dashboard-redirect/<int:id>',redirectTOAllDashBoards),
     path('change-password',change_password),
     path('team-dashboard',teamDashboard),
     path('index',indexPage),
     path('employee-details/<int:pk>',employeeDetails),
     path('agent-dashboard',agentDashBoard),
+    path('ams-update-attendance',applyAttendace),
     path('tl-dashboard',tlDashboard),
+    path('hr-dashboard',hrDashboard),
+    path('add-new-user',addNewUserHR),
+    path('viewusers',viewUsersHR),
+    path('onboarding',onboardingHR),
     path('apply-attendance',applyAttendace),
     path('rm-approval/<int:id>',rmApproval),
     path('view-att-requests',attRequests),
     path('ams-agent-settings',agentSettings),
     path('rm-settings',rmSettings),
     path('upload-image',uploadImageToDB),
+
+    # Mapping
+
+    path('rm-mapping-index',mappingHomePage),
+    path('create-mapping-ticket',createMappingTicket),
+    path('view-mapping-tickets',viewMappingTicketsHr),
+    path('approve-mapping-ticket',approveMappingTicket),
 
 
 

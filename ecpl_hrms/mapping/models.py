@@ -26,6 +26,7 @@ class Profile(models.Model):
     extra_id = models.IntegerField(default=1)
     pc = models.BooleanField(default=False)
     img = models.ImageField(upload_to='users/',default="users/default.png")
+    doj = models.DateField(null=True,blank=True)
 
     def __str__(self):
         return self.emp_name

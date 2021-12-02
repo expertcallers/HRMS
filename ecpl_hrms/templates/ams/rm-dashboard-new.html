@@ -55,7 +55,7 @@
                       <h2>Active Employees</h2>
                     </div>      
                     <div class="card-body">
-                      <h1 style="margin: 0px !important;">{{emp_count}}</h1>
+                      <a href="/ams/rm-mapping-index"><h1 style="margin: 0px !important;">{{emp_count}}</h1></a>
                       <!--<a href="all_emp.html" class="btn btn-sm btn-dark">view all</a>-->
                     </div>              
                   </div>
@@ -66,23 +66,36 @@
                       <h2>Attendance Requests</h2>
                     </div>      
                     <div class="card-body">
-                      <h1 style="margin: 0px !important;">{{total_req}}</h1>
-                      <a href="/ams/view-att-requests" class="btn btn-sm btn-dark">view all</a>
+                      <a href="/ams/view-att-requests"><h1 style="margin: 0px !important;">{{total_req}}</h1></a>
                     </div>              
                   </div>
                 </div>
                 <div class="col-md-2">
                   <div class="card topcards">
                     <div class="card-header">
-                      <!--<h2>Leaves Today</h2>-->
+                      <h2>Mapping Tickets</h2>
                     </div>      
                     <div class="card-body">
-                      <!--<h1 style="margin: 0px !important;">{{leaves_today}}</h1>-->
-
+                      <a href="/ams/view-mapping-tickets"><h1 style="margin: 0px !important;">{{map_tickets_counts}}</h1></a>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <h4>Today's Attendance Status</h4>
+                </div>
+                <div class="card-body">
+                  <div id="main" style="height:350px;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+
             </div>
           </div>
 
@@ -162,4 +175,6 @@
         <!-- /footer content -->
       </div>
     </div>
+
+
 {% endblock %}

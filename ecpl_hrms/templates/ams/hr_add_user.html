@@ -19,13 +19,6 @@
     <link href="{% static 'assets/vendors/nprogress/nprogress.css" rel="stylesheet' %}">
     <!-- iCheck -->
     <link href="{% static 'assets/vendors/iCheck/skins/flat/green.css" rel="stylesheet' %}">
-    <!-- Datatables -->
-    <link href="{% static 'assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}" rel="stylesheet">
-
 
     <!-- bootstrap-progressbar -->
     <link href="{% static 'assets/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css' %}" rel="stylesheet">
@@ -34,14 +27,17 @@
     <!-- bootstrap-daterangepicker -->
     <link href="{% static 'assets/vendors/bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet">
 
+    <!-- Datatables -->
+    <link href="{% static 'vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}" rel="stylesheet">
+
     <!-- Custom Theme Style -->
     <link href="{% static 'assets/build/css/custom.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'assets/css/monthly.css' %}">
-
-    <!-- The follwing two tags to be added Can be added to base file-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-
+    <link href=https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css rel="stylesheet" />
   </head>
   <body class="nav-md">
   <div class="container body">
@@ -72,36 +68,18 @@
 
             <br />
 
-            <!-- sidebar menu -->
-            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
-              <div class="menu_section">
-                <ul class="nav side-menu">
-                  <li><a href="/ams/tl-dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
-                  <li><a><i class="fa fa-clock-o"></i>Attendance <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="/ams/ams-update-attendance"><i class="fa fa-calendar"></i>Mark Attendance</a></li>
-                      <!--<li><a href="all_emp.html">Active Employees</a></li>-->
-                      <li><a href="/ams/view-att-requests">Attendance Requests</a></li>
-                    </ul>
-                  </li>
-                  <li><a href="/ams/rm-settings"><i class="fa fa-gear"></i> Settings</a></li>
-                    <li><a href="/ams/rm-mapping-index"><i class="fa fa-user"></i> Mapping</a></li>
-                </ul>
-              </div>
-
-            </div>
+            {% include 'ams/sidebar-menu_hr.html' %}
             <!-- /sidebar menu -->
 
             <!-- /menu footer buttons -->
             <div class="sidebar-footer hidden-small">
-              <a data-toggle="tooltip" data-placement="top" title="Logout" href="/ams/logout">
+              <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
               </a>
             </div>
             <!-- /menu footer buttons -->
           </div>
         </div>
-
 
         <!-- top navigation -->
         <div class="top_nav">
@@ -113,7 +91,7 @@
               <ul class=" navbar-right">
                 <li class="nav-item dropdown open" style="padding-left: 15px;">
                   <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{{user.profile.img.url}}" alt="">{{emp.emp_name}}
+                    <img src="{% static 'assets/images/img.jpg' %}" alt="">{{emp.emp_name}}
                   </a>
                   <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item"  href="/ams/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
@@ -124,9 +102,172 @@
           </div>
         </div>
         <!-- /top navigation -->
-{% block main %}
 
-{% endblock %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <!-- top tiles -->
+          <div class="row" >
+        </div>
+          <!-- /top tiles -->
+
+        <div class="page-title">
+          <div class="title_left">
+            <h3>Add New User</h3>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header">
+                <h2>Add New User</h2>
+              </div>
+              <div class="card-body">
+                <form method="POST" action="/ams/add-new-user" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_name">Employee Name</label>
+                        <input type="text" name="emp_name" id="emp_name" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_id">Employee ID</label>
+                        <input type="text" name="emp_id" id="emp_id" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_doj">Date of Joining</label>
+                        <input type="date" name="emp_doj" id="emp_doj" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <label for="emp_desg">Designation</label>
+                            <select name="emp_desg" id="emp_desg" class="form-control select2">
+                              {% for a in all_data %}
+                              <option value="{{a.emp_desi}}">{{a.emp_desi}}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_rm1">RM1</label>
+                        <select name="emp_rm1" id="emp_rm1" class="form-control select2">
+                          {% for r in rms %}
+                          <option value="{{r.emp_name}}">{{r.emp_name}} / {{r.emp_id}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_rm2">RM2</label>
+                        <select name="emp_rm2" id="emp_rm2" class="form-control select2">
+                          {% for r in rms %}
+                          <option value="{{r.emp_name}}">{{r.emp_name}} / {{r.emp_id}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_rm3">RM3</label>
+                        <select name="emp_rm3" id="emp_rm3" class="form-control select2">
+                          {% for r in rms %}
+                          <option value="{{r.emp_name}}">{{r.emp_name}} / {{r.emp_id}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_pro">Process</label>
+                        <select name="emp_pro" id="emp_pro" class="form-control select2">
+                          {% for a in all_team %}
+                              <option value="{{a.emp_process}}">{{a.emp_process}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-12" align="center">
+                      <button type="submit" class="btn btn-success btn-lg">Submit</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+
+          {% for m in messages %}
+            <p style="color: green;font-size: 18px;padding: 10px;">{{m}}</p>
+          {% endfor %}
+        </div>
+
+
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <footer>
+          <div class="text-center">
+            ECPL CC Team
+          </div>
+          <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+      </div>
+    </div>
+
+
+
+    <!-- Start New Designation Pop-Up -->
+      <div class="modal fade" id="add_desg" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Add New Designation</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form method="" action="" enctype="">
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="new_desg">Designation Name</label>
+                      <input type="text" name="new_desg" id="new_desg" class="form-control">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    <!-- End New Designation Pop-Up -->
+
+
+
+
 
 <!-- jQuery -->
     <script src="{% static 'assets/vendors/jquery/dist/jquery.min.js' %}"></script>
@@ -182,160 +323,11 @@
     <script src="{% static 'assets/vendors/jszip/dist/jszip.min.js' %}"></script>
     <script src="{% static 'assets/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
     <script src="{% static 'assets/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
-
-
-      <script type="text/javascript" src="{% static 'assets/js/monthly.js' %}"></script>
-      <script type="text/javascript">
-          var sampleEvents = {
-          "monthly": [
-              {% for c in month_cal %}
-              {
-                  "id": 1,
-                  "name": "{{c.st}}",
-                  "startdate": "{{c.dt}}",
-                  "enddate": "",
-                  "starttime": "",
-                  "endtime": "",
-                  {% if c.st == 'Unmarked' %}
-                  "color": "grey",
-                  {% elif c.st == 'Holiday' %}
-                  "color": "black",
-                  {% elif c.st == 'Week OFF' %}
-                  "color": "blue",
-                  {% elif c.st == 'Comp OFF' %}
-                  "color": "blue",
-                  {% elif c.st == 'Absent' %}
-                  "color": "red",
-                  {% elif c.st == 'present' %}
-                  "color": "green",
-                  {% else %}
-                  "color": "grey",
-                  {% endif %}
-
-                  "url": ""
-              },
-              {% endfor %}
-          ]
-          };
-
-          $(window).load( function() {
-              $('#mycalendar').monthly({
-                  mode: 'event',
-                  dataType: 'json',
-                  jsonURL: '',
-                  weekStart:'Mon',
-                  events: sampleEvents
-              });
-          });
-      </script>
-
-    <script src="{% static 'assets/vendors/echarts/dist/echarts.js' %}"></script>
-
-    <script type="text/javascript">
-		var echartPie = echarts.init(document.getElementById('main'));
-
-        echartPie.setOption({
-            tooltip: {
-                trigger: 'item',
-                formatter: "{a} <br/>{b} : {c} ({d}%)"
-            },
-            legend: {
-                x: 'center',
-                y: 'bottom',
-                data: ['Present', 'Absent', 'Leave', 'Company Off', 'Week Off', 'Unmarked', 'Half Day']
-            },
-            toolbox: {
-                show: true,
-                feature: {
-                    magicType: {
-                        show: true,
-                        type: ['pie', 'funnel'],
-                        option: {
-                            funnel: {
-                                x: '25%',
-                                width: '50%',
-                                funnelAlign: 'left',
-                                max: 1548
-                            }
-                        }
-                    },
-                    restore: {
-                        show: true,
-                        title: "Restore"
-                    },
-                    saveAsImage: {
-                        show: true,
-                        title: "Save Image"
-                    }
-                }
-            },
-            calculable: true,
-            color:["green","red","#f39c12","grey","black","brown", "blue"],
-            series: [{
-                name: 'ECPL',
-                type: 'pie',
-                radius: '60%',
-                center: ['50%', '48%'],
-                data: [{
-                    value: {{present_count}},
-                    name: 'Present'
-                }, {
-                    value: {{absent_count}},
-                    name: 'Absent'
-                }, {
-                    value: 0,
-                    name: 'Leave'
-                }, {
-                    value: {{comp_off_count}},
-                    name: 'Company Off'
-                }, {
-                    value: {{week_off_count}},
-                    name: 'Week Off'
-                },{
-                    value: 6,
-                    name: 'Unmarked'
-                }, {
-                    value: 0,
-                    name: 'Half Day'
-                }]
-            }]
-        });
-    </script>
     <!-- Custom Theme Scripts -->
     <script src="{% static 'assets/build/js/custom.min.js' %}"></script>
-          <script type="text/javascript">
-      $(document).ready(function() {
-          $('#datatablex').DataTable({
-            "bPaginate": true,
-            "bLengthChange": true,
-            "bFilter": true,
-            "bInfo": true,
-              dom: 'lBfrtip',
-              buttons: [
-                    {
-                        extend: "copy",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                    {
-                        extend: "csv",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                    {
-                        extend: "excel",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                    {
-                        extend: "pdfHtml5",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                    {
-                        extend: "print",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                ],
-                responsive: true
-          } );
-      } );
+    <script src=https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js></script>
+    <script>
+      $('.select2').select2();
     </script>
 
   </body>
