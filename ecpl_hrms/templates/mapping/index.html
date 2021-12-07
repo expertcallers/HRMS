@@ -9,11 +9,15 @@
                     <h4><b><u>Features</u></b></h4>
                 </div>
                 <div>
+                    {% if user.username == '8' %}
+                    <p>No Access</p>
+                    {% else %}
                     <div style="margin: 0px 40px;">
                         <i class="fa fa-address-card" aria-hidden="true" style="font-size: 24px;"></i>
                         <h5>Update RM1, RM2, RM3 and Team</h5>
                         <a href="/mapping/update-employee-profile">Click Here !</a>
                     </div>
+                    {% endif %}
                 </div>
                 <div style="margin-top:50px">
                     <div style="margin: 0px 40px;">
