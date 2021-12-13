@@ -84,15 +84,15 @@
                   <li><a><i class="fa fa-clock-o"></i>Attendance <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/ams/ams-update-attendance"><i class="fa fa-calendar"></i>Mark Attendance</a></li>
+                        <li><a href="/ams/team-attendance"><i class="fa fa-user"></i>Team Attendance</a></li>
                       <!--<li><a href="all_emp.html">Active Employees</a></li>-->
-                      <li><a href="/ams/view-att-requests">Attendance Requests</a></li>
                     </ul>
                   </li>
                   <li><a href="/ams/rm-settings"><i class="fa fa-gear"></i> Settings</a></li>
                     <li><a href="/ams/rm-mapping-index"><i class="fa fa-user"></i> Mapping</a></li>
+                    <!--<li><a href="/ams/add-new-job"><i class="fa fa-check-square-o"></i> Job Requisition Form</a></li>-->
                 </ul>
               </div>
-
             </div>
             <!-- /sidebar menu -->
 
@@ -337,6 +337,15 @@
                 ],
                 responsive: true
           } );
+      } );
+      $('#datatable').DataTable( {
+          responsive: true
+      } );
+      $('#datatable_two').DataTable( {
+          responsive: true
+      } );
+      $('#datatable_three').DataTable( {
+          responsive: true
       } );
     </script>
 

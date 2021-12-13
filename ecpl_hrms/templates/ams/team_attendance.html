@@ -55,7 +55,7 @@
                       <td class="align-middle">{{i.emp_team}}</td>
 
                       <td class="align-middle">
-                        <form action="/ams/ams-update-attendance" method="POST" enctype="multipart/form-data">
+                        <form action="/ams/apply-attendance" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                           <div>
                             <input type="hidden" value="{{i.date}}" name="date">
@@ -136,7 +136,7 @@
                       <td class="align-middle">{{i.emp_team}}</td>
 
                       <td class="align-middle">
-                        <form action="/ams/ams-update-attendance" method="POST" enctype="multipart/form-data">
+                        <form action="/ams/apply-attendance" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                           <div>
                             <input type="hidden" value="{{i.date}}" name="date">
@@ -217,7 +217,7 @@
                       <td class="align-middle">{{i.emp_team}}</td>
 
                       <td class="align-middle">
-                        <form action="/ams/ams-update-attendance" method="POST" enctype="multipart/form-data">
+                        <form action="/ams/apply-attendance" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                           <div>
                             <input type="hidden" value="{{i.date}}" name="date">
@@ -278,11 +278,11 @@
         $they.setDate($yesterday.getDate() - 1);
         $("#todaydate").html(moment($today).format('YYYY-MM-DD'));
         $("#yesdate").html(moment($yesterday).format('YYYY-MM-DD'));
-        $("#tyesdate").html(moment($they).format('YYYY-MM-DD'));
+        $("#tyesdate").html(moment($they).format('YYYY-MM-DD')); 
         $("#ttodaydate").html(moment($today).format('DD-MMM-YYYY'));
         $("#ttyesdate").html(moment($yesterday).format('DD-MMM-YYYY'));
-        $("#tttyesdate").html(moment($they).format('DD-MMM-YYYY'));
-      });
+        $("#tttyesdate").html(moment($they).format('DD-MMM-YYYY')); 
+      });   
     </script>
 
 {% endblock %}

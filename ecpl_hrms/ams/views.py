@@ -18,7 +18,7 @@ from datetime import date
 from django.db.models import Q
 
 manager_list = ['Associate Director','Assistant Manager','Team Leader','Operations Manager','Trainer','Command Centre Head','Process Trainer','Learning and Development Head','Service Delivery Manager','Trainer Sales',
-                        'Team Leader - GB','Head-CC']
+                        'Team Leader - GB','Head-CC','Assistant Manager']
 
 hr_list = ['HR']
 
@@ -50,6 +50,7 @@ def loginAndRedirect(request):
 
             if request.user.profile.emp_desi in manager_list:
                 return redirect('/ams/tl-dashboard')
+
             elif request.user.profile.emp_desi in hr_list:
                 return redirect('/ams/hr-dashboard')
             else:
@@ -180,15 +181,15 @@ def tlDashboard(request):
     emp_name = request.user.profile.emp_name
     emp_id = request.user.profile.emp_id
     emp = Employee.objects.get(emp_id=emp_id)
-    cal = EcplCalander.objects.filter(approved_status=False,rm1=emp_name)
+    cal = EcplCalander.objects.filter(applied_status=False,rm1=emp_name)
     total_req = cal.count()
     # details
     today = date.today()
     today = str(today)
     att_details = EcplCalander.objects.filter(date = today,rm1=emp_name)
     all_active = Employee.objects.filter(emp_rm1=emp_name).order_by('emp_name')
-    all_present = EcplCalander.objects.filter(Q(rm1=emp_name) ,Q(date=today),Q(applied_status=True),Q(att_approved='approved'),Q(att_applied='present') |
-                               Q(att_applied='Half Day')).order_by('emp_name')
+    all_present = EcplCalander.objects.filter(Q(rm1=emp_name) ,Q(date=today),Q(applied_status=True),Q(att_actual='present') |
+                               Q(att_actual='Half Day')).order_by('emp_name')
 
     #Unmarked Employees
     emps = Employee.objects.filter(emp_rm1=emp_name)
@@ -200,19 +201,10 @@ def tlDashboard(request):
         else:
             unmarked_emps.append(i)
 
-    # Leaves
-    all_leaves = EcplCalander.objects.filter(Q(rm1=emp_name), Q(date=today), Q(applied_status=True),
-                                              Q(att_approved='approved'), Q(att_applied='PL') |
-                                              Q(att_applied='Hald Day') | Q(att_applied='Sick Leave') | Q(att_applied='Maternity Leave')).order_by('emp_name')
 
-    leaves_today = EcplCalander.objects.filter(Q(rm1=emp_name), Q(date=today), Q(applied_status=True),
-                                             Q(att_approved='approved'), Q(att_applied='PL') |
-                                             Q(att_applied='Hald Day') | Q(att_applied='Sick Leave') | Q(
-            att_applied='Maternity Leave')).count()
     #counts
     emp_count = Employee.objects.filter(emp_rm1=emp_name).count()
-    active_today = EcplCalander.objects.filter(Q(rm1=emp_name) ,Q(date=today),Q(applied_status=True),Q(att_approved='approved'),Q(att_applied='present') |
-                               Q(att_applied='Half Day')).count()
+    active_today = EcplCalander.objects.filter(Q(rm1=emp_name) ,Q(date=today),Q(applied_status=True)).count()
     unmarked_today = emp_count-active_today
 
     ################
@@ -233,7 +225,7 @@ def tlDashboard(request):
     data = {'emp_name': emp_name, 'emp': emp,'cal':cal, 'att_details':att_details,
             'emp_count':emp_count,'active_today':active_today,'unmarked_today':unmarked_today,
             'all_active':all_active,'all_present':all_present,'unmarked_emps':unmarked_emps,
-            'all_leaves':all_leaves,'leaves_today':leaves_today,'total_req':total_req,
+            'total_req':total_req,
 
             'present_count':present_count,'absent_count':absent_count,'week_off_count':week_off_count,
             'comp_off_count':comp_off_count,'half_day_count':half_day_count,'holiday_count':holiday_count,
@@ -402,93 +394,169 @@ def employeeDetails(request,pk):
 def applyAttendace(request):
     if request.method == 'POST':
         ddate = request.POST['date']
-        att_applied = request.POST['att_applied']
+        att_actual = request.POST['att_actual']
+        emp_name = request.POST['emp_name']
         rm1 = request.POST['rm1']
         rm2 = request.POST['rm2']
         rm3 = request.POST['rm3']
-        emp_id = request.user.profile.emp_id
-        emp_name = request.user.profile.emp_name
-        emp_desi = request.user.profile.emp_desi
-        team = request.user.profile.emp_process
+        emp_id = request.POST['emp_id']
+        emp_desi = request.POST['emp_desi']
+        team = request.POST['emp_team']
         now = datetime.now()
         cal = EcplCalander.objects.create(
-            team = team, date = ddate, emp_name = emp_name, emp_id = emp_id,
-            att_applied = att_applied,applied_by = emp_id,applied_status = True,
+            team = team, date = ddate, emp_id = emp_id,
+            att_actual = att_actual,applied_status = True,
             rm1 = rm1, rm2 = rm2, rm3 = rm3,
-            applied_on = now, emp_desi = emp_desi,
+            approved_on = now, emp_desi = emp_desi,appoved_by = request.user.profile.emp_name,
+            emp_name = emp_name
+        )
+        cal.save()
+
+        return redirect('/ams/team-attendance')
+    else:
+
+        pass
+
+def newSingleAttandance(request):
+
+    if request.method == 'POST':
+        ddate = request.POST['date']
+        att_actual = request.POST['att_actual']
+        emp_name = request.POST['emp_name']
+        rm1 = request.POST['rm1']
+        rm2 = request.POST['rm2']
+        rm3 = request.POST['rm3']
+        emp_id = request.POST['emp_id']
+        emp_desi = request.POST['emp_desi']
+        team = request.POST['emp_team']
+        now = datetime.now()
+        cal = EcplCalander.objects.create(
+            team=team, date=ddate, emp_id=emp_id,
+            att_actual=att_actual, applied_status=True,
+            rm1=rm1, rm2=rm2, rm3=rm3,
+            approved_on=now, emp_desi=emp_desi, appoved_by=request.user.profile.emp_name,
+            emp_name=emp_name
         )
         cal.save()
 
         return redirect('/ams/ams-update-attendance')
+
     else:
+        ######### Dates #################################
         today = date.today()
         yesterday = today - timedelta(days=1)
         dby_date = yesterday - timedelta(days=1)
 
-        emp_name = request.user.profile.emp_name
-        emp_id = request.user.profile.emp_id
-        emp = Employee.objects.get(emp_id=emp_id)
-        try:
-            cal_day = EcplCalander.objects.get(date=today, applied_status=True, emp_id=emp_id)
-            tdy_date = today
-            today = 'Applied'
-        except EcplCalander.DoesNotExist:
-            today = str(today)
-            tdy_date = today
-
-        try:
-            cal_yday = EcplCalander.objects.get(date=yesterday, applied_status=True, emp_id=emp_id)
-            yst_date = yesterday
-            yesterday = 'Applied'
-
-        except EcplCalander.DoesNotExist:
-            yst_date = yesterday
-            yesterday = str(yesterday)
-
-        try:
-            dby = EcplCalander.objects.get(date=dby_date, applied_status=True, emp_id=emp_id)
-            dby_date = dby_date
-            day_befor_yest = 'Applied'
-        except EcplCalander.DoesNotExist:
-            dby_date = dby_date
-            day_befor_yest = str(dby_date)
-
-        # attendance status
-        cal = EcplCalander.objects.filter(emp_id=emp_id).order_by('-date')[:3]
-
-        # Month view
-        ########### Month View ############
-        month_days = []
-        todays_date = date.today()
-        year = todays_date.year
-        month = todays_date.month
-        a, num_days = calendar.monthrange(year, month)
-        start_date = date(year, month, 1)
-        end_date = date(year, month, num_days)
-        delta = timedelta(days=1)
-        while start_date <= end_date:
-            month_days.append(start_date.strftime("%Y-%m-%d"))
-            start_date += delta
-
-        month_cal = []
-        for i in month_days:
-
-            dict = {}
+        emp_s = Employee.objects.filter(emp_id=request.user.profile.emp_id)
+        ############## Todays Attendance ###################
+        todays_list_list = []
+        for i in emp_s:
+            todays_list = {}
             try:
-                st = EcplCalander.objects.get(Q(date=i), Q(emp_name=emp_name)).att_actual
+                cal_day = EcplCalander.objects.get(date=today, applied_status=True, emp_id=i.emp_id)
+                tdy_date = today
+                todays_list['id'] = i.id
+                todays_list['emp_id'] = i.emp_id
+                todays_list['name'] = i.emp_name
+                todays_list['status'] = 'Applied'
+                todays_list['date'] = str(today)
+                todays_list['rm1'] = i.emp_rm1
+                todays_list['rm2'] = i.emp_rm2
+                todays_list['rm3'] = i.emp_rm3
+                todays_list['emp_desi'] = i.emp_desi
+                todays_list['emp_team'] = i.emp_process
 
             except EcplCalander.DoesNotExist:
-                st = 'Unmarked'
-            dict['dt'] = i
-            dict['st'] = st
-            month_cal.append(dict)
+                tdy_date = today
+                todays_list['id'] = i.id
+                todays_list['emp_id'] = i.emp_id
+                todays_list['name'] = i.emp_name
+                todays_list['status'] = str(today)
+                todays_list['date'] = str(today)
+                todays_list['rm1'] = i.emp_rm1
+                todays_list['rm2'] = i.emp_rm2
+                todays_list['rm3'] = i.emp_rm3
+                todays_list['emp_desi'] = i.emp_desi
+                todays_list['emp_team'] = i.emp_process
 
-        data = {'emp_name': emp_name, 'emp': emp, 'date': today, 'yesterday': yesterday, 'cal': cal,
-                'month_cal': month_cal,
-                'yst_date': yst_date, 'tdy_date': tdy_date,
-                'dby_date': dby_date, 'day_befor_yest': day_befor_yest}
+            todays_list_list.append(todays_list)
 
-        return render(request,'ams/attendance.html',data)
+        ############## Yesterdays Attendance ###################
+        ystday_list_list = []
+        for i in emp_s:
+            ystday_list = {}
+            try:
+                cal_day = EcplCalander.objects.get(date=yesterday, applied_status=True, emp_id=i.emp_id)
+                tdy_date = yesterday
+                ystday_list['id'] = i.id
+                ystday_list['emp_id'] = i.emp_id
+                ystday_list['name'] = i.emp_name
+                ystday_list['status'] = 'Applied'
+                ystday_list['date'] = str(yesterday)
+                ystday_list['rm1'] = i.emp_rm1
+                ystday_list['rm2'] = i.emp_rm2
+                ystday_list['rm3'] = i.emp_rm3
+                ystday_list['emp_desi'] = i.emp_desi
+                ystday_list['emp_team'] = i.emp_process
+
+            except EcplCalander.DoesNotExist:
+                tdy_date = yesterday
+                ystday_list['id'] = i.id
+                ystday_list['emp_id'] = i.emp_id
+                ystday_list['name'] = i.emp_name
+                ystday_list['status'] = str(yesterday)
+                ystday_list['date'] = str(yesterday)
+                ystday_list['rm1'] = i.emp_rm1
+                ystday_list['rm2'] = i.emp_rm2
+                ystday_list['rm3'] = i.emp_rm3
+                ystday_list['emp_desi'] = i.emp_desi
+                ystday_list['emp_team'] = i.emp_process
+
+            ystday_list_list.append(ystday_list)
+
+        ############## Day befor Yesterdays Attendance ###################
+        dby_list_list = []
+        for i in emp_s:
+            dby_list = {}
+            try:
+                cal_day = EcplCalander.objects.get(date=dby_date, applied_status=True, emp_id=i.emp_id)
+                tdy_date = dby_date
+                dby_list['id'] = i.id
+                dby_list['emp_id'] = i.emp_id
+                dby_list['name'] = i.emp_name
+                dby_list['status'] = 'Applied'
+                dby_list['date'] = str(dby_date)
+                dby_list['rm1'] = i.emp_rm1
+                dby_list['rm2'] = i.emp_rm2
+                dby_list['rm3'] = i.emp_rm3
+                dby_list['emp_desi'] = i.emp_desi
+                dby_list['emp_team'] = i.emp_process
+
+            except EcplCalander.DoesNotExist:
+                tdy_date = dby_date
+                dby_list['id'] = i.id
+                dby_list['emp_id'] = i.emp_id
+                dby_list['name'] = i.emp_name
+                dby_list['status'] = str(dby_date)
+                dby_list['date'] = str(dby_date)
+                dby_list['rm1'] = i.emp_rm1
+                dby_list['rm2'] = i.emp_rm2
+                dby_list['rm3'] = i.emp_rm3
+                dby_list['emp_desi'] = i.emp_desi
+                dby_list['emp_team'] = i.emp_process
+
+            dby_list_list.append(dby_list)
+
+        emp_id = request.user.profile.emp_id
+        emp = Employee.objects.get(emp_id=emp_id)
+
+        data = {'todays_att': todays_list_list,
+                'ystdays_att': ystday_list_list,
+                'dbys_att': dby_list_list,'emp':emp}
+
+        return render(request, 'ams/attendance.html', data)
+
+
 
 def rmApproval(request,id):
     if request.method == 'POST':
@@ -518,7 +586,131 @@ def attRequests(request):
     data = {'cal':cal,'emp':emp}
     return render(request,'ams/req_att.html',data)
 
+@login_required
+def teamAttendance(request):
+    user_nm = request.user.profile.emp_name
+    if request.method == 'POST':
+        return HttpResponse('<h1>Not Available</h1>')
+    else:
+        ######### Dates #################################
+        today = date.today()
+        yesterday = today - timedelta(days=1)
+        dby_date = yesterday - timedelta(days=1)
 
+        emp_s = Employee.objects.filter(emp_rm1=user_nm)
+        if emp_s.count()<1:
+            return HttpResponse('<h1>RM1 name and user name not matching </h1>')
+
+        ############## Todays Attendance ###################
+        todays_list_list = []
+        for i in emp_s:
+            todays_list = {}
+            try:
+                cal_day = EcplCalander.objects.get(date=today, applied_status=True, emp_id=i.emp_id)
+                tdy_date = today
+                todays_list['id']=i.id
+                todays_list['emp_id']=i.emp_id
+                todays_list['name'] = i.emp_name
+                todays_list['status'] = 'Applied'
+                todays_list['date'] = str(today)
+                todays_list['rm1'] = i.emp_rm1
+                todays_list['rm2'] = i.emp_rm2
+                todays_list['rm3'] = i.emp_rm3
+                todays_list['emp_desi'] = i.emp_desi
+                todays_list['emp_team'] = i.emp_process
+
+            except EcplCalander.DoesNotExist:
+                tdy_date = today
+                todays_list['id'] = i.id
+                todays_list['emp_id'] = i.emp_id
+                todays_list['name'] = i.emp_name
+                todays_list['status'] = str(today)
+                todays_list['date'] = str(today)
+                todays_list['rm1'] = i.emp_rm1
+                todays_list['rm2'] = i.emp_rm2
+                todays_list['rm3'] = i.emp_rm3
+                todays_list['emp_desi'] = i.emp_desi
+                todays_list['emp_team'] = i.emp_process
+
+            todays_list_list.append(todays_list)
+
+        ############## Yesterdays Attendance ###################
+        ystday_list_list = []
+        for i in emp_s:
+            ystday_list = {}
+            try:
+                cal_day = EcplCalander.objects.get(date=yesterday, applied_status=True, emp_id=i.emp_id)
+                tdy_date = yesterday
+                ystday_list['id']=i.id
+                ystday_list['emp_id']=i.emp_id
+                ystday_list['name'] = i.emp_name
+                ystday_list['status'] = 'Applied'
+                ystday_list['date'] = str(yesterday)
+                ystday_list['rm1'] = i.emp_rm1
+                ystday_list['rm2'] = i.emp_rm2
+                ystday_list['rm3'] = i.emp_rm3
+                ystday_list['emp_desi'] = i.emp_desi
+                ystday_list['emp_team'] = i.emp_process
+
+            except EcplCalander.DoesNotExist:
+                tdy_date = yesterday
+                ystday_list['id'] = i.id
+                ystday_list['emp_id'] = i.emp_id
+                ystday_list['name'] = i.emp_name
+                ystday_list['status'] = str(yesterday)
+                ystday_list['date'] = str(yesterday)
+                ystday_list['rm1'] = i.emp_rm1
+                ystday_list['rm2'] = i.emp_rm2
+                ystday_list['rm3'] = i.emp_rm3
+                ystday_list['emp_desi'] = i.emp_desi
+                ystday_list['emp_team'] = i.emp_process
+
+            ystday_list_list.append(ystday_list)
+
+        ############## Bay befor Yesterdays Attendance ###################
+        dby_list_list = []
+        for i in emp_s:
+            dby_list = {}
+            try:
+                cal_day = EcplCalander.objects.get(date=dby_date, applied_status=True, emp_id=i.emp_id)
+                tdy_date = dby_date
+                dby_list['id']=i.id
+                dby_list['emp_id']=i.emp_id
+                dby_list['name'] = i.emp_name
+                dby_list['status'] = 'Applied'
+                dby_list['date'] = str(dby_date)
+                dby_list['rm1'] = i.emp_rm1
+                dby_list['rm2'] = i.emp_rm2
+                dby_list['rm3'] = i.emp_rm3
+                dby_list['emp_desi'] = i.emp_desi
+                dby_list['emp_team'] = i.emp_process
+
+            except EcplCalander.DoesNotExist:
+                tdy_date = dby_date
+                dby_list['id'] = i.id
+                dby_list['emp_id'] = i.emp_id
+                dby_list['name'] = i.emp_name
+                dby_list['status'] = str(dby_date)
+                dby_list['date'] = str(dby_date)
+                dby_list['rm1'] = i.emp_rm1
+                dby_list['rm2'] = i.emp_rm2
+                dby_list['rm3'] = i.emp_rm3
+                dby_list['emp_desi'] = i.emp_desi
+                dby_list['emp_team'] = i.emp_process
+
+            dby_list_list.append(dby_list)
+
+        emp_id = request.user.profile.emp_id
+        emp = Employee.objects.get(emp_id=emp_id)
+
+        data = {'todays_att':todays_list_list,
+                'ystdays_att':ystday_list_list,
+                'dbys_att':dby_list_list,'emp':emp}
+
+        return render(request,'ams/team_attendance.html',data)
+
+
+@login_required
 def agentSettings(request):
     emp_id = request.user.profile.emp_id
     emp = Employee.objects.get(emp_id=emp_id)
@@ -526,6 +718,7 @@ def agentSettings(request):
     data = {'emp':emp,'form':form}
     return render(request,'ams/agent-settings.html',data)
 
+@login_required
 def rmSettings(request):
     emp_id = request.user.profile.emp_id
     emp = Employee.objects.get(emp_id=emp_id)
@@ -533,6 +726,7 @@ def rmSettings(request):
     data = {'emp':emp,'form':form}
     return render(request,'ams/rm-settings.html',data)
 
+@login_required
 def uploadImageToDB(request):
     if request.method=='POST':
         user_image = request.FILES['user-img']
@@ -545,10 +739,10 @@ def uploadImageToDB(request):
             return redirect('/ams/tl-dashboard')
         else:
             return redirect('/ams/agent-dashboard')
-
     else:
         pass
 
+@login_required
 def mappingHomePage(request):
     emp_id = request.user.profile.emp_id
     user_nm = request.user.profile.emp_name
@@ -562,6 +756,7 @@ def mappingHomePage(request):
 
     return render(request,'ams/mapping_home.html',data)
 
+@login_required
 def createMappingTicket(request):
 
     if request.method == "POST":
@@ -650,3 +845,81 @@ def approveMappingTicket(request):
     else:
         return redirect('/ams/logout')
 
+
+@login_required
+def jobRequisition(request):
+    if request.method == "POST":
+        log_user = request.user
+
+        req_date = request.POST["req_date"]
+        hc_req = request.POST["hc_required"]
+        req_raised_by = request.POST["req_rais_by"]
+        position = request.POST["position"]
+        department = request.POST["department"]
+        designation = request.POST["designation"]
+
+        process_typ_one = request.POST["pro_type_1"]
+        process_typ_two = request.POST["pro_type_2"]
+        process_typ_three = request.POST["pro_type_3"]
+        salary_rang_frm = request.POST["sal_from"]
+        salary_rang_to = request.POST["sal_to"]
+        qualification = request.POST["quali"]
+        other_quali = request.POST["other_quali"]
+        skills_set = request.POST["skills"]
+        languages = request.POST.getlist("lang")
+        shift_timing = request.POST["shift"]
+        working_from = request.POST["work_from"]
+        working_to = request.POST["work_to"]
+        # week_off = request.POST[""]
+        # week_no_days = request.POST[""]
+        # week_from = request.POST[""]
+        # week_two = request.POST[""]
+        requisition_typ = request.POST["req_type"]
+        candidate_name = request.POST["cand_name"]
+        closure_date = request.POST["clos_date"]
+        source = request.POST["source"]
+        source_empref_emp_name = request.POST["emp_name"]
+        source_empref_emp_id = request.POST["emp_id"]
+        source_social = request.POST.get('social')
+        source_partners = request.POST["partner"]
+
+        e = JobRequisition()
+
+        e.req_date = req_date
+        e.hc_req = hc_req
+        e.req_raised_by = req_raised_by
+        e.position = position
+        e.department = department
+        e.designation = designation
+        e.process_typ_one = process_typ_one
+        e.process_typ_two = process_typ_two
+        e.process_typ_three = process_typ_three
+        e.salary_rang_frm = salary_rang_frm
+        e.salary_rang_to = salary_rang_to
+        e.qualification = qualification
+        e.other_quali = other_quali
+        e.skills_set = skills_set
+        e.languages = languages
+        e.shift_timing = shift_timing
+        e.working_from = working_from
+        e.working_to = working_to
+        # e.week_off = week_off
+        # e.week_no_days =week_no_days
+        # e.week_from = week_from
+        # e.week_two = week_two
+        e.requisition_typ = requisition_typ
+        e.candidate_name = candidate_name
+        e.closure_date = closure_date
+        e.source = source
+        e.source_empref_emp_name = source_empref_emp_name
+        e.source_empref_emp_id = source_empref_emp_id
+        e.source_social = source_social
+        e.source_partners = source_partners
+        e.user_name = log_user
+        e.save()
+
+    else:
+        emp_id = request.user.profile.emp_id
+        emp = Employee.objects.get(emp_id=emp_id)
+        data = {'emp':emp}
+        return render(request,'ams/hr_job_requisition.html',data)
