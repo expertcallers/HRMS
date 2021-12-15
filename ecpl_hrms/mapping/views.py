@@ -315,6 +315,7 @@ def createUserandProfile(request):
 
         else:
             user = User.objects.create_user(username=i.emp_id, password=str(i.emp_id))
+            user.save()
             usr = User.objects.get(username=i.emp_id)
             profile = Profile.objects.create(
                 emp_id = i.emp_id,emp_name = i.emp_name, emp_desi = i.emp_desi,
@@ -322,7 +323,7 @@ def createUserandProfile(request):
                 emp_process = i.emp_process, user = usr
                                           )
             profile.save()
-            user.save()
+
 
 
 
