@@ -301,6 +301,7 @@ def createUserandProfile(request):
     for i in emp:
         user = User.objects.filter(username=i.emp_id)
         if user.exists():
+            usr = User.objects.get(username=i.emp_id)
             prof = Profile.objects.filter(emp_id = i.emp_id)
             if prof.exists():
                 pass
@@ -308,20 +309,21 @@ def createUserandProfile(request):
                 profile = Profile.objects.create(
                     emp_id=i.emp_id, emp_name=i.emp_name, emp_desi=i.emp_desi,
                     emp_rm1=i.emp_rm1, emp_rm2=i.emp_rm2, emp_rm3=i.emp_rm3,
-                    emp_process=i.emp_process, user_id=i.emp_id
+                    emp_process=i.emp_process, user=usr
                 )
                 profile.save()
 
         else:
-            user = User.objects.create_user(id=i.emp_id, username=i.emp_id, password=str(i.emp_id))
-
+            user = User.objects.create_user(username=i.emp_id, password=str(i.emp_id))
+            usr = User.objects.get(username=i.emp_id)
             profile = Profile.objects.create(
                 emp_id = i.emp_id,emp_name = i.emp_name, emp_desi = i.emp_desi,
                 emp_rm1 = i.emp_rm1, emp_rm2 = i.emp_rm2, emp_rm3 = i.emp_rm3,
-                emp_process = i.emp_process, user_id = i.emp_id
+                emp_process = i.emp_process, user = usr
                                           )
             profile.save()
             user.save()
+
 
 
 def correct_process(request):
