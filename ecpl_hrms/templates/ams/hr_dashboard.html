@@ -1,224 +1,177 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    {% load static %}
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- Meta, title, CSS, favicons, etc. -->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-	 <link rel="icon" href="images/expertcallers-icon.png" type="image/ico" />
+{% extends 'ams/base_hr_new.html' %}
+{% block main %}
+{% load static %}
 
-    <title>ECPL Attendance Management | Dashboard</title>
-
-    <!-- Bootstrap -->
-    <link href="{% static 'assets/vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="{% static 'assets/vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
-    <!-- NProgress -->
-    <link href="{% static 'assets/vendors/nprogress/nprogress.css" rel="stylesheet' %}">
-    <!-- iCheck -->
-    <link href="{% static 'assets/vendors/iCheck/skins/flat/green.css" rel="stylesheet' %}">
-
-    <!-- bootstrap-progressbar -->
-    <link href="{% static 'assets/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css' %}" rel="stylesheet">
-    <!-- JQVMap -->
-    <link href="{% static 'assets/vendors/jqvmap/dist/jqvmap.min.css' %}" rel="stylesheet"/>
-    <!-- bootstrap-daterangepicker -->
-    <link href="{% static 'assets/vendors/bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet">
-
-    <!-- Datatables -->
-    <link href="{% static 'vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}" rel="stylesheet">
-
-    <!-- Custom Theme Style -->
-    <link href="{% static 'assets/build/css/custom.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'assets/css/monthly.css' %}">
-  </head>
-  <body class="nav-md">
-  <div class="container body">
-      <div class="main_container">
-        <div class="col-md-3 left_col">
-          <div class="left_col scroll-view">
-            <div class="navbar nav_title clearfix" style="border: 0; background-color: #fff;">
-              <a href="#" class="site_title">
-                <img src="{% static 'assets/images/ecpl-logo-new.png' %}" class="imgmd" style="width: 100%">
-                <img src="{% static 'assets/images/expertcallers-icon.png' %}" class="imgsm" style="width: 100%">
-              </a>
-            </div>
-
-            <div class="clearfix"></div>
-            <!-- menu profile quick info -->
-            <div class="profile clearfix">
-              <div class="profile_pic mb-2">
-                <img src="{{user.profile.img.url}}" alt="..." class="img-circle profile_img">
-              </div>
-              <div class="profile_info">
-                <h2>{{emp.emp_name}}</h2>
-                <h2>ID: {{emp.emp_id}}</h2>
-                <h2>{{emp.emp_desi}}</h2>
-                <h2>{{emp.emp_process}}</h2>
+<!-- page content -->
+        <div class="right_col pb-4" role="main">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="welcome">
+                <p>Welcome</p>
+                <h3>{{emp.emp_name}} <span>!</span></h3>
               </div>
             </div>
-            <!-- /menu profile quick info -->
-
-            <br />
-
-           {% include 'ams/sidebar-menu_hr.html' %}
-            <!-- /sidebar menu -->
-
-            <!-- /menu footer buttons -->
-            <div class="sidebar-footer hidden-small">
-              <a data-toggle="tooltip" data-placement="top" title="Logout" href="login.html">
-                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
-              </a>
-            </div>
-            <!-- /menu footer buttons -->
           </div>
-        </div>
-
-        <!-- top navigation -->
-        <div class="top_nav">
-          <div class="nav_menu">
-              <div class="nav toggle">
-                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
-              </div>
-              <nav class="nav navbar-nav">
-              <ul class=" navbar-right">
-                <li class="nav-item dropdown open" style="padding-left: 15px;">
-                  <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{% static 'assets/images/img.jpg' %}" alt="">{{emp.emp_name}}
-                  </a>
-                  <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item"  href="/ams/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
+          <div class="row mt-3">
+            <div class="col-md-12">
+              <div class="row">
+                <div class="col-md-2">
+                  <div class="card topcards">
+                    <div class="card-header">
+                      <h2>RM1</h2>
+                    </div>
+                    <div class="card-body">
+                      <h6>{{emp.emp_rm1}}</h6>
+                    </div>
                   </div>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-        <!-- /top navigation -->
-
-        <!-- page content -->
-        <div class="right_col" role="main">
-          <!-- top tiles -->
-          <div class="row" >
-        </div>
-          <!-- /top tiles -->
-
-
-
-
-
-        </div>
-        <!-- /page content -->
-
-        <!-- footer content -->
-        <footer>
-          <div class="text-center">
-            ECPL CC Team
-          </div>
-          <div class="clearfix"></div>
-        </footer>
-        <!-- /footer content -->
-      </div>
-    </div>
-
-
-
-    <!-- Start New Designation Pop-Up -->
-      <div class="modal fade" id="add_desg" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLongTitle">Add New Designation</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <form method="" action="" enctype="">
-              <div class="modal-body">
-                <div class="row">
-                  <div class="col-md-12">
-                    <div class="form-group">
-                      <label for="new_desg">Designation Name</label>
-                      <input type="text" name="new_desg" id="new_desg" class="form-control">
+                </div>
+                <div class="col-md-2">
+                  <div class="card topcards">
+                    <div class="card-header">
+                      <h2>RM2</h2>
+                    </div>
+                    <div class="card-body">
+                      <h6>{{emp.emp_rm2}}</h6>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-2">
+                  <div class="card topcards">
+                    <div class="card-header">
+                      <h2>RM3</h2>
+                    </div>
+                    <div class="card-body">
+                      <h6>{{emp.emp_rm3}}</h6>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">Save changes</button>
-              </div>
-            </form>
+            </div>
           </div>
+          <div class="row mt-4">
+            <div class="col-md-3">
+              <div class="card-base">
+                <div class="card-icon">
+                  <span title="Total Users" id="widgetCardIcon" class="imagecard">
+                    <i class="fa fa-user"></i>
+                  </span>
+                  <div class="card-data widgetCardData">
+                    <h2 class="box-title mt-5" style="color: #2A3F54;">Total Users</h2>
+                    <h1>{{all_users_count}}</h1>
+                    <a href="/ams/viewusers" title="Style Builder" class="anchor btn btn-default" style="background: #1ABB9C; color: #fff;">
+                      View All
+                    </a>
+                  </div>
+                </div>
+                <div class="space"></div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="card-base">
+                <div class="card-icon">
+                  <span title="Total Teams" id="widgetCardIcon" class="imagecard">
+                    <i class="fa fa-users"></i>
+                  </span>
+                  <div class="card-data widgetCardData">
+                    <h2 class="box-title mt-5" style="color: #2A3F54;">Total Teams</h2>
+                    <h1>{{all_team_count}}</h1>
+                    <a href="/ams/view-all-teams" title="Style Builder" class="anchor btn btn-default" style="background: #1ABB9C; color: #fff;">
+                      View All
+                    </a>
+                  </div>
+                </div>
+                <div class="space"></div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="card-base">
+                <div class="card-icon">
+                  <span title="Job Requisitions" id="widgetCardIcon" class="imagecard" style="line-height:100px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="64" height="64" viewBox="0 0 172 172" style=" fill:#000000;"><g fill="none" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none" style="mix-blend-mode: normal"><path d="M0,172v-172h172v172z" fill="none"></path><g fill="#ffffff"><path d="M158.5625,41.65625h-16.125c-2.2264,0 -4.03125,1.80485 -4.03125,4.03125c0,2.2264 1.80485,4.03125 4.03125,4.03125h16.125c2.22539,0.00243 4.02882,1.80586 4.03125,4.03125v86c-0.00243,2.22539 -1.80586,4.02882 -4.03125,4.03125h-145.125c-2.22539,-0.00243 -4.02882,-1.80586 -4.03125,-4.03125v-86c0.00243,-2.22539 1.80586,-4.02882 4.03125,-4.03125h16.125c2.2264,0 4.03125,-1.80485 4.03125,-4.03125c0,-2.2264 -1.80485,-4.03125 -4.03125,-4.03125h-16.125c-6.67618,0.00727 -12.08648,5.41757 -12.09375,12.09375v86c0.00727,6.67618 5.41757,12.08648 12.09375,12.09375h41.65625v10.75h-14.78125c-2.2264,0 -4.03125,1.80485 -4.03125,4.03125c0,2.2264 1.80485,4.03125 4.03125,4.03125h91.375c2.2264,0 4.03125,-1.80485 4.03125,-4.03125c0,-2.2264 -1.80485,-4.03125 -4.03125,-4.03125h-14.78125v-10.75h41.65625c6.67618,-0.00727 12.08648,-5.41757 12.09375,-12.09375v-86c-0.00727,-6.67618 -5.41757,-12.08648 -12.09375,-12.09375zM108.84375,162.59375h-45.6875v-10.75h45.6875z"></path><path d="M32.67516,114.67804l5.375,10.75c0.60472,1.20701 1.77318,2.03148 3.11307,2.19659c1.33989,0.16511 2.67354,-0.35103 3.5532,-1.37513l16.125,-18.8125c1.44749,-1.69027 1.25163,-4.23372 -0.43759,-5.68244c-1.68921,-1.44872 -4.2328,-1.25472 -5.68276,0.43343l-12.17381,14.20384l-2.65993,-5.31988c-0.99789,-1.98767 -3.4169,-2.79182 -5.40619,-1.79717c-1.98929,0.99465 -2.79738,3.41234 -1.80598,5.40326z"></path><path d="M59.125,123.625c0.00012,2.22635 1.8049,4.03113 4.03125,4.03125h72.5625c2.2264,0 4.03125,-1.80485 4.03125,-4.03125c0,-2.2264 -1.80485,-4.03125 -4.03125,-4.03125h-72.5625c-2.22635,0.00012 -4.03113,1.8049 -4.03125,4.03125z"></path><path d="M118.25,1.34375h-64.5c-6.67618,0.00727 -12.08648,5.41757 -12.09375,12.09375v64.5c0.00727,6.67618 5.41757,12.08648 12.09375,12.09375h64.5c6.67618,-0.00727 12.08648,-5.41757 12.09375,-12.09375v-64.5c-0.00727,-6.67618 -5.41757,-12.08648 -12.09375,-12.09375zM109.60748,69.42619h-47.21365c-2.2264,0 -4.03125,-1.80485 -4.03125,-4.03125c0,-2.2264 1.80485,-4.03125 4.03125,-4.03125h47.21365c2.2264,0 4.03125,1.80485 4.03125,4.03125c0,2.2264 -1.80485,4.03125 -4.03125,4.03125zM109.60748,49.71875h-47.21365c-2.2264,0 -4.03125,-1.80485 -4.03125,-4.03125c0,-2.2264 1.80485,-4.03125 4.03125,-4.03125h47.21365c2.2264,0 4.03125,1.80485 4.03125,4.03125c0,2.2264 -1.80485,4.03125 -4.03125,4.03125zM109.60748,30.01131h-47.21365c-2.2264,0 -4.03125,-1.80485 -4.03125,-4.03125c0,-2.2264 1.80485,-4.03125 4.03125,-4.03125h47.21365c2.2264,0 4.03125,1.80485 4.03125,4.03125c0,2.2264 -1.80485,4.03125 -4.03125,4.03125z"></path></g></g></svg>
+                  </span>
+                  <div class="card-data widgetCardData">
+                    <h2 class="box-title mt-5" style="color: #2A3F54;">Job Requisitions</h2>
+                    <h1 id="attrition">{{all_job_count}}</h1>
+                    <a href="/ams/view-job-table" title="Style Builder" class="anchor btn btn-default" style="background: #1ABB9C; color: #fff;">
+                      View All
+                    </a>
+                  </div>
+                </div>
+                <div class="space"></div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="card-base">
+                <div class="card-icon">
+                  <span title="Leave Request" id="widgetCardIcon" class="imagecard">
+                    <i class="fa fa-calendar-times"></i>
+                  </span>
+                  <div class="card-data widgetCardData">
+                    <h2 class="box-title mt-5" style="color: #2A3F54;">Leave Request</h2>
+                    <h1 id="attrition">40</h1>
+                    <a href="#" title="Style Builder" class="anchor btn btn-default" style="background: #1ABB9C; color: #fff;">
+                      View All
+                    </a>
+                  </div>
+                </div>
+                <div class="space"></div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="card-base">
+                <div class="card-icon">
+                  <span title="Attendance Requests" id="widgetCardIcon" class="imagecard">
+                    <i class="fa fa-calendar-alt"></i>
+                  </span>
+                  <div class="card-data widgetCardData">
+                    <h2 class="box-title mt-5" style="color: #2A3F54;">Attendance Requests</h2>
+                    <h1 id="shrink">40</h1>
+                    <a href="#" title="Style Builder" class="anchor btn btn-default" style="background: #1ABB9C; color: #fff;">
+                      View All
+                    </a>
+                  </div>
+                </div>
+                <div class="space"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-4">
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <h4>Attendance Report</h4>
+                </div>
+                <div class="card-body">
+                  <form action="" method="">
+                    <div class="row">
+                      <div class="col-md-12 form-group">
+                        <label for="emp_name">Team Name</label>
+                        <select id="emp_name" name="emp_name" class="form-control select2">
+                          {% for t in team %}
+                          <option value="{{t.name}}">{{t.name}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <label for="start_date">Start Date</label>
+                        <input type="date" id="start_date" onchange="mydate(this)" name="start_date" class="form-control" value="" />
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <label for="end_date">End Date</label>
+                        <input type="date" id="end_date" onchange="mydate(this)" name="end_date" class="form-control" value="" />
+                      </div>
+                      <div class="col-md-12 form-group">
+                        <button class="form-control btn btn-primary">Submit</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
-      </div>
-    <!-- End New Designation Pop-Up -->
+        <!-- /page content -->
 
-
-
-
-
-<!-- jQuery -->
-    <script src="{% static 'assets/vendors/jquery/dist/jquery.min.js' %}"></script>
-    <!-- Bootstrap -->
-    <script src="{% static 'assets/vendors/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
-    <!-- FastClick -->
-    <script src="{% static 'assets/vendors/fastclick/lib/fastclick.js' %}"></script>
-    <!-- NProgress -->
-    <script src="{% static 'assets/vendors/nprogress/nprogress.js' %}"></script>
-    <!-- Chart.js -->
-    <script src="{% static 'assets/vendors/Chart.js/dist/Chart.min.js' %}"></script>
-    <!-- gauge.js -->
-    <script src="{% static 'assets/vendors/gauge.js/dist/gauge.min.js' %}"></script>
-    <!-- bootstrap-progressbar -->
-    <script src="{% static 'assets/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js' %}"></script>
-    <!-- iCheck -->
-    <script src="{% static 'assets/vendors/iCheck/icheck.min.js' %}"></script>
-    <!-- Skycons -->
-    <script src="{% static 'assets/vendors/skycons/skycons.js' %}"></script>
-    <!-- Flot -->
-    <script src="{% static 'assets/vendors/Flot/jquery.flot.js' %}"></script>
-    <script src="{% static 'assets/vendors/Flot/jquery.flot.pie.js' %}"></script>
-    <script src="{% static 'assets/vendors/Flot/jquery.flot.time.js' %}"></script>
-    <script src="{% static 'assets/vendors/Flot/jquery.flot.stack.js' %}"></script>
-    <script src="{% static 'assets/vendors/Flot/jquery.flot.resize.js' %}"></script>
-    <!-- Flot plugins -->
-    <script src="{% static 'assets/vendors/flot.orderbars/js/jquery.flot.orderBars.js' %}"></script>
-    <script src="{% static 'assets/vendors/flot-spline/js/jquery.flot.spline.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/flot.curvedlines/curvedLines.js' %}"></script>
-    <!-- DateJS -->
-    <script src="{% static 'assets/vendors/DateJS/build/date.js' %}"></script>
-    <!-- JQVMap -->
-    <script src="{% static 'assets/vendors/jqvmap/dist/jquery.vmap.js' %}"></script>
-    <script src="{% static 'assets/vendors/jqvmap/dist/maps/jquery.vmap.world.js' %}"></script>
-    <script src="{% static 'assets/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js' %}"></script>
-    <!-- bootstrap-daterangepicker -->
-    <script src="{% static 'assets/vendors/moment/min/moment.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
-
-    <!-- Datatables -->
-    <script src="{% static 'assets/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/datatables.net-buttons/js/dataTables.buttons.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/datatables.net-buttons/js/buttons.flash.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js' %}"></script>
-    <script src="{% static 'assets/vendors/datatables.net-scroller/js/dataTables.scroller.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/jszip/dist/jszip.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
-    <!-- Custom Theme Scripts -->
-    <script src="{% static 'assets/build/js/custom.min.js' %}"></script>
-  </body>
-</html>
+{% endblock %}

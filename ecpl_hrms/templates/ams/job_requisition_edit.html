@@ -1,0 +1,1137 @@
+{% extends 'ams/base_hr_new.html' %}
+
+{% block main %}
+  {% load static %}
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+          <div class="page-title">
+            <div class="title_left">
+              <h3>Job Requisiotion Form</h3>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <h2>Job Requisiotion Form</h2>
+                </div>
+                <div class="card-body">
+
+                  <form method="POST" action="/ams/update-job-form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="req_date">Requested Date</label>
+                          <input type="date" value="" name="req_date" id="req_date" required class="form-control">
+                          <input type="hidden" value="{{job.req_date}}" id="myreq_date">
+                          <input type="hidden" value="{{job.id}}" name="id">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="hc_required">HC Required</label>
+                          <input type="number" value="{{job.hc_req}}" min="1" name="hc_required" id="hc_required" required class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="req_rais_by">Request Raised By</label>
+                          <input type="text" value="{{job.req_raised_by}}" name="req_rais_by" id="req_rais_by" required class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="position">Position</label>
+                          <input type="text" value="{{job.position}}" name="position" id="position" required class="form-control">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="department">Department</label>
+                          <input type="hidden" id="depart" value="{{job.department}}">
+                          <input type="hidden" id="desig" value="{{job.designation}}">
+                          <select class="form-control select2" name="department" id="department" onchange="add_fields(this)">
+                            <option value="" >Please Select</option>
+                            <option value="Operations">Operations</option>
+                            <option value="Quality">Quality</option>
+                            <option value="Command Center">Command Center</option>
+                            <option value="Sevice Excellence">Sevice Excellence</option>
+                            <option value="IT">IT</option>
+                            <option value="Admin">Admin</option>
+                            <option value="L&D">L&D</option>
+                            <option value="Sales & Marketing">Sales & Marketing</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row d-none" id="dep_operations">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="CRO-Client Relationship Officer" class="designation" name="designation" id="op_cro">
+                          <label for="op_cro">CRO-Client Relationship Officer</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Patrolling Officer" class="designation" name="designation" id="op_pat">
+                          <label for="op_pat">Patrolling Officer</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="SME-Subject Matter Expert" class="designation" name="designation" id="op_sme">
+                          <label for="op_sme">SME-Subject Matter Expert</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Assistant Team Leader" class="designation" name="designation" id="op_atl">
+                          <label for="op_atl">Assistant Team Leader</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Team Leader" class="designation" name="designation" id="op_tl">
+                          <label for="op_tl">Team Leader</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required class="designation" name="designation" id="op_am" value="Assistant Manager">
+                          <label for="op_am">Assistant Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required class="designation" name="designation" id="op_man" value="Manager">
+                          <label for="op_man">Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required class="designation" name="designation" id="op_sm" value="Senior Manager">
+                          <label for="op_sm">Senior Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <hr>
+                      </div>
+                    </div>
+                    <div class="row d-none" id="dep_quality">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required class="designation" name="designation" id="qu_qa" value="Quality Analyst">
+                          <label for="qu_qa">Quality Analyst</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required class="designation" name="designation" id="qu_tl" value="Team Leader">
+                          <label for="qu_tl">Team Leader</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required class="designation" name="designation" id="qu_am" value="Assistant Manager">
+                          <label for="qu_am">Assistant Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required class="designation" name="designation" id="qu_man" value="Manager">
+                          <label for="qu_man">Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required class="designation" name="designation" id="qu_sm" value="Senior Manger">
+                          <label for="qu_sm">Senior Manger</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required class="designation" name="designation" id="qu_head" value="Head">
+                          <label for="qu_head">Head</label>
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <hr>
+                      </div>
+                    </div>
+                    <div class="row d-none" id="dep_command_center">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required class="designation" name="designation" id="cc_mis" value="MIS Executive">
+                          <label for="cc_mis">MIS Executive</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required class="designation" name="designation" id="cc_dat" value="Data Analyst">
+                          <label for="cc_dat">Data Analyst</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required class="designation" name="designation" id="cc_pow" value="PowerBI Developer">
+                          <label for="cc_pow">PowerBI Developer</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required class="designation" name="designation" id="cc_web" value="Web Developer">
+                          <label for="cc_web">Web Developer</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required class="designation" name="designation" id="cc_pay" value="Python Developer">
+                          <label for="cc_pay">Python Developer</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required class="designation" name="designation" id="cc_tl" value="Team Leader">
+                          <label for="cc_tl">Team Leader</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Assistant Manager" class="designation" name="designation" id="cc_am">
+                          <label for="cc_am">Assistant Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Manager" class="designation" name="designation" id="cc_man">
+                          <label for="cc_man">Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="MIS Manager" class="designation" name="designation" id="cc_mis_man">
+                          <label for="cc_mis_man">MIS Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Head" class="designation" name="designation" id="cc_head">
+                          <label for="cc_head">Head</label>
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <hr>
+                      </div>
+                    </div>
+                    <div class="row d-none" id="dep_sevice_excellence">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Client Service Coordinator" class="designation" name="designation" id="se_csc">
+                          <label for="se_csc">Client Service Coordinator</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="MIS Executive" class="designation" name="designation" id="se_mis">
+                          <label for="se_mis">MIS Executive</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Business Analyst" class="designation" name="designation" id="se_bus">
+                          <label for="se_bus">Business Analyst</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Data Analyst" class="designation" name="designation" id="se_dat">
+                          <label for="se_dat">Data Analyst</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Team Leader" class="designation" name="designation" id="se_tl">
+                          <label for="se_tl">Team Leader</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Assistant Manager" class="designation" name="designation" id="se_am">
+                          <label for="se_am">Assistant Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Manager" class="designation" name="designation" id="se_man">
+                          <label for="se_man">Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Head" class="designation" name="designation" id="se_head">
+                          <label for="se_head">Head</label>
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <hr>
+                      </div>
+                    </div>
+                    <div class="row d-none" id="dep_it">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="System Admin - L1" class="designation" name="designation" id="it_sa_l1">
+                          <label for="it_sa_l1">System Admin - L1</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="System Admin - L2" class="designation" name="designation" id="it_sa_l2">
+                          <label for="it_sa_l2">System Admin - L2</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Team Leader" class="designation" name="designation" id="it_tl">
+                          <label for="it_tl">Team Leader</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Assistant Manager" class="designation" name="designation" id="it_am">
+                          <label for="it_am">Assistant Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Manager" class="designation" name="designation" id="it_man">
+                          <label for="it_man">Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <hr>
+                      </div>
+                    </div>
+                    <div class="row d-none" id="dep_admin">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Office Boy" class="designation" name="designation" id="ad_ob">
+                          <label for="ad_ob">Office Boy</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Office Admin" class="designation" name="designation" id="ad_oa">
+                          <label for="ad_oa">Office Admin</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Admin Executive" class="designation" name="designation" id="ad_ae">
+                          <label for="ad_ae">Admin Executive</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Facility Lead" class="designation" name="designation" id="ad_fl">
+                          <label for="ad_fl">Facility Lead</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Assistant Manager" class="designation" name="designation" id="ad_am">
+                          <label for="ad_am">Assistant Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Manager" class="designation" name="designation" id="ad_man">
+                          <label for="ad_man">Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Head" class="designation" name="designation" id="ad_head">
+                          <label for="ad_head">Head</label>
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <hr>
+                      </div>
+                    </div>
+                    <div class="row d-none" id="dep_ld">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Softskills Trainer" class="designation" name="designation" id="ld_st">
+                          <label for="ld_st">Softskills Trainer</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Process Trainer - Sales" class="designation" name="designation" id="ld_pt_sales">
+                          <label for="ld_pt_sales">Process Trainer - Sales</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Process Trainer - Customer Service" class="designation" name="designation" id="ld_pt_cs">
+                          <label for="ld_pt_cs">Process Trainer - Customer Service</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="FLE Trainer" class="designation" name="designation" id="ld_fle">
+                          <label for="ld_fle">FLE Trainer</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Technical Trainer" class="designation" name="designation" id="ld_tt">
+                          <label for="ld_tt">Technical Trainer</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Language Trainer" class="designation" name="designation" id="ld_lt">
+                          <label for="ld_lt">Language Trainer</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Team Leader" class="designation" name="designation" id="ld_tl">
+                          <label for="ld_tl">Team Leader</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Assistant Manager" class="designation" name="designation" id="ld_am">
+                          <label for="ld_am">Assistant Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Manager" class="designation" name="designation" id="ld_man">
+                          <label for="ld_man">Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Head" class="designation" name="designation" id="ld_head">
+                          <label for="ld_head">Head</label>
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <hr>
+                      </div>
+                    </div>
+                    <div class="row d-none" id="dep_sales">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Content Developer" class="designation" name="designation" id="sm_cd">
+                          <label for="sm_cd">Content Developer</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Business Development Executive" class="designation" name="designation" id="sm_bde">
+                          <label for="sm_bde">Business Development Executive</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Business Development Manager" class="designation" name="designation" id="sm_bdm">
+                          <label for="sm_bdm">Business Development Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Head" class="designation" name="designation" id="sm_head">
+                          <label for="sm_head">Head</label>
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <hr>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="pro_type_1">Process Type 1</label>
+                          <input type="hidden" id="pro_1" value="{{job.process_typ_one}}">
+                          <select class="form-control select2" name="pro_type_1" id="pro_type_1">
+                            <option value="Domestic">Domestic</option>
+                            <option value="International">International</option>
+                            <option value="Support Staff">Support Staff</option>
+                            <option value="Support Function">Support Function</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="pro_type_2">Process Type 2</label>
+                          <input type="hidden" id="pro_2" value="{{job.process_typ_two}}">
+                          <select class="form-control select2" name="pro_type_2" id="pro_type_2">
+                            <option value="Voice">Voice</option>
+                            <option value="Nonvoice">Nonvoice</option>
+                            <option value="Email">Email</option>
+                            <option value="Chat">Chat</option>
+                            <option value="Email & Chat">Email & Chat</option>
+                            <option value="Semi voice">Semi voice</option>
+                            <option value="Support Staff">Support Staff</option>
+                            <option value="Support Function">Support Function</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="pro_type_3">Process Type 3</label>
+                          <input type="hidden" id="pro_3" value="{{job.process_typ_three}}">
+                          <select class="form-control select2" name="pro_type_3" id="pro_type_3">
+                            <option value="Sales">Sales</option>
+                            <option value="Customer service">Customer service</option>
+                            <option value="Tech Support">Tech Support</option>
+                            <option value="IT Sales/Tech Sales">IT Sales/Tech Sales</option>
+                            <option value="Lead Generation">Lead Generation</option>
+                            <option value="Appointment Setting">Appointment Setting</option>
+                            <option value="Data Mining">Data Mining</option>
+                            <option value="CCTV Monitoring">CCTV Monitoring</option>
+                            <option value="Data Entry">Data Entry</option>
+                            <option value="Support Staff">Support Staff</option>
+                            <option value="Support Function">Support Function</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="salary">Salary Range</label>
+                          <div style="width:100%; display: inline-flex;">
+                            <input type="number" value="{{job.salary_rang_frm}}" min="1" required name="sal_from" id="salary" class="form-control" placeholder="From">
+                            <input type="number" value="{{job.salary_rang_to}}" min="1" required name="sal_to" id="salaryto" class="form-control" placeholder="To">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="quali">Qualification</label>
+                          <input type="hidden" id="qualification" value="{{job.qualification}}">
+                          <select class="form-control select2" name="quali" required id="quali" onchange="myqualification(this);">
+                            <option value="SSLC">SSLC</option>
+                            <option value="12th">12th</option>
+                            <option value="Graduate">Graduate</option>
+                            <option value="Post Graduate">Post Graduate</option>
+                            <option value="Others">Others</option>
+                          </select>
+                          <input type="text" value="{{job.other_quali}}" name="other_quali" id="other_quali" class="form-control d-none mt-2" placeholder=" Please Enter Your Qualification">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="skills">Skills Set</label>
+                          <textarea class="form-control" name="skills" id="skills" rows="3" required>{{job.skills_set}}</textarea>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="lang">Languages</label>
+                          <select class="form-control select2" name="lang" required id="lang" multiple="multiple">
+
+
+                            <option value="Hindi" {% if 'Hindi' in job.languages %} selected {% endif %}>Hindi</option>
+                            <option value="English" {% if 'English' in job.languages %} selected {% endif %}>English</option>
+                            <option value="Kannada" {% if 'Kannada' in job.languages %} selected {% endif %}>Kannada</option>
+                            <option value="Urdu" {% if 'Urdu' in job.languages %} selected {% endif %}>Urdu</option>
+                            <option value="Tamil" {% if 'Tamil' in job.languages %} selected {% endif %}>Tamil</option>
+                            <option value="Arabic" {% if 'Arabic' in job.languages %} selected {% endif %}>Arabic</option>
+                            <option value="Telgu" {% if 'Telgu' in job.languages %} selected {% endif %}>Telgu</option>
+                            <option value="Malyalam" {% if 'Malyalam' in job.languages %} selected {% endif %}>Malyalam</option>
+                            <option value="French" {% if 'French' in job.languages %} selected {% endif %}>French</option>
+                            <option value="German" {% if 'German' in job.languages %} selected {% endif %}>German</option>
+
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="shift">Shift Timing</label>
+                          <input type="hidden" id="myshift" value="{{job.shift_timing}}">
+                          <select class="form-control select2" onchange="shiftt(this)" name="shift" required id="shift">
+                            <option value="Rotational - Timing">Rotational - Timing</option>
+                            <option value="Fixed - Timing">Fixed - Timing</option>
+                            <option value="Day - Timing">Day - Timing</option>
+                            <option value="Night - Timing">Night - Timing</option>
+                          </select>
+                        </div>
+                        <div id="shift_time" style="width:100%; display: inline-flex;" class="mt-2 d-none">
+                          <input type="time" value="{{job.shift_timing_frm}}" name="shift_from" id="shift_from" class="form-control" placeholder="From">
+                          <input type="time" value="{{job.shift_timing_to}}" name="shift_to" id="shift_to" class="form-control" placeholder="To">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="work_from">Working Days</label>
+                          <input type="hidden" id="mywork_from" value="{{job.working_from}}">
+                          <div style="width:100%; display: inline-flex;">
+                            <select required name="work_from" id="work_from" class="form-control">
+                              <option value="Monday">Monday</option>
+                              <option value="Tuesday">Tuesday</option>
+                              <option value="Wednesday">Wednesday</option>
+                              <option value="Thursday">Thursday</option>
+                              <option value="Friday">Friday</option>
+                              <option value="Saturday">Saturday</option>
+                              <option value="Sunday">Sunday</option>
+                            </select>
+                            <input type="hidden" id="mywork_to" value="{{job.working_to}}">
+                            <select required name="work_to" id="work_to" class="form-control">
+                              <option value="Monday">Monday</option>
+                              <option value="Tuesday">Tuesday</option>
+                              <option value="Wednesday">Wednesday</option>
+                              <option value="Thursday">Thursday</option>
+                              <option value="Friday">Friday</option>
+                              <option value="Saturday">Saturday</option>
+                              <option value="Sunday">Sunday</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="num_off">Week Off</label>
+                          <input type="number" value="{{job.week_no_days}}" onchange="week(this);" min="1" max="6" name="num_off" id="num_off" class="form-control">
+                          <div id="week_off" style="width:100%; display: inline-flex;" class="mt-2 d-none">
+                            <input type="hidden" id="myoff_from" value="{{job.week_from}}">
+                            <input type="hidden" id="myoff_to" value="{{job.week_to}}">
+                            <select required name="off_from" id="off_from" class="form-control">
+                              <option value="Monday">Monday</option>
+                              <option value="Tuesday">Tuesday</option>
+                              <option value="Wednesday">Wednesday</option>
+                              <option value="Thursday">Thursday</option>
+                              <option value="Friday">Friday</option>
+                              <option value="Saturday">Saturday</option>
+                              <option value="Sunday">Sunday</option>
+                            </select>
+                            <select required name="off_to" id="off_to" class="form-control">
+                              <option value="Monday">Monday</option>
+                              <option value="Tuesday">Tuesday</option>
+                              <option value="Wednesday">Wednesday</option>
+                              <option value="Thursday">Thursday</option>
+                              <option value="Friday">Friday</option>
+                              <option value="Saturday">Saturday</option>
+                              <option value="Sunday">Sunday</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="req_type">Requisition Type</label>
+                          <input type="hidden" id="requisition" value="{{job.requisition_typ}}">
+                          <select class="form-control select2" name="req_type" required id="req_type">
+                            <option value="Budgeted">Budgeted</option>
+                            <option value="Replacement">Replacement</option>
+                            <option value="Buffer">Buffer</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <hr>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="cand_name">Candidate Name</label>
+                          <textarea required name="cand_name" id="cand_name" class="form-control">{{job.candidate_name}}</textarea>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="clos_date">Closure Date</label>
+                          <input type="hidden" value="{{job.closure_date}}" id="myclos_date">
+                          <input type="date" value="{{job.closure_date}}" required name="clos_date" id="clos_date" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="source">Source</label>
+                          <input type="hidden" id="mysource" value="{{job.source}}">
+                          <div id="source" style="display: block; width: 100%;">
+                            <input type="radio" required class="source" name="source" onchange="esource(this)" id="sou_walk" value="Walk In">
+                            <label for="sou_walk">Walk In</label>
+                            <input type="radio" required class="source" name="source" onchange="esource(this)" id="sou_referral" value="Employee Referral">
+                            <label for="sou_referral">Employee Referral</label><br>
+                            <input type="radio" required class="source" name="source" onchange="esource(this)" id="sou_social" value="Social">
+                            <label for="sou_social">Social</label>
+                            <input type="radio" required class="source" name="source" onchange="esource(this)" id="sou_partner" value="Partners (Agency)">
+                            <label for="sou_partner">Partners (Agency)</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-3 d-none" id="pleasefill">
+                        <div class="form-group">
+                          <p>Please Fill</p>
+                          <div id="source1">
+                            <div id="part_select" class="d-none">
+                              <label for="partner">Select From List</label>
+                              <input type="hidden" id="mypartner" value="{{job.source_partners}}">
+                              <select class="form-control select2" name="partner" id="partner" style="width:100%;">
+                                <option value="" selected disabled>Please Choose</option>
+                                <option value="Cappricous">Cappricous</option>
+                                <option value="V4u">V4u</option>
+                                <option value="Yukthi">Yukthi</option>
+                                <option value="Amino Infotech">Amino Infotech</option>
+                                <option value="ShubadraJobs">ShubadraJobs</option>
+                                <option value="Delphic">Delphic</option>
+                                <option value="E & Q">E & Q</option>
+                                <option value="Brain & Skills">Brain & Skills</option>
+                                <option value="NJ">NJ</option>
+                                <option value="Bright E">Bright E</option>
+                                <option value="Swastik">Swastik</option>
+                                <option value="Allience Manpower">Allience Manpower</option>
+                                <option value="Blue collar">Blue collar</option>
+                                <option value="Futuretech">Futuretech</option>
+                                <option value="Quick consultancy">Quick consultancy</option>
+                                <option value="Vijay consultancy">Vijay consultancy</option>
+                                <option value="Career mint">Career mint</option>
+                                <option value="Job Zio">Job Zio</option>
+                                <option value="Jobzion Consultants">Jobzion Consultants</option>
+                                <option value="Laksh Agency">Laksh Agency</option>
+                                <option value="I5 Career">I5 Career</option>
+                                <option value="Millenium Jobs">Millenium Jobs</option>
+                                <option value="Ahmins Consultancy">Ahmins Consultancy</option>
+                              </select>
+                            </div>
+                            <input type="text" value="{{job.source_empref_emp_name}}" name="emp_name" id="emp_name" class="form-control d-none" placeholder="Employee Name">
+                            <input type="text" value="{{job.source_empref_emp_id}}" name="emp_id" id="emp_id" class="form-control d-none" placeholder="Employee ID">
+                            <div id="social" class="d-none" style="display: block; width: 100%;">
+
+                              <input type="hidden" id="mysocial" value="{{job.source_social}}">
+                              <input type="radio" class="social" name="social" id="fb" value="FB">
+                              <label for="fb">FB</label>
+                              <input type="radio" class="social" name="social" id="insta" value="Insta">
+                              <label for="insta">Insta</label><br>
+                              <input type="radio" class="social" name="social" id="news" value="News Paper">
+                              <label for="news">News Paper</label>
+                              <input type="radio" class="social" name="social" id="linkedin" value="LinkedIn">
+                              <label for="linkedin">LinkedIn</label><br>
+                              <input type="radio" class="social" name="social" id="website" value="Website">
+                              <label for="website">Website</label>
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-md-12" align="center">
+                        <button type="submit" class="btn btn-success btn-lg" onclick="confirm('Are you sure you want to proceed?');"  >Submit</button>
+                      </div>
+                    </div>
+                  </form>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+
+
+  <script type="text/javascript">
+    function week(e) {
+      var hello = document.getElementById('week_off')
+      var from = document.getElementById('off_from')
+      var to = document.getElementById('off_to')
+      if (e.value > 1) {
+        hello.classList.remove("d-none");
+        from.setAttribute("required","required");
+        to.setAttribute("required","required");
+      } else {
+        hello.classList.add("d-none");
+        from.removeAttribute("required","required");
+        to.removeAttribute("required","required");
+      }
+    }
+    function shiftt(e) {
+      var hello = document.getElementById('shift_time')
+      var from = document.getElementById('shift_from')
+      var to = document.getElementById('shift_to')
+      if (e.value == "Fixed - Timing") {
+        hello.classList.remove("d-none");
+        from.setAttribute("required","required");
+        to.setAttribute("required","required");
+      } else {
+        hello.classList.add("d-none");
+        from.removeAttribute("required","required");
+        to.removeAttribute("required","required");
+      }
+    }
+    function esource(e) {
+      var soc = document.querySelector('input[name="source"]:checked').value;
+      document.getElementById('pleasefill').classList.remove("d-none");
+      if (soc == "Walk In") {
+        document.getElementById('pleasefill').classList.add("d-none");
+      }
+      if (soc == "Employee Referral") {
+        document.getElementById('emp_name').classList.remove("d-none");
+        document.getElementById('emp_id').classList.remove("d-none");
+        document.getElementById('emp_name').setAttribute("required","required");
+        document.getElementById('emp_id').setAttribute("required","required");
+      } else {
+        document.getElementById('emp_name').classList.add("d-none");
+        document.getElementById('emp_id').classList.add("d-none");
+        document.getElementById('emp_name').removeAttribute("required","required");
+        document.getElementById('emp_id').removeAttribute("required","required");
+      }
+      if ( soc == "Social") {
+        document.getElementById('social').classList.remove("d-none");
+        document.getElementById('fb').setAttribute("required","required");
+        document.getElementById('insta').setAttribute("required","required");
+        document.getElementById('news').setAttribute("required","required");
+        document.getElementById('linkedin').setAttribute("required","required");
+        document.getElementById('website').setAttribute("required","required");
+      }
+      else {
+        document.getElementById('social').classList.add("d-none");
+        document.getElementById('fb').removeAttribute("required","required");
+        document.getElementById('insta').removeAttribute("required","required");
+        document.getElementById('news').removeAttribute("required","required");
+        document.getElementById('linkedin').removeAttribute("required","required");
+        document.getElementById('website').removeAttribute("required","required");
+      }
+      if (soc == "Partners (Agency)") {
+        document.getElementById('part_select').classList.remove("d-none");
+        document.getElementById('partner').setAttribute("required","required");
+      } else {
+        document.getElementById('part_select').classList.add("d-none");
+        document.getElementById('partner').removeAttribute("required","required");
+      }
+    }
+    function add_fields(e) {
+      var selected = e.value;
+      if (selected == "Sales & Marketing") {
+        document.getElementById('dep_sales').classList.remove("d-none");
+      } else {
+        document.getElementById('dep_sales').classList.add("d-none");
+      }
+      if (selected == "Operations") {
+        document.getElementById('dep_operations').classList.remove("d-none");
+
+      } else{
+        document.getElementById('dep_operations').classList.add("d-none");
+      }
+      if (selected == "Quality") {
+        document.getElementById('dep_quality').classList.remove("d-none");
+
+      } else {
+        document.getElementById('dep_quality').classList.add("d-none");
+      }
+      if (selected == "Command Center") {
+        document.getElementById('dep_command_center').classList.remove("d-none");
+
+      } else{
+        document.getElementById('dep_command_center').classList.add("d-none");
+      }
+      if (selected == "IT") {
+        document.getElementById('dep_it').classList.remove("d-none");
+      }
+      else {
+        document.getElementById('dep_it').classList.add("d-none");
+      }
+      if (selected == "Sevice Excellence") {
+        document.getElementById('dep_sevice_excellence').classList.remove("d-none");
+
+      } else{
+        document.getElementById('dep_sevice_excellence').classList.add("d-none");
+      }
+      if (selected == "Admin") {
+        document.getElementById('dep_admin').classList.remove("d-none");
+
+      } else {
+        document.getElementById('dep_admin').classList.add("d-none");
+      }
+      if (selected == "L&D") {
+        document.getElementById('dep_ld').classList.remove("d-none");
+
+      } else {
+        document.getElementById('dep_ld').classList.add("d-none");
+      }
+    }
+    function myqualification(e) {
+      var selected = e.value;
+      if (selected == "Others") {
+        document.getElementById('other_quali').classList.remove("d-none");
+        document.getElementById('other_quali').setAttribute("required","required");
+      } else {
+        document.getElementById('other_quali').classList.add("d-none");
+        document.getElementById('other_quali').removeAttribute("required","required");
+      }
+    }
+    </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script>
+        var selected = document.getElementById('depart').value;
+        if (selected == "Sales & Marketing") {
+          document.getElementById('dep_sales{{i.id}}').classList.remove("d-none");
+        } else {
+          document.getElementById('dep_sales{{i.id}}').classList.add("d-none");
+        }
+        if (selected == "Operations") {
+          document.getElementById('dep_operations{{i.id}}').classList.remove("d-none");
+
+        } else{
+          document.getElementById('dep_operations{{i.id}}').classList.add("d-none");
+        }
+        if (selected == "Quality") {
+          document.getElementById('dep_quality{{i.id}}').classList.remove("d-none");
+
+        } else {
+          document.getElementById('dep_quality{{i.id}}').classList.add("d-none");
+        }
+        if (selected == "Command Center") {
+          document.getElementById('dep_command_center{{i.id}}').classList.remove("d-none");
+
+        } else{
+          document.getElementById('dep_command_center{{i.id}}').classList.add("d-none");
+        }
+        if (selected == "IT") {
+          document.getElementById('dep_it{{i.id}}').classList.remove("d-none");
+        }
+        else {
+          document.getElementById('dep_it{{i.id}}').classList.add("d-none");
+        }
+        if (selected == "Sevice Excellence") {
+          document.getElementById('dep_sevice_excellence{{i.id}}').classList.remove("d-none");
+
+        } else{
+          document.getElementById('dep_sevice_excellence{{i.id}}').classList.add("d-none");
+        }
+        if (selected == "Admin") {
+          document.getElementById('dep_admin{{i.id}}').classList.remove("d-none");
+
+        } else {
+          document.getElementById('dep_admin{{i.id}}').classList.add("d-none");
+        }
+        if (selected == "L&D") {
+          document.getElementById('dep_ld{{i.id}}').classList.remove("d-none");
+
+        } else {
+          document.getElementById('dep_ld{{i.id}}').classList.add("d-none");
+        }
+
+
+        var myvalue = document.getElementById('depart').value;
+        var depoptions = document.getElementById('department').options;
+        for (var j=0; j < depoptions.length; j++){
+          if(depoptions[j].value === myvalue){
+            depoptions[j].setAttribute("selected","selected");
+            break;
+          }
+        }
+
+        var protype1 = document.getElementById('pro_1').value;
+        var type1options = document.getElementById('pro_type_1').options;
+        for (var j=0; j < type1options.length; j++){
+          if(type1options[j].value === protype1){
+            type1options[j].setAttribute("selected","selected");
+            break;
+          }
+        }
+
+        var protype2 = document.getElementById('pro_2').value;
+        var type2options = document.getElementById('pro_type_2').options;
+        for (var j=0; j < type2options.length; j++){
+          if(type2options[j].value === protype2){
+            type2options[j].setAttribute("selected","selected");
+            break;
+          }
+        }
+
+        var protype3 = document.getElementById('pro_3').value;
+        var type3options = document.getElementById('pro_type_3').options;
+        for (var j=0; j < type3options.length; j++){
+          if(type3options[j].value === protype3){
+            type3options[j].setAttribute("selected","selected");
+            break;
+          }
+        }
+
+        var qualification = document.getElementById('qualification').value;
+        var qualificationop = document.getElementById('quali').options;
+        for (var j=0; j < qualificationop.length; j++){
+          if(qualificationop[j].value === qualification){
+            qualificationop[j].setAttribute("selected","selected");
+            break;
+          }
+        }
+
+        var shift = document.getElementById('myshift').value;
+        var shiftop = document.getElementById('shift').options;
+        for (var j=0; j < shiftop.length; j++){
+          if(shiftop[j].value === shift){
+            shiftop[j].setAttribute("selected","selected");
+            break;
+          }
+        }
+
+        var wofr = document.getElementById('mywork_from').value;
+        var wofrop = document.getElementById('work_from').options;
+        for (var j=0; j < wofrop.length; j++){
+          if(wofrop[j].value === wofr){
+            wofrop[j].setAttribute("selected","selected");
+            break;
+          }
+        }
+
+        var woto = document.getElementById('mywork_to').value;
+        var wotoop = document.getElementById('work_to').options;
+        for (var j=0; j < wotoop.length; j++){
+          if(wotoop[j].value === woto){
+            wotoop[j].setAttribute("selected","selected");
+            break;
+          }
+        }
+
+        var offfr = document.getElementById('myoff_from').value;
+        var offfrop = document.getElementById('off_from').options;
+        for (var j=0; j < offfrop.length; j++){
+          if(offfrop[j].value === offfr){
+            offfrop[j].setAttribute("selected","selected");
+            break;
+          }
+        }
+
+        var offto = document.getElementById('myoff_to').value;
+        var offtoop = document.getElementById('off_to').options;
+        for (var j=0; j < offtoop.length; j++){
+          if(offtoop[j].value === offto){
+            offtoop[j].setAttribute("selected","selected");
+            break;
+          }
+        }
+
+        var req = document.getElementById('requisition').value;
+        var reqop = document.getElementById('req_type').options;
+        for (var j=0; j < reqop.length; j++){
+          if(reqop[j].value === req){
+            reqop[j].setAttribute("selected","selected");
+            break;
+          }
+        }
+
+
+        var part = document.getElementById('mypartner').value;
+        var partop = document.getElementById('partner').options;
+        for (var j=0; j < partop.length; j++){
+          if(partop[j].value === part){
+            partop[j].setAttribute("selected","selected");
+            break;
+          }
+        }
+
+
+        var sourceva = document.getElementById('mysource').value;
+        var sour = document.getElementsByClassName("source");
+        for (var j = 0; j < sour.length ; j++) {
+          if ((sourceva == sour[j].value)) {
+            sour[j].setAttribute("checked","checked");
+          }
+        }
+
+        var socialval = document.getElementById('mysocial').value;
+        var soci = document.getElementsByClassName("social");
+        for (var j = 0; j < soci.length ; j++) {
+          if ((socialval == soci[j].value)) {
+            soci[j].setAttribute("checked","checked");
+          }
+        }
+
+        var date = document.getElementById('myreq_date').value;
+        document.getElementById('req_date').value = moment(date).format('YYYY-MM-DD');
+        var date1 = document.getElementById('myclos_date').value;
+        document.getElementById('clos_date').value = moment(date1).format('YYYY-MM-DD');
+
+        var test=document.getElementById('desig').value;
+        var position = document.getElementsByClassName("designation");
+        console.log(position.length)
+        for (var i = 0; i <= 7; i++) {
+          if ((selected == "Operations") && (test==position[i].value)) {
+            position[i].setAttribute("checked","checked");
+          }
+        }
+        for (var i = 8; i <= 13; i++) {
+          if ((selected == "Quality") && (test==position[i].value)) {
+            position[i].setAttribute("checked","checked");
+          }
+        }
+        for (var i = 14; i <= 23; i++) {
+          if ((selected == "Command Center") && (test==position[i].value)) {
+            position[i].setAttribute("checked","checked");
+          }
+        }
+        for (var i = 24; i <= 31; i++) {
+          if ((selected == "Sevice Excellence") && (test==position[i].value)) {
+            position[i].setAttribute("checked","checked");
+         }
+        }
+        for (var i = 32; i <= 36; i++) {
+          if ((selected == "IT") && (test==position[i].value)) {
+            position[i].setAttribute("checked","checked");
+          }
+        }
+        for (var i = 37; i <= 43; i++) {
+          if ((selected == "Admin") & (test==position[i].value)) {
+            position[i].setAttribute("checked","checked");
+          }
+        }
+        for (var i = 44; i <= 53; i++) {
+          if ((selected == "L&D") & (test==position[i].value)) {
+            position[i].setAttribute("checked","checked");
+          }
+        }
+        for (var i = 54; i <= 57; i++) {
+          if ((selected == "Sales & Marketing") & (test==position[i].value)) {
+            position[i].setAttribute("checked","checked");
+          }
+        }
+
+
+        if (qualification == "Others") {
+          document.getElementById('other_quali').classList.remove("d-none");
+        } else {
+          document.getElementById('other_quali').classList.add("d-none");
+        }
+        if (shift == "Fixed - Timing") {
+          document.getElementById('shift_time').classList.remove("d-none");
+        } else {
+          document.getElementById('shift_time').classList.add("d-none");
+        }
+        var e = document.getElementById('num_off');
+        if (e.value > 1) {
+          document.getElementById('week_off').classList.remove("d-none");
+        } else {
+          document.getElementById('week_off').classList.add("d-none");
+        }
+
+        $( document ).ready(function() {
+          if (sourceva == "Employee Referral") {
+            document.getElementById('pleasefill').classList.remove("d-none");
+            document.getElementById('emp_name').classList.remove("d-none");
+            document.getElementById('emp_id').classList.remove("d-none");
+          }
+          if ( sourceva == "Social") {
+            document.getElementById('social').classList.remove("d-none");
+            document.getElementById('pleasefill').classList.remove("d-none");
+          }
+          if (sourceva == "Partners (Agency)") {
+            document.getElementById('pleasefill').classList.remove("d-none");
+            document.getElementById('part_select').classList.remove("d-none");
+          }
+        });
+
+
+   </script>
+{% endblock %}

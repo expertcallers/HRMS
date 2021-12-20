@@ -28,6 +28,7 @@ urlpatterns = [
     path('agent-dashboard',agentDashBoard),
     path('ams-update-attendance',newSingleAttandance),
     path('tl-dashboard',tlDashboard),
+    path('manager-dashboard',managerDashboard),
     path('hr-dashboard',hrDashboard),
     path('add-new-user',addNewUserHR),
     path('viewusers',viewUsersHR),
@@ -35,6 +36,8 @@ urlpatterns = [
 
     path('apply-attendance',applyAttendace),
     path('team-attendance',teamAttendance),
+
+    path('view-emp-attendance',viewTeamAttendance),
 
     path('rm-approval/<int:id>',rmApproval),
     path('view-att-requests',attRequests),
@@ -51,6 +54,13 @@ urlpatterns = [
 
     path('add-new-job',jobRequisition),
 
+    path('add-newteam',addNewTeam),
+    path('view-all-teams',viewTeam),
+
+    path('add-new-job',jobRequisition),
+    path('view-job-table',jobRequisitionReportTable),
+    path('edit-job-form',viewJobEditRequisition),
+    path('update-job-form',updateJobForm),
 
 
 

@@ -2,8 +2,6 @@
 
 {% load static %}
 {% block main %}
-
-
         <!-- page content -->
         <div class="right_col" role="main">
           <!-- top tiles -->
@@ -13,64 +11,80 @@
 
         <div class="page-title">
           <div class="title_left">
-            <h3>View User</h3>
+            <h3>View Teams</h3>
           </div>
         </div>
         <div class="row">
           <div class="col-md-12">
             <div class="card">
               <div class="card-header">
-                <h2>View User</h2>
+                <h2>View Teams</h2>
               </div>
               <div class="card-body">
                 <table  id="datatablex" class="table table-striped" style="max-width: 100% !important;">
                   <thead>
                     <tr>
-                            <th>Emp Name</th>
-                            <th>Emp ID</th>
-                            <th>Designation</th>
-                            <th>RM1</th>
-                            <th>RM2</th>
-                            <th>RM3</th>
-                            <th>Process</th>
+                            <th>Team Name</th>
+                            <th>Manager</th>
                         </tr>
                   </thead>
                   <tfoot>
                     <tr>
-                            <th>Emp Name</th>
-                            <th>Emp ID</th>
-                            <th>Designation</th>
-                            <th>RM1</th>
-                            <th>RM2</th>
-                            <th>RM3</th>
-                            <th>Process</th>
+                            <th>Team Name</th>
+                            <th>Manager</th>
                         </tr>
                   </tfoot>
                   <tbody>
-                  {% for i in add %}
-                          <tr>
-                              <td>{{i.emp_name}}</td>
-                              <td>{{i.emp_id}}</td>
-                              <td>{{i.emp_desi}}</td>
-                              <td>{{i.emp_rm1}}</td>
-                              <td>{{i.emp_rm2}}</td>
-                              <td>{{i.emp_rm3}}</td>
-                              <td>{{i.emp_process}}</td>
-                          </tr>
+                  {% for i in teams %}
+                        <tr>
+                            <td>{{i.name}}</td>
+                            <td>{{i.om}}</td>
+
+                        </tr>
                   {% endfor %}
-                      </tbody>
+                  </tbody>
                   </table>
               </div>
             </div>
           </div>
         </div>
+
+
+
         </div>
         <!-- /page content -->
 
 
-
-
-
+    <!-- Start New Designation Pop-Up -->
+      <div class="modal fade" id="add_desg" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Add New Designation</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form method="" action="" enctype="">
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="new_desg">Designation Name</label>
+                      <input type="text" name="new_desg" id="new_desg" class="form-control">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    <!-- End New Designation Pop-Up -->
 
 
           <script type="text/javascript">
@@ -107,7 +121,9 @@
           } );
       } );
     </script>
-{% endblock %}
 
+
+
+{% endblock %}
 
 

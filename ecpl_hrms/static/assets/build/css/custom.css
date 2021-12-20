@@ -922,7 +922,6 @@
 
 .img-circle.profile_img {
   width: 90%;
-  height: 180px;
   background: #fff;
   margin-left: 5%;
   z-index: 1000;
@@ -933,14 +932,30 @@
 
 .profile_info {
   width: 100%;
-  text-align: center; }
+  text-align: center; 
+}
 
 
 .profile_info h2 {
   font-size: 16px;
   color: #ECF0F1;
-  margin: 0;
-  font-weight: 300; }
+  padding: 0 0 0 15px;
+  font-weight: 300;
+  text-align: left;
+}
+
+.profile_info h2 i{
+  font-size: 18px;
+  margin: 0 5px 0 0; 
+  text-align: center;
+  width: 24px;
+  color: #1ABB9C;
+}
+.profile_info h2 span{
+  font-weight: 600;
+  font-size: 18px;
+  color: #1ABB9C;
+}
 
 .profile.img_2 {
   text-align: center; }
@@ -1167,7 +1182,7 @@ body {
   padding: 10px 0; }
 
 .page-title .title_left {
-  width: 45%;
+  width: 100%;
   float: left;
   display: block; }
 
@@ -5013,6 +5028,7 @@ ul.notifications {
 .nav-sm .imgsm {
   display: all;
 }
+
 .topcards .card-header {
   height: 80px;
   text-align: center;
@@ -5025,3 +5041,38 @@ ul.notifications {
   padding: 0.75rem;
   text-align: center;
 }
+
+
+
+.card-base > .card-icon {
+  text-align: center;
+  position: relative;
+}
+
+.imagecard { 
+  z-index: 2;
+  display: block;
+  positioN: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 5px solid white;
+  box-shadow: 1px 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  margin: 0 auto;
+  color: white;
+}
+.card-base > .card-icon > .card-data {
+  /*min-height: 250px !important;*/
+  margin-top: -50px;
+  background: ghostwhite;
+  border: 1px solid #e0e0e0;
+  padding: 15px 0 10px 0;
+   box-shadow: 1px 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  min-height: 215px;
+}
+#widgetCardIcon {
+  background: #1ABB9C!important;
+  font-size: 50px;
+  line-height: 115px;
+}
+
