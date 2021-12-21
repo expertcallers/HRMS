@@ -1,26 +1,32 @@
 <!DOCTYPE html>
-{% load static %}
 <html lang="en">
   <head>
+    {% load static %}
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- Meta, title, CSS, favicons, etc. -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	 <link rel="icon" href="{% static 'assets/images/expertcallers-icon.png' %}" type="image/ico" />
+	 <link rel="icon" href="images/expertcallers-icon.png" type="image/ico" />
 
-    <title>ECPL Attendance Managment | Dashboard</title>
+    <title>ECPL Attendance Management | Dashboard</title>
 
     <!-- Bootstrap -->
-    <link href="cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
     <link href="{% static 'assets/vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="{% static 'assets/vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
     <link rel="stylesheet" href=https://pro.fontawesome.com/releases/v5.10.0/css/all.css integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
     <!-- NProgress -->
-    <link href="{% static 'assets/vendors/nprogress/nprogress.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendors/nprogress/nprogress.css" rel="stylesheet' %}">
     <!-- iCheck -->
-    <link href="{% static 'assets/vendors/iCheck/skins/flat/green.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendors/iCheck/skins/flat/green.css" rel="stylesheet' %}">
+    <!-- Datatables -->
+    <link href="{% static 'assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}" rel="stylesheet">
+
 
     <!-- bootstrap-progressbar -->
     <link href="{% static 'assets/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css' %}" rel="stylesheet">
@@ -29,61 +35,57 @@
     <!-- bootstrap-daterangepicker -->
     <link href="{% static 'assets/vendors/bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet">
 
-    <!-- Datatables -->
-    <link href="{% static 'assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}" rel="stylesheet">
-
     <!-- Custom Theme Style -->
     <link href="{% static 'assets/build/css/custom.css' %}" rel="stylesheet">
-
+    <link rel="stylesheet" href="{% static 'assets/css/monthly.css' %}">
 
     <!-- The follwing two tags to be added Can be added to base file-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-
-
-    <style type="text/css">
-      .select2-container {
-        width: 100% !important;
-      }
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
     </style>
   </head>
-
-<body class="nav-md">
-
-    <div class="container body">
+  <body class="nav-md">
+  <div class="container body">
       <div class="main_container">
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title clearfix" style="border: 0; background-color: #fff;">
-              <a href="index.html" class="site_title">
+              <a href="#" class="site_title">
                 <img src="{% static 'assets/images/ecpl-logo-new.png' %}" class="imgmd" style="width: 100%">
                 <img src="{% static 'assets/images/expertcallers-icon.png' %}" class="imgsm" style="width: 100%">
               </a>
             </div>
 
             <div class="clearfix"></div>
-
             <!-- menu profile quick info -->
             <div class="profile clearfix">
               <div class="profile_pic mb-2">
                 <img src="{{user.profile.img.url}}" alt="..." class="img-circle profile_img">
               </div>
-              <div class="profile_info">
+                <div class="profile_info">
                     <h2><i class="fa fa-user"></i><span>Name</span><br>{{emp.emp_name}}</h2>
                     <h2><i class="fa fa-id-card"></i><span>Employee ID</span><br> {{emp.emp_id}}</h2>
                     <h2><i class="fa fa-headset"></i><span>Designation</span><br> {{emp.emp_desi}}</h2>
                     <h2><i class="fa fa-users"></i><span>Team</span><br>{{emp.emp_process}}</h2>
-              </div>
+                </div>
             </div>
             <!-- /menu profile quick info -->
 
             <br />
 
-           {% include 'ams/sidebar-menu-hr.html' %}
+            <!-- sidebar menu -->
+            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+              <div class="menu_section">
+                <ul class="nav side-menu">
+                  <li><a href="/ams/tl-dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
+                    <!--<li><a href="/ams/add-new-job"><i class="fa fa-check-square-o"></i> Job Requisition Form</a></li>-->
+                </ul>
+              </div>
+            </div>
             <!-- /sidebar menu -->
 
             <!-- /menu footer buttons -->
@@ -96,11 +98,6 @@
           </div>
         </div>
 
-        <style>
-          input[type="radio"] {
-            transform: scale(1.2);
-          }
-        </style>
 
         <!-- top navigation -->
         <div class="top_nav">
@@ -112,7 +109,7 @@
               <ul class=" navbar-right">
                 <li class="nav-item dropdown open" style="padding-left: 15px;">
                   <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{% static 'assets/images/img.jpg' %}" alt="">Employee Name
+                    <img src="{{user.profile.img.url}}" alt="">{{emp.emp_name}}
                   </a>
                   <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item"  href="/ams/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
@@ -123,32 +120,10 @@
           </div>
         </div>
         <!-- /top navigation -->
-
-
-
-
 {% block main %}
 
 {% endblock %}
 
-
-
-        <!-- footer content -->
-        <footer>
-          <div class="text-center">
-            ECPL CC Team
-          </div>
-          <div class="clearfix"></div>
-        </footer>
-        <!-- /footer content -->
-      </div>
-    </div>
-
-
-
-
-    <!-- jQuery -->
-    <script src="{% static 'assets/vendors/jquery/dist/jquery.min.js' %}"></script>
     <!-- Bootstrap -->
     <script src="{% static 'assets/vendors/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
     <!-- FastClick -->
@@ -182,8 +157,9 @@
     <script src="{% static 'assets/vendors/jqvmap/dist/maps/jquery.vmap.world.js' %}"></script>
     <script src="{% static 'assets/vendors/jqvmap/examples/js/jquery.vmap.sampledata.js' %}"></script>
     <!-- bootstrap-daterangepicker -->
-    <script src="{% static 'assets/vendors/moment/moment.js' %}"></script>
+    <script src="{% static 'assets/vendors/moment/min/moment.min.js' %}"></script>
     <script src="{% static 'assets/vendors/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
+
     <!-- Datatables -->
     <script src="{% static 'assets/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
@@ -201,20 +177,172 @@
     <script src="{% static 'assets/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
     <script src="{% static 'assets/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
 
-    <!-- Custom Theme Scripts -->
-    <script src="{% static 'assets/build/js/custom.min.js' %}"></script>
-
-
-
-
-
     <!-- The follwing two tags to be added Can be added to base file-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script>
       $('.select2').select2();
-      {% if messages %}
-      alert('{% for m in messages %}{{m}}{% endfor %}');
-      {% endif %}
+    </script>
+      <script type="text/javascript" src="{% static 'assets/js/monthly.js' %}"></script>
+      <script type="text/javascript">
+          var sampleEvents = {
+          "monthly": [
+              {% for c in month_cal %}
+              {
+                  "id": 1,
+                  "name": "{{c.st}}",
+                  "startdate": "{{c.dt}}",
+                  "enddate": "",
+                  "starttime": "",
+                  "endtime": "",
+                  {% if c.st == 'Unmarked' %}
+                  "color": "grey",
+                  {% elif c.st == 'Holiday' %}
+                  "color": "black",
+                  {% elif c.st == 'Week OFF' %}
+                  "color": "blue",
+                  {% elif c.st == 'Comp OFF' %}
+                  "color": "blue",
+                  {% elif c.st == 'Absent' %}
+                  "color": "red",
+                  {% elif c.st == 'present' %}
+                  "color": "green",
+                  {% else %}
+                  "color": "grey",
+                  {% endif %}
+
+                  "url": ""
+              },
+              {% endfor %}
+          ]
+          };
+
+          $(window).load( function() {
+              $('#mycalendar').monthly({
+                  mode: 'event',
+                  dataType: 'json',
+                  jsonURL: '',
+                  weekStart:'Mon',
+                  events: sampleEvents
+              });
+          });
+      </script>
+
+    <script src="{% static 'assets/vendors/echarts/dist/echarts.js' %}"></script>
+
+    <script type="text/javascript">
+		var echartPie = echarts.init(document.getElementById('main'));
+
+        echartPie.setOption({
+            tooltip: {
+                trigger: 'item',
+                formatter: "{a} <br/>{b} : {c} ({d}%)"
+            },
+            legend: {
+                x: 'center',
+                y: 'bottom',
+                data: ['Present', 'Absent', 'Company Off', 'Week Off', 'Unmarked', 'Half Day','Holiday']
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    magicType: {
+                        show: true,
+                        type: ['pie', 'funnel'],
+                        option: {
+                            funnel: {
+                                x: '25%',
+                                width: '50%',
+                                funnelAlign: 'left',
+                                max: 1548
+                            }
+                        }
+                    },
+                    restore: {
+                        show: true,
+                        title: "Restore"
+                    },
+                    saveAsImage: {
+                        show: true,
+                        title: "Save Image"
+                    }
+                }
+            },
+            calculable: true,
+            color:["green","red","grey","black","brown", "blue",'violet'],
+            series: [{
+                name: 'ECPL',
+                type: 'pie',
+                radius: '60%',
+                center: ['50%', '48%'],
+                data: [{
+                    value: {{present_count}},
+                    name: 'Present'
+                }, {
+                    value: {{absent_count}},
+                    name: 'Absent'
+                }, {
+                    value: {{comp_off_count}},
+                    name: 'Company Off'
+                }, {
+                    value: {{week_off_count}},
+                    name: 'Week Off'
+                },{
+                    value: {{unmarked_count}},
+                    name: 'Unmarked'
+                }, {
+                    value: {{half_day_count}},
+                    name: 'Half Day'
+                },{
+                    value: {{holiday_count}},
+                    name: 'Holiday'
+                }]
+            }]
+        });
+    </script>
+    <!-- Custom Theme Scripts -->
+    <script src="{% static 'assets/build/js/custom.min.js' %}"></script>
+          <script type="text/javascript">
+      $(document).ready(function() {
+          $('#datatablex').DataTable({
+            "bPaginate": true,
+            "bLengthChange": true,
+            "bFilter": true,
+            "bInfo": true,
+              dom: 'lBfrtip',
+              buttons: [
+                    {
+                        extend: "copy",
+                        className: "btn btn-success btn-sm ml-1"
+                    },
+                    {
+                        extend: "csv",
+                        className: "btn btn-success btn-sm ml-1"
+                    },
+                    {
+                        extend: "excel",
+                        className: "btn btn-success btn-sm ml-1"
+                    },
+                    {
+                        extend: "pdfHtml5",
+                        className: "btn btn-success btn-sm ml-1"
+                    },
+                    {
+                        extend: "print",
+                        className: "btn btn-success btn-sm ml-1"
+                    },
+                ],
+                responsive: true
+          } );
+      } );
+      $('#datatable').DataTable( {
+          responsive: true
+      } );
+      $('#datatable_two').DataTable( {
+          responsive: true
+      } );
+      $('#datatable_three').DataTable( {
+          responsive: true
+      } );
     </script>
     <script type="text/javascript">
       $today = new Date();
@@ -227,5 +355,6 @@
         $end.attr("min", $start);
       }
     </script>
-</body>
+
+  </body>
 </html>

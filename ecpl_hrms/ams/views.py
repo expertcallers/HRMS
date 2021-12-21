@@ -73,13 +73,14 @@ def loginAndRedirect(request):
         data = {'teams': teams, 'form': form}
         return render(request, 'ams/login.html', data)
 
+@login_required
 def redirectTOAllDashBoards(request,id):
     if request.user.profile.emp_desi in tl_am_list:
         return redirect('/ams/tl-dashboard')
     elif request.user.profile.emp_desi in hr_list:
         return redirect('/ams/hr-dashboard')
     else:
-        return redirect('/ams/agent-dashboard')
+        return HttpResponse('<h1>Not Authorised</h1>')
 
 def logoutView(request):
     logout(request)
@@ -221,6 +222,7 @@ def tlDashboard(request):
     else:
         return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
 
+@login_required
 def managerDashboard(request):
     if request.user.profile.emp_desi in manager_list:
         mgr_name = request.user.profile.emp_name
@@ -273,7 +275,7 @@ def hrDashboard(request):
     else:
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
 
-
+@login_required
 def onboardingHR(request):
 
     if request.method == 'POST':
@@ -349,14 +351,33 @@ def onboardingHR(request):
         e.emp_idcard = emp_idcard
         e.emp_certificate = emp_certificate
         e.emp_exp_letter = emp_exp_letter
-        e.emp_upload_bank = emp_passbook
+        e.emp_passbook = emp_passbook
         e.added_by = usr_name
         e.save()
+
+        messages.info(request,'Data has been submitted successfully')
+        emp_id = request.user.profile.emp_id
+        emp = Employee.objects.get(emp_id=emp_id)
+        data = {'emp': emp}
+        return render(request, 'ams/onboarding.html', data)
+
     else:
         emp_id = request.user.profile.emp_id
         emp = Employee.objects.get(emp_id=emp_id)
         data = {'emp':emp}
         return render(request,'ams/onboarding.html',data)
+
+@login_required
+def viewOnBoarding(request):
+
+    onboard = Onboarding.objects.all()
+    emp_id = request.user.profile.emp_id
+    emp = Employee.objects.get(emp_id=emp_id)
+
+    data = {'onboard':onboard,'emp':emp}
+    return render(request, "ams/view_onboarding.html", data)
+
+
 
 @login_required
 def addNewUserHR(request):
@@ -402,7 +423,7 @@ def addNewUserHR(request):
         all_team = Employee.objects.all().values('emp_process').distinct().order_by('emp_process')
         data = {'emp': emp,'all_data':all_desi,'rms':rms,'all_team':all_team}
         return render(request,'ams/hr_add_user.html',data)
-
+@login_required
 def viewUsersHR(request):
     emp_id = request.user.profile.emp_id
     emp = Employee.objects.get(emp_id=emp_id)
@@ -410,18 +431,6 @@ def viewUsersHR(request):
     data = {'add':add,'emp':emp}
 
     return render(request,'ams/view_user_hr.html',data)
-
-def indexPage(request):
-    team_name = 'Gubagoo'
-    emp_team_obj = Employee.objects.filter(emp_process = team_name)
-    data = {'team':emp_team_obj}
-    return render(request,'ams/index.html',data)
-
-def employeeDetails(request,pk):
-    emp_id = pk
-    emp_obj = Employee.objects.get(emp_id = emp_id)
-    data = {'employee':emp_obj}
-    return render(request, 'ams/employee-details.html', data)
 
 
 @login_required
@@ -784,6 +793,61 @@ def viewTeamAttendance(request):
     else:
         return HttpResponse('<h2>*** GET not available ***</h2>')
 
+@login_required
+def teamAttendanceReport(request):
+
+    if request.method == 'POST':
+
+        start_date = request.POST['start_date']
+        end_date = request.POST['end_date']
+        team_name = request.POST['team_name']
+        start_date = start_date
+        end_date = end_date
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+        delta = end_date - start_date  # returns timedelta
+        date_list = []
+
+        for i in range(delta.days + 1):
+            day = start_date + timedelta(days=i)
+            date_list.append(day)
+
+        agt_cal_list = []
+
+        agent_list = []
+        agents = Employee.objects.filter(emp_process=team_name)
+        for i in agents:
+            agent_list.append(i.emp_name)
+
+        for i in date_list:
+            for j in agent_list:
+                agt_cal = {}
+                try:
+                    agt_calendar = EcplCalander.objects.get(date=i, emp_name=j,team=team_name)
+                    agt_cal['date'] = i
+                    agt_cal['status'] = agt_calendar.att_actual
+                    agt_cal['approved_on'] = agt_calendar.approved_on
+                    agt_cal['team'] = agt_calendar.team
+                    agt_cal['emp_name'] = agt_calendar.emp_name
+                except EcplCalander.DoesNotExist:
+                    agt_cal['date'] = i
+                    agt_cal['status'] = 'Unmarked'
+                    agt_cal['approved_on'] = 'NA'
+                    agt_cal['team'] = team_name
+                    agt_cal['emp_name'] = j
+                agt_cal_list.append(agt_cal)
+
+        emp_id = request.user.profile.emp_id
+        emp = Employee.objects.get(emp_id=emp_id)
+
+        data = {'agt_cal_list': agt_cal_list,
+                'emp': emp}
+
+        return render(request, 'ams/agent-calander-status.html', data)
+
+    else:
+        return HttpResponse('<h2>*** GET not available ***</h2>')
+
 
 @login_required
 def agentSettings(request):
@@ -922,75 +986,6 @@ def approveMappingTicket(request):
 
 
 @login_required
-def jobRequisition(request):
-    if request.method == "POST":
-        log_user = request.user
-
-        req_date = request.POST["req_date"]
-        hc_req = request.POST["hc_required"]
-        req_raised_by = request.POST["req_rais_by"]
-        position = request.POST["position"]
-        department = request.POST["department"]
-        designation = request.POST["designation"]
-        process_typ_one = request.POST["pro_type_1"]
-        process_typ_two = request.POST["pro_type_2"]
-        process_typ_three = request.POST["pro_type_3"]
-        salary_rang_frm = request.POST["sal_from"]
-        salary_rang_to = request.POST["sal_to"]
-        qualification = request.POST["quali"]
-        other_quali = request.POST["other_quali"]
-        skills_set = request.POST["skills"]
-        languages = request.POST.getlist("lang")
-        shift_timing = request.POST["shift"]
-        working_from = request.POST["work_from"]
-        working_to = request.POST["work_to"]
-        requisition_typ = request.POST["req_type"]
-        candidate_name = request.POST["cand_name"]
-        closure_date = request.POST["clos_date"]
-        source = request.POST["source"]
-        source_empref_emp_name = request.POST["emp_name"]
-        source_empref_emp_id = request.POST["emp_id"]
-        source_social = request.POST.get('social')
-        source_partners = request.POST["partner"]
-
-        e = JobRequisition()
-
-        e.req_date = req_date
-        e.hc_req = hc_req
-        e.req_raised_by = req_raised_by
-        e.position = position
-        e.department = department
-        e.designation = designation
-        e.process_typ_one = process_typ_one
-        e.process_typ_two = process_typ_two
-        e.process_typ_three = process_typ_three
-        e.salary_rang_frm = salary_rang_frm
-        e.salary_rang_to = salary_rang_to
-        e.qualification = qualification
-        e.other_quali = other_quali
-        e.skills_set = skills_set
-        e.languages = languages
-        e.shift_timing = shift_timing
-        e.working_from = working_from
-        e.working_to = working_to
-        e.requisition_typ = requisition_typ
-        e.candidate_name = candidate_name
-        e.closure_date = closure_date
-        e.source = source
-        e.source_empref_emp_name = source_empref_emp_name
-        e.source_empref_emp_id = source_empref_emp_id
-        e.source_social = source_social
-        e.source_partners = source_partners
-        e.user_name = log_user
-        e.save()
-
-    else:
-        emp_id = request.user.profile.emp_id
-        emp = Employee.objects.get(emp_id=emp_id)
-        data = {'emp':emp}
-        return render(request,'ams/hr_job_requisition.html',data)
-
-@login_required
 def addNewTeam(request):
 
     mgrs = Employee.objects.filter(emp_desi__in=manager_list)
@@ -1023,7 +1018,7 @@ def viewTeam(request):
         messages.info(request,'*** You are not authorised to view this page ***')
         return redirect('ams/logout')
 
-
+@login_required
 def jobRequisition(request):
     if request.method == "POST":
         log_user = request.user
@@ -1106,7 +1101,7 @@ def jobRequisition(request):
         data = {'emp':emp}
         return render(request, "ams/job_requisition.html",data)
 
-
+@login_required
 def jobRequisitionReportTable(request):
     job = JobRequisition.objects.all()
     emp_id = request.user.profile.emp_id
@@ -1114,7 +1109,7 @@ def jobRequisitionReportTable(request):
     data = {'emp':emp,'job':job}
     return render(request, "ams/job_requisition_report_table.html", data)
 
-
+@login_required
 def viewJobEditRequisition(request):
     if request.method == 'POST':
         rowid = request.POST.get("rowid")
@@ -1123,9 +1118,10 @@ def viewJobEditRequisition(request):
         emp = Employee.objects.get(emp_id=emp_id)
         data = {'emp':emp,'job':job}
         return render(request, "ams/job_requisition_edit.html", data)
+    else:
+        return HttpResponse('<h1>No Get method Available</h1>')
 
-
-
+@login_required
 def updateJobForm(request):
     if request.method == 'POST':
         log_user = request.user
@@ -1198,4 +1194,4 @@ def updateJobForm(request):
         job.save()
         return redirect("/ams/view-job-table")
     else:
-        pass
+        return HttpResponse('<h1>No Get method Available</h1>')

@@ -8,7 +8,7 @@
             <div class="col-md-12">
               <div class="welcome">
                 <p>Welcome</p>
-                <h3>{{emp.emp_name}} <span>!</span></h3>
+                <h3>{{emp.emp_name}}</h3>
               </div>
             </div>
           </div>
@@ -106,10 +106,10 @@
                   <span title="Leave Request" id="widgetCardIcon" class="imagecard">
                     <i class="fa fa-calendar-times"></i>
                   </span>
-                  <div class="card-data widgetCardData">
+                  <div class="card-data widgetCardData" style="background:  #dcdcdc;;">
                     <h2 class="box-title mt-5" style="color: #2A3F54;">Leave Request</h2>
-                    <h1 id="attrition">40</h1>
-                    <a href="#" title="Style Builder" class="anchor btn btn-default" style="background: #1ABB9C; color: #fff;">
+                    <h1 id="attrition"><span style="font-size:18px">Coming Soon</span></h1>
+                    <a href="#" title="Style Builder" class="anchor disabled btn btn-default" style="background: #1ABB9C; color: #fff;">
                       View All
                     </a>
                   </div>
@@ -123,10 +123,10 @@
                   <span title="Attendance Requests" id="widgetCardIcon" class="imagecard">
                     <i class="fa fa-calendar-alt"></i>
                   </span>
-                  <div class="card-data widgetCardData">
+                  <div class="card-data widgetCardData" style="background: #dcdcdc;">
                     <h2 class="box-title mt-5" style="color: #2A3F54;">Attendance Requests</h2>
-                    <h1 id="shrink">40</h1>
-                    <a href="#" title="Style Builder" class="anchor btn btn-default" style="background: #1ABB9C; color: #fff;">
+                    <h1 id="shrink"><span style="font-size:18px">Coming Soon</span></h1>
+                    <a href="#" title="Style Builder"  class="anchor disabled btn btn-default" style="background: #1ABB9C; color: #fff;">
                       View All
                     </a>
                   </div>
@@ -143,11 +143,12 @@
                   <h4>Attendance Report</h4>
                 </div>
                 <div class="card-body">
-                  <form action="" method="">
+                  <form action="/ams/team-attendance-report" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
                     <div class="row">
                       <div class="col-md-12 form-group">
                         <label for="emp_name">Team Name</label>
-                        <select id="emp_name" name="emp_name" class="form-control select2">
+                        <select id="emp_name" name="team_name" class="form-control select2">
                           {% for t in team %}
                           <option value="{{t.name}}">{{t.name}}</option>
                           {% endfor %}
@@ -155,11 +156,11 @@
                       </div>
                       <div class="col-md-6 form-group">
                         <label for="start_date">Start Date</label>
-                        <input type="date" id="start_date" onchange="mydate(this)" name="start_date" class="form-control" value="" />
+                        <input type="date" required id="start_date" onchange="mydate(this)" name="start_date" class="form-control" value="" />
                       </div>
                       <div class="col-md-6 form-group">
                         <label for="end_date">End Date</label>
-                        <input type="date" id="end_date" onchange="mydate(this)" name="end_date" class="form-control" value="" />
+                        <input type="date" required id="end_date" onchange="mydate(this)" name="end_date" class="form-control" value="" />
                       </div>
                       <div class="col-md-12 form-group">
                         <button class="form-control btn btn-primary">Submit</button>
@@ -173,5 +174,10 @@
 
         </div>
         <!-- /page content -->
+<script>
+  function runn(){
+    alert("Coming Soon");
+  }
+</script>
 
 {% endblock %}
