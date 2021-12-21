@@ -17,9 +17,9 @@ c = Calendar()
 from datetime import date
 from django.db.models import Q
 
-tl_am_list = ['Team Leader','Assistant Manager', 'Subject Matter Expert', 'Trainer',]
+tl_am_list = ['Team Leader','Assistant Manager', 'Subject Matter Expert', 'Trainer','Learning and Development Head']
 
-manager_list = ['Operations Manager','Service Delivery Manager','Manager']
+manager_list = ['Operations Manager','Service Delivery Manager','Manager',]
 
 hr_list = ['HR','HR Manager','Manager ER','HR Lead','Sr Recruiter','MIS Executive HR',
 'Lead HRBP','Employee Relations Specialist','Payroll Specialist','Recruiter','HR Generalist']
