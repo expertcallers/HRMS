@@ -2,7 +2,6 @@
 
 {% block main %}
   {% load static %}
-
         <!-- page content -->
         <div class="right_col" role="main">
             <!-- top tiles -->
@@ -32,43 +31,43 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_name">Name(As per Aadhar)</label>
-                          <input type="text" name="emp_name" id="emp_name" class="form-control" required>
+                          <input type="text" name="emp_name" required id="emp_name" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_dob">Date Of Birth (DD/MM/YYYY)</label>
-                          <input type="date" name="emp_dob" id="emp_dob" class="form-control" required>
+                          <input type="date" name="emp_dob" required id="emp_dob" max="2006-01-01" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_desg">Designation (Refer offer letter and mention)</label>
-                          <input type="text" name="emp_desg" id="emp_desg" class="form-control" required>
+                          <input type="text" name="emp_desg" required id="emp_desg" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_pro">Process (Refer offer letter and mention)</label>
-                          <input type="text" name="emp_pro" id="emp_pro" class="form-control">
+                          <input type="text" name="emp_pro" required id="emp_pro" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_pan">PAN Number</label>
-                          <input type="text" name="emp_pan" id="emp_pan" class="form-control" required>
+                          <input type="text" name="emp_pan" id="emp_pan" maxlength="10" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_aad">Aadhar Number</label>
-                          <input type="number" name="emp_aad" id="emp_aad" class="form-control" required>
+                          <input type="number" name="emp_aad" id="emp_aad" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==12) return false;" onfocusout="testing(this);" required class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_fat">Father's Name</label>
-                          <input type="text" name="emp_fat" id="emp_fat" class="form-control" required>
+                          <input type="text" required name="emp_fat" id="emp_fat" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
@@ -83,62 +82,97 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_email">Email Address</label>
-                          <input type="email" name="emp_email" id="emp_email" class="form-control" required>
+                          <input type="email" required name="emp_email" id="emp_email" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
-                          <label for="emp_ph">Contact Number</label>
-                          <input type="number" name="emp_ph" id="emp_ph" class="form-control" required>
+                          <label for="emp_ph">Contact Number (Without +91 / 0)</label>
+                          <input type="number" required pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==10) return false;" name="emp_ph" id="emp_ph" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_add">Present Address</label>
-                          <textarea name="emp_add" id="emp_add" class="form-control" rows="4" required></textarea>
+                          <textarea name="emp_add" required id="emp_add" class="form-control" rows="4"></textarea>
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_pre_add">Permanent Address</label>
-                          <textarea name="emp_pre_add" id="emp_pre_add" class="form-control" rows="4" required></textarea>
+                          <textarea name="emp_pre_add" required id="emp_pre_add" class="form-control" rows="4"></textarea>
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
-                          <label for="emp_alph">Alternate Contact Number</label>
-                          <input type="text" name="emp_alph" id="emp_alph" class="form-control">
+                          <label for="emp_alph">Alternate Contact Number (Without +91 / 0)</label>
+                          <input type="number" name="emp_alph" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==10) return false;" id="emp_alph" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_blo">Blood Group</label>
-                          <input type="text" name="emp_blo" id="emp_blo" class="form-control" required>
+                          <select name="emp_blo" id="emp_blo" class="form-control select2" required>
+                            <option value="" selected disabled>Please Select</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                          </select>
                         </div>
                       </div>
                     </div>
                     <div class="row mt-4">
                       <div class="col-md-12">
-                        <h4>Emergency Contact</h4>
+                        <h4>Emergency Contact 1</h4>
                         <p>Person to be contacted in case of emergency.</p>
                         <hr>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_emer_name">Name</label>
-                          <input type="text" name="emp_emer_name" id="emp_emer_name" class="form-control" required>
+                          <input type="text" required name="emp_emer_name" id="emp_emer_name" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
-                          <label for="emp_emer_ph">Phone Number</label>
-                          <input type="number" name="emp_emer_ph" id="emp_emer_ph" class="form-control" required>
+                          <label for="emp_emer_ph">Phone Number (Without +91 / 0)</label>
+                          <input type="number" required pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==10) return false;" name="emp_emer_ph" id="emp_emer_ph" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
-                          <label for="emp_emer_add">Addres</label>
-                          <textarea name="emp_emer_add" id="emp_emer_add" class="form-control" rows="4" required></textarea>
+                          <label for="emp_emer_add">Address</label>
+                          <textarea name="emp_emer_add" required id="emp_emer_add" class="form-control" rows="4"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-md-12">
+                        <h4>Emergency Contact 2</h4>
+                        <p>Person to be contacted in case of emergency.</p>
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_emer_name2">Name</label>
+                          <input type="text" required name="emp_emer_name2" id="emp_emer_name2" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_emer_ph2">Phone Number (Without +91 / 0)</label>
+                          <input type="number" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==10) return false;" required name="emp_emer_ph2" id="emp_emer_ph2" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_emer_add2">Address</label>
+                          <textarea name="emp_emer_add2" required id="emp_emer_add2" class="form-control" rows="4"></textarea>
                         </div>
                       </div>
                     </div>
@@ -151,67 +185,74 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_high_qua">Highest Qualification</label>
-                          <select name="emp_high_qua" id="emp_high_qua" class="form-control select2" required>
+                          <select name="emp_high_qua" id="emp_high_qua" class="form-control select2" required onchange="other_qualification(this);">
+                            <option value="" selected disabled>Please Select</option>
                             <option value="10th">10th</option>
                             <option value="12th/PUC">12th/PUC</option>
-                            <option value="Under Graduate">Under Graduate</option>
+                            <option value="Diploma">Diploma</option>
+                            <option value="Graduate">Graduate</option>
                             <option value="Post Graduate(Masters)">Post Graduate(Masters)</option>
-
+                            <option value="Others">Others</option>
                           </select>
+                          <input type="text" class="form-control mt-2 d-none" name="other_quli" id="other_quli" placeholder="Please mention your qualification.">
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
-                          <label for="emp_cou">Course</label>
+                          <label for="emp_cou">Highest Course</label>
                           <input type="text" name="emp_cou" id="emp_cou" class="form-control" required>
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
-                          <label for="emp_ins">Institution Name</label>
+                          <label for="emp_ins">Highest Course Institution Name</label>
                           <input type="text" name="emp_ins" id="emp_ins" class="form-control" required>
                         </div>
                       </div>
                     </div>
-                    <div class="row mt-4">
+                    <div class="row mt-4" id="experience_1">
                       <div class="col-md-12">
-                        <h4>Previous Work / Experience</h4>
+                        <h4>Previous Work / Experience 1</h4>
                         <!-- <p>Person to be contacted in case of emergency.</p> -->
                         <hr>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_exp">Experience in Years</label>
-                          <input type="number" name="emp_exp" id="emp_exp" class="form-control" required>
+                          <input type="number" name="emp_exp" min="0" value="0" id="emp_exp" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_ind">Industry (Ex : Agriculture/IT/BPO)</label>
-                          <select name="emp_ind" id="emp_ind" class="form-control select2" required>
-                            <option value="BPO">BPO</option>
-                            <option value="IT">IT</option>
-                            <option value="Agriculture">Agriculture</option>
-                          </select>
+                          <input type="text" name="emp_ind" id="emp_ind" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_pre_org">Name of previous organisation</label>
-                          <input type="text" name="emp_pre_org" id="emp_pre_org" class="form-control" required>
+                          <input type="text" name="emp_pre_org" id="emp_pre_org" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_pre_desg">Previous Designation</label>
-                          <input type="text" name="emp_pre_desg" id="emp_pre_desg" class="form-control" required>
+                          <input type="text" name="emp_pre_desg" id="emp_pre_desg" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_pre_empl">Period of Employment</label>
-                          <input type="text" name="emp_pre_empl" id="emp_pre_empl" class="form-control" required>
+                          <div style="display: inline-flex; width: 100%">
+                            <input type="date" name="emp_pre_empl_from" id="emp_pre_empl" placeholder="From" class="form-control">
+                            <input type="date" name="emp_pre_empl_to" class="form-control" placeholder="To">
+                          </div>
                         </div>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-md-12" align="center">
+                        <button type="button" class="btn btn-primary" onclick="addMore();">Add More</button>
                       </div>
                     </div>
                     <div class="row mt-4">
@@ -220,22 +261,68 @@
                         <!-- <p>Person to be contacted in case of emergency.</p> -->
                         <hr>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-3">
                         <div class="form-group">
                           <label for="emp_bank_name">Account Holder Name</label>
-                          <input type="text" name="emp_bank_name" id="emp_bank_name" class="form-control" required>
+                          <input type="text" required name="emp_bank_name" id="emp_bank_name" class="form-control">
                         </div>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="emp_bank_na">Bank Name</label>
+                          <input type="text" required name="emp_bank_na" id="emp_bank_na" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
                         <div class="form-group">
                           <label for="emp_bank_no">Account Number</label>
-                          <input type="number" name="emp_bank_no" id="emp_bank_no" class="form-control" required>
+                          <input type="number" required name="emp_bank_no" id="emp_bank_no" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="emp_bank_ifsc">IFSC Code</label>
+                          <input type="text" required name="emp_bank_ifsc"  maxlength="11" id="emp_bank_ifsc" class="form-control">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-md-12">
+                        <h4>Documentation Form</h4>
+                        <!-- <p>Person to be contacted in case of emergency.</p> -->
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="have_system">Do you have your own system/laptop?</label>
+                          <div style="display: inline-flex; width: 100%" id="have_system">
+                            <input type="radio" required name="have_system" id="have_system_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                            <label for="have_system_1">Yes</label>
+                            <input type="radio" required name="have_system" id="have_system_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                            <label for="have_system_0">No</label>
+                          </div>
                         </div>
                       </div>
                       <div class="col-md-4">
                         <div class="form-group">
-                          <label for="emp_bank_ifsc">IFSC Code</label>
-                          <input type="text" name="emp_bank_ifsc" id="emp_bank_ifsc" class="form-control" required>
+                          <label for="require_system">Do you require a system to be provided from the company?</label>
+                          <div style="display: inline-flex; width: 100%" id="require_system">
+                            <input type="radio" required name="require_system" value="Yes" id="require_system_1" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                            <label for="require_system_1">Yes</label>
+                            <input type="radio" required name="require_system" value="No" id="require_system_0" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                            <label for="require_system_0">No</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="wifi">Do you have Wifi/Broadbrand services at home? if yes the amount can be claimed will be reimbursed by submitting the broadbrand bill every month</label>
+                          <div style="display: inline-flex; width: 100%" id="wifi">
+                            <input type="radio" required name="wifi" id="wifi_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                            <label for="wifi_1">Yes</label>
+                            <input type="radio" required name="wifi" id="wifi_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                            <label for="wifi_0">No</label>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -245,79 +332,82 @@
                         <!-- <p>Person to be contacted in case of emergency.</p> -->
                         <hr>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-3 mt-5">
                         <div class="form-group">
-                          <label for="emp_up_aad">Aadhar Card (Front and Back page)</label>
+                          <label for="emp_up_aad">Aadhar Card Front</label>
                           <input type="file" name="emp_up_aad" id="emp_up_aad" class="form-control" required>
                         </div>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-3 mt-5">
                         <div class="form-group">
-                          <label for="emp_up_pan">PAN Card</label>
-                          <input type="file" name="emp_up_pan" id="emp_up_pan" class="form-control" required>
+                          <label for="emp_up_aad_back">Aadhar Card Back</label>
+                          <input type="file" name="emp_up_aad_back" id="emp_up_aad_back" class="form-control" required>
                         </div>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-3 mt-5">
                         <div class="form-group">
-                          <label for="emp_up_id">ID Proof Document - Passport/DL/Voters ID/Other (Government Approved)</label>
+                          <label for="emp_up_id">ID Proof Document - Passport/DL/Voters ID/Other (Government Approved) Front</label>
                           <input type="file" name="emp_up_id" id="emp_up_id" class="form-control" required>
                         </div>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-3 mt-5">
                         <div class="form-group">
-                          <label for="emp_up_edu">Educational Documents</label>
+                          <label for="emp_up_id_back">ID Proof Document - Passport/DL/Voters ID/Other (Government Approved) Back</label>
+                          <input type="file" name="emp_up_id_back" id="emp_up_id_back" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_edu">Educational Documents (10th)</label>
                           <input type="file" name="emp_up_edu" id="emp_up_edu" class="form-control" required>
                         </div>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-4 mt-5">
                         <div class="form-group">
-                          <label for="emp_up_cer">Certificates of work experience (If any)</label>
-                          <input type="file" name="emp_up_cer" id="emp_up_cer" class="form-control" required>
+                          <label for="emp_up_edu_12">Educational Documents (12th)</label>
+                          <input type="file" name="emp_up_edu_12" id="emp_up_edu_12" class="form-control">
                         </div>
                       </div>
-                      <div class="col-md-4">
+                      <div class="col-md-4 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_edu_gra">Educational Documents (Graduation/Post Graduation)</label>
+                          <input type="file" name="emp_up_edu_gra" id="emp_up_edu_gra" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_pan">PAN Card</label>
+                          <input type="file" name="emp_up_pan" id="emp_up_pan" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_cer">Certificates of work experience (If any) 1</label>
+                          <input type="file" name="emp_up_cer" id="emp_up_cer" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_cer_2">Certificates of work experience (If any) 2</label>
+                          <input type="file" name="emp_up_cer_2" id="emp_up_cer_2" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_cer_3">Certificates of work experience (If any) 3</label>
+                          <input type="file" name="emp_up_cer_3" id="emp_up_cer_3" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4 mt-5">
                         <div class="form-group">
                           <label for="emp_up_bank">Cancelled cheque/passbook/bank statement (to validate your account details)</label>
                           <input type="file" name="emp_up_bank" id="emp_up_bank" class="form-control" required>
                         </div>
                       </div>
                     </div>
-                    <!-- <div class="row mt-4">
-                      <div class="col-md-12">
-                        <h4>Needs / Requirements</h4>
-                        <hr>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label for="emp_req_lap">Do you have your own system/laptop to work?</label>
-                          <select name="emp_req_lap" id="emp_req_lap" class="form-control">
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label for="emp_req_sys">Do you require a system to be provided from the company?</label>
-                          <select name="emp_req_sys" id="emp_req_sys" class="form-control">
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label for="emp_req_lap">Do you have WiFi/Broadband services at home? (If yes, the amount can be claimed/will be reimbursed by submitting the broadband bill every month. ONLY IF WORK FROM HOME)</label>
-                          <select name="emp_req_lap" id="emp_req_lap" class="form-control">
-                            <option value="Yes">Yes</option>
-                            <option value="No">No</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div> -->
                     <div class="row mb-5 mt-4">
                       <div class="col-md-12">
-                        <button type="submit" onclick="confirm('Are you sure you want to proceed?')" class="btn btn-success form-control">Submit</button>
+                        <button type="submit" onclick="return confirmm();" class="btn btn-success form-control">Submit</button>
                       </div>
                     </div>
                   </form>
@@ -329,6 +419,35 @@
 
         </div>
         <!-- /page content -->
+
+
+
+<script>
+function other_qualification(e) {
+  var other = $("#other_quli");
+  if (e.value == "Others"){
+    other.removeClass("d-none");
+    other.attr("required","required");
+  } else {
+    other.addClass("d-none");
+    other.removeAttr("required","required");
+  }
+}
+var n=1;
+function addMore() {
+  n=n+1;
+  var ex = document.getElementById('experience_1');
+  if (n<=3) {
+    html = '<div class="row mt-4" id="experience_'+n+'">  <div class="col-md-12">    <h4>Previous Work / Experience '+n+'</h4>    <hr>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_exp_'+n+'">Experience in Years</label>      <input type="number" name="emp_exp_'+n+'" required min="0" value="0" id="emp_exp_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_ind_'+n+'">Industry (Ex : Agriculture/IT/BPO)</label>      <input type="text" name="emp_ind_'+n+'" required id="emp_ind_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_pre_org_'+n+'">Name of previous organisation</label>      <input type="text" name="emp_pre_org_'+n+'" required id="emp_pre_org_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_pre_desg_'+n+'">Previous Designation</label>      <input type="text" name="emp_pre_desg_'+n+'" required id="emp_pre_desg_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_pre_empl_'+n+'">Period of Employment</label>      <div style="display: inline-flex; width: 100%">        <input type="date" name="emp_pre_empl_from_'+n+'" id="emp_pre_empl_'+n+'" required placeholder="From" class="form-control">        <input type="date" name="emp_pre_empl_to_'+n+'" class="form-control" required placeholder="To">      </div>    </div>  </div></div>';
+    ex.insertAdjacentHTML('beforeend',html);
+  } else {
+    alert("Reached Maximum :)");
+  }
+}
+
+</script>
+
+
 
 
 {% endblock %}

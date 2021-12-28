@@ -1,0 +1,157 @@
+{% extends 'ams/base_common.html' %}
+
+{% block main %}
+  {% load static %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="page-title">
+            <div class="title_left">
+            </div>
+          </div>
+          <div class="row mt-4 pb-4">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <h4>Leave Requests</h4>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <table  id="datatablex" class="table table-striped" style="max-width: 100% !important;">
+                        <thead>
+                          <tr>
+                            <th>Applied On</th>
+                            <th>Employee Name</th>
+                            <th>Employee ID</th>
+                            <th>Applied For Dates</th>
+                            <th>Number of days</th>
+                            <th>Leave Type</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tfoot>
+                          <tr>
+                            <th>Applied On</th>
+                            <th>Employee Name</th>
+                            <th>Employee ID</th>
+                            <th>Applied For Dates</th>
+                            <th>Number of days</th>
+                            <th>Leave Type</th>
+                            <th>Action</th>
+                          </tr>
+                        </tfoot>
+                        <tbody>
+                        {% for i in leave_request %}
+
+                          <tr>
+                              <td>{{i.applied_date}}</td>
+                              <td>{{i.emp_name}}</td>
+                              <td>{{i.emp_id}}</td>
+                              <td>{{i.start_date}} to {{i.end_date}}</td>
+                              <td>{{i.no_days}}</td>
+                              <td>{{i.leave_type}}</td>
+                              <td>
+                                  <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#view_{{i.id}}">View</button>
+                              </td>
+                          </tr>
+
+                        {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div> 
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+
+
+    <!-- Start New Designation Pop-Up -->
+        {% for i in leave_request %}
+      <div class="modal fade" id="view_{{i.id}}" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">View Request</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+              <form action="/ams/view-leave-request-mgr" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-6 mt-2">
+                    <label for="emp_name">Employee Name</label>
+                    <input type="text" readonly value="{{i.emp_name}}" id="emp_name" class="form-control">
+                  </div>
+                  <div class="col-md-6 mt-2">
+                    <label for="emp_id">Employee ID</label>
+                    <input type="text" readonly value="{{i.emp_id}}"  name="emp_id" id="emp_id" class="form-control">
+                  </div>
+                  <div class="col-md-4 mt-2">
+                    <label for="app_on">Applied On</label>
+                    <input type="text" readonly value="{{i.applied_date}}" id="app_on" class="form-control">
+                  </div>
+                  <div class="col-md-8 mt-2">
+                    <label for="app_for">Applied For Dates</label>
+                    <input type="text" readonly value="{{i.start_date}} to {{i.end_date}}" id="app_for" class="form-control">
+                  </div>
+                  <div class="col-md-4 mt-2">
+                    <label for="num_days">Number of Days</label>
+                    <input type="text" readonly value="{{i.no_days}}" id="num_days" class="form-control">
+                  </div>
+                  <div class="col-md-4 mt-2">
+                    <label for="leave_type">Leave Type</label>
+                    <input type="text" readonly  value="{{i.leave_type}}" id="leave_type" class="form-control">
+                  </div>
+                  <div class="col-md-4 mt-2">
+                    <label for="tl_app">TL Status</label>
+                    <input type="text" readonly value="{{i.tl_status}}" id="tl_app" class="form-control">
+                  </div>
+                  <div class="col-md-6 mt-2">
+                    <label for="reason">Employee Reason</label>
+                    <textarea id="reason" name="reason" class="form-control" rows="3" readonly>{{i.agent_reason}}</textarea>
+                  </div>
+                  <div class="col-md-6 mt-2">
+                    <label for="tl_reason">TL Comments</label>
+                    <textarea id="tl_reason" readonly class="form-control" rows="3">{{i.tl_reason}}</textarea>
+                  </div>
+                  <div class="col-md-6 mt-2">
+                    <label for="app">Select</label>
+                    <div id="app" style="width:100%; display: inline-flex;">
+                      <select name="tl_response" id="" class="form-control">
+                        <option value="Approve" class="form-control">Approve</option>
+                        <option value="Reject" class="form-control">Reject</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mt-2">
+                    <label for="om_reason">Comments</label>
+                    <textarea id="om_reason" name="tl_reason" class="form-control" rows="3" required></textarea>
+                  </div>
+
+                </div>
+              </div>
+                <div>
+                  <input type="hidden" name="id" value="{{i.id}}">
+                </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" onclick="return confirmm();" class="btn btn-success">Submit</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+        {% endfor %}
+    <!-- End New Designation Pop-Up -->
+
+
+
+
+
+
+{% endblock %}

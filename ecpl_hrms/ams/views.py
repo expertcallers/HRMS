@@ -24,6 +24,8 @@ manager_list = ['Operations Manager','Service Delivery Manager','Manager',]
 hr_list = ['HR','HR Manager','Manager ER','HR Lead','Sr Recruiter','MIS Executive HR',
 'Lead HRBP','Employee Relations Specialist','Payroll Specialist','Recruiter','HR Generalist']
 
+agent_list = ['Jr Dev']
+
 # Create your views here.
 def loginPage(request):
     logout(request)
@@ -207,18 +209,24 @@ def tlDashboard(request):
         # Mapping Tickets >>
         map_tickets_counts = MappingTickets.objects.filter(new_rm3 = emp_name,status=False).count()
 
+        #Leaves
+        leave_req_count = LeaveTable.objects.filter(emp_rm1 = emp_name,tl_approval = False).count()
+
         data = {'emp_name': emp_name, 'emp': emp, 'att_details':att_details,
                 'emp_count':emp_count,
                 'present_count':present_count,'absent_count':absent_count,'week_off_count':week_off_count,
                 'comp_off_count':comp_off_count,'half_day_count':half_day_count,'holiday_count':holiday_count,
                 'unmarked_count':unmarked_count,'map_tickets_counts':map_tickets_counts,
-                'all_emp':all_emp
+                'all_emp':all_emp,
+                'leave_req_count':leave_req_count
                 }
         return render(request, 'ams/rm-dashboard-new.html', data)
     elif usr_desi in manager_list:
         return redirect('/ams/manager-dashboard')
     elif usr_desi in hr_list:
         return redirect('/ams/hr-dashboard')
+    elif usr_desi in agent_list:
+        return redirect('/ams/agent-dashboard')
     else:
         return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
 
@@ -246,14 +254,103 @@ def managerDashboard(request):
         #Mapping Tickets
         map_tickets_counts = MappingTickets.objects.filter(new_rm3=mgr_name, status=False).count()
 
+        #Leave Requests
+        leave_req_count = LeaveTable.objects.filter(emp_rm3=mgr_name,tl_status='Approved',manager_approval=False).count()
         data = {'emp':emp,'count_all_emps':count_all_emps,
                 'all_tls':all_tls,'all_tls_count':all_tls_count,
                 'all_ams': all_ams, 'all_ams_count': all_ams_count,
-                'map_tickets_counts':map_tickets_counts
+                'map_tickets_counts':map_tickets_counts,
+                'leave_req_count':leave_req_count
                 }
         return render(request,'ams/manager-dashboard.html',data)
     else:
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
+
+def viewAndApproveLeaveRequestMgr(request):
+
+    if request.method == 'POST':
+        id = request.POST["id"]
+        e = LeaveTable.objects.get(id=id)
+        emp_id = e.emp_id
+        team = e.emp_process
+        att_actual = e.leave_type
+        leave_type = e.leave_type
+        no_days = e.no_days
+        rm1 = e.emp_rm1
+        rm2 = e.emp_rm2
+        rm3 = e.emp_rm3
+        emp_desi = e.emp_desi
+        emp_name = e.emp_name
+        now=datetime.now()
+        start_date = e.start_date
+        end_date = e.end_date
+
+        om_response = request.POST['tl_response']
+        om_reason = request.POST['tl_reason']
+
+        if om_response == 'Approve':
+            manager_approval = True
+            manager_status = 'Approved'
+            status = 'Approved'
+
+            month_days = []
+            start_date = start_date
+            end_date = end_date
+            delta = timedelta(days=1)
+            while start_date <= end_date:
+                month_days.append(start_date.strftime("%Y-%m-%d"))
+                start_date += delta
+
+            for i in month_days:
+
+                try:
+                    cal = EcplCalander.objects.get(date = i,emp_id=emp_id)
+                    cal.att_actual = att_actual
+                    cal.save()
+
+                except EcplCalander.DoesNotExist:
+
+                    cal = EcplCalander.objects.create(
+                            team=team, date=i, emp_id=emp_id,
+                            att_actual=att_actual, applied_status=True,
+                            rm1=rm1, rm2=rm2, rm3=rm3,
+                            approved_on=now, emp_desi=emp_desi, appoved_by=request.user.profile.emp_name,
+                            emp_name=emp_name
+                        )
+                    cal.save()
+
+
+        else:
+
+            manager_approval = True
+            manager_status = 'Rejected'
+            status = 'Rejected'
+
+            leave_balance = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
+
+            if leave_type == 'PL':
+                leave_balance.pl_balance += int(no_days)
+                leave_balance.save()
+            elif leave_type == 'SL':
+                leave_balance.sl_balance += int(no_days)
+                leave_balance.save()
+
+        e.manager_approval = manager_approval
+        e.manager_reason = om_reason
+        e.manager_status = manager_status
+        e.status = status
+        e.save()
+
+        return redirect('/ams/view-leave-request-mgr')
+    else:
+
+        mgr_name = request.user.profile.emp_name
+        emp_id = request.user.profile.emp_id
+        emp = Employee.objects.get(emp_id=emp_id)
+        leave_request = LeaveTable.objects.filter(emp_rm3=mgr_name,tl_status='Approved',manager_approval=False)
+
+        data = {'emp':emp,'leave_request':leave_request}
+        return render(request,'ams/leave_approval_rm3.html',data)
 
 
 @login_required
@@ -276,15 +373,13 @@ def hrDashboard(request):
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
 
 @login_required
-def onboardingHR(request):
+def on_boarding(request):
+    if request.method == "POST":
 
-    if request.method == 'POST':
-
-        usr_name = request.user.profile.emp_name
-
+        hrname = request.user
         emp_name = request.POST["emp_name"]
         emp_dob = request.POST["emp_dob"]
-        emp_desi = request.POST["emp_desg"]
+        emp_desig = request.POST["emp_desg"]
         emp_process = request.POST["emp_pro"]
         emp_pan = request.POST["emp_pan"]
         emp_aadhar = request.POST["emp_aad"]
@@ -295,32 +390,61 @@ def onboardingHR(request):
         emp_alt_phone = request.POST["emp_alph"]
         emp_present_address = request.POST["emp_add"]
         emp_permanent_address = request.POST["emp_pre_add"]
-        emp_blood_group = request.POST["emp_blo"]
+        emp_blood = request.POST["emp_blo"]
         emp_emergency_person = request.POST["emp_emer_name"]
         emp_emergency_number = request.POST["emp_emer_ph"]
         emp_emergency_address = request.POST["emp_emer_add"]
-        emp_edu_quali = request.POST["emp_high_qua"]
+        emp_emergency_person2 = request.POST["emp_emer_name2"]
+        emp_emergency_number2 = request.POST["emp_emer_ph2"]
+        emp_emergency_address2 = request.POST["emp_emer_add2"]
+        emp_edu_qualification = request.POST["emp_high_qua"]
+        emp_quali_other = request.POST["other_quli"]
         emp_edu_course = request.POST["emp_cou"]
         emp_edu_institute = request.POST["emp_ins"]
+        # Previous Experience
         emp_pre_exp = request.POST["emp_exp"]
-        emp_pre_industry = request.POST["emp_ind"]
+        emp_pre_industry = request.POST.get("emp_ind")
         emp_pre_org_name = request.POST["emp_pre_org"]
-        emp_pre_desi = request.POST["emp_pre_desg"]
-        emp_prev_tenure = request.POST["emp_pre_empl"]
-        emp_bank_name = request.POST["emp_bank_name"]
-        emp_account_no = request.POST["emp_bank_no"]
-        emp_bank_ifsc = request.POST["emp_bank_ifsc"]
-        emp_aadhar = request.FILES["emp_up_aad"]
-        emp_pan = request.FILES["emp_up_pan"]
-        emp_idcard = request.FILES["emp_up_id"]
-        emp_certificate = request.FILES["emp_up_edu"]
-        emp_exp_letter = request.FILES["emp_up_cer"]
-        emp_passbook = request.FILES["emp_up_bank"]
-
-        e = Onboarding()
+        emp_pre_desg = request.POST["emp_pre_desg"]
+        emp_pre_period_of_employment_frm = request.POST["emp_pre_empl_from"]
+        emp_pre_period_of_employment_to = request.POST["emp_pre_empl_to"]
+        emp_pre_exp_two = request.POST.get("emp_exp_2")
+        emp_pre_industry_two = request.POST.get("emp_ind_2")
+        emp_pre_org_name_two = request.POST.get("emp_pre_org_2")
+        emp_pre_desg_two = request.POST.get("emp_pre_desg_2")
+        emp_pre_period_of_employment_frm_two = request.POST.get("emp_pre_empl_from_2")
+        emp_pre_period_of_employment_to_two = request.POST.get("emp_pre_empl_to_2")
+        emp_pre_exp_three = request.POST.get("emp_exp_3")
+        emp_pre_industry_three = request.POST.get("emp_ind_3")
+        emp_pre_org_name_three = request.POST.get("emp_pre_org_3")
+        emp_pre_desg_three = request.POST.get("emp_pre_desg_3")
+        emp_pre_period_of_employment_frm_three = request.POST.get("emp_pre_empl_from_3")
+        emp_pre_period_of_employment_to_three = request.POST.get("emp_pre_empl_to_3")
+        # Bank
+        emp_bank_holder_name = request.POST["emp_bank_name"]
+        emp_bank_name = request.POST["emp_bank_na"]
+        emp_bank_acco_no = request.POST["emp_bank_no"]
+        emp_bank_ifsc = request.POST["emp_bank_ifsc"]        #
+        have_system = request.POST["have_system"]
+        require_system = request.POST["require_system"]
+        wifi_broadband = request.POST["wifi"]
+        emp_upload_aadhar = request.FILES.get("emp_up_aad")
+        emp_upload_aadhar_back = request.FILES.get("emp_up_aad_back")
+        emp_upload_pan = request.FILES.get("emp_up_pan")
+        emp_upload_id = request.FILES.get("emp_up_id")
+        emp_upload_id_back = request.FILES.get("emp_up_id_back")
+        emp_upload_edu_sslc = request.FILES.get("emp_up_edu")
+        emp_upload_edu_twelveth = request.FILES.get("emp_up_edu_12")
+        emp_upload_edu_gradu = request.FILES.get("emp_up_edu_gra")
+        emp_upload_experience = request.FILES.get("emp_up_cer")
+        emp_upload_experience_two = request.FILES.get("emp_up_cer_2")
+        emp_upload_experience_three = request.FILES.get("emp_up_cer_3")
+        emp_upload_bank = request.FILES.get("emp_up_bank")
+        e = OnboardingnewHRC()
+        e.submit_date = datetime.now()
         e.emp_name = emp_name
         e.emp_dob = emp_dob
-        e.emp_desi = emp_desi
+        e.emp_desig = emp_desig
         e.emp_process = emp_process
         e.emp_pan = emp_pan
         e.emp_aadhar = emp_aadhar
@@ -331,46 +455,92 @@ def onboardingHR(request):
         e.emp_alt_phone = emp_alt_phone
         e.emp_present_address = emp_present_address
         e.emp_permanent_address = emp_permanent_address
-        e.emp_blood_group = emp_blood_group
+        e.emp_blood = emp_blood
+
         e.emp_emergency_person = emp_emergency_person
         e.emp_emergency_number = emp_emergency_number
         e.emp_emergency_address = emp_emergency_address
-        e.emp_edu_quali = emp_edu_quali
+        e.emp_emergency_person_two = emp_emergency_person2
+        e.emp_emergency_number_two = emp_emergency_number2
+        e.emp_emergency_address_two = emp_emergency_address2
+
+        e.emp_edu_qualification = emp_edu_qualification
+        e.emp_quali_other=emp_quali_other
         e.emp_edu_course = emp_edu_course
         e.emp_edu_institute = emp_edu_institute
+
+        # emp pevious experiance
         e.emp_pre_exp = emp_pre_exp
         e.emp_pre_industry = emp_pre_industry
         e.emp_pre_org_name = emp_pre_org_name
-        e.emp_pre_desi = emp_pre_desi
-        e.emp_prev_tenure = emp_prev_tenure
+        e.emp_pre_desg = emp_pre_desg
+        if emp_pre_period_of_employment_frm:
+            e.emp_pre_period_of_employment_frm = emp_pre_period_of_employment_frm
+        if emp_pre_period_of_employment_to:
+            e.emp_pre_period_of_employment_to = emp_pre_period_of_employment_to
+        if emp_pre_exp_two:
+            e.emp_pre_exp_two = emp_pre_exp_two
+        if emp_pre_industry_two:
+            e.emp_pre_industry_two = emp_pre_industry_two
+        if emp_pre_org_name_two:
+            e.emp_pre_org_name_two = emp_pre_org_name_two
+        if emp_pre_desg_two:
+            e.emp_pre_desg_two = emp_pre_desg_two
+        if emp_pre_period_of_employment_frm_two:
+            e.emp_pre_period_of_employment_frm_two = emp_pre_period_of_employment_frm_two
+        if emp_pre_period_of_employment_to_two:
+            e.emp_pre_period_of_employment_to_two = emp_pre_period_of_employment_to_two
+        if emp_pre_exp_three:
+            e.emp_pre_exp_three = emp_pre_exp_three
+        if emp_pre_industry_three:
+            e.emp_pre_industry_three = emp_pre_industry_three
+        if emp_pre_org_name_three:
+            e.emp_pre_org_name_three = emp_pre_org_name_three
+        if emp_pre_desg_three:
+            e.emp_pre_desg_three = emp_pre_desg_three
+        if emp_pre_period_of_employment_frm_three:
+            e.emp_pre_period_of_employment_frm_three = emp_pre_period_of_employment_frm_three
+        if emp_pre_period_of_employment_to_three:
+            e.emp_pre_period_of_employment_to_three = emp_pre_period_of_employment_to_three
+
+
+        e.emp_bank_holder_name = emp_bank_holder_name
         e.emp_bank_name = emp_bank_name
-        e.emp_account_no = emp_account_no
+        e.emp_bank_acco_no = emp_bank_acco_no
         e.emp_bank_ifsc = emp_bank_ifsc
-        e.emp_aadhar = emp_aadhar
-        e.emp_pan = emp_pan
-        e.emp_idcard = emp_idcard
-        e.emp_certificate = emp_certificate
-        e.emp_exp_letter = emp_exp_letter
-        e.emp_passbook = emp_passbook
-        e.added_by = usr_name
+        e.have_system = have_system
+        e.require_system = require_system
+        e.wifi_broadband = wifi_broadband
+        e.emp_upload_aadhar = emp_upload_aadhar
+        e.emp_upload_aadhar_back = emp_upload_aadhar_back
+        e.emp_upload_pan = emp_upload_pan
+        e.emp_upload_id = emp_upload_id
+        e.emp_upload_id_back = emp_upload_id_back
+        e.emp_upload_edu_sslc = emp_upload_edu_sslc
+        e.emp_upload_edu_twelveth = emp_upload_edu_twelveth
+        e.emp_upload_edu_gradu = emp_upload_edu_gradu
+        e.emp_upload_experience = emp_upload_experience
+        e.emp_upload_experience_two = emp_upload_experience_two
+        e.emp_upload_experience_three = emp_upload_experience_three
+        e.emp_upload_bank = emp_upload_bank
+        e.hr_name = hrname
         e.save()
 
-        messages.info(request,'Data has been submitted successfully')
+        return redirect("/ams/onboarding")
+    else:
         emp_id = request.user.profile.emp_id
         emp = Employee.objects.get(emp_id=emp_id)
         data = {'emp': emp}
         return render(request, 'ams/onboarding.html', data)
 
-    else:
-        emp_id = request.user.profile.emp_id
-        emp = Employee.objects.get(emp_id=emp_id)
-        data = {'emp':emp}
-        return render(request,'ams/onboarding.html',data)
+
+
+
 
 @login_required
 def viewOnBoarding(request):
 
-    onboard = Onboarding.objects.all()
+    onboard = OnboardingnewHRC.objects.all()
     emp_id = request.user.profile.emp_id
     emp = Employee.objects.get(emp_id=emp_id)
 
@@ -378,10 +548,205 @@ def viewOnBoarding(request):
     return render(request, "ams/view_onboarding.html", data)
 
 
+def on_boarding_update(request,id):
+    if request.method == "POST":
+        id = request.POST["id"]
+        e = OnboardingnewHRC.objects.get(id=id)
+        hrname = request.user
+        # usrname = request.user.id
+        emp_name = request.POST["emp_name"]
+        emp_dob = request.POST["emp_dob"]
+        emp_desig = request.POST["emp_desg"]
+        emp_process = request.POST["emp_pro"]
+        emp_pan = request.POST["emp_pan"]
+        emp_aadhar = request.POST["emp_aad"]
+        emp_father_name = request.POST["emp_fat"]
+        emp_marital_status = request.POST["emp_mar"]
+        emp_email = request.POST["emp_email"]
+        emp_phone = request.POST["emp_ph"]
+        emp_alt_phone = request.POST["emp_alph"]
+        emp_present_address = request.POST["emp_add"]
+        emp_permanent_address = request.POST["emp_pre_add"]
+        emp_blood = request.POST["emp_blo"]
+
+        emp_emergency_person = request.POST["emp_emer_name"]
+        emp_emergency_number = request.POST["emp_emer_ph"]
+        emp_emergency_address = request.POST["emp_emer_add"]
+        emp_emergency_person2 = request.POST["emp_emer_name2"]
+        emp_emergency_number2 = request.POST["emp_emer_ph2"]
+        emp_emergency_address2 = request.POST["emp_emer_add2"]
+
+        emp_edu_qualification = request.POST["emp_high_qua"]
+        emp_quali_other = request.POST["other_quli"]
+        emp_edu_course = request.POST["emp_cou"]
+        emp_edu_institute = request.POST["emp_ins"]
+
+        # Previous Experience
+        emp_pre_exp = request.POST["emp_exp"]
+        emp_pre_industry = request.POST.get("emp_ind")
+        emp_pre_org_name = request.POST["emp_pre_org"]
+        emp_pre_desg = request.POST["emp_pre_desg"]
+        emp_pre_period_of_employment_frm = request.POST.get("emp_pre_empl_from")
+        emp_pre_period_of_employment_to = request.POST.get("emp_pre_empl_to")
+
+        emp_pre_exp_two = request.POST.get("emp_exp_2")
+        emp_pre_industry_two = request.POST.get("emp_ind_2")
+        emp_pre_org_name_two = request.POST.get("emp_pre_org_2")
+        emp_pre_desg_two = request.POST.get("emp_pre_desg_2")
+        emp_pre_period_of_employment_frm_two = request.POST.get("emp_pre_empl_from_2")
+        emp_pre_period_of_employment_to_two = request.POST.get("emp_pre_empl_to_2")
+
+        emp_pre_exp_three = request.POST.get("emp_exp_3")
+        emp_pre_industry_three = request.POST.get("emp_ind_3")
+        emp_pre_org_name_three = request.POST.get("emp_pre_org_3")
+        emp_pre_desg_three = request.POST.get("emp_pre_desg_3")
+        emp_pre_period_of_employment_frm_three = request.POST.get("emp_pre_empl_from_3")
+        emp_pre_period_of_employment_to_three = request.POST.get("emp_pre_empl_to_3")
+
+        # Bank
+        emp_bank_holder_name = request.POST["emp_bank_name"]
+        emp_bank_name = request.POST["emp_bank_na"]
+        emp_bank_acco_no = request.POST["emp_bank_no"]
+        emp_bank_ifsc = request.POST["emp_bank_ifsc"]
+
+        #
+        have_system = request.POST["have_system"]
+        require_system = request.POST["require_system"]
+        wifi_broadband = request.POST["wifi"]
+
+        emp_upload_aadhar = request.FILES.get("emp_up_aad")
+        emp_upload_aadhar_back = request.FILES.get("emp_up_aad_back")
+        emp_upload_pan = request.FILES.get("emp_up_pan")
+
+        emp_upload_id = request.FILES.get("emp_up_id")
+        emp_upload_id_back = request.FILES.get("emp_up_id_back")
+
+        emp_upload_edu_sslc = request.FILES.get("emp_up_edu")
+        emp_upload_edu_twelveth = request.FILES.get("emp_up_edu_12")
+        emp_upload_edu_gradu = request.FILES.get("emp_up_edu_gra")
+
+        emp_upload_experience = request.FILES.get("emp_up_cer")
+        emp_upload_experience_two = request.FILES.get("emp_up_cer_2")
+        emp_upload_experience_three = request.FILES.get("emp_up_cer_3")
+        emp_upload_bank = request.FILES.get("emp_up_bank")
+
+        e.emp_name = emp_name
+        e.emp_dob = emp_dob
+        e.emp_desig = emp_desig
+        e.emp_process = emp_process
+        e.emp_pan = emp_pan
+        e.emp_aadhar = emp_aadhar
+        e.emp_father_name = emp_father_name
+        e.emp_marital_status = emp_marital_status
+        e.emp_email = emp_email
+        e.emp_phone = emp_phone
+        e.emp_alt_phone = emp_alt_phone
+        e.emp_present_address = emp_present_address
+        e.emp_permanent_address = emp_permanent_address
+        e.emp_blood = emp_blood
+
+        e.emp_emergency_person = emp_emergency_person
+        e.emp_emergency_number = emp_emergency_number
+        e.emp_emergency_address = emp_emergency_address
+        e.emp_emergency_person_two = emp_emergency_person2
+        e.emp_emergency_number_two = emp_emergency_number2
+        e.emp_emergency_address_two = emp_emergency_address2
+
+        e.emp_edu_qualification = emp_edu_qualification
+        e.emp_quali_other = emp_quali_other
+        e.emp_edu_course = emp_edu_course
+        e.emp_edu_institute = emp_edu_institute
+
+        # emp pevious experiance
+        e.emp_pre_exp = emp_pre_exp
+        e.emp_pre_industry = emp_pre_industry
+        e.emp_pre_org_name = emp_pre_org_name
+        e.emp_pre_desg = emp_pre_desg
+
+        if emp_pre_period_of_employment_frm:
+            e.emp_pre_period_of_employment_frm = emp_pre_period_of_employment_frm
+        if emp_pre_period_of_employment_to:
+            e.emp_pre_period_of_employment_to = emp_pre_period_of_employment_to
+
+        if emp_pre_exp_two:
+            e.emp_pre_exp_two = emp_pre_exp_two
+        if emp_pre_industry_two:
+            e.emp_pre_industry_two = emp_pre_industry_two
+        if emp_pre_org_name_two:
+            e.emp_pre_org_name_two = emp_pre_org_name_two
+        if emp_pre_desg_two:
+            e.emp_pre_desg_two = emp_pre_desg_two
+        if emp_pre_period_of_employment_frm_two:
+            e.emp_pre_period_of_employment_frm_two = emp_pre_period_of_employment_frm_two
+        if emp_pre_period_of_employment_to_two:
+            e.emp_pre_period_of_employment_to_two = emp_pre_period_of_employment_to_two
+        if emp_pre_exp_three:
+            e.emp_pre_exp_three = emp_pre_exp_three
+        if emp_pre_industry_three:
+            e.emp_pre_industry_three = emp_pre_industry_three
+        if emp_pre_org_name_three:
+            e.emp_pre_org_name_three = emp_pre_org_name_three
+        if emp_pre_desg_three:
+            e.emp_pre_desg_three = emp_pre_desg_three
+        if emp_pre_period_of_employment_frm_three:
+            e.emp_pre_period_of_employment_frm_three = emp_pre_period_of_employment_frm_three
+        if emp_pre_period_of_employment_to_three:
+            e.emp_pre_period_of_employment_to_three = emp_pre_period_of_employment_to_three
+
+        e.emp_bank_holder_name = emp_bank_holder_name
+        e.emp_bank_name = emp_bank_name
+
+        e.emp_bank_acco_no = emp_bank_acco_no
+        e.emp_bank_ifsc = emp_bank_ifsc
+
+        e.have_system = have_system
+        e.require_system = require_system
+        e.wifi_broadband = wifi_broadband
+
+        if emp_upload_aadhar_back:
+            e.emp_upload_aadhar = emp_upload_aadhar
+        if emp_upload_aadhar_back:
+            e.emp_upload_aadhar_back = emp_upload_aadhar_back
+        if emp_upload_pan:
+            e.emp_upload_pan = emp_upload_pan
+        if emp_upload_id:
+            e.emp_upload_id = emp_upload_id
+        if emp_upload_id_back:
+            e.emp_upload_id_back = emp_upload_id_back
+        if emp_upload_edu_sslc:
+            e.emp_upload_edu_sslc = emp_upload_edu_sslc
+        if emp_upload_edu_twelveth:
+            e.emp_upload_edu_twelveth = emp_upload_edu_twelveth
+        if emp_upload_edu_gradu:
+            e.emp_upload_edu_gradu = emp_upload_edu_gradu
+        if emp_upload_experience:
+            e.emp_upload_experience = emp_upload_experience
+        if emp_upload_experience_two:
+            e.emp_upload_experience_two = emp_upload_experience_two
+        if emp_upload_experience_three:
+            e.emp_upload_experience_three = emp_upload_experience_three
+        if emp_upload_bank:
+            e.emp_upload_bank = emp_upload_bank
+
+        e.hr_name = hrname
+        e.save()
+
+        return redirect("/ams/view-onboarding")
+
+    else:
+
+        id = id
+        onboard = OnboardingnewHRC.objects.get(id=id)
+        emp_id = request.user.profile.emp_id
+        emp = Employee.objects.get(emp_id=emp_id)
+        data = {"onboard": onboard,'emp':emp}
+        return render(request, "ams/edit_onboarding.html", data)
+
 
 @login_required
 def addNewUserHR(request):
     if request.method == 'POST':
+        on_id = request.POST['id']
         emp_name = request.POST["emp_name"]
         emp_id = request.POST["emp_id"]
         emp_doj = request.POST["emp_doj"]
@@ -391,6 +756,8 @@ def addNewUserHR(request):
         emp_rm3 = request.POST["emp_rm3"]
         emp_process = request.POST["emp_pro"]
         usr = User.objects.filter(username=emp_id)
+        onb_obj = OnboardingnewHRC.objects.get(id=on_id)
+
         if usr.exists():
             return HttpResponse('<h1>User Already Exists</h1>')
         else:
@@ -402,14 +769,16 @@ def addNewUserHR(request):
             profile = Profile.objects.create(
                 emp_id=emp_id, emp_name=emp_name, emp_desi=emp_desi,
                 emp_rm1=emp_rm1, emp_rm2=emp_rm2, emp_rm3=emp_rm3,
-                emp_process=emp_process, user=usr,doj=emp_doj,
+                emp_process=emp_process, user=usr,doj=emp_doj,on_id=on_id,
             )
             #creating Employee table(Mapping)
             emp = Employee.objects.create(
                 emp_id=emp_id, emp_name=emp_name, emp_desi=emp_desi,
                 emp_rm1=emp_rm1, emp_rm2=emp_rm2, emp_rm3=emp_rm3,
-                emp_process=emp_process
+                emp_process=emp_process,on_id=on_id,
             )
+            onb_obj.user_created = True
+            onb_obj.save()
             profile.save()
             emp.save()
         messages.info(request,'User and Profile Successfully Created')
@@ -421,7 +790,8 @@ def addNewUserHR(request):
         all_desi = Employee.objects.all().values('emp_desi').distinct().order_by('emp_desi')
         rms = Employee.objects.exclude(emp_desi__in =['Client Relationship Officer','Patrolling Officer']).order_by('emp_name')
         all_team = Employee.objects.all().values('emp_process').distinct().order_by('emp_process')
-        data = {'emp': emp,'all_data':all_desi,'rms':rms,'all_team':all_team}
+        onboarding = OnboardingnewHRC.objects.filter(user_created=False)
+        data = {'emp': emp,'all_data':all_desi,'rms':rms,'all_team':all_team,'onboarding':onboarding}
         return render(request,'ams/hr_add_user.html',data)
 @login_required
 def viewUsersHR(request):
@@ -432,6 +802,13 @@ def viewUsersHR(request):
 
     return render(request,'ams/view_user_hr.html',data)
 
+def viewEmployeeProfile(request,id,on_id):
+
+    profile = Employee.objects.get(id=id)
+    onboarding = OnboardingnewHRC.objects.get(id=on_id)
+
+    data = {'profile': profile, 'onboarding': onboarding}
+    return render(request,'ams/emp_profile_view.html',data)
 
 @login_required
 def applyAttendace(request):
@@ -984,6 +1361,16 @@ def approveMappingTicket(request):
     else:
         return redirect('/ams/logout')
 
+@login_required
+def viewMappingApplicationStatus(request):
+    usr = request.user.profile.emp_name
+    tickets = MappingTickets.objects.filter(created_by=usr).order_by('created_date')
+    emp_id = request.user.profile.emp_id
+    emp = Employee.objects.get(emp_id=emp_id)
+    data = {'tickets': tickets, 'emp': emp}
+    return render(request, 'ams/view_mapping_status.html', data)
+
+
 
 @login_required
 def addNewTeam(request):
@@ -1025,75 +1412,59 @@ def jobRequisition(request):
         req_date = request.POST["req_date"]
         hc_req = request.POST["hc_required"]
         req_raised_by = request.POST["req_rais_by"]
-        position = request.POST["position"]
         department = request.POST["department"]
         designation = request.POST["designation"]
         process_typ_one = request.POST["pro_type_1"]
         process_typ_two = request.POST["pro_type_2"]
-        process_typ_three =request.POST["pro_type_3"]
-        salary_rang_frm =request.POST["sal_from"]
+        process_typ_three = request.POST["pro_type_3"]
+        salary_rang_frm = request.POST["sal_from"]
         salary_rang_to = request.POST["sal_to"]
-        qualification =request.POST["quali"]
+        qualification = request.POST["quali"]
         other_quali = request.POST["other_quali"]
         skills_set = request.POST["skills"]
-        languages =request.POST.getlist("lang")
+        languages = request.POST.getlist("lang")
         shift_timing = request.POST["shift"]
         shift_timing_frm = request.POST["shift_from"]
         shift_timing_to = request.POST["shift_to"]
         working_from = request.POST["work_from"]
         working_to = request.POST["work_to"]
         week_no_days = request.POST["num_off"]
-        week_from = request.POST["off_from"]
-        week_to = request.POST["off_to"]
+        week_from = request.POST.get("off_from")
+        week_to = request.POST.get("off_to")
         requisition_typ = request.POST["req_type"]
-        candidate_name = request.POST["cand_name"]
-        closure_date = request.POST["clos_date"]
-        source =request.POST["source"]
-        source_empref_emp_name = request.POST["emp_name"]
-        source_empref_emp_id = request.POST["emp_id"]
-        source_social = request.POST.get('social')
-        source_partners = request.POST.get("partner")
-
         e = JobRequisition()
-
-        e.req_date =req_date
+        e.req_date = req_date
         e.hc_req = hc_req
         e.req_raised_by = req_raised_by
-        e.position = position
-        e.department =department
+        e.department = department
         e.designation = designation
         e.process_typ_one = process_typ_one
         e.process_typ_two = process_typ_two
         e.process_typ_three = process_typ_three
-        e.salary_rang_frm =salary_rang_frm
+        e.salary_rang_frm = salary_rang_frm
         e.salary_rang_to = salary_rang_to
         e.qualification = qualification
         e.other_quali = other_quali
         e.skills_set = skills_set
         e.languages = languages
-        e.shift_timing =shift_timing
+        e.shift_timing = shift_timing
         e.shift_timing_frm = shift_timing_frm
         e.shift_timing_to = shift_timing_to
         e.working_from = working_from
         e.working_to = working_to
-        e.week_no_days =week_no_days
-        e.week_from = week_from
-        e.week_to = week_to
+        e.week_no_days = week_no_days
+        if week_from:
+            e.week_from = week_from
+        if week_to:
+            e.week_to = week_to
         e.requisition_typ = requisition_typ
-        e.candidate_name = candidate_name
-        e.closure_date = closure_date
-        e.source =source
-        e.source_empref_emp_name = source_empref_emp_name
-        e.source_empref_emp_id = source_empref_emp_id
-        e.source_social = source_social
-        e.source_partners =source_partners
-        e.user_name=log_user
+        e.user_name = log_user
         e.save()
 
         emp_id = request.user.profile.emp_id
         emp = Employee.objects.get(emp_id=emp_id)
-        data = {'emp':emp}
-        return render(request, "ams/job_requisition.html",data)
+        data = {'emp': emp}
+        return render(request, "ams/job_requisition.html", data)
 
     else:
         emp_id = request.user.profile.emp_id
@@ -1122,35 +1493,11 @@ def viewJobEditRequisition(request):
         return HttpResponse('<h1>No Get method Available</h1>')
 
 @login_required
-def updateJobForm(request):
+def updateJobForm(request,id):
+
     if request.method == 'POST':
         log_user = request.user
-        rowid = request.POST.get("id")
-        job = JobRequisition.objects.get(id=rowid)
-        req_date = request.POST["req_date"]
-        hc_req = request.POST["hc_required"]
-        req_raised_by = request.POST["req_rais_by"]
-        position = request.POST["position"]
-        department = request.POST["department"]
-        designation = request.POST["designation"]
-        process_typ_one = request.POST["pro_type_1"]
-        process_typ_two = request.POST["pro_type_2"]
-        process_typ_three = request.POST["pro_type_3"]
-        salary_rang_frm = request.POST["sal_from"]
-        salary_rang_to = request.POST["sal_to"]
-        qualification = request.POST["quali"]
-        other_quali = request.POST["other_quali"]
-        skills_set = request.POST["skills"]
-        languages = request.POST.getlist("lang")
-        shift_timing = request.POST["shift"]
-        shift_timing_frm = request.POST["shift_from"]
-        shift_timing_to = request.POST["shift_to"]
-        working_from = request.POST["work_from"]
-        working_to = request.POST["work_to"]
-        week_no_days = request.POST["num_off"]
-        week_from = request.POST["off_from"]
-        week_to = request.POST["off_to"]
-        requisition_typ = request.POST["req_type"]
+        job = JobRequisition.objects.get(id=id)
         candidate_name = request.POST["cand_name"]
         closure_date = request.POST["clos_date"]
         source = request.POST["source"]
@@ -1158,31 +1505,11 @@ def updateJobForm(request):
         source_empref_emp_id = request.POST["emp_id"]
         source_social = request.POST.get('social')
         source_partners = request.POST.get("partner")
+        recruited_people = request.POST["rec_peo"]
+        request_status = request.POST.get("req_status")
+        candidate_remark = request.POST["can_remark"]
 
-        job.req_date = req_date
-        job.hc_req = hc_req
-        job.req_raised_by = req_raised_by
-        job.position = position
-        job.department = department
-        job.designation = designation
-        job.process_typ_one = process_typ_one
-        job.process_typ_two = process_typ_two
-        job.process_typ_three = process_typ_three
-        job.salary_rang_frm = salary_rang_frm
-        job.salary_rang_to = salary_rang_to
-        job.qualification = qualification
-        job.other_quali = other_quali
-        job.skills_set = skills_set
-        job.languages = languages
-        job.shift_timing = shift_timing
-        job.shift_timing_frm = shift_timing_frm
-        job.shift_timing_to = shift_timing_to
-        job.working_from = working_from
-        job.working_to = working_to
-        job.week_no_days = week_no_days
-        job.week_from = week_from
-        job.week_to = week_to
-        job.requisition_typ = requisition_typ
+        job.candidate_remark = candidate_remark
         job.candidate_name = candidate_name
         job.closure_date = closure_date
         job.source = source
@@ -1190,8 +1517,114 @@ def updateJobForm(request):
         job.source_empref_emp_id = source_empref_emp_id
         job.source_social = source_social
         job.source_partners = source_partners
+        job.recruited_people = recruited_people
         job.user_name = log_user
+        if request_status:
+            job.request_status = request_status
+        if request_status == "Completed":
+            job.status = True
         job.save()
+
         return redirect("/ams/view-job-table")
     else:
-        return HttpResponse('<h1>No Get method Available</h1>')
+        job = JobRequisition.objects.get(id=id)
+        emp_id = request.user.profile.emp_id
+        emp = Employee.objects.get(emp_id=emp_id)
+        data = {'job':job,'emp':emp}
+        return render(request, "ams/job_requisition_edit.html", data)
+
+
+def applyLeave(request):
+
+    if request.method == 'POST':
+        emp_name = request.POST["emp_name"]
+        emp_id = request.POST["emp_id"]
+        emp_desi = request.POST["emp_desi"]
+        emp_process = request.POST["emp_process"]
+        emp_rm1 = request.POST["emp_rm1"]
+        emp_rm2 = request.POST["emp_rm2"]
+        emp_rm3 = request.POST["emp_rm3"]
+        leave_type = request.POST["type"]
+        start_date = request.POST["startdate"]
+        end_date = request.POST["enddate"]
+        no_days = request.POST["leave_days"]
+        agent_reason = request.POST["reason"]
+
+        e = LeaveTable()
+        e.applied_date = date.today()
+        e.leave_type = leave_type
+        e.start_date = start_date
+        e.end_date = end_date
+        e.no_days = no_days
+        e.agent_reason = agent_reason
+        e.emp_name = emp_name
+        e.emp_id = emp_id
+        e.emp_desi = emp_desi
+        e.emp_process = emp_process
+        e.emp_rm1 = emp_rm1
+        e.emp_rm2 = emp_rm2
+        e.emp_rm3 = emp_rm3
+        e.save()
+
+
+        leave_balance = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
+
+        if leave_type == 'PL':
+            leave_balance.pl_balance-=int(no_days)
+            leave_balance.save()
+        elif leave_type == 'SL':
+            leave_balance.sl_balance-=int(no_days)
+            leave_balance.save()
+
+        return redirect('/ams/ams-apply_leave')
+
+    else:
+
+        emp_id = request.user.profile.emp_id
+        emp = Employee.objects.get(emp_id=emp_id)
+        leave = LeaveTable.objects.filter(emp_id=emp_id)
+
+        try:
+            leave_balance = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
+        except EmployeeLeaveBalance.DoesNotExist:
+            leave_balance = {'sl_balance':0,'pl_balance':0}
+
+        data = {'emp': emp,'leave':leave,'leave_balance':leave_balance}
+        return render(request,'ams/apply-leave.html',data)
+
+@login_required
+def viewleaveListRM1(request):
+
+    emp_id = request.user.profile.emp_id
+    emp = Employee.objects.get(emp_id=emp_id)
+    leave_request = LeaveTable.objects.filter(emp_rm1=request.user.profile.emp_name,tl_approval=False)
+    data = {'emp':emp,'leave_request':leave_request}
+    return render(request,'ams/leave_approval_rm1.html',data)
+
+def approveLeaveRM1(request):
+
+    if request.method == "POST":
+        id = request.POST["id"]
+        e = LeaveTable.objects.get(id=id)
+
+        tl_response = request.POST['tl_response']
+        tl_reason = request.POST['tl_reason']
+
+        if tl_response == 'Approve':
+            tl_approval = True
+            tl_status = 'Approved'
+            status = 'Pending'
+        else:
+            tl_approval = True
+            tl_status = 'Rejected'
+            status = 'Rejected'
+
+        e.tl_approval = tl_approval
+        e.tl_reason = tl_reason
+        e.tl_status = tl_status
+        e.status = status
+        e.save()
+
+        return redirect('/ams/view-leave-list')
+
+

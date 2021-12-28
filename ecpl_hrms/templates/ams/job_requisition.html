@@ -1,4 +1,4 @@
-{% extends 'ams/base_hr_new.html' %}
+{% extends 'ams/base_common.html' %}
 
 {% block main %}
   {% load static %}
@@ -21,28 +21,22 @@
                   <form method="post" action="/ams/add-new-job" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="row">
-                      <div class="col-md-3">
+                      <div class="col-md-4">
                         <div class="form-group">
                           <label for="req_date">Requested Date</label>
                           <input type="date" name="req_date" id="req_date" required class="form-control">
                         </div>
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-4">
                         <div class="form-group">
                           <label for="hc_required">HC Required</label>
                           <input type="number" name="hc_required" id="hc_required" min="1" required class="form-control">
                         </div>
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-4">
                         <div class="form-group">
                           <label for="req_rais_by">Request Raised By</label>
-                          <input type="text" name="req_rais_by" id="req_rais_by" required class="form-control">
-                        </div>
-                      </div>
-                      <div class="col-md-3">
-                        <div class="form-group">
-                          <label for="position">Position</label>
-                          <input type="text" name="position" id="position" required class="form-control">
+                          <input type="text" name="req_rais_by" id="req_rais_by" readonly class="form-control" value="{{request.user.profile.emp_name}}">
                         </div>
                       </div>
                     </div>
@@ -50,18 +44,138 @@
                       <div class="col-md-3">
                         <div class="form-group">
                           <label for="department">Department</label>
-                          <select class="form-control select2" name="department" id="department" onchange="add_fields(this)">
-                            <option value="" >Please Select</option>
+                          <select class="form-control select2" required name="department" id="department" onchange="add_fields(this)">
+                            <option value="" selected disabled >Please Select</option>
                             <option value="Operations">Operations</option>
                             <option value="Quality">Quality</option>
                             <option value="Command Center">Command Center</option>
                             <option value="Sevice Excellence">Sevice Excellence</option>
+                            <option value="Human Resource">Human Resource</option>
                             <option value="IT">IT</option>
                             <option value="Admin">Admin</option>
                             <option value="L&D">L&D</option>
                             <option value="Sales & Marketing">Sales & Marketing</option>
                           </select>
                         </div>
+                      </div>
+                    </div>
+                    <div class="row d-none" id="dep_hr">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Junior Recruiter" name="designation" id="hr_jr">
+                          <label for="hr_jr">Junior Recruiter</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Recruiter" name="designation" id="hr_rec">
+                          <label for="hr_rec">Recruiter</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Senior Recruiter" name="designation" id="hr_sr">
+                          <label for="hr_sr">Senior Recruiter</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="HR Executive" name="designation" id="hr_hr">
+                          <label for="hr_hr">HR Executive</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required value="Talent Acquisition Specialist/Recruitment Lead" name="designation" id="hr_ta">
+                          <label for="hr_ta">Talent Acquisition Specialist/Recruitment Lead</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required name="designation" id="hr_tar" value="Talent Acquisition/Recruitment Manager">
+                          <label for="hr_tar">Talent Acquisition/Recruitment Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required name="designation" id="hr_amr" value="Assistant Manager - Recruitment">
+                          <label for="hr_amr">Assistant Manager - Recruitment</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required name="designation" id="hr_hrbp" value="HRBP">
+                          <label for="hr_hrbp">HRBP</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required name="designation" id="hr_hrbp_l" value="HRBP Lead">
+                          <label for="hr_hrbp_l">HRBP Lead</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required name="designation" id="hr_ahrbp" value="Assistant Manager - HRBP">
+                          <label for="hr_ahrbp">Assistant Manager - HRBP</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required name="designation" id="hr_mhrbp" value="Manager - HRBP">
+                          <label for="hr_mhrbp">Manager - HRBP</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required name="designation" id="hr_ers" value="Employee Relations Specialist">
+                          <label for="hr_ers">Employee Relations Specialist</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required name="designation" id="hr_amer" value="Assistant Manager - Employee Relations">
+                          <label for="hr_amer">Assistant Manager - Employee Relations</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required name="designation" id="hr_mer" value="Manager - Employee Relations">
+                          <label for="hr_mer">Manager - Employee Relations</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required name="designation" id="hr_gen" value="Generalist">
+                          <label for="hr_gen">Generalist</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required name="designation" id="hr_oms" value="Onboarding Specialist">
+                          <label for="hr_oms">Onboarding Specialist</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required name="designation" id="hr_cw" value="Content Writer">
+                          <label for="hr_cw">Content Writer</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required name="designation" id="hr_hrm" value="Human Resource Manager">
+                          <label for="hr_hrm">Human Resource Manager</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <input type="radio" required name="designation" id="hr_hhrm" value="Head - Human Resources">
+                          <label for="hr_hhrm">Head - Human Resources</label>
+                        </div>
+                      </div>
+                      <div class="col-md-12">
+                        <hr>
                       </div>
                     </div>
                     <div class="row d-none" id="dep_operations">
@@ -456,7 +570,8 @@
                       <div class="col-md-3">
                         <div class="form-group">
                           <label for="pro_type_1">Process Type 1</label>
-                          <select class="form-control select2" name="pro_type_1" id="pro_type_1">
+                          <select required class="form-control select2" name="pro_type_1" id="pro_type_1">
+                            <option value="" selected disabled >Please Select</option>
                             <option value="Domestic">Domestic</option>
                             <option value="International">International</option>
                             <option value="Support Staff">Support Staff</option>
@@ -467,7 +582,8 @@
                       <div class="col-md-3">
                         <div class="form-group">
                           <label for="pro_type_2">Process Type 2</label>
-                          <select class="form-control select2" name="pro_type_2" id="pro_type_2">
+                          <select class="form-control select2" name="pro_type_2" id="pro_type_2" required>
+                            <option value="" selected disabled >Please Select</option>
                             <option value="Voice">Voice</option>
                             <option value="Nonvoice">Nonvoice</option>
                             <option value="Email">Email</option>
@@ -482,7 +598,8 @@
                       <div class="col-md-3">
                         <div class="form-group">
                           <label for="pro_type_3">Process Type 3</label>
-                          <select class="form-control select2" name="pro_type_3" id="pro_type_3">
+                          <select class="form-control select2" name="pro_type_3" id="pro_type_3" required>
+                            <option value="" selected disabled >Please Select</option>
                             <option value="Sales">Sales</option>
                             <option value="Customer service">Customer service</option>
                             <option value="Tech Support">Tech Support</option>
@@ -510,6 +627,7 @@
                         <div class="form-group">
                           <label for="quali">Qualification</label>
                           <select class="form-control select2" name="quali" required id="quali" onchange="qualification(this);">
+                            <option value="" selected disabled >Please Select</option>
                             <option value="SSLC">SSLC</option>
                             <option value="12th">12th</option>
                             <option value="Graduate">Graduate</option>
@@ -528,10 +646,7 @@
                       <div class="col-md-3">
                         <div class="form-group">
                           <label for="lang">Languages</label>
-
-
                           <select class="form-control select2" name="lang" required id="lang" multiple="multiple">
-
                             <option value="Hindi">Hindi</option>
                             <option value="English">English</option>
                             <option value="Kannada">Kannada</option>
@@ -542,8 +657,6 @@
                             <option value="Malyalam">Malyalam</option>
                             <option value="French">French</option>
                             <option value="German">German</option>
-
-
                           </select>
                         </div>
                       </div>
@@ -551,6 +664,7 @@
                         <div class="form-group">
                           <label for="shift">Shift Timing</label>
                           <select class="form-control select2" onchange="shiftt(this)" name="shift" required id="shift">
+                            <option value="" selected disabled >Please Select</option>
                             <option value="Rotational - Timing">Rotational - Timing</option>
                             <option value="Fixed - Timing">Fixed - Timing</option>
                             <option value="Day - Timing">Day - Timing</option>
@@ -567,6 +681,7 @@
                           <label for="work_from">Working Days</label>
                           <div style="width:100%; display: inline-flex;">
                             <select required name="work_from" id="work_from" class="form-control">
+                              <option value="" selected disabled >Please Select</option>
                               <option value="Monday">Monday</option>
                               <option value="Tuesday">Tuesday</option>
                               <option value="Wednesday">Wednesday</option>
@@ -576,6 +691,7 @@
                               <option value="Sunday">Sunday</option>
                             </select>
                             <select required name="work_to" id="work_to" class="form-control">
+                              <option value="" selected disabled >Please Select</option>
                               <option value="Monday">Monday</option>
                               <option value="Tuesday">Tuesday</option>
                               <option value="Wednesday">Wednesday</option>
@@ -590,9 +706,10 @@
                       <div class="col-md-3">
                         <div class="form-group">
                           <label for="num_off">Week Off</label>
-                          <input type="number" onchange="week(this);" min="1" max="6" name="num_off" id="num_off" class="form-control" placeholder="Number of days">
+                          <input type="number" required onchange="week(this);" min="1" max="6" name="num_off" id="num_off" class="form-control" placeholder="Number of days">
                           <div id="week_off" style="width:100%; display: inline-flex;" class="mt-2 d-none">
                             <select required name="off_from" id="off_from" class="form-control">
+                              <option value="" selected disabled >Please Select</option>
                               <option value="Monday">Monday</option>
                               <option value="Tuesday">Tuesday</option>
                               <option value="Wednesday">Wednesday</option>
@@ -602,6 +719,7 @@
                               <option value="Sunday">Sunday</option>
                             </select>
                             <select required name="off_to" id="off_to" class="form-control">
+                              <option value="" selected disabled >Please Select</option>
                               <option value="Monday">Monday</option>
                               <option value="Tuesday">Tuesday</option>
                               <option value="Wednesday">Wednesday</option>
@@ -617,6 +735,7 @@
                         <div class="form-group">
                           <label for="req_type">Requisition Type</label>
                           <select class="form-control select2" name="req_type" required id="req_type">
+                            <option value="" selected disabled >Please Select</option>
                             <option value="Budgeted">Budgeted</option>
                             <option value="Replacement">Replacement</option>
                             <option value="Buffer">Buffer</option>
@@ -631,26 +750,26 @@
                       <div class="col-md-3">
                         <div class="form-group">
                           <label for="cand_name">Candidate Name</label>
-                          <textarea required name="cand_name" id="cand_name" class="form-control"></textarea>
+                          <textarea name="cand_name" id="cand_name" disabled class="form-control"></textarea>
                         </div>
                       </div>
                       <div class="col-md-3">
                         <div class="form-group">
                           <label for="clos_date">Closure Date</label>
-                          <input type="date" required name="clos_date" id="clos_date" class="form-control">
+                          <input type="date" name="clos_date" disabled id="clos_date" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-3">
                         <div class="form-group">
                           <label for="source">Source</label>
                           <div id="source" style="display: block; width: 100%;">
-                            <input type="radio" name="source" onchange="mysource(this)" id="sou_walk" value="Walk In">
+                            <input type="radio" name="source" disabled onchange="mysource(this)" id="sou_walk" value="Walk In">
                             <label for="sou_walk">Walk In</label>
-                            <input type="radio" name="source" onchange="mysource(this)" id="sou_referral" value="Employee Referral">
+                            <input type="radio" name="source" disabled onchange="mysource(this)" id="sou_referral" value="Employee Referral">
                             <label for="sou_referral">Employee Referral</label><br>
-                            <input type="radio" name="source" onchange="mysource(this)" id="sou_social" value="Social">
+                            <input type="radio" name="source" disabled onchange="mysource(this)" id="sou_social" value="Social">
                             <label for="sou_social">Social</label>
-                            <input type="radio" name="source" onchange="mysource(this)" id="sou_partner" value="Partners (Agency)">
+                            <input type="radio" name="source" disabled onchange="mysource(this)" id="sou_partner" value="Partners (Agency)">
                             <label for="sou_partner">Partners (Agency)</label>
                           </div>
                         </div>
@@ -691,15 +810,15 @@
                             <input type="text" name="emp_name" id="emp_name" class="form-control d-none" placeholder="Employee Name">
                             <input type="text" name="emp_id" id="emp_id" class="form-control d-none" placeholder="Employee ID">
                             <div style="display: block; width: 100%;">
-                              <input type="radio" required name="social" class="d-none" id="fb" value="FB">
+                              <input type="radio" name="social" class="d-none" id="fb" value="FB">
                               <label for="fb" class="d-none" id="fblabel">FB</label>
-                              <input type="radio" required class="d-none" name="social" id="insta" value="Insta">
+                              <input type="radio" class="d-none" name="social" id="insta" value="Insta">
                               <label for="insta" class="d-none" id="instalabel">Insta</label><br>
-                              <input type="radio" required class="d-none" name="social" id="news" value="News Paper">
+                              <input type="radio" class="d-none" name="social" id="news" value="News Paper">
                               <label for="news" class="d-none" id="newslabel">News Paper</label>
-                              <input type="radio" required class="d-none" name="social" id="linkedin" value="LinkedIn">
+                              <input type="radio" class="d-none" name="social" id="linkedin" value="LinkedIn">
                               <label for="linkedin" class="d-none" id="linkedinklabel">LinkedIn</label><br>
-                              <input type="radio" required class="d-none" name="social" id="website" value="Website">
+                              <input type="radio" class="d-none" name="social" id="website" value="Website">
                               <label for="website" class="d-none" id="websitelabel">Website</label>
                             </div>
                           </div>
@@ -708,7 +827,7 @@
                     </div>
                     <div class="row mt-4">
                       <div class="col-md-12" align="center">
-                        <button type="submit" class="btn btn-success btn-lg" onclick="confirm('Are you sure you want to proceed?');"  >Submit</button>
+                        <button type="submit" class="btn btn-success btn-lg" onclick="return confirmm(this);"  >Submit</button>
                       </div>
                     </div>
                   </form>
@@ -860,6 +979,12 @@
 
       } else {
         document.getElementById('dep_ld').classList.add("d-none");
+      }
+      if (selected == "Human Resource") {
+        document.getElementById('dep_hr').classList.remove("d-none");
+
+      } else {
+        document.getElementById('dep_hr').classList.add("d-none");
       }
     }
     function qualification(e) {

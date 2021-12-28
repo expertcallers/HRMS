@@ -1,0 +1,605 @@
+{% extends 'ams/base_hr_new.html' %}
+
+{% block main %}
+  {% load static %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <!-- top tiles -->
+            <div class="row" >
+            </div>
+            <!-- /top tiles -->
+
+          <div class="page-title">
+            <div class="title_left">
+              <h3>Onboarding</h3>
+            </div>
+          </div>
+          <div class="row mb-5">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <h2>Onboarding</h2>
+                </div>
+                <div class="card-body">
+                  <form method="post" action="/ams/edit-onboarding/{{onboard.id}}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{onboard.id}}">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <h4>Personal Details</h4>
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_name">Name(As per Aadhar)</label>
+                          <input type="text" value="{{onboard.emp_name}}" name="emp_name" required id="emp_name" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_dob_v">Date Of Birth (DD/MM/YYYY)</label>
+                          <input type="date" name="emp_dob" required id="emp_dob_v" max="2006-01-01" class="form-control">
+                          <input type="hidden" value="{{onboard.emp_dob}}" id="emp_dob_1">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_desg">Designation (Refer offer letter and mention)</label>
+                          <input type="text" value="{{onboard.emp_desig}}" name="emp_desg" required id="emp_desg" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pro">Process (Refer offer letter and mention)</label>
+                          <input type="text" value="{{onboard.emp_process}}" name="emp_pro" required id="emp_pro" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pan">PAN Number</label>
+                          <input type="text" value="{{onboard.emp_pan}}" name="emp_pan" id="emp_pan" maxlength="10" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_aad">Aadhar Number</label>
+                          <input type="number" value="{{onboard.emp_aadhar}}" name="emp_aad" id="emp_aad" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==12) return false;" onfocusout="testing(this);" required class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_fat">Father's Name</label>
+                          <input type="text" value="{{onboard.emp_father_name}}" required name="emp_fat" id="emp_fat" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_mar">Marital Status</label>
+                          <select name="emp_mar" id="emp_mar" class="form-control" required>
+                            <option value="Single" {% if 'Single' in onboard.emp_marital_status %} selected {% endif %}>Single</option>
+                            <option value="Married" {% if 'Married' in onboard.emp_marital_status %} selected {% endif %}>Married</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_email">Email Address</label>
+                          <input type="email" value="{{onboard.emp_email}}" required name="emp_email" id="emp_email" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_ph">Contact Number (Without +91 / 0)</label>
+                          <input type="number" value="{{onboard.emp_phone}}" required pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==10) return false;" name="emp_ph" id="emp_ph" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_add">Present Address</label>
+                          <textarea name="emp_add" required id="emp_add" class="form-control" rows="4">{{onboard.emp_present_address}}</textarea>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pre_add">Permanent Address</label>
+                          <textarea name="emp_pre_add" required id="emp_pre_add" class="form-control" rows="4">{{onboard.emp_permanent_address}}</textarea>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_alph">Alternate Contact Number (Without +91 / 0)</label>
+                          <input type="number" value="{{onboard.emp_alt_phone}}" name="emp_alph" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==10) return false;" id="emp_alph" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_blo">Blood Group</label>
+                          <select name="emp_blo" id="emp_blo" class="form-control select2" required>
+                            <option value="" disabled>Please Select</option>
+                            <option value="A+" {% if 'A+' in onboard.emp_blood %} selected {% endif %}>A+</option>
+                            <option value="A-" {% if 'A-' in onboard.emp_blood %} selected {% endif %}>A-</option>
+                            <option value="B+" {% if 'B+' in onboard.emp_blood %} selected {% endif %}>B+</option>
+                            <option value="B-" {% if 'B-' in onboard.emp_blood %} selected {% endif %}>B-</option>
+                            <option value="O+" {% if 'O+' in onboard.emp_blood %} selected {% endif %}>O+</option>
+                            <option value="O-" {% if '0+' in onboard.emp_blood %} selected {% endif %}>O-</option>
+                            <option value="AB+" {% if 'AB+' in onboard.emp_blood %} selected {% endif %}>AB+</option>
+                            <option value="AB-" {% if 'AB-' in onboard.emp_blood %} selected {% endif %}>AB-</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-md-12">
+                        <h4>Emergency Contact 1</h4>
+                        <p>Person to be contacted in case of emergency.</p>
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_emer_name">Name</label>
+                          <input type="text" value="{{onboard.emp_emergency_person}}" required name="emp_emer_name" id="emp_emer_name" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_emer_ph">Phone Number (Without +91 / 0)</label>
+                          <input type="number" value="{{onboard.emp_emergency_number}}" required pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==10) return false;" name="emp_emer_ph" id="emp_emer_ph" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_emer_add">Address</label>
+                          <textarea name="emp_emer_add" required id="emp_emer_add" class="form-control" rows="4">{{onboard.emp_emergency_address}}</textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-md-12">
+                        <h4>Emergency Contact 2</h4>
+                        <p>Person to be contacted in case of emergency.</p>
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_emer_name2">Name</label>
+                          <input type="text" value="{{onboard.emp_emergency_person_two}}" required name="emp_emer_name2" id="emp_emer_name2" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_emer_ph2">Phone Number (Without +91 / 0)</label>
+                          <input type="number" value="{{onboard.emp_emergency_number_two}}" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==10) return false;" required name="emp_emer_ph2" id="emp_emer_ph2" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_emer_add2">Address</label>
+                          <textarea name="emp_emer_add2" required id="emp_emer_add2" class="form-control" rows="4">{{onboard.emp_emergency_address_two}}</textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-md-12">
+                        <h4>Qualification Details</h4>
+                        <!-- <p>Person to be contacted in case of emergency.</p> -->
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_high_qua">Highest Qualification</label>
+                          <select name="emp_high_qua" id="emp_high_qua" class="form-control select2" required onchange="other_qualification(this);">
+                            <option value="" disabled>Please Select</option>
+                            <option value="10th" {% if '10th' in onboard.emp_edu_qualification %} selected {% endif %}>10th</option>
+                            <option value="12th/PUC"{% if '12th/PUC' in onboard.emp_edu_qualification %} selected {% endif %}>12th/PUC</option>
+                            <option value="Diploma" {% if 'Diploma' in onboard.emp_edu_qualification %} selected {% endif %}>Diploma</option>
+                            <option value="Graduate" {% if 'Graduate' in onboard.emp_edu_qualification %} selected {% endif %}>Under Graduate</option>
+                            <option value="Post Graduate(Masters)" {% if 'Post Graduate(Masters)' in onboard.emp_edu_qualification %} selected {% endif %}>Post Graduate(Masters)</option>
+                            <option value="Others" {% if 'Others' in onboard.emp_edu_qualification %} selected {% endif %}>Others</option>
+                          </select>
+                          <input type="text" class="form-control mt-2 d-none" name="other_quli" id="other_quli" value="{{onboard.emp_quali_other}}">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_cou">Highest Course</label>
+                          <input type="text" value="{{onboard.emp_edu_course}}" name="emp_cou" id="emp_cou" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_ins">Highest Course Institution Name</label>
+                          <input type="text" value="{{onboard.emp_edu_institute}}" name="emp_ins" id="emp_ins" class="form-control" required>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-md-12">
+                        <h4>Previous Work / Experience</h4>
+                        <!-- <p>Person to be contacted in case of emergency.</p> -->
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_exp">Experience in Years</label>
+                          <input type="number" value="{{onboard.emp_pre_exp}}" name="emp_exp" min="0" id="emp_exp" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_ind">Industry (Ex : Agriculture/IT/BPO)</label>
+                          <input type="text" value="{{onboard.emp_pre_industry}}"  name="emp_ind" id="emp_ind" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pre_org">Name of previous organisation</label>
+                          <input type="text" value="{{onboard.emp_pre_org_name}}" name="emp_pre_org" id="emp_pre_org" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pre_desg">Previous Designation</label>
+                          <input type="text" value="{{onboard.emp_pre_desg}}" name="emp_pre_desg" id="emp_pre_desg" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pre_empl">Period of Employment</label>
+                          <input type="hidden" id="emp_pre_empl_from" value="{{onboard.emp_pre_period_of_employment_frm_two}}">
+                          <input type="hidden" id="emp_pre_empl_to" value="{{onboard.emp_pre_period_of_employment_frm_two}}">
+                          <div style="display: inline-flex; width: 100%">
+                            <input type="date" name="emp_pre_empl_from" id="va_emp_pre_empl_from" class="form-control"  value="">
+                            <input type="date" name="emp_pre_empl_to" id="va_emp_pre_empl_to" class="form-control" value="">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {% if onboard.emp_pre_exp_two %}
+                    <div class="row mt-4" id="experience_2{{onboard.id}}">
+                      <div class="col-md-12">
+                        <h4>Previous Work / Experience 2</h4>
+                        <!-- <p>Person to be contacted in case of emergency.</p> -->
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_exp2{{onboard.id}}">Experience in Years</label>
+                          <input type="number" value="{{onboard.emp_pre_exp_two}}" name="emp_exp_2" id="emp_exp2{{onboard.id}}" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_ind">Industry (Ex : Agriculture/IT/BPO)</label>
+                          <input type="text" value="{{onboard.emp_pre_industry_two}}" name="emp_ind_2" id="emp_ind" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pre_org">Name of previous organisation</label>
+                          <input type="text" value="{{onboard.emp_pre_org_name_two}}" name="emp_pre_org_2" id="emp_pre_org" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pre_desg">Previous Designation</label>
+                          <input type="text" value="{{onboard.emp_pre_desg_two}}" name="emp_pre_desg_2" id="emp_pre_desg" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pre_empl">Period of Employment</label>
+                          <input type="hidden" id="emp_pre_empl_from_2" value="{{onboard.emp_pre_period_of_employment_frm_two}}">
+                          <input type="hidden" id="emp_pre_empl_to_2" value="{{onboard.emp_pre_period_of_employment_frm_two}}">
+                          <div style="display: inline-flex; width: 100%">
+                            <input type="date" name="emp_pre_empl_from_2" id="va_emp_pre_empl_from_2" class="form-control"  value="">
+                            <input type="date" name="emp_pre_empl_to_2" id="va_emp_pre_empl_to_2" class="form-control" value="">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {% endif %}
+                    {% if onboard.emp_pre_exp_three %}
+                    <div class="row mt-4" id="experience_3{{onboard.id}}">
+                      <div class="col-md-12">
+                        <h4>Previous Work / Experience 3</h4>
+                        <!-- <p>Person to be contacted in case of emergency.</p> -->
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_exp3{{onboard.id}}">Experience in Years</label>
+                          <input type="number" value="{{onboard.emp_pre_exp_three}}" name="emp_exp_3" id="emp_exp3{{onboard.id}}" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_ind">Industry (Ex : Agriculture/IT/BPO)</label>
+                          <input type="text" value="{{onboard.emp_pre_industry_three}}" name="emp_ind_3" id="emp_ind" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pre_org">Name of previous organisation</label>
+                          <input type="text" value="{{onboard.emp_pre_org_name_three}}" name="emp_pre_org_3" id="emp_pre_org" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pre_desg">Previous Designation</label>
+                          <input type="text" value="{{onboard.emp_pre_desg_three}}" name="emp_pre_desg_3" id="emp_pre_desg" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="emp_pre_empl">Period of Employment</label>
+                          <input type="hidden" id="emp_pre_empl_from_3" value="{{onboard.emp_pre_period_of_employment_frm_three}}">
+                          <input type="hidden" id="emp_pre_empl_to_3" value="{{onboard.emp_pre_period_of_employment_frm_three}}">
+                          <div style="display: inline-flex; width: 100%">
+                            <input type="date" name="emp_pre_empl_from_3" id="va_emp_pre_empl_from_3" class="form-control" value="">
+                            <input type="date" name="emp_pre_empl_to_3" id="va_emp_pre_empl_to_3" class="form-control" value="">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {% endif %}
+                    <div class="row mt-4">
+                      <div class="col-md-12">
+                        <h4>Bank Account Details</h4>
+                        <!-- <p>Person to be contacted in case of emergency.</p> -->
+                        <hr>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="emp_bank_name">Account Holder Name</label>
+                          <input type="text" value="{{onboard.emp_bank_holder_name}}" required name="emp_bank_name" id="emp_bank_name" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="emp_bank_na">Bank Name</label>
+                          <input type="text" required value="{{onboard.emp_bank_name}}" name="emp_bank_na" id="emp_bank_na" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="emp_bank_no">Account Number</label>
+                          <input type="text" value="{{onboard.emp_bank_acco_no}}" required name="emp_bank_no" id="emp_bank_no" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="emp_bank_ifsc">IFSC Code</label>
+                          <input type="text" value="{{onboard.emp_bank_ifsc}}" required name="emp_bank_ifsc"  maxlength="11" id="emp_bank_ifsc" class="form-control">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row mt-4">
+                      <div class="col-md-12">
+                        <h4>Documentation Form</h4>
+                        <!-- <p>Person to be contacted in case of emergency.</p> -->
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="have_system">Do you have your own system/laptop?</label>
+                          <div style="display: inline-flex; width: 100%" id="have_system">
+                            <input type="radio" required {% if 'Yes' in onboard.have_system %} checked {% endif %}  name="have_system" id="have_system_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                            <label for="have_system_1">Yes</label>
+                            <input type="radio" required {% if 'No' in onboard.have_system %} checked {% endif %} name="have_system" id="have_system_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                            <label for="have_system_0">No</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="require_system">Do you require a system to be provided from the company?</label>
+                          <div style="display: inline-flex; width: 100%" id="require_system">
+                            <input type="radio" required {% if 'Yes' in onboard.require_system %} checked {% endif %} name="require_system" value="Yes" id="require_system_1" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                            <label for="require_system_1">Yes</label>
+                            <input type="radio" required {% if 'No' in onboard.require_system %} checked {% endif %} name="require_system" value="No" id="require_system_0" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                            <label for="require_system_0">No</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="wifi">Do you have Wifi/Broadbrand services at home? if yes the amount can be claimed will be reimbursed by submitting the broadbrand bill every month</label>
+                          <div style="display: inline-flex; width: 100%" id="wifi">
+                            <input type="radio" required {% if 'Yes' in onboard.wifi_broadband %} checked {% endif %} name="wifi" id="wifi_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                            <label for="wifi_1">Yes</label>
+                            <input type="radio" required {% if 'No' in onboard.wifi_broadband %} checked {% endif %} name="wifi" id="wifi_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                            <label for="wifi_0">No</label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-md-12">
+                        <h4>Upload Documents</h4>
+                        <!-- <p>Person to be contacted in case of emergency.</p> -->
+                        <hr>
+                      </div>
+                      <div class="col-md-3 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_aad">Aadhar Card Front</label>
+                          {% if onboard.emp_upload_aadhar %}
+                          <a href="/media/{{onboard.emp_upload_aadhar}}" target="_blank">
+                            <center><button type="button" class="btn btn-primary form-control">View</button></center>
+                          </a>
+                          {% endif %}
+                          <input type="file" name="emp_up_aad" id="emp_up_aad" class="form-control" >
+                        </div>
+                      </div>
+                      <div class="col-md-3 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_aad_back">Aadhar Card Back</label>
+                          {% if onboard.emp_upload_aadhar_back %}
+                          <a href="/media/{{onboard.emp_upload_aadhar_back}}" target="_blank">
+                            <center><button type="button" class="btn btn-primary form-control">View</button></center>
+                          </a>
+                          {% endif %}
+                          <input type="file" name="emp_up_aad_back" id="emp_up_aad_back" class="form-control" >
+                        </div>
+                      </div>
+                      <div class="col-md-3 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_id">ID Proof Document - Passport/DL/Voters ID/Other (Government Approved) Front</label>
+                          {% if onboard.emp_upload_id %}
+                          <a href="/media/{{onboard.emp_upload_id}}" target="_blank">
+                            <center><button type="button" class="btn btn-primary form-control">View</button></center>
+                          </a>
+                          {% endif %}
+                          <input type="file" name="emp_up_id" id="emp_up_id" class="form-control" >
+                        </div>
+                      </div>
+                      <div class="col-md-3 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_id_back">ID Proof Document - Passport/DL/Voters ID/Other (Government Approved) Back</label>
+                          {% if onboard.emp_upload_id_back %}
+                          <a href="/media/{{onboard.emp_upload_id_back}}" target="_blank">
+                            <center><button type="button" class="btn btn-primary form-control">View</button></center>
+                          </a>
+                          {% endif %}
+                          <input type="file" name="emp_up_id_back" id="emp_up_id_back" class="form-control" >
+                        </div>
+                      </div>
+                      <div class="col-md-4 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_edu">Educational Documents (10th)</label>
+                          {% if onboard.emp_upload_edu_sslc %}
+                          <a href="/media/{{onboard.emp_upload_edu_sslc}}" target="_blank">
+                            <center><button type="button" class="btn btn-primary form-control">View</button></center>
+                          </a>
+                          {% endif %}
+                          <input type="file" name="emp_up_edu" id="emp_up_edu" class="form-control" >
+                        </div>
+                      </div>
+                      <div class="col-md-4 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_edu_12">Educational Documents (12th)</label>
+                          {% if onboard.emp_upload_edu_twelveth %}
+                          <a href="/media/{{onboard.emp_upload_edu_twelveth}}" target="_blank">
+                            <center><button type="button" class="btn btn-primary form-control">View</button></center>
+                          </a>
+                          {% endif %}
+                          <input type="file" name="emp_up_edu_12" id="emp_up_edu_12" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_edu_gra">Educational Documents (Graduation/Post Graduation)</label>
+                          {% if onboard.emp_upload_edu_gradu %}
+                          <a href="/media/{{onboard.emp_upload_edu_gradu}}" target="_blank">
+                            <center><button type="button" class="btn btn-primary form-control">View</button></center>
+                          </a>
+                          {% endif %}
+                          <input type="file" name="emp_up_edu_gra" id="emp_up_edu_gra" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_pan">PAN Card</label>
+                          {% if onboard.emp_upload_pan %}
+                          <a href="/media/{{onboard.emp_upload_pan}}" target="_blank">
+                            <center><button type="button" class="btn btn-primary form-control">View</button></center>
+                          </a>
+                          {% endif %}
+                          <input type="file" name="emp_up_pan" id="emp_up_pan" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_cer">Certificates of work experience (If any) 1</label>
+                          {% if onboard.emp_upload_experience %}
+                          <a href="/media/{{onboard.emp_upload_experience}}" target="_blank">
+                            <center><button type="button" class="btn btn-primary form-control">View</button></center>
+                          </a>
+                          {% endif %}
+                          <input type="file" name="emp_up_cer" id="emp_up_cer" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_cer">Certificates of work experience (If any) 2</label>
+                          {% if onboard.emp_upload_experience_two %}
+                          <a href="/media/{{onboard.emp_upload_experience_two}}" target="_blank">
+                            <center><button type="button" class="btn btn-primary form-control">View</button></center>
+                          </a>
+                          {% endif %}
+                          <input type="file" name="emp_up_cer" id="emp_up_cer" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_cer">Certificates of work experience (If any) 3</label>
+                          {% if onboard.emp_upload_experience_three %}
+                          <a href="/media/{{onboard.emp_upload_experience_three}}" target="_blank">
+                            <center><button type="button" class="btn btn-primary form-control">View</button></center>
+                          </a>
+                          {% endif %}
+                          <input type="file" name="emp_up_cer" id="emp_up_cer" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4 mt-5">
+                        <div class="form-group">
+                          <label for="emp_up_bank">Cancelled cheque/passbook/bank statement (to validate your account details)</label>
+                          {% if onboard.emp_upload_bank %}
+                          <a href="/media/{{onboard.emp_upload_bank}}" target="_blank">
+                            <center><button type="button" class="btn btn-primary form-control">View</button></center>
+                          </a>
+                          {% endif %}
+                          <input type="file" name="emp_up_bank" id="emp_up_bank" class="form-control" >
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row mb-5 mt-4">
+                      <div class="col-md-12">
+                        <button type="submit" onclick="return confirmm();" class="btn btn-success form-control">Submit</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+        <!-- /page content -->
+
+
+
+<script>
+function testing(e) {
+  var regexp = /^[2-9]{1}[0-9]{11}$/;
+  var ano = e.value;
+
+  if(regexp.test(ano)) {
+    return true;
+  }else{
+    alert("Invalid Aadhaar Number");
+    return false;
+  }
+}
+var other = $("#other_quli");
+function other_qualification(e) {
+  if (e.value == "Others"){
+    other.removeClass("d-none");
+    other.attr("required","required");
+  } else {
+    other.addClass("d-none");
+    other.removeAttr("required","required");
+  }
+}
+var hiq = $("#emp_high_qua").val();
+if (hiq=="Others"){
+  other.removeClass("d-none");
+}
+
+</script>
+
+
+{% endblock %}

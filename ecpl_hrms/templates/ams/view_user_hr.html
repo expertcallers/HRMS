@@ -33,6 +33,7 @@
                             <th>RM2</th>
                             <th>RM3</th>
                             <th>Process</th>
+                            <th>Action</th>
                         </tr>
                   </thead>
                   <tfoot>
@@ -44,6 +45,7 @@
                             <th>RM2</th>
                             <th>RM3</th>
                             <th>Process</th>
+                            <th>Action</th>
                         </tr>
                   </tfoot>
                   <tbody>
@@ -56,6 +58,12 @@
                               <td>{{i.emp_rm2}}</td>
                               <td>{{i.emp_rm3}}</td>
                               <td>{{i.emp_process}}</td>
+                              <td>
+                              <a href="/ams/view-employee-profile/{{i.id}}/{{i.on_id}}">
+                                <button type="submit"submi class="btn-primary btn btn-sm">view</button>
+                              </a>
+                            </td>
+
                           </tr>
                   {% endfor %}
                       </tbody>

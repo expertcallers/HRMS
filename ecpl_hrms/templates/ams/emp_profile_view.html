@@ -1,0 +1,377 @@
+{% extends 'ams/base_common.html' %}
+
+{% block main %}
+  {% load static %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <!-- top tiles -->
+          <div class="row" >
+        </div>
+          <!-- /top tiles -->
+
+        <div class="page-title">
+          <div class="title_left">
+            <h3>Employee Details</h3>
+          </div>
+        </div>
+        <div class="row pb-4">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-12">
+                    <h4>Personal Details</h4>
+                    <hr>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="name">Name(As per Aadhar)</label> 
+                      <input type="text" value="{{onboarding.emp_name}}" readonly id="name" class="form-control">                      
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="dob">Date Of Birth</label> 
+                      <input type="text" value="{{onboarding.emp_dob}}" readonly id="dob" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="desg">Designation (Refer offer letter and mention)</label> 
+                      <input type="text" value="{{onboarding.emp_desi}}" readonly id="desg" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="pro">Process (Refer offer letter and mention)</label> 
+                      <input type="text" value="{{onboarding.emp_process}}" readonly id="pro" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_pan">PAN Number</label> 
+                      <input type="text" value="{{onboarding.emp_pan}}" readonly id="emp_pan" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_aad">Aadhar Number</label> 
+                      <input type="text" value="{{onboarding.emp_aadhar}}" readonly id="emp_aad" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_fat">Father's Name</label> 
+                      <input type="text" value="{{onboarding.emp_father_name}}" readonly id="emp_fat" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_mar">Marital Status</label>
+                      <input type="text" value="{{onboarding.emp_marital_status}}" id="emp_mar" class="form-control" readonly>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_email">Email Address</label> 
+                      <input type="email" value="{{onboarding.emp_email}}" readonly id="emp_email" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_ph">Contact Number</label> 
+                      <input type="text" value="{{onboarding.emp_phone}}" readonly id="emp_ph" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_add">Present Address</label> 
+                      <textarea id="emp_add" value="{{onboarding.emp_present_address}}" readonly class="form-control" rows="4">{{onboarding.emp_present_address}}</textarea>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_per_add">Permanent Address</label> 
+                      <textarea value="{{onboarding.emp_permanent_address}}" readonly id="emp_per_add" class="form-control" rows="4">{{onboarding.emp_permanent_address}}</textarea>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_alph">Alternate Contact Number</label> 
+                      <input type="text" value="{{onboarding.emp_alt_phone}}" readonly id="emp_alph" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_blo">Blood Group</label> 
+                      <input type="text" value="{{onboarding.emp_blood_group}}" readonly id="emp_blo" class="form-control">
+                    </div>
+                  </div>
+                </div>
+                <div class="row mt-4">
+                  <div class="col-md-12">
+                    <h4>Emergency Contact</h4>
+                    <p>Person to be contacted in case of emergency.</p>
+                    <hr>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_emer_name">Name</label> 
+                      <input type="text" value="{{onboarding.emp_name}}" readonly id="emp_emer_name" class="form-control">                      
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_emer_ph">Phone Number</label> 
+                      <input type="text" value="{{onboarding.emp_name}}" readonly id="emp_emer_ph" class="form-control">                      
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_emer_add">Address</label> 
+                      <textarea readonly id="emp_emer_add" class="form-control" rows="4">{{onboarding.emp_name}}</textarea>                     
+                    </div>
+                  </div>
+                </div>
+                <div class="row mt-4">
+                  <div class="col-md-12">
+                    <h4>Qualification Details</h4>
+                    <!-- <p>Person to be contacted in case of emergency.</p> -->
+                    <hr>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_high_qua">Highest Qualification</label>
+                      <input type="text" value="{{onboarding.emp_name}}" readonly id="emp_high_qua" class="form-control"> 
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_cou">Course</label> 
+                      <input type="text" value="{{onboarding.emp_name}}" readonly id="emp_cou" class="form-control">                      
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_ins">Institution Name</label> 
+                      <input type="text" value="{{onboarding.emp_name}}" readonly id="emp_ins" class="form-control">                   
+                    </div>
+                  </div>
+                </div>
+                <div class="row mt-4">
+                  <div class="col-md-12">
+                    <h4>Previous Work / Experience</h4>
+                    <!-- <p>Person to be contacted in case of emergency.</p> -->
+                    <hr>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_exp">Experience in Years</label>                   
+                      <input type="text" value="{{onboarding.emp_name}}" readonly id="emp_exp" class="form-control">                      
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_ind">Industry (Ex : Agriculture/IT/BPO)</label> 
+                      <input type="text" value="{{onboarding.emp_name}}" readonly id="emp_ind" class="form-control">                      
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_pre_org">Name of previous organisation</label> 
+                      <input type="text" value="{{onboarding.emp_name}}" readonly id="emp_pre_org" class="form-control">                   
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_pre_desg">Previous Designation</label> 
+                      <input type="text" value="{{onboarding.emp_name}}" readonly id="emp_pre_desg" class="form-control">                   
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_pre_empl">Period of Employment</label> 
+                      <input type="text" value="{{onboarding.emp_name}}" readonly id="emp_pre_empl" class="form-control">                   
+                    </div>
+                  </div>
+                </div>
+                <div class="row mt-4">
+                  <div class="col-md-12">
+                    <h4>Bank Account Details</h4>
+                    <!-- <p>Person to be contacted in case of emergency.</p> -->
+                    <hr>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_bank_name">Account Holder Name</label>                   
+                      <input type="text" value="{{onboarding.emp_name}}" readonly id="emp_bank_name" class="form-control">                      
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_bank_no">Account Number</label>                    
+                      <input type="text" value="{{onboarding.emp_name}}" readonly id="emp_bank_no" class="form-control">                   
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_bank_ifsc">IFSC Code</label> 
+                      <input type="text" value="{{onboarding.emp_name}}" readonly id="emp_bank_ifsc" class="form-control">                   
+                    </div>
+                  </div>
+                </div>
+                <div class="row mt-4">
+                  <div class="col-md-12">
+                    <h4>Upload Documents</h4>
+                    <!-- <p>Person to be contacted in case of emergency.</p> -->
+                    <hr>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_up_aad">Aadhar Card (Front and Back page)</label>
+                      <a href="{{onboarding.emp_name}}" target="_blank">
+                        <center><button class="btn btn-primary">View</button></center>
+                      </a>                    
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_up_pan">PAN Card</label>                    
+                      <a href="{{onboarding.emp_name}}" target="_blank">
+                        <center><button class="btn btn-primary">View</button></center>
+                      </a>                      
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_up_id">ID Proof Document - Passport/DL/Voters ID/Other (Government Approved)</label>
+                      <a href="{{onboarding.emp_name}}" target="_blank">
+                        <center><button class="btn btn-primary">View</button></center>
+                      </a>              
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_up_edu">Educational Documents</label> 
+                      <a href="{{onboarding.emp_name}}" target="_blank">
+                        <center><button class="btn btn-primary">View</button></center>
+                      </a>                   
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_up_cer">Certificates of work experience (If any)</label> 
+                      <a href="{{onboarding.emp_name}}" target="_blank">
+                        <center><button class="btn btn-primary">View</button></center>
+                      </a>                      
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_up_bank">Cancelled cheque/passbook/bank statement (to validate your account details)</label> 
+                      <a href="{{onboarding.emp_name}}" target="_blank">
+                        <center><button class="btn btn-primary">View</button></center>
+                      </a>                
+                    </div>
+                  </div>
+                </div>
+                <div class="row mt-4">
+                  <div class="col-md-12">
+                    <h4>Officail Details</h4>
+                    <!-- <p>Person to be contacted in case of emergency.</p> -->
+                    <hr>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_name">Employee Name</label>                   
+                      <input type="text" value="{{profile.emp_name}}" readonly id="emp_name" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_id">Employee ID</label>                   
+                      <input type="text" value="{{profile.emp_id}}" readonly id="emp_id" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_desg">Employee Designation</label>                   
+                      <input type="text" value="{{profile.emp_desi}}" readonly id="emp_desg" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_pro">Employee Process</label>                   
+                      <input type="text" value="{{profile.emp_process}}" readonly id="emp_pro" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_rm1">RM1</label>                   
+                      <input type="text" value="{{profile.emp_rm1}}" readonly id="emp_rm1" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_rm2">RM2</label>                   
+                      <input type="text" value="{{profile.emp_rm2}}" readonly id="emp_rm2" class="form-control">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label for="emp_rm3">RM3</label>                   
+                      <input type="text" value="{{profile.emp_rm3}}" readonly id="emp_rm3" class="form-control">
+                    </div>
+                  </div>
+                </div>
+                {% if request.user.profile %}
+                  <div class="row mt-4">
+                    <div class="col-md-12">
+                      <h4>Status</h4>
+                      <!-- <p>Person to be contacted in case of emergency.</p> -->
+                      <hr>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_status">Current Status</label>                   
+                        <input type="text" value="{{onboarding.emp_name}}" readonly id="emp_status" class="form-control">                      
+                      </div>
+                    </div>
+                    <div class="col-md-9">
+                      <form action="" method="" enctype="">
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label for="new_status">New Status</label>                   
+                            <select class="form-control select2" name="new_status" id="new_status" required>
+                              <option value="" selected disabled>Please Select</option>
+                              <option value="Attrition">Attrition</option>
+                              <option value="Bench">Bench</option>
+                              <option value="Training">Training</option>
+                            </select>                      
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label for="reason">Reason</label>                   
+                            <textarea id="reason" class="form-control" rows="3" required></textarea>                     
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <button class="form-control btn btn-primary mt-4" onclick="return confirmm();">submit</button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        </div>
+        <!-- /page content -->
+{% endblock %}

@@ -90,7 +90,21 @@
                     </ul>
                   </li>
                   <li><a href="/ams/rm-settings"><i class="fa fa-gear"></i> Settings</a></li>
-                    <li><a href="/ams/rm-mapping-index"><i class="fa fa-user"></i> Mapping</a></li>
+
+                  <li><a><i class="fa fa-user"></i>Mapping <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="/ams/rm-mapping-index"><i class="fa fa-user"></i> Mapping</a></li>
+                      <li><a href="/ams/mapping-application-status"><i class="fa fa-users"></i>Mapping Change Status</a></li>
+                    </ul>
+                  </li>
+
+
+                  <li><a><i class="fa fa-briefcase"></i> Job Requisition <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="/ams/add-new-job">Add New</a></li>
+                      <li><a href="/ams/view-job-table">View Submissions</a></li>
+                    </ul>
+                  </li>
                     <!--<li><a href="/ams/add-new-job"><i class="fa fa-check-square-o"></i> Job Requisition Form</a></li>-->
                 </ul>
               </div>
@@ -364,6 +378,17 @@
         $end.attr("min", $start);
       }
     </script>
+          <script>
+            function confirmm(){
+              var c = confirm("Are you sure you want to proceed?");
+              if (c==true){
+                return true;
+              } else {
+                return false;
+              }
+          }
+        </script>
+
 
   </body>
 </html>

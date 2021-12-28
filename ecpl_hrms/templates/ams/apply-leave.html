@@ -1,0 +1,163 @@
+{% extends 'ams/base_common.html' %}
+
+{% block main %}
+  {% load static %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header">
+                  <h4>Total Leave Balance</h4>
+                </div>
+                <div class="card-body" align="center">
+                  <h1 style="font-size: 64px;" id="total_leave"></h1>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header">
+                  <h4>Privilege Leave Balance</h4>
+                </div>
+                <div class="card-body" align="center">
+                  <h1 style="font-size: 64px;" id="leave_bal">{{leave_balance.pl_balance}}</h1>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header">
+                  <h4>Sick Leave Balance</h4>
+                </div>
+                <div class="card-body" align="center">
+                  <h1 style="font-size: 64px;" id="s_leave_bal">{{leave_balance.sl_balance}}</h1>
+                </div>
+              </div>
+            </div>
+          </div>
+          <form action="/ams/ams-apply_leave" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-12">
+                <div class="card">
+                  <div class="card-header">
+                    <h4>Apply for Leave</h4>
+                  </div>
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-md-3">
+                        <label for="type">Select type of Leave</label>
+                        <select name="type" class="form-control" id="type">
+                          <option value="" selected disabled>Please Select</option>
+                          <option value="PL">Privilege Leave</option>
+                          <option value="SL">Sick Leave</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <label for="leave">Select the Dates</label>
+                        <div class="control-group ">
+                          <div class="controls">
+                            <div class="input-prepend input-group">
+                              <span class="add-on input-group-addon"><i class="fa fa-calendar pt-1"></i></span>
+                              <input type="text" style="width: 200px" id="leave" class="form-control" value="" />
+                            </div>
+                          </div>
+                        </div>
+                        <input type="hidden" name="startdate" id="startdate">
+                        <input type="hidden" name="enddate" id="enddate">
+                      </div> 
+                      <div class="col-md-2">
+                        <label for="leave_days">Number of days</label>
+                        <input type="number" name="leave_days" id="leave_days" class="form-control" readonly>
+                      </div>
+                      <div class="col-md-3">
+                        <label for="reason">Reason for applying</label>
+                        <textarea id="reason" name="reason" class="form-control" required></textarea>
+                      </div>
+                      <div>
+                        <input type="hidden" name="emp_id" value="{{emp.emp_id}}">
+                        <input type="hidden" name="emp_name" value="{{emp.emp_name}}">
+                        <input type="hidden" name="emp_process" value="{{emp.emp_process}}">
+                        <input type="hidden" name="emp_desi" value="{{emp.emp_desi}}">
+                        <input type="hidden" name="emp_rm1" value="{{emp.emp_rm1}}">
+                        <input type="hidden" name="emp_rm2" value="{{emp.emp_rm2}}">
+                        <input type="hidden" name="emp_rm3" value="{{emp.emp_rm3}}">
+                      </div>
+                      <div class="col-md-12 mt-4 pt-1" id="mybutton">
+                        <button class="form-control btn btn-success" onclick="return confirmm();" id="mysubmit">Submit</button>
+                      </div>
+                    </div>
+                  </div>
+                </div> 
+              </div>
+            </div>
+          </form>
+          <div class="row mt-4 pb-4">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <h4>Leave Status</h4>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <table  id="datatablex" class="table table-striped" style="max-width: 100% !important;">
+                        <thead>
+                          <tr>
+                            <th class="align-middle align-center" style="text-align: center;">Applied On</th>
+                            <th class="align-middle align-center" style="text-align: center;">Applied For Dates</th>
+                            <th class="align-middle align-center" style="text-align: center;">Number of days</th>
+                            <th class="align-middle align-center" style="text-align: center;">Leave Type</th>
+                            <th class="align-middle align-center" style="width: 250px;text-align: center;">Reason</th>
+                            <th class="align-middle align-center" style="text-align: center;">TL Approval</th>
+                            <th class="align-middle align-center" style="text-align: center;">TL Comments</th>
+                            <th class="align-middle align-center" style="text-align: center;">OM Approval</th>
+                            <th class="align-middle align-center" style="text-align: center;">OM Comments</th>
+                            <th class="align-middle align-center" style="text-align: center;">Status</th>
+                          </tr>
+                        </thead>
+                        <tfoot>
+                          <tr>
+                            <th class="align-middle align-center" style="text-align: center;">Applied On</th>
+                            <th class="align-middle align-center" style="text-align: center;">Applied For Dates</th>
+                            <th class="align-middle align-center" style="text-align: center;">Number of days</th>
+                            <th class="align-middle align-center" style="text-align: center;">Leave Type</th>
+                            <th class="align-middle align-center" style="width: 250px;text-align: center;">Reason</th>
+                            <th class="align-middle align-center" style="text-align: center;">TL Approval</th>
+                            <th class="align-middle align-center" style="text-align: center;">TL Comments</th>
+                            <th class="align-middle align-center" style="text-align: center;">OM Approval</th>
+                            <th class="align-middle align-center" style="text-align: center;">OM Comments</th>
+                            <th class="align-middle align-center" style="text-align: center;">Status</th>
+                          </tr>
+                        </tfoot>
+                        <tbody>
+                        {% for i in leave %}
+                          <tr>
+                              <td>{{i.applied_date}}</td>
+                              <td>{{i.start_date}} to {{i.end_date}}</td>
+                              <td>{{i.no_days}}</td>
+                              <td>{{i.leave_type}}</td>
+                              <td><p>{{i.agent_reason}}</p></td>
+
+                              <td>{{i.tl_approval}}</td>
+                              <td><p>{{i.tl_reason}}</p></td>
+                              <td>{{i.manager_approval}}</td>
+                              <td><p>{{i.manager_reason}}</p></td>
+                              <td>{{i.status}}</td>
+                          </tr>
+                        {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div> 
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+
+
+
+{% endblock %}

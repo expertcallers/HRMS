@@ -30,6 +30,7 @@
                       <th>Employee Designation</th>
                       <th>Created By</th>
                       <th>Effective Date</th>
+                      <th>Status</th>
                       <th>Action</th>
                     </tr>
                   </thead>
@@ -41,6 +42,7 @@
                       <th>Employee Designation</th>
                       <th>Created By</th>
                       <th>Effective Date</th>
+                      <th>Status</th>
                       <th>Action</th>
                     </tr>
                   </tfoot>
@@ -54,7 +56,14 @@
                         <td>{{t.created_by}}</td>
                         <td>{{t.effective_date}}</td>
                         <td>
-                          <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#v{{t.id}}">View / Approve</button>
+                          {% if t.status == False %}
+                          Pending by OM
+                          {% else %}
+                          Approved
+                          {% endif %}
+                        </td>
+                        <td>
+                          <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#v{{t.id}}">View</button>
                         </td>
                     </tr>
                   {% endfor %}
@@ -179,10 +188,16 @@
                       <input type="text" name="eff_date" id="eff_date" value="{{t.effective_date}}" readonly class="form-control">
                     </div>
                   </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="eff_date">Status</label>
+                      <input type="text" name="eff_date" id="status" value="{% if t.status == False %}Pending by OM{% else %}Approved{% endif %}" readonly class="form-control">
+                    </div>
+                  </div>
+
                 </div>
               </div>
               <div class="modal-footer">
-                <button type="submit"  onclick="return confirmm();" class="btn btn-success">Approve</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
               </div>
             </form>

@@ -51,7 +51,13 @@
                       <td>{{i.emp_email}}</td>
                       <td>{{i.emp_phone}}</td>
                       <td>
-                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#view_{{i.id}}">View</button>
+                        <div style="width: 100%; display: inline-flex;">
+                          <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#view_{{i.id}}">View</button>
+                          <a href="/ams/edit-onboarding/{{i.id}}">
+                            <button class="btn btn-secondary">Edit</button>
+                          </a>
+
+                        </div>
                       </td>
                     </tr>
                   {% endfor %}
@@ -88,43 +94,43 @@
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_name">Name(As per Aadhar)</label> 
+                    <label for="emp_name">Name(As per Aadhar)</label>
                     <input type="text" name="emp_name" value="{{i.emp_name}}" readonly id="emp_name" class="form-control">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_dob">Date Of Birth</label> 
+                    <label for="emp_dob">Date Of Birth</label>
                     <input type="text" name="emp_dob" value="{{i.emp_dob}}" readonly id="emp_dob" class="form-control">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_desg">Designation (Refer offer letter and mention)</label> 
-                    <input type="text" name="emp_desg" value="{{i.emp_desi}}" readonly id="emp_desg" class="form-control">
+                    <label for="emp_desg">Designation (Refer offer letter and mention)</label>
+                    <input type="text" name="emp_desg" value="{{i.emp_desig}}" readonly id="emp_desg" class="form-control">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_pro">Process (Refer offer letter and mention)</label> 
+                    <label for="emp_pro">Process (Refer offer letter and mention)</label>
                     <input type="text" name="emp_pro" value="{{i.emp_process}}" readonly id="emp_pro" class="form-control">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_pan">PAN Number</label> 
-                    <input type="text" name="emp_pan" value="{{i.emp_pan}}" readonly id="emp_pan" class="form-control">                      
+                    <label for="emp_pan">PAN Number</label>
+                    <input type="text" name="emp_pan" value="{{i.emp_pan}}" readonly id="emp_pan" class="form-control">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_aad">Aadhar Number</label> 
+                    <label for="emp_aad">Aadhar Number</label>
                     <input type="text" name="emp_aad" value="{{i.emp_aadhar}}" readonly id="emp_aad" class="form-control">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_fat">Father's Name</label> 
+                    <label for="emp_fat">Father's Name</label>
                     <input type="text" name="emp_fat" value="{{i.emp_father_name}}" readonly id="emp_fat" class="form-control">
                   </div>
                 </div>
@@ -136,63 +142,88 @@
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_email">Email Address</label> 
+                    <label for="emp_email">Email Address</label>
                     <input type="email" name="emp_email" value="{{i.emp_email}}" readonly id="emp_email" class="form-control">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_ph">Contact Number</label> 
+                    <label for="emp_ph">Contact Number</label>
                     <input type="text" name="emp_ph" value="{{i.emp_phone}}" readonly id="emp_ph" class="form-control">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_add">Present Address</label> 
+                    <label for="emp_add">Present Address</label>
                     <textarea name="emp_add" id="emp_add" readonly class="form-control" rows="4">{{i.emp_present_address}}</textarea>
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_per_add">Permanent Address</label> 
+                    <label for="emp_per_add">Permanent Address</label>
                     <textarea name="emp_per_add" readonly id="emp_per_add" class="form-control" rows="4">{{i.emp_permanent_address}}</textarea>
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_alph">Alternate Contact Number</label> 
+                    <label for="emp_alph">Alternate Contact Number</label>
                     <input type="text" name="emp_alph" value="{{i.emp_alt_phone}}" readonly id="emp_alph" class="form-control">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_blo">Blood Group</label> 
-                    <input type="text" name="emp_blo" value="{{i.emp_blood_group}}" readonly id="emp_blo" class="form-control">
+                    <label for="emp_blo">Blood Group</label>
+                    <input type="text" name="emp_blo" value="{{i.emp_blood}}" readonly id="emp_blo" class="form-control">
                   </div>
                 </div>
               </div>
               <div class="row mt-4">
                 <div class="col-md-12">
-                  <h4>Emergency Contact</h4>
+                  <h4>Emergency Contact 1</h4>
                   <p>Person to be contacted in case of emergency.</p>
                   <hr>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_emer_name">Name</label> 
+                    <label for="emp_emer_name">Name</label>
                     <input type="text" value="{{i.emp_emergency_person}}" readonly name="emp_emer_name" id="emp_emer_name" class="form-control">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_emer_ph">Phone Number</label> 
+                    <label for="emp_emer_ph">Phone Number</label>
                     <input type="text" value="{{i.emp_emergency_number}}" readonly name="emp_emer_ph" id="emp_emer_ph" class="form-control">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_emer_add">Address</label> 
-                    <textarea name="emp_emer_add" readonly id="emp_emer_add" class="form-control" rows="4">{{i.emp_present_address}}</textarea>
+                    <label for="emp_emer_add">Address</label>
+                    <textarea name="emp_emer_add" readonly id="emp_emer_add" class="form-control" rows="4">{{i.emp_emergency_address}}</textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="row mt-4">
+                <div class="col-md-12">
+                  <h4>Emergency Contact 2</h4>
+                  <p>Person to be contacted in case of emergency.</p>
+                  <hr>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="emp_emer_name2">Name</label>
+                    <input type="text" value="{{i.emp_emergency_person_two}}" readonly name="emp_emer_name2" id="emp_emer_name2" class="form-control">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="emp_emer_ph2">Phone Number</label>
+                    <input type="text" value="{{i.emp_emergency_number_two}}" readonly name="emp_emer_ph2" id="emp_emer_ph2" class="form-control">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="emp_emer_add2">Address</label>
+                    <textarea name="emp_emer_add2" readonly id="emp_emer_add2" class="form-control" rows="4">{{i.emp_emergency_address_two}}</textarea>
                   </div>
                 </div>
               </div>
@@ -204,151 +235,343 @@
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_high_qua">Highest Qualification</label>
-                    <input type="text" value="{{i.emp_edu_quali}}" readonly name="emp_high_qua" id="emp_high_qua" class="form-control">
+                    <label for="emp_high_qua{{i.id}}">Highest Qualification</label>
+                    <input type="text" value="{{i.emp_edu_qualification}}" readonly name="emp_high_qua" id="emp_high_qua{{i.id}}" class="form-control">
+                    <input type="text" value="{{i.emp_quali_other}}" readonly name="other_quli" id="other_quli{{i.id}}" class="form-control d-none">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_cou">Course</label> 
+                    <label for="emp_cou">Course</label>
                     <input type="text" value="{{i.emp_edu_course}}" readonly name="emp_cou" id="emp_cou" class="form-control">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_ins">Institution Name</label> 
+                    <label for="emp_ins">Institution Name</label>
                     <input type="text" value="{{i.emp_edu_institute}}" readonly name="emp_ins" id="emp_ins" class="form-control">
                   </div>
                 </div>
               </div>
-              <div class="row mt-4">
+              <div class="row mt-4" id="experience_1">
                 <div class="col-md-12">
-                  <h4>Previous Work / Experience</h4>
+                  <h4>Previous Work / Experience 1</h4>
                   <!-- <p>Person to be contacted in case of emergency.</p> -->
                   <hr>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_exp">Experience in Years</label>                   
+                    <label for="emp_exp">Experience in Years</label>
                     <input type="number" value="{{i.emp_pre_exp}}" readonly name="emp_exp" id="emp_exp" class="form-control">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_ind">Industry (Ex : Agriculture/IT/BPO)</label> 
+                    <label for="emp_ind">Industry (Ex : Agriculture/IT/BPO)</label>
                     <input type="text" value="{{i.emp_pre_industry}}" readonly name="emp_ind" id="emp_ind" class="form-control">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_pre_org">Name of previous organisation</label> 
+                    <label for="emp_pre_org">Name of previous organisation</label>
                     <input type="text" value="{{i.emp_pre_org_name}}" readonly name="emp_pre_org" id="emp_pre_org" class="form-control">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_pre_desg">Previous Designation</label> 
-                    <input type="text" value="{{i.emp_pre_desi}}" readonly name="emp_pre_desg" id="emp_pre_desg" class="form-control">
+                    <label for="emp_pre_desg">Previous Designation</label>
+                    <input type="text" value="{{i.emp_pre_desg}}" readonly name="emp_pre_desg" id="emp_pre_desg" class="form-control">
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-group">
-                    <label for="emp_pre_empl">Period of Employment</label> 
-                    <input type="text" value="{{i.emp_prev_tenure}}" readonly name="emp_pre_empl" id="emp_pre_empl" class="form-control">
+                    <label for="emp_pre_empl">Period of Employment</label>
+                    <div style="display: inline-flex; width: 100%">
+                      <input type="text" readonly name="emp_pre_empl_from" id="emp_pre_empl" class="form-control" value="{{i.emp_pre_period_of_employment_frm}}">
+                      <input type="text" readonly name="emp_pre_empl_to" class="form-control" value="{{i.emp_pre_period_of_employment_to}}">
+                    </div>
                   </div>
                 </div>
               </div>
+              {% if i.emp_pre_exp_two %}
+              <div class="row mt-4" id="experience_2{{i.id}}">
+                <div class="col-md-12">
+                  <h4>Previous Work / Experience 2</h4>
+                  <!-- <p>Person to be contacted in case of emergency.</p> -->
+                  <hr>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="emp_exp2{{i.id}}">Experience in Years</label>
+                    <input type="number" value="{{i.emp_pre_exp_two}}" readonly name="emp_exp" id="emp_exp2{{i.id}}" class="form-control">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="emp_ind">Industry (Ex : Agriculture/IT/BPO)</label>
+                    <input type="text" value="{{i.emp_pre_industry_two}}" readonly name="emp_ind" id="emp_ind" class="form-control">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="emp_pre_org">Name of previous organisation</label>
+                    <input type="text" value="{{i.emp_pre_org_name_two}}" readonly name="emp_pre_org" id="emp_pre_org" class="form-control">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="emp_pre_desg">Previous Designation</label>
+                    <input type="text" value="{{i.emp_pre_desg_two}}" readonly name="emp_pre_desg" id="emp_pre_desg" class="form-control">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="emp_pre_empl">Period of Employment</label>
+                    <div style="display: inline-flex; width: 100%">
+                      <input type="text" name="emp_pre_empl_from" readonly id="emp_pre_empl" class="form-control"  value="{{i.emp_pre_period_of_employment_frm_two}}">
+                      <input type="text" name="emp_pre_empl_to" readonly class="form-control" value="{{i.emp_pre_period_of_employment_to_two}}">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+              {% if i.emp_pre_exp_three %}
+              <div class="row mt-4" id="experience_3{{i.id}}">
+                <div class="col-md-12">
+                  <h4>Previous Work / Experience 3</h4>
+                  <!-- <p>Person to be contacted in case of emergency.</p> -->
+                  <hr>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="emp_exp3{{i.id}}">Experience in Years</label>
+                    <input type="number" value="{{i.emp_pre_exp_three}}" readonly name="emp_exp" id="emp_exp3{{i.id}}" class="form-control">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="emp_ind">Industry (Ex : Agriculture/IT/BPO)</label>
+                    <input type="text" value="{{i.emp_pre_industry_three}}" readonly name="emp_ind" id="emp_ind" class="form-control">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="emp_pre_org">Name of previous organisation</label>
+                    <input type="text" value="{{i.emp_pre_org_name_three}}" readonly name="emp_pre_org" id="emp_pre_org" class="form-control">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="emp_pre_desg">Previous Designation</label>
+                    <input type="text" value="{{i.emp_pre_desg_three}}" readonly name="emp_pre_desg" id="emp_pre_desg" class="form-control">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="emp_pre_empl">Period of Employment</label>
+                    <div style="display: inline-flex; width: 100%">
+                      <input type="text" readonly name="emp_pre_empl_from" id="emp_pre_empl" class="form-control" value="{{i.emp_pre_period_of_employment_frm_three}}">
+                      <input type="text" readonly name="emp_pre_empl_to" class="form-control" value="{{i.emp_pre_period_of_employment_frm_three}}">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
               <div class="row mt-4">
                 <div class="col-md-12">
                   <h4>Bank Account Details</h4>
                   <!-- <p>Person to be contacted in case of emergency.</p> -->
                   <hr>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <div class="form-group">
-                    <label for="emp_bank_name">Account Holder Name</label>                   
+                    <label for="emp_acc_bank_name">Account Holder Name</label>
+                    <input type="text" value="{{i.emp_bank_holder_name}}" readonly name="emp_acc_bank_name" id="emp_acc_bank_name" class="form-control">
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="emp_bank_name">Bank Name</label>
                     <input type="text" value="{{i.emp_bank_name}}" readonly name="emp_bank_name" id="emp_bank_name" class="form-control">
                   </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <div class="form-group">
-                    <label for="emp_bank_no">Account Number</label>                    
-                    <input type="text" value="{{i.emp_account_no}}" readonly name="emp_bank_no" id="emp_bank_no" class="form-control">
+                    <label for="emp_bank_no">Account Number</label>
+                    <input type="text" value="{{i.emp_bank_acco_no}}" readonly name="emp_bank_no" id="emp_bank_no" class="form-control">
                   </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <div class="form-group">
-                    <label for="emp_bank_ifsc">IFSC Code</label> 
+                    <label for="emp_bank_ifsc">IFSC Code</label>
                     <input type="text" value="{{i.emp_bank_ifsc}}" readonly name="emp_bank_ifsc" id="emp_bank_ifsc" class="form-control">
                   </div>
                 </div>
               </div>
+
+              <div class="row mt-4">
+                      <div class="col-md-12">
+                        <h4>Documentation Form</h4>
+                        <!-- <p>Person to be contacted in case of emergency.</p> -->
+                        <hr>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="have_system">Do you have your own system/laptop?</label>
+                          <input type="text" id="have_system" readonly value="{{i.have_system}}" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="require_system">Do you require a system to be provided from the company?</label>
+                          <input type="text" id="require_system" readonly value="{{i.require_system}}" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="wifi">Do you have Wifi/Broadbrand services at home? if yes the amount can be claimed will be reimbursed by submitting the broadbrand bill every month</label>
+                          <input type="text" id="wifi" readonly value="{{i.wifi_broadband}}" class="form-control">
+                        </div>
+                      </div>
+                    </div>
+
               <div class="row mt-4">
                 <div class="col-md-12">
                   <h4>Upload Documents</h4>
                   <!-- <p>Person to be contacted in case of emergency.</p> -->
                   <hr>
                 </div>
-                {% if i.emp_aadhar %}
-                <div class="col-md-4 border">
+
+                {% if i.emp_upload_aadhar %}
+                <div class="col-md-3 border">
                   <div class="form-group">
-                    <label for="emp_up_aad">Aadhar Card (Front and Back page)</label>
-                    <a href="/media/{{i.emp_aadhar}}" target="_blank">
+                    <label for="emp_up_aad">Aadhar Card Front</label>
+                    <a href="/media/{{i.emp_upload_aadhar}}" target="_blank">
                       <center><button class="btn btn-primary form-control">View</button></center>
-                    </a>                    
+                    </a>
                   </div>
                 </div>
                 {% endif %}
 
-                {% if i.emp_pan %}
-                <div class="col-md-4 border">
+                {% if i.emp_upload_aadhar_back %}
+                <div class="col-md-3 border">
                   <div class="form-group">
-                    <label for="emp_up_pan">PAN Card</label>                    
-                    <a href="/media/{{i.emp_pan}}" target="_blank">
-                      <center><button class="btn btn-primary  form-control">View</button></center>
-                    </a>                      
+                    <label for="emp_up_aad_back">Aadhar Card Back</label>
+                    <a href="/media/{{i.emp_upload_aadhar_back}}" target="_blank">
+                      <center><button class="btn btn-primary form-control">View</button></center>
+                    </a>
                   </div>
                 </div>
                 {% endif %}
 
-                {% if i.emp_idcard %}
-                <div class="col-md-4 border">
+
+                {% if i.emp_upload_id %}
+                <div class="col-md-3 border">
                   <div class="form-group">
-                    <label for="emp_up_id">ID Proof Document - Passport/DL/Voters ID/Other (Government Approved)</label>
-                    <a href="/media/{{i.emp_idcard}}" target="_blank">
+                    <label for="emp_up_id">ID Proof Document - Passport/DL/Voters ID/Other (Government Approved) Front</label>
+                    <a href="/media/{{i.emp_upload_id}}" target="_blank">
                       <center><button class="btn btn-primary  form-control">View</button></center>
-                    </a>              
+                    </a>
                   </div>
                 </div>
                 {% endif %}
 
-                {% if i.emp_certificate %}
-                <div class="col-md-4 border">
+                {% if i.emp_upload_id_back %}
+                <div class="col-md-3 border">
                   <div class="form-group">
-                    <label for="emp_up_edu">Educational Documents</label> 
-                    <a href="/media/{{i.emp_certificate}}" target="_blank">
+                    <label for="emp_up_id">ID Proof Document - Passport/DL/Voters ID/Other (Government Approved) Back</label>
+                    <a href="/media/{{i.emp_upload_id_back}}" target="_blank">
                       <center><button class="btn btn-primary  form-control">View</button></center>
-                    </a>                   
+                    </a>
                   </div>
                 </div>
                 {% endif %}
-                {% if i.emp_exp_letter %}
+
+
+                {% if i.emp_upload_pan %}
                 <div class="col-md-4 border">
                   <div class="form-group">
-                    <label for="emp_up_cer">Certificates of work experience (If any)</label> 
-                    <a href="/media/{{i.emp_exp_letter}}" target="_blank">
+                    <label for="emp_up_pan">PAN Card</label>
+                    <a href="/media/{{i.emp_upload_pan}}" target="_blank">
                       <center><button class="btn btn-primary  form-control">View</button></center>
-                    </a>                      
+                    </a>
                   </div>
                 </div>
                 {% endif %}
-                {% if i.emp_passbook %}
+
+                {% if i.emp_upload_edu_sslc %}
                 <div class="col-md-4 border">
                   <div class="form-group">
-                    <label for="emp_up_bank">Cancelled cheque/passbook/bank statement (to validate your account details)</label> 
-                    <a href="/media/{{i.emp_passbook}}" target="_blank">
+                    <label for="emp_up_edu">Educational Documents 10th</label>
+                    <a href="/media/{{i.emp_upload_edu_sslc}}" target="_blank">
                       <center><button class="btn btn-primary  form-control">View</button></center>
-                    </a>                
+                    </a>
+                  </div>
+                </div>
+                {% endif %}
+
+                {% if i.emp_upload_edu_twelveth %}
+                <div class="col-md-4 border">
+                  <div class="form-group">
+                    <label for="emp_up_edu">Educational Documents 12th</label>
+                    <a href="/media/{{i.emp_upload_edu_twelveth}}" target="_blank">
+                      <center><button class="btn btn-primary  form-control">View</button></center>
+                    </a>
+                  </div>
+                </div>
+                 {% endif %}
+
+                {% if i.emp_upload_edu_gradu %}
+                <div class="col-md-4 border">
+                  <div class="form-group">
+                    <label for="emp_up_edu">Educational Documents (Graduation/Post Graduation)</label>
+                    <a href="/media/{{i.emp_upload_edu_gradu}}" target="_blank">
+                      <center><button class="btn btn-primary  form-control">View</button></center>
+                    </a>
+                  </div>
+                </div>
+                {% endif %}
+
+                {% if i.emp_upload_experience %}
+                <div class="col-md-4 border">
+                  <div class="form-group">
+                    <label for="emp_up_cer">Certificates of work experience (If any)</label>
+                    <a href="/media/{{i.emp_upload_experience}}" target="_blank">
+                      <center><button class="btn btn-primary  form-control">View</button></center>
+                    </a>
+                  </div>
+                </div>
+                {% endif %}
+
+                {% if i.emp_upload_experience_two %}
+                <div class="col-md-4 border">
+                  <div class="form-group">
+                    <label for="emp_up_cer">Certificates of work experience (If any) 2</label>
+                    <a href="/media/{{i.emp_upload_experience_two}}" target="_blank">
+                      <center><button class="btn btn-primary  form-control">View</button></center>
+                    </a>
+                  </div>
+                </div>
+                {% endif %}
+
+                {% if i.emp_upload_experience_three %}
+                <div class="col-md-4 border">
+                  <div class="form-group">
+                    <label for="emp_up_cer">Certificates of work experience (If any) 3</label>
+                    <a href="/media/{{i.emp_upload_experience_three}}" target="_blank">
+                      <center><button class="btn btn-primary  form-control">View</button></center>
+                    </a>
+                  </div>
+                </div>
+                {% endif %}
+
+                {% if i.emp_upload_bank %}
+                <div class="col-md-4 border">
+                  <div class="form-group">
+                    <label for="emp_up_bank">Cancelled cheque/passbook/bank statement (to validate your account details)</label>
+                    <a href="/media/{{i.emp_upload_bank}}" target="_blank">
+                      <center><button class="btn btn-primary  form-control">View</button></center>
+                    </a>
                   </div>
                 </div>
                 {% endif %}
@@ -400,7 +623,15 @@
           } );
       } );
     </script>
-
+{% for i in onboard %}
+<script>
+  var quali = document.getElementById("emp_high_qua{{i.id}}");
+  var other = document.getElementById("other_quli{{i.id}}");
+  if (quali.value == "Others"){
+    other.classList.remove("d-none");
+  }
+</script>
+{% endfor %}
 
 
 {% endblock %}

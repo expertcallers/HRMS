@@ -30,14 +30,20 @@ urlpatterns = [
     path('hr-dashboard',hrDashboard),
     path('add-new-user',addNewUserHR),
     path('viewusers',viewUsersHR),
+    path('view-employee-profile/<int:id>/<int:on_id>',viewEmployeeProfile),
 
-    path('onboarding',onboardingHR),
+    path('onboarding',on_boarding),
     path('view-onboarding',viewOnBoarding),
+    path('edit-onboarding/<int:id>',on_boarding_update),
     path('apply-attendance',applyAttendace),
     path('team-attendance',teamAttendance),
 
     path('view-emp-attendance',viewTeamAttendance),
     path('team-attendance-report',teamAttendanceReport),
+
+    path('ams-apply_leave',applyLeave),
+    path('view-leave-list',viewleaveListRM1),
+    path('approve-leave-rm1',approveLeaveRM1),
 
     path('rm-approval/<int:id>',rmApproval),
     path('view-att-requests',attRequests),
@@ -45,22 +51,22 @@ urlpatterns = [
     path('rm-settings',rmSettings),
     path('upload-image',uploadImageToDB),
 
-    # Mapping
+    # Mappingview-leave-request-mgr
 
     path('rm-mapping-index',mappingHomePage),
     path('create-mapping-ticket',createMappingTicket),
     path('view-mapping-tickets',viewMappingTicketsHr),
     path('approve-mapping-ticket',approveMappingTicket),
 
-    path('add-new-job',jobRequisition),
+    path('mapping-application-status',viewMappingApplicationStatus),
+    path('view-leave-request-mgr',viewAndApproveLeaveRequestMgr),
 
     path('add-newteam',addNewTeam),
     path('view-all-teams',viewTeam),
 
     path('add-new-job',jobRequisition),
     path('view-job-table',jobRequisitionReportTable),
-    path('edit-job-form',viewJobEditRequisition),
-    path('update-job-form',updateJobForm),
+    path('update-job-status/<int:id>',updateJobForm),
 
 
 

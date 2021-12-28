@@ -148,5 +148,16 @@
 
     <!-- Custom Theme Scripts -->
     <script src="{% static 'assets/build/js/custom.min.js' %}"></script>
+  <script>
+  function confirmm(){
+      var c = confirm("Are you sure you want to proceed?");
+      if (c==true){
+        return true;
+      } else {
+        return false;
+      }
+  }
+</script>
+
   </body>
 </html>
