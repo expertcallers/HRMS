@@ -119,11 +119,16 @@
                                   {% elif c.st == 'Week OFF' %}
                                   "color": "blue",
                                   {% elif c.st == 'Comp OFF' %}
-                                  "color": "blue",
+                                  "color": "brown",
                                   {% elif c.st == 'Absent' %}
                                   "color": "red",
                                   {% elif c.st == 'present' %}
                                   "color": "green",
+                                  {% elif c.st == 'SL' %}
+                                  "color": "#fb06d0",
+                                  {% elif c.st == 'PL' %}
+                                  "color": "#fda802",
+
                                   {% else %}
                                   "color": "grey",
                                   {% endif %}

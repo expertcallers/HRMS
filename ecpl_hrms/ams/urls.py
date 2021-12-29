@@ -66,6 +66,7 @@ urlpatterns = [
 
     path('add-new-job',jobRequisition),
     path('view-job-table',jobRequisitionReportTable),
+    path('view-job-table-rm',jobRequisitionReportTableRM),
     path('update-job-status/<int:id>',updateJobForm),
 
 

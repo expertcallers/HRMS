@@ -1,0 +1,324 @@
+{% extends 'ams/base_common.html' %}
+
+{% block main %}
+  {% load static %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+          <div class="page-title">
+            <div class="title_left">
+              <h3>All Job Requisiotion Form</h3>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <h2>All Job Requisiotion Form</h2>
+                </div>
+                <div class="card-body">
+                  <table  id="datatablex" class="table table-striped" style="max-width: 100% !important;">
+                    <thead>
+                      <tr>
+                        <th>Requested Date</th>
+                        <th>HC</th>
+                        <th>Request Raised By</th>
+                        <th>Department</th>
+                        <th>Designation</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tfoot>
+                      <tr>
+                        <th>Requested Date</th>
+                        <th>HC</th>
+                        <th>Request Raised By</th>
+                        <th>Department</th>
+                        <th>Designation</th>
+                        <th>Action</th>
+                      </tr>
+                    </tfoot>
+                    <tbody>
+                    {% for i in job %}
+                      <tr>
+                          <td>{{i.req_date}}</td>
+                          <td>{{i.hc_req}}</td>
+                          <td>{{i.req_raised_by}}</td>
+                          <td>{{i.department}}</td>
+                          <td>{{i.designation}}</td>
+                          <td>
+                            <div style="display: inline-flex;">
+                              <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#view_{{i.id}}">View</button>
+                            </div>
+                          </td>
+                      </tr>
+                    {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- /page content -->
+
+
+
+
+    <!-- Start View Pop-Up -->
+    {% for i in job %}
+      <div class="modal fade" id="view_{{i.id}}" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Add New Designation</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="card">
+                      <div class="card-body">
+                          <div class="row">
+                            <div class="col-md-4">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}req_date">Requested Date</label>
+                                <input type="text" readonly value="{{i.req_date}}" id="v_{{i.id}}req_date" required class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}hc_required">HC Required</label>
+                                <input type="text" readonly value="{{i.hc_req}}" id="v_{{i.id}}hc_required" required class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-4">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}req_rais_by">Request Raised By</label>
+                                <input type="text" readonly value="{{i.req_raised_by}}" id="v_{{i.id}}req_rais_by" required class="form-control">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}department">Department</label>
+                                <input type="text" readonly value="{{i.department}}" id="v_{{i.id}}department" required class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}designation">Role/Designation</label>
+                                <input type="text" readonly value="{{i.designation}}" id="v_{{i.id}}designation" required class="form-control">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}pro_type_1">Process Type 1</label>
+                                <input type="text" readonly value="{{i.process_typ_one}}" id="v_{{i.id}}pro_type_1" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}pro_type_2">Process Type 2</label>
+                                <input type="text" readonly value="{{i.process_typ_two}}" id="v_{{i.id}}pro_type_2" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}pro_type_3">Process Type 3</label>
+                                <input type="text" readonly value="{{i.process_typ_three}}" id="v_{{i.id}}pro_type_3" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}salary">Salary Range</label>
+                                <div style="width:100%; display: inline-flex;">
+                                  <input type="text" readonly value="{{i.salary_rang_frm}}" id="v_{{i.id}}salary" class="form-control" placeholder="From">
+                                  <input type="text" readonly value="{{i.salary_rang_to}}" id="v_{{i.id}}salaryto" class="form-control" placeholder="To">
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}quali">Qualification</label>
+                                <input type="text" readonly value="{{i.qualification}}" id="v_{{i.id}}quali" class="form-control">
+                                <input type="text" readonly value="{{i.other_quali}}" id="v_{{i.id}}other_quali" class="form-control  mt-2" placeholder=" Please Enter Your Qualification">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}skills">Skills Set</label>
+                                <textarea class="form-control" readonly id="v_{{i.id}}skills" rows="3" placeholder="Please Enter your Skills Set and if multiple seperate by comma." required>{{i.skills_set}}</textarea>
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}lang">Languages</label>
+                                <textarea class="form-control" readonly id="v_{{i.id}}lang" rows="3" >{{i.languages}}</textarea>
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}shift">Shift Timing</label>
+                                <input type="text" readonly value="{{i.shift_timing}}" id="v_{{i.id}}shift" class="form-control">
+                              </div>
+                              <div id="v_{{i.id}}shift_time" style="width:100%; display: inline-flex;" class="mt-2 d-none">
+                                <input type="text" readonly id="v_{{i.id}}shift_from" readonly class="form-control" value="{{i.shift_timing_frm}}">
+                                <input type="text" readonly id="v_{{i.id}}shift_to" readonly class="form-control" value="{{i.shift_timing_to}}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}work_from">Working Days</label>
+                                <div style="width:100%; display: inline-flex;">
+                                  <input type="text" readonly value="{{i.working_from}}" id="v_{{i.id}}work_from" class="form-control" placeholder="From">
+                                  <input type="text" readonly value="{{i.working_to}}" id="v_{{i.id}}work_to" class="form-control" placeholder="To">
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}off_from">Week Off</label>
+                                <input type="text" name="num_off" id="v_{{i.id}}num_off" value="{{i.week_no_days}}" class="form-control" readonly>
+                                <div id="v_{{i.id}}week_off" style="width:100%; display: inline-flex;" class="mt-2 d-none">
+                                  <input type="text" readonly value="{{i.week_from}}" id="v_{{i.id}}off_from" class="form-control" placeholder="From">
+                                  <input type="text" readonly value="{{i.week_to}}" id="v_{{i.id}}off_to" class="form-control" placeholder="To">
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}req_type">Requisition Type</label>
+                                <input type="text" readonly value="{{i.requisition_typ}}" id="v_{{i.id}}req_type" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-12">
+                              <hr>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name">Candidate Name</label>
+                                <textarea readonly id="v_{{i.id}}cand_name" class="form-control">{{i.candidate_name}}</textarea>
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}clos_date">Closure Date</label>
+                                <input type="text" readonly value="{{i.closure_date}}" id="v_{{i.id}}clos_date" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source">Source</label>
+                                <input type="text" readonly value="{{i.source}}" id="v_{{i.id}}source" class="form-control">
+                              </div>
+                            </div>
+                            
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_empref_emp_name}}" id="v_{{i.id}}emp_name" class="form-control">
+                                <input type="text" readonly value="{{i.source_empref_emp_id}}" id="v_{{i.id}}emp_id" class="form-control">
+
+                              </div>
+                            </div>
+                            
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social}}" id="v_{{i.id}}sol_me" class="form-control">
+                              </div>
+                            </div>
+                            
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners}}" id="v_{{i.id}}agency" class="form-control">
+                              </div>
+                            </div>
+                            {% if i.recruited_people %}
+                            <div class="col-md-3" id="v_{{i.id}}rec_popmain">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}rec_pop">No of people recruited</label>
+                                <input type="text" readonly value="{{i.recruited_people}}" id="v_{{i.id}}rec_pop" class="form-control">
+                              </div>
+                            </div>
+                            {% endif %}
+                            {% if i.candidate_remark %}
+                            <div class="col-md-3" id="v_{{i.id}}rec_popmain">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}can_remark">Candidates Remark</label>
+                                <textarea readonly id="v_{{i.id}}can_remark" class="form-control">{{i.candidate_remark}}</textarea>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+    <!-- End View Pop-Up -->
+
+
+
+{% for i in job %}
+    <script type="text/javascript">
+      var qu = document.getElementById('v_{{i.id}}quali').value;
+      if (qu == "Others") {
+        document.getElementById('v_{{i.id}}other_quali').classList.remove("d-none");
+      } else {
+        document.getElementById('v_{{i.id}}other_quali').classList.add("d-none");
+      }
+      var e = document.getElementById('v_{{i.id}}num_off');
+      var week_off = document.getElementById('v_{{i.id}}week_off');
+      if (e.value > 1) {
+        week_off.classList.remove("d-none");
+      } else {
+        week_off.classList.add("d-none");
+      }
+      var shift_time = document.getElementById('v_{{i.id}}shift_time');
+      var f = document.getElementById('v_{{i.id}}shift');
+      if (f.value == "Fixed - Timing") {
+        shift_time.classList.remove("d-none");
+      } else {
+        shift_time.classList.add("d-none");
+      }
+
+
+      $( document ).ready(function() {
+        var soc = document.getElementById('v_{{i.id}}source').value;
+        if (soc == "Employee Referral") {
+          document.getElementById('v_{{i.id}}emp_val').classList.remove("d-none");
+        }
+        if ( soc == "Social") {
+          document.getElementById('v_{{i.id}}social_val').classList.remove("d-none");
+        }
+        if (soc == "Partners (Agency)") {
+          document.getElementById('v_{{i.id}}partner_val').classList.remove("d-none");
+        }
+      });
+
+    </script>
+{% endfor %}
+
+
+
+
+
+{% endblock %}

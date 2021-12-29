@@ -114,40 +114,12 @@ def teamDashboard(request):
 
 @login_required
 def agentDashBoard(request):
-    today = date.today()
-    yesterday = today - timedelta(days=1)
-    dby_date = yesterday - timedelta(days=1)
 
     emp_name = request.user.profile.emp_name
     emp_id = request.user.profile.emp_id
     emp = Employee.objects.get(emp_id = emp_id)
-    try:
-        cal_day = EcplCalander.objects.get(date=today,applied_status=True,emp_id=emp_id)
-        tdy_date = today
-        today = 'Applied'
-    except EcplCalander.DoesNotExist:
-        today = str(today)
-        tdy_date = today
-
-    try:
-        cal_yday = EcplCalander.objects.get(date=yesterday, applied_status=True, emp_id=emp_id)
-        yst_date = yesterday
-        yesterday = 'Applied'
-
-    except EcplCalander.DoesNotExist:
-        yst_date = yesterday
-        yesterday = str(yesterday)
-
-    try:
-        dby = EcplCalander.objects.get(date=dby_date, applied_status=True, emp_id=emp_id)
-        dby_date = dby_date
-        day_befor_yest = 'Applied'
-    except EcplCalander.DoesNotExist:
-        dby_date = dby_date
-        day_befor_yest = str(dby_date)
-
     #attendance status
-    cal = EcplCalander.objects.filter(emp_id=emp_id).order_by('-date')[:3]
+    cal = EcplCalander.objects.filter(Q(emp_id=emp_id),Q(att_actual__in=['SL','PL'])).order_by('-date')
 
     # Month view
     ########### Month View ############
@@ -177,9 +149,9 @@ def agentDashBoard(request):
         month_cal.append(dict)
 
 
-    data = {'emp_name':emp_name,'emp':emp,'date':today,'yesterday':yesterday,'cal':cal,'month_cal':month_cal,
-            'yst_date':yst_date,'tdy_date':tdy_date,
-            'dby_date':dby_date,'day_befor_yest':day_befor_yest}
+    data = {'emp':emp,'cal':cal,'month_cal':month_cal,
+
+         }
 
     return render(request,'ams/agent-dashboard-new.html',data)
 
@@ -823,13 +795,21 @@ def applyAttendace(request):
         emp_desi = request.POST['emp_desi']
         team = request.POST['emp_team']
         now = datetime.now()
-        cal = EcplCalander.objects.create(
-            team = team, date = ddate, emp_id = emp_id,
-            att_actual = att_actual,applied_status = True,
-            rm1 = rm1, rm2 = rm2, rm3 = rm3,
-            approved_on = now, emp_desi = emp_desi,appoved_by = request.user.profile.emp_name,
-            emp_name = emp_name
-        )
+        try:
+            cal = EcplCalander.objects.get(date=ddate,emp_id=emp_id)
+            messages.info(request,'*** Already Marked in Calendar, Please Refresh the page and try again ***')
+            return redirect('/ams/team-attendance')
+
+        except EcplCalander.DoesNotExist:
+
+            cal = EcplCalander.objects.create(
+                team = team, date = ddate, emp_id = emp_id,
+                att_actual = att_actual,applied_status = True,
+                rm1 = rm1, rm2 = rm2, rm3 = rm3,
+                approved_on = now, emp_desi = emp_desi,appoved_by = request.user.profile.emp_name,
+                emp_name = emp_name
+            )
+
         cal.save()
         return redirect('/ams/team-attendance')
     else:
@@ -1479,6 +1459,14 @@ def jobRequisitionReportTable(request):
     emp = Employee.objects.get(emp_id=emp_id)
     data = {'emp':emp,'job':job}
     return render(request, "ams/job_requisition_report_table.html", data)
+
+@login_required
+def jobRequisitionReportTableRM(request):
+    job = JobRequisition.objects.all()
+    emp_id = request.user.profile.emp_id
+    emp = Employee.objects.get(emp_id=emp_id)
+    data = {'emp':emp,'job':job}
+    return render(request, "ams/job_requisition_report_table_rm.html", data)
 
 @login_required
 def viewJobEditRequisition(request):
