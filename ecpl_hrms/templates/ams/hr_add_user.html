@@ -18,9 +18,6 @@
         <div class="row">
           <div class="col-md-12">
             <div class="card">
-              <div class="card-header">
-                <h2>Add New User</h2>
-              </div>
               <div class="card-body">
                 <form method="POST" action="/ams/add-new-user" enctype="multipart/form-data">
                   {% csrf_token %}
@@ -41,19 +38,19 @@
                     <div class="col-md-3">
                       <div class="form-group">
                         <label for="emp_name">Employee Name</label>
-                        <input type="text" name="emp_name" id="emp_name" class="form-control">
+                        <input type="text" name="emp_name" id="emp_name" class="form-control" required>
                       </div>
                     </div>
                     <div class="col-md-3">
                       <div class="form-group">
                         <label for="emp_id">Employee ID</label>
-                        <input type="text" name="emp_id" id="emp_id" class="form-control">
+                        <input type="text" name="emp_id" id="emp_id" class="form-control" required>
                       </div>
                     </div>
                     <div class="col-md-3">
                       <div class="form-group">
                         <label for="emp_doj">Date of Joining</label>
-                        <input type="date" name="emp_doj" id="emp_doj" class="form-control">
+                        <input type="date" name="emp_doj" id="emp_doj" class="form-control" required>
                       </div>
                     </div>
                     <div class="col-md-3">
@@ -61,13 +58,14 @@
                         <div class="row">
                           <div class="col-md-12">
                             <label for="emp_desg">Designation</label>
-                            <select name="emp_desg" id="emp_desg" class="form-control select2">
+                            <select name="emp_desg" id="emp_desg" class="form-control select2" required>
+                             <option value="" selected disabled>Please select</option>
                               {% for a in all_data %}
                               <option value="{{a.emp_desi}}">{{a.emp_desi}}</option>
                               {% endfor %}
                             </select>
                             <center>
-                              <button type="button" class="btn btn-sm btn-primary mt-2" data-toggle="modal" data-target="#add_desg">Add New designation</button>
+                              <button type="button" class="btn btn-sm btn-primary mt-2" disabled data-toggle="modal" data-target="#add_desg">Add New designation</button>
                             </center>
                           </div>
                         </div>
@@ -78,7 +76,8 @@
                     <div class="col-md-3">
                       <div class="form-group">
                         <label for="emp_rm1">RM1</label>
-                        <select name="emp_rm1" id="emp_rm1" class="form-control select2">
+                        <select name="emp_rm1" id="emp_rm1" class="form-control select2" required>
+                          <option value="" selected disabled>Please select</option>
                           {% for r in rms %}
                           <option value="{{r.emp_name}}">{{r.emp_name}} / {{r.emp_id}}</option>
                           {% endfor %}
@@ -88,7 +87,8 @@
                     <div class="col-md-3">
                       <div class="form-group">
                         <label for="emp_rm2">RM2</label>
-                        <select name="emp_rm2" id="emp_rm2" class="form-control select2">
+                        <select name="emp_rm2" id="emp_rm2" class="form-control select2" required>
+                          <option value="" selected disabled>Please select</option>
                           {% for r in rms %}
                           <option value="{{r.emp_name}}">{{r.emp_name}} / {{r.emp_id}}</option>
                           {% endfor %}
@@ -98,7 +98,8 @@
                     <div class="col-md-3">
                       <div class="form-group">
                         <label for="emp_rm3">RM3</label>
-                        <select name="emp_rm3" id="emp_rm3" class="form-control select2">
+                        <select name="emp_rm3" id="emp_rm3" class="form-control select2" required>
+                          <option value="" selected disabled>Please select</option>
                           {% for r in rms %}
                           <option value="{{r.emp_name}}">{{r.emp_name}} / {{r.emp_id}}</option>
                           {% endfor %}
@@ -108,7 +109,8 @@
                     <div class="col-md-3">
                       <div class="form-group">
                         <label for="emp_pro">Process</label>
-                        <select name="emp_pro" id="emp_pro" class="form-control select2">
+                        <select name="emp_pro" id="emp_pro" class="form-control select2" required>
+                          <option value="" selected disabled>Please select</option>
                           {% for a in all_team %}
                               <option value="{{a.emp_process}}">{{a.emp_process}}</option>
                           {% endfor %}
@@ -127,10 +129,6 @@
           </div>
         </div>
         <div>
-
-          {% for m in messages %}
-            <p style="color: green;font-size: 18px;padding: 10px;">{{m}}</p>
-          {% endfor %}
         </div>
 
 

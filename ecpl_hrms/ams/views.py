@@ -19,12 +19,16 @@ from django.db.models import Q
 
 tl_am_list = ['Team Leader','Assistant Manager', 'Subject Matter Expert', 'Trainer','Learning and Development Head']
 
-manager_list = ['Operations Manager','Service Delivery Manager','Manager',]
+manager_list = ['Quality Head','Operations Manager','Service Delivery Manager','Command Centre Head']
 
 hr_list = ['HR','HR Manager','Manager ER','HR Lead','Sr Recruiter','MIS Executive HR',
 'Lead HRBP','Employee Relations Specialist','Payroll Specialist','Recruiter','HR Generalist']
 
-agent_list = ['Jr Dev']
+agent_list = [ 'Client Relationship Officer ','MIS Executive','Patrolling officer',
+               'Data Analyst','Business Development Executive','Content Developer',
+               'Junior Developer','Web Developer','Trainee Developer',
+               'Jr Dev'
+                ]
 
 # Create your views here.
 def loginPage(request):
@@ -119,7 +123,7 @@ def agentDashBoard(request):
     emp_id = request.user.profile.emp_id
     emp = Employee.objects.get(emp_id = emp_id)
     #attendance status
-    cal = EcplCalander.objects.filter(Q(emp_id=emp_id),Q(att_actual__in=['SL','PL'])).order_by('-date')
+    cal = LeaveTable.objects.filter(Q(emp_id=emp_id),Q(leave_type__in=['SL','PL']))
 
     # Month view
     ########### Month View ############
@@ -163,21 +167,26 @@ def tlDashboard(request):
         emp_id = request.user.profile.emp_id
         emp = Employee.objects.get(emp_id=emp_id)
         #All Employees
-        all_emp = Employee.objects.filter(emp_rm1=emp_name)
+        all_emp = Employee.objects.filter(Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name))
         # details
         today = date.today()
         today = str(today)
         # All Active Today
         att_details = EcplCalander.objects.filter(date = today,rm1=emp_name)
         #counts
-        emp_count = Employee.objects.filter(emp_rm1=emp_name).count()
-        present_count = EcplCalander.objects.filter(Q(rm1=emp_name),Q(date=today),Q(att_actual='present')).count()
-        absent_count = EcplCalander.objects.filter(Q(rm1=emp_name), Q(date=today), Q(att_actual='Absent')).count()
-        week_off_count = EcplCalander.objects.filter(Q(rm1=emp_name), Q(date=today), Q(att_actual='Week OFF')).count()
-        comp_off_count = EcplCalander.objects.filter(Q(rm1=emp_name), Q(date=today), Q(att_actual='Comp OFF')).count()
-        half_day_count = EcplCalander.objects.filter(Q(rm1=emp_name), Q(date=today), Q(att_actual='Half Day')).count()
-        holiday_count = EcplCalander.objects.filter(Q(rm1=emp_name), Q(date=today), Q(att_actual='Holiday')).count()
-        unmarked_count = emp_count - (present_count + absent_count + week_off_count + comp_off_count + half_day_count + holiday_count)
+        emp_count = Employee.objects.filter(Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name)).count()
+        present_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name),Q(date=today),Q(att_actual='present')).count()
+        absent_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Absent')).count()
+        week_off_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Week OFF')).count()
+        comp_off_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Comp OFF')).count()
+        half_day_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Half Day')).count()
+        holiday_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Holiday')).count()
+        sl_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='SL')).count()
+        pl_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='PL')).count()
+        attrition_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Attrition')).count()
+        training_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Training')).count()
+
+        unmarked_count = emp_count - (present_count + absent_count + week_off_count + comp_off_count + half_day_count + holiday_count + sl_count + pl_count + attrition_count + training_count)
         # Mapping Tickets >>
         map_tickets_counts = MappingTickets.objects.filter(new_rm3 = emp_name,status=False).count()
 
@@ -189,7 +198,8 @@ def tlDashboard(request):
                 'present_count':present_count,'absent_count':absent_count,'week_off_count':week_off_count,
                 'comp_off_count':comp_off_count,'half_day_count':half_day_count,'holiday_count':holiday_count,
                 'unmarked_count':unmarked_count,'map_tickets_counts':map_tickets_counts,
-                'all_emp':all_emp,
+                'all_emp':all_emp,'sl_count':sl_count,'pl_count':pl_count,'attrition_count':attrition_count,
+                'training_count':training_count,
                 'leave_req_count':leave_req_count
                 }
         return render(request, 'ams/rm-dashboard-new.html', data)
@@ -769,17 +779,21 @@ def addNewUserHR(request):
 def viewUsersHR(request):
     emp_id = request.user.profile.emp_id
     emp = Employee.objects.get(emp_id=emp_id)
-    add = Employee.objects.all()
+    add = Profile.objects.all()
     data = {'add':add,'emp':emp}
 
     return render(request,'ams/view_user_hr.html',data)
 
 def viewEmployeeProfile(request,id,on_id):
+    emp_id = request.user.profile.emp_id
+    emp = Employee.objects.get(emp_id=emp_id)
 
-    profile = Employee.objects.get(id=id)
+    profile = Profile.objects.get(id=id)
+
     onboarding = OnboardingnewHRC.objects.get(id=on_id)
+    
+    data = {'profile': profile, 'onboard': onboarding,'emp':emp}
 
-    data = {'profile': profile, 'onboarding': onboarding}
     return render(request,'ams/emp_profile_view.html',data)
 
 @login_required
@@ -1462,7 +1476,8 @@ def jobRequisitionReportTable(request):
 
 @login_required
 def jobRequisitionReportTableRM(request):
-    job = JobRequisition.objects.all()
+
+    job = JobRequisition.objects.filter(req_raised_by = request.user.profile.emp_name)
     emp_id = request.user.profile.emp_id
     emp = Employee.objects.get(emp_id=emp_id)
     data = {'emp':emp,'job':job}
@@ -1521,7 +1536,7 @@ def updateJobForm(request,id):
         data = {'job':job,'emp':emp}
         return render(request, "ams/job_requisition_edit.html", data)
 
-
+@login_required
 def applyLeave(request):
 
     if request.method == 'POST':
@@ -1589,6 +1604,7 @@ def viewleaveListRM1(request):
     data = {'emp':emp,'leave_request':leave_request}
     return render(request,'ams/leave_approval_rm1.html',data)
 
+@login_required
 def approveLeaveRM1(request):
 
     if request.method == "POST":
@@ -1616,3 +1632,25 @@ def approveLeaveRM1(request):
         return redirect('/ams/view-leave-list')
 
 
+@login_required
+def editAgentStatus(request):
+    if request.method == 'POST':
+
+        id = request.POST['id']
+        agent_status = request.POST['new_status']
+        reason = request.POST['reason']
+        profile = Profile.objects.get(id=id)
+        emp = Employee.objects.get(emp_id = profile.emp_id)
+        emp.agent_status = agent_status
+        emp.save()
+        profile.agent_status = agent_status
+        profile.save()
+        sh = AgentActiveStatusHist.objects.create(emp_id = profile.emp_id,emp_name=profile.emp_name ,current_status = profile.agent_status,
+                                                  new_status= agent_status,
+                                                  date=date.today() ,reason =reason ,changed_by =request.user.profile.emp_name)
+
+        sh.save()
+        return redirect('/ams/viewusers')
+
+    else:
+        return HttpResponse('<h1>Not Get Method</h1>')

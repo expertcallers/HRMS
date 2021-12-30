@@ -59,9 +59,11 @@
                               <td>{{i.emp_rm3}}</td>
                               <td>{{i.emp_process}}</td>
                               <td>
+                              {% if i.on_id %}
                               <a href="/ams/view-employee-profile/{{i.id}}/{{i.on_id}}">
                                 <button type="submit"submi class="btn-primary btn btn-sm">view</button>
                               </a>
+                              {% endif %}
                             </td>
 
                           </tr>

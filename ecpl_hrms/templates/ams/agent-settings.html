@@ -7,7 +7,7 @@
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title clearfix" style="border: 0; background-color: #fff;">
-              <a href="index.html" class="site_title">
+              <a href="/ams/agent-dashboard" class="site_title">
                 <img src="{% static 'assets/images/ecpl-logo-new.png' %}" class="imgmd" style="width: 100%">
                 <img src="{% static 'assets/images/expertcallers-icon.png' %}" class="imgsm" style="width: 100%">
               </a>
@@ -63,7 +63,7 @@
               <ul class=" navbar-right">
                 <li class="nav-item dropdown open" style="padding-left: 15px;">
                   <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{% static 'assets/images/img.jpg' %}" alt="">{{emp.emp_name}}
+                    <img src="{{user.profile.img.url}}" alt="">{{emp.emp_name}}
                   </a>
                   <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item"  href="/ams/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a>

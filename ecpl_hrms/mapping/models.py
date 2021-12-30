@@ -15,6 +15,10 @@ class Employee(models.Model):
     id_extra = models.IntegerField(null=True)
 
     on_id = models.IntegerField(null=True, blank=True)
+    agent_status = models.CharField(max_length=20, default='Active')
+
+    def __str__(self):
+        return self.emp_name
 
 
 class Profile(models.Model):
@@ -32,6 +36,7 @@ class Profile(models.Model):
     doj = models.DateField(null=True,blank=True)
     active = models.BooleanField(default=True)
     on_id = models.IntegerField(null=True,blank=True)
+    agent_status = models.CharField(max_length=20,default='Active')
 
     def __str__(self):
         return self.emp_name

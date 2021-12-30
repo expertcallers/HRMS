@@ -244,8 +244,8 @@
                         <div class="form-group">
                           <label for="emp_pre_empl">Period of Employment</label>
                           <div style="display: inline-flex; width: 100%">
-                            <input type="date" name="emp_pre_empl_from" id="emp_pre_empl" placeholder="From" class="form-control">
-                            <input type="date" name="emp_pre_empl_to" class="form-control" placeholder="To">
+                            <input type="date" onchange="mydate1(this);" name="emp_pre_empl_from" id="emp_pre_empl" placeholder="From" class="form-control">
+                            <input type="date" name="emp_pre_empl_to" id="emp_pre_emplend" class="form-control" placeholder="To">
                           </div>
                         </div>
                       </div>
@@ -420,6 +420,7 @@
         </div>
         <!-- /page content -->
 
+<script src="{% static 'assets/vendors/moment/moment.js' %}"></script>
 
 
 <script>
@@ -434,17 +435,47 @@ function other_qualification(e) {
   }
 }
 var n=1;
+
+$today = new Date();
+$today = moment($today).format('YYYY-MM-DD');
+$('#emp_pre_empl').attr("max", $today);
+$('#emp_pre_emplend').attr("max", $today);
+
+$('#emp_pre_empl_2').attr("max", $today);
+$('#emp_pre_emplend_2').attr("max", $today);
+
+$('#emp_pre_empl_3').attr("max", $today);
+$('#emp_pre_emplend_3').attr("max", $today);
+
+function mydate1(e) {
+  $start = $('#emp_pre_empl').val();
+  $end = $('#emp_pre_emplend');
+  $end.attr("min", $start);
+}
+
 function addMore() {
   n=n+1;
   var ex = document.getElementById('experience_1');
   if (n<=3) {
-    html = '<div class="row mt-4" id="experience_'+n+'">  <div class="col-md-12">    <h4>Previous Work / Experience '+n+'</h4>    <hr>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_exp_'+n+'">Experience in Years</label>      <input type="number" name="emp_exp_'+n+'" required min="0" value="0" id="emp_exp_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_ind_'+n+'">Industry (Ex : Agriculture/IT/BPO)</label>      <input type="text" name="emp_ind_'+n+'" required id="emp_ind_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_pre_org_'+n+'">Name of previous organisation</label>      <input type="text" name="emp_pre_org_'+n+'" required id="emp_pre_org_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_pre_desg_'+n+'">Previous Designation</label>      <input type="text" name="emp_pre_desg_'+n+'" required id="emp_pre_desg_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_pre_empl_'+n+'">Period of Employment</label>      <div style="display: inline-flex; width: 100%">        <input type="date" name="emp_pre_empl_from_'+n+'" id="emp_pre_empl_'+n+'" required placeholder="From" class="form-control">        <input type="date" name="emp_pre_empl_to_'+n+'" class="form-control" required placeholder="To">      </div>    </div>  </div></div>';
+    html = '<div class="row mt-4" id="experience_'+n+'">  <div class="col-md-12">    <h4>Previous Work / Experience '+n+'</h4>    <hr>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_exp_'+n+'">Experience in Years</label>      <input type="number" name="emp_exp_'+n+'" required min="0" value="0" id="emp_exp_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_ind_'+n+'">Industry (Ex : Agriculture/IT/BPO)</label>      <input type="text" name="emp_ind_'+n+'" required id="emp_ind_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_pre_org_'+n+'">Name of previous organisation</label>      <input type="text" name="emp_pre_org_'+n+'" required id="emp_pre_org_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_pre_desg_'+n+'">Previous Designation</label>      <input type="text" name="emp_pre_desg_'+n+'" required id="emp_pre_desg_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_pre_empl_'+n+'">Period of Employment</label>      <div style="display: inline-flex; width: 100%">        <input type="date" name="emp_pre_empl_from_'+n+'" id="emp_pre_empl_'+n+'" onchange="mydate'+n+'(this);" required placeholder="From" class="form-control">        <input type="date" name="emp_pre_empl_to_'+n+'" id="emp_pre_emplend_'+n+'" class="form-control" required placeholder="To">      </div>    </div>  </div></div>';
     ex.insertAdjacentHTML('beforeend',html);
   } else {
     alert("Reached Maximum :)");
   }
 }
 
+  function mydate2(e) {
+    $start = $('#emp_pre_empl_2').val();
+    $end = $('#emp_pre_emplend_2');
+    $end.attr("min", $start);
+    $end.attr("max", $today);
+  }
+  function mydate3(e) {
+    $start = $('#emp_pre_empl_3').val();
+    $end = $('#emp_pre_emplend_3');
+    $end.attr("min", $start);
+    $end.attr("max", $today);
+  }
 </script>
 
 

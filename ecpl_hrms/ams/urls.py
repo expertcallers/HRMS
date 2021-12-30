@@ -18,6 +18,7 @@ from .views import *
 
 urlpatterns = [
     path('',loginPage),
+    path('login/',loginAndRedirect),
     path('login',loginAndRedirect),
     path('logout',logoutView),
     path('dashboard-redirect/<int:id>',redirectTOAllDashBoards),
@@ -69,6 +70,7 @@ urlpatterns = [
     path('view-job-table-rm',jobRequisitionReportTableRM),
     path('update-job-status/<int:id>',updateJobForm),
 
+    path('edit-employee-profile-status',editAgentStatus),
 
 
 ]

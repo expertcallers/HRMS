@@ -209,3 +209,12 @@ class LeaveTable(models.Model):
     emp_rm2 = models.CharField(max_length=50, null=True)
     emp_rm3 = models.CharField(max_length=50, null=True)
 
+
+class AgentActiveStatusHist(models.Model):
+    emp_id = models.CharField(max_length=20,null=True,blank=True)
+    emp_name = models.CharField(max_length=30,null=True,blank=True)
+    current_status = models.CharField(max_length=20,null=True,blank=True)
+    new_status = models.CharField(max_length=20,null=True,blank=True)
+    date = models.DateField()
+    reason = models.TextField()
+    changed_by = models.CharField(max_length=30)

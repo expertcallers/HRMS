@@ -918,12 +918,12 @@
 
 .profile_pic {
   width: 100%;
-  float: left; }
+  text-align: center }
 
 .img-circle.profile_img {
-  width: 90%;
+  width: 80%;
   background: #fff;
-  margin-left: 5%;
+  height: 170px;
   z-index: 1000;
   position: inherit;
   margin-top: 20px;

@@ -22,15 +22,16 @@
                     <div class="col-md-4">
                       <div class="form-group">
                         <label for="team_name">Team Name</label>
-                        <input type="text" name="campaign" id="team_name" class="form-control">
+                        <input type="text" name="campaign" id="team_name" class="form-control" required>
                       </div>
                     </div>
                     <div class="col-md-4">
                       <div class="form-group">
                         <label for="emp_rm1">Manager</label>
-                        <select name="om" id="emp_rm1" class="form-control select2">
+                        <select name="om" id="emp_rm1" class="form-control select2" required>
+                          <option value="" selected disabled>Please select</option>
                           {% for m in mgrs %}
-                          <option value="Test">{{m.emp_name}}</option>
+                          <option value="{{m.emp_name}}">{{m.emp_name}}</option>
                           {% endfor %}
                         </select>
                       </div>
