@@ -334,6 +334,37 @@ def viewAndApproveLeaveRequestMgr(request):
         data = {'emp':emp,'leave_request':leave_request}
         return render(request,'ams/leave_approval_rm3.html',data)
 
+@login_required
+def viewallOMS(request,name):
+    emp_name = request.user.profile.emp_name
+    emp_id = request.user.profile.emp_id
+    emp = Employee.objects.get(emp_id=emp_id)
+
+    if name == 'Agent':
+
+        all_emp = Employee.objects.filter(Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name))
+
+        data = {'emp':emp,'all_emp':all_emp}
+        return render(request,'ams/view_all_emp_om.html',data)
+
+    elif name == 'TL':
+        all_emp = Employee.objects.filter(Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name), Q(emp_desi='Team Leader'))
+        data = {'emp': emp, 'all_emp': all_emp}
+        return render(request, 'ams/view_all_emp_om.html', data)
+
+    elif name == 'AM':
+        all_emp = Employee.objects.filter(Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name), Q(emp_desi='Assistant Manager'))
+        data = {'emp': emp, 'all_emp': all_emp}
+        return render(request, 'ams/view_all_emp_om.html', data)
+
+    else:
+
+        messages.info(request,'Bad Request')
+
+        return redirect('/ams/tl-dashboard')
+
+
+
 
 @login_required
 def hrDashboard(request):
@@ -685,7 +716,7 @@ def on_boarding_update(request,id):
         e.require_system = require_system
         e.wifi_broadband = wifi_broadband
 
-        if emp_upload_aadhar_back:
+        if emp_upload_aadhar:
             e.emp_upload_aadhar = emp_upload_aadhar
         if emp_upload_aadhar_back:
             e.emp_upload_aadhar_back = emp_upload_aadhar_back

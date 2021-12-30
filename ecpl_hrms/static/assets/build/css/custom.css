@@ -1167,6 +1167,7 @@ body {
   font-family: "Helvetica Neue", Roboto, Arial, "Droid Sans", sans-serif;
   font-size: 13px;
   font-weight: 400;
+  overflow-x: hidden;
   line-height: 1.471; }
 
 .main_container .top_nav {

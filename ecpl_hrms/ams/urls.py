@@ -50,6 +50,7 @@ urlpatterns = [
     path('view-att-requests',attRequests),
     path('ams-agent-settings',agentSettings),
     path('rm-settings',rmSettings),
+    path('view-all-employees-oms/<str:name>',viewallOMS),
     path('upload-image',uploadImageToDB),
 
     # Mappingview-leave-request-mgr

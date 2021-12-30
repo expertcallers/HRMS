@@ -1,0 +1,76 @@
+{% extends 'ams/base_common.html' %}
+
+{% load static %}
+{% block main %}
+
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+        <div class="page-title">
+          <div class="title_left">
+            <h3>Employees Under Me</h3>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-body">
+                <table  id="datatablex" class="table table-striped" style="max-width: 100% !important;">
+                  <thead>
+                    <tr>
+                            <th>Emp Name</th>
+                            <th>Emp ID</th>
+                            <th>Designation</th>
+                            <th>RM1</th>
+                            <th>RM2</th>
+                            <th>RM3</th>
+                            <th>Process</th>
+                            <th>Action</th>
+                        </tr>
+                  </thead>
+                  <tfoot>
+                    <tr>
+                            <th>Emp Name</th>
+                            <th>Emp ID</th>
+                            <th>Designation</th>
+                            <th>RM1</th>
+                            <th>RM2</th>
+                            <th>RM3</th>
+                            <th>Process</th>
+                            <th>Action</th>
+                        </tr>
+                  </tfoot>
+                  <tbody>
+                  {% for i in all_emp %}
+                          <tr>
+                              <td>{{i.emp_name}}</td>
+                              <td>{{i.emp_id}}</td>
+                              <td>{{i.emp_desi}}</td>
+                              <td>{{i.emp_rm1}}</td>
+                              <td>{{i.emp_rm2}}</td>
+                              <td>{{i.emp_rm3}}</td>
+                              <td>{{i.emp_process}}</td>
+                              <td>
+                              {% if i.on_id %}
+                              <a href="/ams/view-employee-profile/{{i.id}}/{{i.on_id}}">
+                                <button type="submit"submi class="btn-primary btn btn-sm">view</button>
+                              </a>
+                              {% endif %}
+                            </td>
+
+                          </tr>
+                  {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+        <!-- /page content -->
+
+{% endblock %}
+
+
+

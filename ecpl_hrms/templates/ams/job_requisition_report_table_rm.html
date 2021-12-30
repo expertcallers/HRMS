@@ -25,6 +25,7 @@
                         <th>Request Raised By</th>
                         <th>Department</th>
                         <th>Designation</th>
+                        <th>Status</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -35,6 +36,7 @@
                         <th>Request Raised By</th>
                         <th>Department</th>
                         <th>Designation</th>
+                        <th>Status</th>
                         <th>Action</th>
                       </tr>
                     </tfoot>
@@ -46,6 +48,7 @@
                           <td>{{i.req_raised_by}}</td>
                           <td>{{i.department}}</td>
                           <td>{{i.designation}}</td>
+                          <td>{{i.request_status}}</td>
                           <td>
                             <div style="display: inline-flex;">
                               <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#view_{{i.id}}">View</button>
