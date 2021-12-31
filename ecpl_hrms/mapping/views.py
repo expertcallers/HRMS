@@ -5,10 +5,12 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import *
+
+from django.apps import apps
+Campaigns = apps.get_model('ams', 'Campaigns')
+
 from django.db.models import Avg, Max, Min, Sum, Q
-
 from itertools import chain
-
 manager_list = ['Associate Director','Assistant Manager','Team Leader','Operations Manager','Trainer','Command Centre Head','Process Trainer','Learning and Development Head','Service Delivery Manager','Trainer Sales',
                         'Team Leader - GB','Head-CC']
 
@@ -27,7 +29,7 @@ def employeeMapping(request):
         ## Largest Employee ID
         emp = Employee.objects.all().order_by('-emp_id')[:1]
 
-        teams = Employee.objects.values_list('emp_process',flat=True).distinct()
+        teams = Campaigns.objects.all()
         data = {'employees': employees,'teams':teams,'emp_name':emp_name,'emp':emp}
         return render(request, 'mapping/index.html', data)
     else:
@@ -36,7 +38,7 @@ def employeeMapping(request):
         emp = Employee.objects.all().order_by('-emp_id')[:1]
 
         employees = Employee.objects.all()
-        teams = Employee.objects.values_list('emp_process', flat=True).distinct()
+        teams = Campaigns.objects.all()
         data = {'employees':employees,'teams':teams,'emp':emp}
         return render(request,'mapping/index.html',data)
 
@@ -94,7 +96,7 @@ def teamWiseData(request):
         team = request.POST['team']
         employees = Employee.objects.filter(emp_process=team)
         messages.info(request, 'Search Result')
-        teams = Employee.objects.values_list('emp_process',flat=True).distinct()
+        teams = Campaigns.objects.all()
         data = {'employees': employees,'teams':teams}
         return render(request, 'mapping/index.html', data)
     else:
@@ -112,13 +114,13 @@ def empIDwiseData(request):
         else:
             messages.info(request,'The requested employee not found')
 
-        teams = Employee.objects.values_list('emp_process',flat=True).distinct()
+        teams = Campaigns.objects.all()
         data = {'employees': employees,'teams':teams,'emp_id':emp_id}
         return render(request, 'mapping/index.html', data)
     else:
 
         employees = Employee.objects.all()
-        teams = Employee.objects.values_list('emp_process', flat=True).distinct()
+        teams = Campaigns.objects.all()
         data = {'employees': employees, 'teams': teams}
         return render(request, 'mapping/index.html', data)
 
@@ -128,7 +130,7 @@ def updateEmployeeProfile(request):
     if request.method == 'POST':
         emp_id = request.POST['emp_id']
         emp = Employee.objects.get(emp_id = emp_id)
-        teams = Employee.objects.values_list('emp_process', flat=True).distinct()
+        teams = Campaigns.objects.all()
         desis = Employee.objects.values_list('emp_desi', flat=True).distinct()
 
 
@@ -145,7 +147,7 @@ def updateEmployeeProfile(request):
         return render(request,'mapping/update-to-database.html',data)
     else:
         employees = Employee.objects.all().order_by('emp_name')
-        teams = Employee.objects.values_list('emp_process', flat=True).distinct()
+        teams = Campaigns.objects.all()
         data = {'employees':employees,'teams':teams}
         return render(request,'mapping/update-employee-profile.html',data)
 
@@ -400,6 +402,6 @@ def searchForEmployee(request):
         messages.info(request,'Not Found, Please search below !')
         emp=None
     employees = Employee.objects.all().order_by('emp_name')
-    teams = Employee.objects.values_list('emp_process', flat=True).distinct()
+    teams = Campaigns.objects.all()
     data = {'emp':emp,'employees':employees,'teams':teams}
     return render(request,'mapping/update-employee-profile.html',data)

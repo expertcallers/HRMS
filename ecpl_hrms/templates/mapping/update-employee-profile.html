@@ -46,7 +46,7 @@
                    <p>Select Team</p>
                    <select name="team" id="">
                        {% for t in teams %}
-                       <option value="{{t}}">{{t}}</option>
+                       <option value="{{t.name}}">{{t.name}}</option>
                        {% endfor %}
                    </select>
                    <br><br>

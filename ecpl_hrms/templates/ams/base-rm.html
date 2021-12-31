@@ -97,15 +97,13 @@
                       <li><a href="/ams/mapping-application-status"><i class="fa fa-users"></i>Mapping Change Status</a></li>
                     </ul>
                   </li>
-
-
                   <li><a><i class="fa fa-briefcase"></i> Job Requisition <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/ams/add-new-job">Add New</a></li>
                       <li><a href="/ams/view-job-table-rm">View Submissions</a></li>
                     </ul>
                   </li>
-                    <!--<li><a href="/ams/add-new-job"><i class="fa fa-check-square-o"></i> Job Requisition Form</a></li>-->
+                  <li><a href="/ams/ams-apply_leave"><i class="fa fa-check-square-o"></i> Leaves</a></li>
                 </ul>
               </div>
             </div>
@@ -407,6 +405,55 @@
       alert('{% for m in messages %}{{m}}{% endfor %}');
       {% endif %}
     </script>
+
+          <script type="text/javascript" src="{% static 'assets/js/monthly.js' %}"></script>
+                      <script type="text/javascript">
+                          var sampleEvents = {
+                          "monthly": [
+                              {% for c in month_cal %}
+                              {
+                                  "id": 1,
+                                  "name": "{{c.st}}",
+                                  "startdate": "{{c.dt}}",
+                                  "enddate": "",
+                                  "starttime": "",
+                                  "endtime": "",
+                                  {% if c.st == 'Unmarked' %}
+                                  "color": "grey",
+                                  {% elif c.st == 'Holiday' %}
+                                  "color": "black",
+                                  {% elif c.st == 'Week OFF' %}
+                                  "color": "blue",
+                                  {% elif c.st == 'Comp OFF' %}
+                                  "color": "brown",
+                                  {% elif c.st == 'Absent' %}
+                                  "color": "red",
+                                  {% elif c.st == 'present' %}
+                                  "color": "green",
+                                  {% elif c.st == 'SL' %}
+                                  "color": "#fb06d0",
+                                  {% elif c.st == 'PL' %}
+                                  "color": "#fda802",
+
+                                  {% else %}
+                                  "color": "grey",
+                                  {% endif %}
+
+                                  "url": ""
+                              },
+                              {% endfor %}
+                          ]
+                          };
+                          $(window).load( function() {
+                              $('#mycalendar').monthly({
+                                  mode: 'event',
+                                  dataType: 'json',
+                                  jsonURL: '',
+                                  weekStart:'Mon',
+                                  events: sampleEvents
+                              });
+                          });
+                      </script>
 
 
   </body>

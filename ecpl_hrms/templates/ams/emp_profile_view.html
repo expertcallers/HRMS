@@ -166,6 +166,14 @@
                         <input type="text" value="{{onboard.emp_edu_qualification}}" readonly id="emp_high_qua" class="form-control">
                       </div>
                     </div>
+                    {% if onboard.emp_quali_other %}
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_cou">Other Qualification</label>
+                        <input type="text" value="{{onboard.emp_quali_other}}" readonly id="emp_cou" class="form-control">
+                      </div>
+                    </div>
+                    {% endif %}
                     <div class="col-md-3">
                       <div class="form-group">
                         <label for="emp_cou">Course</label> 
@@ -561,7 +569,7 @@
                       <div class="col-md-3">
                         <div class="form-group">
                           <label for="emp_status">Current Status</label>
-                          <p>{{profile.agent_status}}</p>
+                          <p> {{profile.agent_status}}</p>
                           <input type="text" value="{{profile.agent_status}}" readonly id="emp_status" class="form-control">
                         </div>
                       </div>

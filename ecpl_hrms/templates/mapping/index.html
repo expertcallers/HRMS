@@ -29,7 +29,7 @@
                             <select name="team" id="" class="form-control">
                                 <option value="all">All</option>
                                 {% for t in teams %}
-                                <option value="{{t}}">{{t}}</option>
+                                <option value="{{t.name}}">{{t.name}}</option>
                                 {% endfor %}
                             </select>
                             <br>
@@ -90,7 +90,7 @@
                                 <h5>Team</h5>
                                 <select name="team" id="" class="form-control">
                                     {% for t in teams %}
-                                    <option value="{{t}}">{{t}}</option>
+                                    <option value="{{t.name}}">{{t.name}}</option>
                                     {% endfor %}
                                 </select>
                                 <br>

@@ -123,7 +123,7 @@ def agentDashBoard(request):
     emp_id = request.user.profile.emp_id
     emp = Employee.objects.get(emp_id = emp_id)
     #attendance status
-    cal = LeaveTable.objects.filter(Q(emp_id=emp_id),Q(leave_type__in=['SL','PL']))
+    cal = LeaveTable.objects.filter(Q(emp_id=emp_id),Q(leave_type__in=['SL','PL'])).order_by('-applied_date')[:5]
 
     # Month view
     ########### Month View ############
@@ -193,6 +193,35 @@ def tlDashboard(request):
         #Leaves
         leave_req_count = LeaveTable.objects.filter(emp_rm1 = emp_name,tl_approval = False).count()
 
+        # Month view
+        ########### Month View ############
+        month_days = []
+        todays_date = date.today()
+        year = todays_date.year
+        month = todays_date.month
+        a, num_days = calendar.monthrange(year, month)
+        start_date = date(year, month, 1)
+        end_date = date(year, month, num_days)
+        delta = timedelta(days=1)
+        while start_date <= end_date:
+            month_days.append(start_date.strftime("%Y-%m-%d"))
+            start_date += delta
+
+        month_cal = []
+        for i in month_days:
+
+            dict = {}
+            try:
+                st = EcplCalander.objects.get(Q(date=i), Q(emp_name=emp_name)).att_actual
+
+            except EcplCalander.DoesNotExist:
+                st = 'Unmarked'
+            dict['dt'] = i
+            dict['st'] = st
+            month_cal.append(dict)
+
+
+
         data = {'emp_name': emp_name, 'emp': emp, 'att_details':att_details,
                 'emp_count':emp_count,
                 'present_count':present_count,'absent_count':absent_count,'week_off_count':week_off_count,
@@ -200,7 +229,8 @@ def tlDashboard(request):
                 'unmarked_count':unmarked_count,'map_tickets_counts':map_tickets_counts,
                 'all_emp':all_emp,'sl_count':sl_count,'pl_count':pl_count,'attrition_count':attrition_count,
                 'training_count':training_count,
-                'leave_req_count':leave_req_count
+                'leave_req_count':leave_req_count,
+                'month_cal': month_cal,
                 }
         return render(request, 'ams/rm-dashboard-new.html', data)
     elif usr_desi in manager_list:
@@ -1584,6 +1614,7 @@ def applyLeave(request):
         no_days = request.POST["leave_days"]
         agent_reason = request.POST["reason"]
 
+
         e = LeaveTable()
         e.applied_date = date.today()
         e.leave_type = leave_type
@@ -1598,7 +1629,14 @@ def applyLeave(request):
         e.emp_rm1 = emp_rm1
         e.emp_rm2 = emp_rm2
         e.emp_rm3 = emp_rm3
+
+        if emp_desi in manager_list or emp_desi in tl_am_list:
+            e.tl_status = 'Approved'
+            e.tl_approval = True
+            e.tl_reason = 'Self Approved'
+
         e.save()
+
 
 
         leave_balance = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
@@ -1641,6 +1679,9 @@ def approveLeaveRM1(request):
     if request.method == "POST":
         id = request.POST["id"]
         e = LeaveTable.objects.get(id=id)
+        emp_id = e.emp_id
+        leave_type = e.leave_type
+        no_days = e.no_days
 
         tl_response = request.POST['tl_response']
         tl_reason = request.POST['tl_reason']
@@ -1653,6 +1694,15 @@ def approveLeaveRM1(request):
             tl_approval = True
             tl_status = 'Rejected'
             status = 'Rejected'
+
+            leave_balance = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
+
+            if leave_type == 'PL':
+                leave_balance.pl_balance += int(no_days)
+                leave_balance.save()
+            elif leave_type == 'SL':
+                leave_balance.sl_balance += int(no_days)
+                leave_balance.save()
 
         e.tl_approval = tl_approval
         e.tl_reason = tl_reason
