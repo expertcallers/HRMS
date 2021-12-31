@@ -802,7 +802,7 @@ def addNewUserHR(request):
         emp = Employee.objects.get(emp_id=emp_id)
         all_desi = Employee.objects.all().values('emp_desi').distinct().order_by('emp_desi')
         rms = Employee.objects.exclude(emp_desi__in =['Client Relationship Officer','Patrolling Officer']).order_by('emp_name')
-        all_team = Employee.objects.all().values('emp_process').distinct().order_by('emp_process')
+        all_team = Campaigns.objects.all()
         onboarding = OnboardingnewHRC.objects.filter(user_created=False)
         data = {'emp': emp,'all_data':all_desi,'rms':rms,'all_team':all_team,'onboarding':onboarding}
         return render(request,'ams/hr_add_user.html',data)

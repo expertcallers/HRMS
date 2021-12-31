@@ -112,7 +112,7 @@
                         <select name="emp_pro" id="emp_pro" class="form-control select2" required>
                           <option value="" selected disabled>Please select</option>
                           {% for a in all_team %}
-                              <option value="{{a.emp_process}}">{{a.emp_process}}</option>
+                              <option value="{{a.name}}">{{a.name}}</option>
                           {% endfor %}
                         </select>
                       </div>
