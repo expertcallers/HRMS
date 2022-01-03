@@ -247,17 +247,17 @@ def managerDashboard(request):
     if request.user.profile.emp_desi in manager_list:
         mgr_name = request.user.profile.emp_name
         # All Employees
-        all_emps = Employee.objects.filter(Q(emp_rm2=mgr_name) |Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name))
+        all_emps = Employee.objects.filter(Q(emp_rm1=mgr_name) |Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name))
         # count of all employees
         count_all_emps = all_emps.count()
 
         # TLS
-        all_tls = Employee.objects.filter(Q(emp_rm2=mgr_name) |Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name),Q(emp_desi='Team Leader'))
+        all_tls = Employee.objects.filter(Q(emp_rm1=mgr_name) |Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name),Q(emp_desi='Team Leader'))
         # TLS Count
         all_tls_count=all_tls.count()
 
         # AMS
-        all_ams = Employee.objects.filter(Q(emp_rm2=mgr_name) | Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name),
+        all_ams = Employee.objects.filter(Q(emp_rm1=mgr_name) | Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name),
                                          Q(emp_desi='Assistant Manager'))
         # TLS Count
         all_ams_count = all_ams.count()
