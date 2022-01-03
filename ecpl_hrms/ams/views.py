@@ -212,7 +212,7 @@ def tlDashboard(request):
 
             dict = {}
             try:
-                st = EcplCalander.objects.get(Q(date=i), Q(emp_name=emp_name)).att_actual
+                st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id)).att_actual
 
             except EcplCalander.DoesNotExist:
                 st = 'Unmarked'
