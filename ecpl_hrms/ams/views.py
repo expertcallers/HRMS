@@ -904,13 +904,22 @@ def newSingleAttandance(request):
         emp_desi = request.POST['emp_desi']
         team = request.POST['emp_team']
         now = datetime.now()
-        cal = EcplCalander.objects.create(
-            team=team, date=ddate, emp_id=emp_id,
-            att_actual=att_actual, applied_status=True,
-            rm1=rm1, rm2=rm2, rm3=rm3,
-            approved_on=now, emp_desi=emp_desi, appoved_by=request.user.profile.emp_name,
-            emp_name=emp_name
-        )
+
+        try:
+            cal = EcplCalander.objects.get(date=ddate,emp_id=emp_id)
+            messages.info(request,'*** Already Marked in Calendar, Please Refresh the page and try again ***')
+            return redirect('/ams/team-attendance')
+
+        except EcplCalander.DoesNotExist:
+
+            cal = EcplCalander.objects.create(
+                team=team, date=ddate, emp_id=emp_id,
+                att_actual=att_actual, applied_status=True,
+                rm1=rm1, rm2=rm2, rm3=rm3,
+                approved_on=now, emp_desi=emp_desi, appoved_by=request.user.profile.emp_name,
+                emp_name=emp_name
+            )
+
         cal.save()
         return redirect('/ams/ams-update-attendance')
 
