@@ -133,6 +133,11 @@ class Campaigns(models.Model):
     created_by = models.CharField(max_length=50,null=True,blank=True)
     created_date = models.DateField(null=True,blank=True)
 
+    def __str__(self):
+        return self.name
+
+
+
 class JobRequisition(models.Model):
 
     user_name = models.ForeignKey(User, on_delete=models.CASCADE, related_name='log_user', null=True)
