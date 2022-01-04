@@ -12,7 +12,7 @@ Campaigns = apps.get_model('ams', 'Campaigns')
 from django.db.models import Avg, Max, Min, Sum, Q
 from itertools import chain
 manager_list = ['Associate Director','Assistant Manager','Team Leader','Operations Manager','Trainer','Command Centre Head','Process Trainer','Learning and Development Head','Service Delivery Manager','Trainer Sales',
-                        'Team Leader - GB','Head-CC']
+                        'Team Leader - GB','Head-CC','Quality Head']
 
 # Create your views here.
 @login_required

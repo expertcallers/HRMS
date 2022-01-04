@@ -73,5 +73,8 @@ urlpatterns = [
 
     path('edit-employee-profile-status',editAgentStatus),
 
+    #Attrition
+    path('attrition',viewAttrition),
+
 
 ]

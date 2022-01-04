@@ -1744,3 +1744,28 @@ def editAgentStatus(request):
 
     else:
         return HttpResponse('<h1>Not Get Method</h1>')
+
+@login_required
+def viewAttrition(request):
+
+    if request.method == 'POST':
+        emp_id = request.POST['emp_id']
+        try:
+            prof = Profile.objects.get(emp_id = emp_id)
+            prof.agent_status = 'Attrition'
+            prof.save()
+
+        except Profile.DoesNotExist:
+            messages.info(request,'Incorrect Employee Id, Please contact Admin')
+            att = EcplCalander.objects.filter(att_actual='Attrition').distinct()
+            data = {'att': att}
+            return render(request, 'ams/view_attrition.html', data)
+
+        att = EcplCalander.objects.filter(att_actual='Attrition').distinct()
+        data = {'att': att}
+        return render(request, 'ams/view_attrition.html', data)
+
+    else:
+        att = EcplCalander.objects.filter(att_actual = 'Attrition').distinct()
+        data = {'att':att}
+        return render(request,'ams/view_attrition.html',data)
