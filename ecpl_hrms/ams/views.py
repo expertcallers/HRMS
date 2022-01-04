@@ -167,14 +167,14 @@ def tlDashboard(request):
         emp_id = request.user.profile.emp_id
         emp = Employee.objects.get(emp_id=emp_id)
         #All Employees
-        all_emp = Employee.objects.filter(Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name))
+        all_emp = Employee.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name))
         # details
         today = date.today()
         today = str(today)
         # All Active Today
         att_details = EcplCalander.objects.filter(date = today,rm1=emp_name)
         #counts
-        emp_count = Employee.objects.filter(Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name)).count()
+        emp_count = Employee.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name)).count()
         present_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name),Q(date=today),Q(att_actual='present')).count()
         absent_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Absent')).count()
         week_off_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Week OFF')).count()
@@ -247,22 +247,27 @@ def managerDashboard(request):
     if request.user.profile.emp_desi in manager_list:
         mgr_name = request.user.profile.emp_name
         # All Employees
-        all_emps = Employee.objects.filter(Q(emp_rm1=mgr_name) |Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name))
+        all_emps = Employee.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=mgr_name) |Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name))
         # count of all employees
         count_all_emps = all_emps.count()
 
         # TLS
-        all_tls = Employee.objects.filter(Q(emp_rm1=mgr_name) |Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name),Q(emp_desi='Team Leader'))
+        all_tls = Employee.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=mgr_name) |Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name),Q(emp_desi='Team Leader'))
         # TLS Count
         all_tls_count=all_tls.count()
 
         # AMS
-        all_ams = Employee.objects.filter(Q(emp_rm1=mgr_name) | Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name),
+        all_ams = Employee.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=mgr_name) | Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name),
                                          Q(emp_desi='Assistant Manager'))
         # TLS Count
         all_ams_count = all_ams.count()
 
         emp= Employee.objects.get(emp_name = mgr_name)
+
+        # All Employees
+        all_emp = Employee.objects.filter(Q(agent_status='Active'),
+                                          Q(emp_rm1=mgr_name) | Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name))
+
         #Mapping Tickets
         map_tickets_counts = MappingTickets.objects.filter(new_rm3=mgr_name, status=False).count()
 
@@ -272,7 +277,7 @@ def managerDashboard(request):
                 'all_tls':all_tls,'all_tls_count':all_tls_count,
                 'all_ams': all_ams, 'all_ams_count': all_ams_count,
                 'map_tickets_counts':map_tickets_counts,
-                'leave_req_count':leave_req_count
+                'leave_req_count':leave_req_count,'all_emp':all_emp,
                 }
         return render(request,'ams/manager-dashboard.html',data)
     else:
@@ -372,18 +377,18 @@ def viewallOMS(request,name):
 
     if name == 'Agent':
 
-        all_emp = Employee.objects.filter(Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name))
+        all_emp = Employee.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name))
 
         data = {'emp':emp,'all_emp':all_emp}
         return render(request,'ams/view_all_emp_om.html',data)
 
     elif name == 'TL':
-        all_emp = Employee.objects.filter(Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name), Q(emp_desi='Team Leader'))
+        all_emp = Employee.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name), Q(emp_desi='Team Leader'))
         data = {'emp': emp, 'all_emp': all_emp}
         return render(request, 'ams/view_all_emp_om.html', data)
 
     elif name == 'AM':
-        all_emp = Employee.objects.filter(Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name), Q(emp_desi='Assistant Manager'))
+        all_emp = Employee.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name), Q(emp_desi='Assistant Manager'))
         data = {'emp': emp, 'all_emp': all_emp}
         return render(request, 'ams/view_all_emp_om.html', data)
 
@@ -846,6 +851,7 @@ def viewUsersHR(request):
     return render(request,'ams/view_user_hr.html',data)
 
 def viewEmployeeProfile(request,id,on_id):
+
     emp_id = request.user.profile.emp_id
     emp = Employee.objects.get(emp_id=emp_id)
 
@@ -928,7 +934,7 @@ def newSingleAttandance(request):
         today = date.today()
         yesterday = today - timedelta(days=1)
         dby_date = yesterday - timedelta(days=1)
-        emp_s = Employee.objects.filter(emp_id=request.user.profile.emp_id)
+        emp_s = Employee.objects.filter(agent_status = 'Active',emp_id=request.user.profile.emp_id)
         ############## Todays Attendance ###################
         todays_list_list = []
         for i in emp_s:
@@ -1076,7 +1082,7 @@ def teamAttendance(request):
         today = date.today()
         yesterday = today - timedelta(days=1)
         dby_date = yesterday - timedelta(days=1)
-        emp_s = Employee.objects.filter(emp_rm1=user_nm)
+        emp_s = Employee.objects.filter(emp_rm1=user_nm,agent_status = 'Active')
         if emp_s.count()<1:
             return HttpResponse('<h1>RM1 name and user name not matching </h1>')
         ############## Todays Attendance ###################
@@ -1189,7 +1195,9 @@ def teamAttendance(request):
 
 @login_required
 def viewTeamAttendance(request):
+
     if request.method == 'POST':
+        rm = request.user.profile.emp_name
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
         emp_name = request.POST['emp_name']
@@ -1198,12 +1206,54 @@ def viewTeamAttendance(request):
         start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
         end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
         delta = end_date - start_date  # returns timedelta
+
         date_list = []
         for i in range(delta.days + 1):
             day = start_date + timedelta(days=i)
             date_list.append(day)
 
+
+        if emp_name == 'All':
+
+
+            all_emp = Employee.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=rm) | Q(emp_rm2=rm) | Q(emp_rm3=rm))
+
+            agt_cal_list = []
+
+            for k in date_list:
+
+                for j in all_emp:
+
+                    agt_cal = {}
+
+                    try:
+                        agt_calendar = EcplCalander.objects.get(date=k, emp_id=j.emp_id)
+                        agt_cal['date'] = k
+                        agt_cal['status'] = agt_calendar.att_actual
+                        agt_cal['approved_on'] = agt_calendar.approved_on
+                        agt_cal['team'] = agt_calendar.team
+                        agt_cal['emp_name'] = agt_calendar.emp_name
+
+                    except EcplCalander.DoesNotExist:
+                        agt_cal['date'] = k
+                        agt_cal['status'] = 'Unmarked'
+                        agt_cal['approved_on'] = 'NA'
+                        agt_cal['team'] = j.emp_process
+                        agt_cal['emp_name'] = j.emp_name
+
+                    agt_cal_list.append(agt_cal)
+
+            emp_id = request.user.profile.emp_id
+            emp = Employee.objects.get(emp_id=emp_id)
+
+            data = {'agt_cal_list': agt_cal_list,
+                        'emp': emp}
+
+            return render(request, 'ams/agent-calander-status.html', data)
+
+
         agt_cal_list = []
+
         for i in date_list:
             agt_cal = {}
             try:
@@ -1256,7 +1306,7 @@ def teamAttendanceReport(request):
         agt_cal_list = []
 
         agent_list = []
-        agents = Employee.objects.filter(emp_process=team_name)
+        agents = Employee.objects.filter(emp_process=team_name,agent_status = 'Active')
         for i in agents:
             agent_list.append(i.emp_name)
 
@@ -1329,7 +1379,7 @@ def mappingHomePage(request):
     emp_id = request.user.profile.emp_id
     user_nm = request.user.profile.emp_name
     emp = Employee.objects.get(emp_id=emp_id)
-    employees = Employee.objects.filter(emp_rm1=user_nm)
+    employees = Employee.objects.filter(emp_rm1=user_nm,agent_status = 'Active')
     rms = Employee.objects.exclude(emp_desi__in=['Client Relationship Officer', 'Patrolling Officer']).order_by(
         'emp_name')
     teams = Employee.objects.values_list('emp_process', flat=True).distinct()
@@ -1439,7 +1489,7 @@ def viewMappingApplicationStatus(request):
 @login_required
 def addNewTeam(request):
 
-    mgrs = Employee.objects.filter(emp_desi__in=manager_list)
+    mgrs = Employee.objects.filter(emp_desi__in=manager_list,agent_status = 'Active')
     if request.method == "POST":
         usr = request.user.profile.emp_name
         om = request.POST["om"]
@@ -1747,8 +1797,11 @@ def editAgentStatus(request):
 
 @login_required
 def viewAttrition(request):
+    emp_idd = request.user.profile.emp_id
+    emp = Employee.objects.get(emp_id=emp_idd)
 
     if request.method == 'POST':
+
         emp_id = request.POST['emp_id']
         try:
             prof = Profile.objects.get(emp_id = emp_id)
@@ -1758,14 +1811,34 @@ def viewAttrition(request):
         except Profile.DoesNotExist:
             messages.info(request,'Incorrect Employee Id, Please contact Admin')
             att = EcplCalander.objects.filter(att_actual='Attrition').distinct()
-            data = {'att': att}
+
+            data = {'att': att,'emp':emp}
             return render(request, 'ams/view_attrition.html', data)
 
+        try:
+            prof = Employee.objects.get(emp_id = emp_id)
+            prof.agent_status = 'Attrition'
+            prof.save()
+
+        except Employee.DoesNotExist:
+            messages.info(request,'Incorrect Employee Id, Please contact Admin')
+            att = EcplCalander.objects.filter(att_actual='Attrition').distinct()
+
+            data = {'att': att,'emp':emp}
+            return render(request, 'ams/view_attrition.html', data)
+
+        cal = EcplCalander.objects.filter(emp_id=emp_id)
+        for i in cal:
+            i.att_actual = 'Disabled'
+            i.save()
+
+
         att = EcplCalander.objects.filter(att_actual='Attrition').distinct()
-        data = {'att': att}
+        data = {'att': att,'emp':emp}
         return render(request, 'ams/view_attrition.html', data)
 
     else:
         att = EcplCalander.objects.filter(att_actual = 'Attrition').distinct()
-        data = {'att':att}
+
+        data = {'att':att,'emp':emp}
         return render(request,'ams/view_attrition.html',data)

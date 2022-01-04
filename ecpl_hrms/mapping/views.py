@@ -20,7 +20,7 @@ def employeeMapping(request):
     if request.method == 'POST':
 
         emp_name = request.POST['emp_name']
-        employees = Employee.objects.filter(emp_name__icontains=emp_name)
+        employees = Employee.objects.filter(agent_status = 'Active',emp_name__icontains=emp_name)
         if employees:
             messages.info(request,'Search Result')
         else:
@@ -94,7 +94,7 @@ def change_password(request):
 def teamWiseData(request):
     if request.method == 'POST':
         team = request.POST['team']
-        employees = Employee.objects.filter(emp_process=team)
+        employees = Employee.objects.filter(emp_process=team,agent_status = 'Active')
         messages.info(request, 'Search Result')
         teams = Campaigns.objects.all()
         data = {'employees': employees,'teams':teams}
@@ -108,7 +108,7 @@ def empIDwiseData(request):
 
     if request.method == 'POST':
         emp_id = request.POST['emp_id']
-        employees = Employee.objects.filter(emp_id=emp_id)
+        employees = Employee.objects.filter(emp_id=emp_id,agent_status = 'Active')
         if employees:
             messages.info(request,'Search Result')
         else:
@@ -138,7 +138,7 @@ def updateEmployeeProfile(request):
         rm2s = Employee.objects.values_list('emp_rm2',flat=True).distinct()
         rm3s = Employee.objects.values_list('emp_rm3',flat=True).distinct()
 
-        rms = Employee.objects.filter(emp_desi__in = manager_list)
+        rms = Employee.objects.filter(emp_desi__in = manager_list,agent_status = 'Active')
 
         data = {'emp':emp,'teams':teams,'desis':desis,'rm1s':rm1s,'rm2s':rm2s,'rm3s':rm3s,
 
@@ -225,7 +225,7 @@ def updateTeamRm1(request):
         rm1 = request.POST['rm1']
         new_rm1 = request.POST['new_rm1']
 
-        rm = Employee.objects.filter(emp_process = team, emp_rm1 = rm1)
+        rm = Employee.objects.filter(emp_process = team, emp_rm1 = rm1,agent_status = 'Active')
         for i in rm:
             i.emp_rm1 = new_rm1
             i.save()
@@ -253,7 +253,7 @@ def updateTeamRm2(request):
         rm2 = request.POST['rm2']
         new_rm2 = request.POST['new_rm2']
 
-        rm = Employee.objects.filter(emp_process = team, emp_rm2 = rm2)
+        rm = Employee.objects.filter(emp_process = team, emp_rm2 = rm2,agent_status = 'Active')
         for i in rm:
             i.emp_rm2 = new_rm2
             i.save()
@@ -281,7 +281,7 @@ def updateTeamRm3(request):
         rm3 = request.POST['rm3']
         new_rm3 = request.POST['new_rm3']
 
-        rm = Employee.objects.filter(emp_process = team, emp_rm3 = rm3)
+        rm = Employee.objects.filter(emp_process = team, emp_rm3 = rm3,agent_status = 'Active')
         for i in rm:
             i.emp_rm3 = new_rm3
             i.save()
@@ -387,7 +387,7 @@ def exportMapping(request):
 
 def nameChanger(request):
     emp_new_rm1 = 'Harish Kumar S'
-    emp = Employee.objects.filter(emp_rm1='Harish Kumar',emp_process='Gubagoo')
+    emp = Employee.objects.filter(emp_rm1='Harish Kumar',emp_process='Gubagoo',agent_status = 'Active')
     for i in emp:
         i.emp_rm1 = emp_new_rm1
         i.save()

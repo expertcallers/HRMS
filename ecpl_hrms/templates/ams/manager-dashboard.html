@@ -73,7 +73,7 @@
             </div>
           </div>
 
-          <div class="row mt-4">
+          <div class="row mb-4 mt-4">
 
             <div class="col-md-3">
               <div class="card-base">
@@ -160,6 +160,43 @@
                   </div>
                 </div>
                 <div class="space"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <h4>Attendance Report</h4>
+                </div>
+                <div class="card-body">
+                  <form action="/ams/view-emp-attendance" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-md-12 form-group">
+                        <label for="emp_name">Employee Name</label>
+                        <select id="emp_name" name="emp_name" class="form-control select2" required>
+                          <option value="All">All</option>
+                          {% for i in all_emp %}
+                          <option value="{{i.emp_name}}">{{i.emp_name}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <label for="start_date">Start Date</label>
+                        <input type="date" id="start_date" onchange="mydate(this);" name="start_date" required class="form-control" value="" />
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <label for="end_date">End Date</label>
+                        <input type="date" id="end_date" onchange="mydate(this);" name="end_date" required class="form-control" value="" />
+                      </div>
+                      <div class="col-md-12 form-group">
+                        <button class="form-control btn btn-primary">Submit</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>

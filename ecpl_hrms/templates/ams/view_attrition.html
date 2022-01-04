@@ -1,0 +1,162 @@
+{% extends 'ams/base_hr_new.html' %}
+
+{% load static %}
+{% block main %}
+
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>Attrition Requests</h3>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <table  id="datatablex" class="table table-striped" style="max-width: 100% !important;">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Empolyee ID</th>
+                        <th>Designation</th>
+                        <th>Process</th>
+                        <th>Requested by</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tfoot>
+                      <tr>
+                        <th>Name</th>
+                        <th>Empolyee ID</th>
+                        <th>Designation</th>
+                        <th>Process</th>
+                        <th>Requested by</th>
+                        <th>Action</th>
+                      </tr>
+                    </tfoot>
+                    <tbody>
+                      {% for a in att %}
+                      <tr>
+                        <td>{{a.emp_name}}</td>
+                        <td>{{a.emp_id}}</td>
+                        <td>{{a.emp_desi}}</td>
+                        <td>{{a.team}}</td>
+                        <td>{{a.appoved_by}}</td>
+                        <td>
+                          <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#view_{{a.id}}">View</button>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+
+  {% for a in att %}
+    <!-- View Pop-Up -->
+      <div class="modal fade" id="view_{{a.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">{{a.emp_name}} | {{a.emp_id}}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form action="/ams/attrition" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-3 form-group">
+                    <label for="emp_name">Employee Name</label>
+                    <input type="text" readonly id="emp_name" name="emp_name" value="{{a.emp_name}}" class="form-control">
+                  </div>
+                  <div class="col-md-3 form-group">
+                    <label for="emp_id">Employee ID</label>
+                    <input type="text" readonly id="emp_id" name="emp_id" value="{{a.emp_id}}" class="form-control">
+                  </div>
+                  <div class="col-md-3 form-group">
+                    <label for="emp_desg">Designation</label>
+                    <input type="text" readonly id="emp_desg" name="emp_desg" value="{{a.emp_desi}}" class="form-control">
+                  </div>
+                  <div class="col-md-3 form-group">
+                    <label for="emp_pro">Process</label>
+                    <input type="text" readonly id="emp_pro" name="emp_pro" value="{{a.team}}" class="form-control">
+                  </div>
+                  <div class="col-md-3 form-group">
+                    <label for="emp_rm1">RM1</label>
+                    <input type="text" readonly name="emp_rm1" id="emp_rm1" value="{{a.rm1}}" class="form-control">
+                  </div>
+                  <div class="col-md-3 form-group">
+                    <label for="emp_rm2">RM2</label>
+                    <input type="text" readonly name="emp_rm2" id="emp_rm2" value="{{a.rm1}}" class="form-control">
+                  </div>
+                  <div class="col-md-3 form-group">
+                    <label for="emp_rm3">RM3</label>
+                    <input type="text" readonly name="emp_rm3" id="emp_rm3" value="{{a.rm1}}" class="form-control">
+                  </div>
+                  <div class="col-md-3 form-group">
+                    <label for="req_by">Request By</label>
+                    <input type="text" readonly name="req_by" id="req_by" value="{{a.appoved_by}}" class="form-control">
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-info">Approve</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    <!-- End New Designation Pop-Up -->
+    {% endfor %}
+
+
+
+          <script type="text/javascript">
+      $(document).ready(function() {
+          $('#datatablex').DataTable( {
+            "bPaginate": true,
+            "bLengthChange": true,
+            "bFilter": true,
+            "bInfo": true,
+              dom: 'lBfrtip',
+              buttons: [
+                    {
+                        extend: "copy",
+                        className: "btn btn-success btn-sm ml-1"
+                    },
+                    {
+                        extend: "csv",
+                        className: "btn btn-success btn-sm ml-1"
+                    },
+                    {
+                        extend: "excel",
+                        className: "btn btn-success btn-sm ml-1"
+                    },
+                    {
+                        extend: "pdfHtml5",
+                        className: "btn btn-success btn-sm ml-1"
+                    },
+                    {
+                        extend: "print",
+                        className: "btn btn-success btn-sm ml-1"
+                    },
+                ],
+                responsive: true
+          } );
+      } );
+    </script>
+
+
+
+{% endblock %}
+
+

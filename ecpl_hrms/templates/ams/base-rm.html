@@ -46,6 +46,9 @@
         .select2-container {
             width: 100% !important;
         }
+        .monthly-prev, .monthly-next{
+            display:none;
+          }
     </style>
   </head>
   <body class="nav-md">
@@ -236,9 +239,8 @@
               {% endfor %}
           ]
           };
-
-          $(window).load( function() {
-              $('#mycalendar').monthly({
+          $(document).ready( function() {
+              $('#mycalendarid').monthly({
                   mode: 'event',
                   dataType: 'json',
                   jsonURL: '',
@@ -337,10 +339,6 @@
           <script type="text/javascript">
       $(document).ready(function() {
           $('#datatablex').DataTable({
-            "bPaginate": true,
-            "bLengthChange": true,
-            "bFilter": true,
-            "bInfo": true,
               dom: 'lBfrtip',
               buttons: [
                     {
@@ -405,55 +403,6 @@
       alert('{% for m in messages %}{{m}}{% endfor %}');
       {% endif %}
     </script>
-
-          <script type="text/javascript" src="{% static 'assets/js/monthly.js' %}"></script>
-                      <script type="text/javascript">
-                          var sampleEvents = {
-                          "monthly": [
-                              {% for c in month_cal %}
-                              {
-                                  "id": 1,
-                                  "name": "{{c.st}}",
-                                  "startdate": "{{c.dt}}",
-                                  "enddate": "",
-                                  "starttime": "",
-                                  "endtime": "",
-                                  {% if c.st == 'Unmarked' %}
-                                  "color": "grey",
-                                  {% elif c.st == 'Holiday' %}
-                                  "color": "black",
-                                  {% elif c.st == 'Week OFF' %}
-                                  "color": "blue",
-                                  {% elif c.st == 'Comp OFF' %}
-                                  "color": "brown",
-                                  {% elif c.st == 'Absent' %}
-                                  "color": "red",
-                                  {% elif c.st == 'present' %}
-                                  "color": "green",
-                                  {% elif c.st == 'SL' %}
-                                  "color": "#fb06d0",
-                                  {% elif c.st == 'PL' %}
-                                  "color": "#fda802",
-
-                                  {% else %}
-                                  "color": "grey",
-                                  {% endif %}
-
-                                  "url": ""
-                              },
-                              {% endfor %}
-                          ]
-                          };
-                          $(window).load( function() {
-                              $('#mycalendar').monthly({
-                                  mode: 'event',
-                                  dataType: 'json',
-                                  jsonURL: '',
-                                  weekStart:'Mon',
-                                  events: sampleEvents
-                              });
-                          });
-                      </script>
 
 
   </body>

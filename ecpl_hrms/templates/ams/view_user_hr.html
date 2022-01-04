@@ -63,7 +63,12 @@
                               <a href="/ams/view-employee-profile/{{i.id}}/{{i.on_id}}">
                                 <button type="submit"submi class="btn-primary btn btn-sm">view</button>
                               </a>
+                              {% else %}
+                              <a href="/ams/view-employee-profile/{{i.id}}/5">
+                                <button type="submit"submi class="btn-primary btn btn-sm">view</button>
+                              </a>
                               {% endif %}
+
                             </td>
 
                           </tr>
