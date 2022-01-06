@@ -1238,7 +1238,7 @@ def viewTeamAttendance(request):
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
         emp_id = request.POST['emp_id']
-        emp_obj = Employee.objects.get(emp_id=emp_id)
+
 
         start_date = start_date
         end_date = end_date
@@ -1290,7 +1290,7 @@ def viewTeamAttendance(request):
 
             return render(request, 'ams/agent-calander-status.html', data)
 
-
+        emp_obj = Employee.objects.get(emp_id=emp_id)
         agt_cal_list = []
 
         for i in date_list:
