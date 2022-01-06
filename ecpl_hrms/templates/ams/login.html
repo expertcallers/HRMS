@@ -18,6 +18,16 @@
 <!-- Core css -->
 <link rel="stylesheet" href="{% static 'old/css/main.css' %}"/>
 <link rel="stylesheet" href="{% static 'old/css/theme1.css' %}"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+        body{
+            overflow-x: hidden;
+        }
+    </style>
 
 <script src="https://kit.fontawesome.com/4a95aa7adc.js" crossorigin="anonymous"></script>
 
@@ -37,8 +47,8 @@
                     <div class="card-title">Login to your Team</div>
                     <div class="form-group">
                         <select class="custom-select" name="team" required>
-                            {% for team in teams %}
-                            <option value="{{team}}">{{team}}</option>
+                            {% for t in teams %}
+                            <option value="{{t.name}}">{{t.name}}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -68,6 +78,10 @@
 
 <script src="{% static 'old/bundles/lib.vendor.bundle.js' %}"></script>
 <script src="{% static 'old/js/core.js' %}"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script>
+      $('.select2').select2();
+    </script>
 </body>
 
 <!-- soccer/project/login.html  07 Jan 2020 03:42:43 GMT -->

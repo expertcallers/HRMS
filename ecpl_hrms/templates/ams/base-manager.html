@@ -46,6 +46,9 @@
         .select2-container {
             width: 100% !important;
         }
+        .monthly-prev, .monthly-next{
+            display:none;
+          }
     </style>
   </head>
   <body class="nav-md">
@@ -192,6 +195,7 @@
       $('.select2').select2();
     </script>
       <script type="text/javascript" src="{% static 'assets/js/monthly.js' %}"></script>
+      <script type="text/javascript" src="{% static 'assets/js/monthly.js' %}"></script>
       <script type="text/javascript">
           var sampleEvents = {
           "monthly": [
@@ -224,9 +228,8 @@
               {% endfor %}
           ]
           };
-
-          $(window).load( function() {
-              $('#mycalendar').monthly({
+          $(document).ready( function() {
+              $('#mycalendarid').monthly({
                   mode: 'event',
                   dataType: 'json',
                   jsonURL: '',

@@ -248,7 +248,7 @@
                     <select class="form-control select2" name="new_process" id="pro_{{e.id}}">
                       <option value="{{e.emp_process}}">{{e.emp_process}}</option>
                       {% for t in teams %}
-                      <option value="{{t}}">{{t}}</option>
+                      <option value="{{t.name}}">{{t.name}}</option>
                       {% endfor %}
                     </select>
                   </div>

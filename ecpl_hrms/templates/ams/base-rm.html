@@ -87,8 +87,9 @@
                   <li><a href="/ams/tl-dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
                   <li><a><i class="fa fa-clock-o"></i>Attendance <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="/ams/ams-update-attendance"><i class="fa fa-calendar"></i>Mark Attendance</a></li>
-                        <li><a href="/ams/team-attendance"><i class="fa fa-user"></i>Team Attendance</a></li>
+                      <li><a href="/ams/ams-update-attendance">Mark Attendance</a></li>
+                        <li><a href="/ams/team-attendance">Team Attendance</a></li>
+                        <li><a href="/ams/attendance-correction">Attendance Correction</a></li>
                       <!--<li><a href="all_emp.html">Active Employees</a></li>-->
                     </ul>
                   </li>
@@ -96,8 +97,8 @@
 
                   <li><a><i class="fa fa-user"></i>Mapping <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="/ams/rm-mapping-index"><i class="fa fa-user"></i> Mapping</a></li>
-                      <li><a href="/ams/mapping-application-status"><i class="fa fa-users"></i>Mapping Change Status</a></li>
+                      <li><a href="/ams/rm-mapping-index"> Mapping</a></li>
+                      <li><a href="/ams/mapping-application-status"> Mapping Change Status</a></li>
                     </ul>
                   </li>
                   <li><a><i class="fa fa-briefcase"></i> Job Requisition <span class="fa fa-chevron-down"></span></a>
@@ -396,13 +397,12 @@
               }
           }
         </script>
-
           <script>
-      $('.select2').select2();
-      {% if messages %}
-      alert('{% for m in messages %}{{m}}{% endfor %}');
-      {% endif %}
-    </script>
+
+              {% if messages %}
+              alert('{% for m in messages %}{{m}}{% endfor %}');
+              {% endif %}
+           </script>
 
 
   </body>

@@ -17,7 +17,9 @@ c = Calendar()
 from datetime import date
 from django.db.models import Q
 
-tl_am_list = ['Team Leader','Assistant Manager', 'Subject Matter Expert', 'Trainer','Learning and Development Head']
+tl_am_list = ['Team Leader','Assistant Manager', 'Subject Matter Expert', 'Trainer','Learning and Development Head',
+              'Process Trainer','Trainer Sales',
+              ]
 
 manager_list = ['Quality Head','Operations Manager','Service Delivery Manager','Command Centre Head']
 
@@ -27,14 +29,15 @@ hr_list = ['HR','HR Manager','Manager ER','HR Lead','Sr Recruiter','MIS Executiv
 agent_list = [ 'Client Relationship Officer ','MIS Executive','Patrolling officer',
                'Data Analyst','Business Development Executive','Content Developer',
                'Junior Developer','Web Developer','Trainee Developer',
-               'Jr Dev'
+               'Jr Dev',
                 ]
 
 # Create your views here.
 def loginPage(request):
     logout(request)
     form = AuthenticationForm()
-    teams = Employee.objects.values_list('emp_process', flat=True).distinct()
+    teams = Campaigns.objects.all()
+
     data = {'teams':teams,'form':form}
     return render(request,'ams/login.html',data)
 
@@ -69,13 +72,13 @@ def loginAndRedirect(request):
         else:
             form = AuthenticationForm()
             messages.info(request,'Invalid Credentials')
-            teams = Employee.objects.values_list('emp_process', flat=True).distinct()
+            teams = Campaigns.objects.all()
             data = {'teams': teams, 'form': form}
             return render(request, 'ams/login.html', data)
     else:
         logout(request)
         form = AuthenticationForm()
-        teams = Employee.objects.values_list('emp_process', flat=True).distinct()
+        teams = Campaigns.objects.all()
         data = {'teams': teams, 'form': form}
         return render(request, 'ams/login.html', data)
 
@@ -174,7 +177,7 @@ def tlDashboard(request):
         # All Active Today
         att_details = EcplCalander.objects.filter(date = today,rm1=emp_name)
         #counts
-        emp_count = Employee.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name)).count()
+        emp_count = Employee.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name)).distinct().count()
         present_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name),Q(date=today),Q(att_actual='present')).count()
         absent_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Absent')).count()
         week_off_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Week OFF')).count()
@@ -246,6 +249,7 @@ def tlDashboard(request):
 def managerDashboard(request):
     if request.user.profile.emp_desi in manager_list:
         mgr_name = request.user.profile.emp_name
+        emp_id = request.user.profile.emp_id
         # All Employees
         all_emps = Employee.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=mgr_name) |Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name))
         # count of all employees
@@ -273,11 +277,40 @@ def managerDashboard(request):
 
         #Leave Requests
         leave_req_count = LeaveTable.objects.filter(emp_rm3=mgr_name,tl_status='Approved',manager_approval=False).count()
+
+        # Month view
+        ########### Month View ############
+        month_days = []
+        todays_date = date.today()
+        year = todays_date.year
+        month = todays_date.month
+        a, num_days = calendar.monthrange(year, month)
+        start_date = date(year, month, 1)
+        end_date = date(year, month, num_days)
+        delta = timedelta(days=1)
+        while start_date <= end_date:
+            month_days.append(start_date.strftime("%Y-%m-%d"))
+            start_date += delta
+
+        month_cal = []
+        for i in month_days:
+
+            dict = {}
+            try:
+                st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id)).att_actual
+
+            except EcplCalander.DoesNotExist:
+                st = 'Unmarked'
+            dict['dt'] = i
+            dict['st'] = st
+            month_cal.append(dict)
+
+
         data = {'emp':emp,'count_all_emps':count_all_emps,
                 'all_tls':all_tls,'all_tls_count':all_tls_count,
                 'all_ams': all_ams, 'all_ams_count': all_ams_count,
                 'map_tickets_counts':map_tickets_counts,
-                'leave_req_count':leave_req_count,'all_emp':all_emp,
+                'leave_req_count':leave_req_count,'all_emp':all_emp,'month_cal':month_cal,
                 }
         return render(request,'ams/manager-dashboard.html',data)
     else:
@@ -412,8 +445,12 @@ def hrDashboard(request):
         all_team_count = Campaigns.objects.all().count()
         all_job_count = JobRequisition.objects.all().count()
         teams = Campaigns.objects.all()
+
+        att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False).count()
+
+
         data = {'emp':emp,'all_users_count':all_users_count,'all_team_count':all_team_count,
-                'all_job_count':all_job_count,
+                'all_job_count':all_job_count,'att_requests_count':att_requests_count,
                 'team':teams}
 
         return render(request,'ams/hr_dashboard.html',data)
@@ -1082,7 +1119,7 @@ def teamAttendance(request):
         today = date.today()
         yesterday = today - timedelta(days=1)
         dby_date = yesterday - timedelta(days=1)
-        emp_s = Employee.objects.filter(emp_rm1=user_nm,agent_status = 'Active')
+        emp_s = Employee.objects.filter(Q(emp_rm1=user_nm) | Q(emp_rm2=user_nm) | Q(emp_rm3=user_nm),agent_status = 'Active')
         if emp_s.count()<1:
             return HttpResponse('<h1>RM1 name and user name not matching </h1>')
         ############## Todays Attendance ###################
@@ -1379,10 +1416,10 @@ def mappingHomePage(request):
     emp_id = request.user.profile.emp_id
     user_nm = request.user.profile.emp_name
     emp = Employee.objects.get(emp_id=emp_id)
-    employees = Employee.objects.filter(emp_rm1=user_nm,agent_status = 'Active')
+    employees = Employee.objects.filter(Q(emp_rm1=user_nm) | Q(emp_rm2=user_nm) | Q(emp_rm3=user_nm),Q(agent_status = 'Active'))
     rms = Employee.objects.exclude(emp_desi__in=['Client Relationship Officer', 'Patrolling Officer']).order_by(
         'emp_name')
-    teams = Employee.objects.values_list('emp_process', flat=True).distinct()
+    teams = Campaigns.objects.all()
     data = {'emp': emp,'employees':employees,'rms':rms,'teams':teams}
 
     return render(request,'ams/mapping_home.html',data)
@@ -1827,7 +1864,7 @@ def viewAttrition(request):
             data = {'att': att,'emp':emp}
             return render(request, 'ams/view_attrition.html', data)
 
-        cal = EcplCalander.objects.filter(emp_id=emp_id)
+        cal = EcplCalander.objects.filter(emp_id=emp_id,att_actual='Attrition')
         for i in cal:
             i.att_actual = 'Disabled'
             i.save()
@@ -1842,3 +1879,146 @@ def viewAttrition(request):
 
         data = {'att':att,'emp':emp}
         return render(request,'ams/view_attrition.html',data)
+
+def attendanceCorrection(request):
+
+    emp_name = request.user.profile.emp_name
+    emp_idd = request.user.profile.emp_id
+    emp = Employee.objects.get(emp_id=emp_idd)
+
+    if request.method == 'POST':
+        date = request.POST['date']
+        emp_id = request.POST['emp_id']
+
+        emp_obj = Employee.objects.get(emp_id = emp_id)
+
+        try:
+            cal = EcplCalander.objects.get(date = date,emp_id = emp_id)
+
+        except EcplCalander.DoesNotExist:
+            cal = {'date':date,'emp_name':emp_obj.emp_name,'emp_id':emp_id,'team':emp_obj.emp_process,'att_actual':'Unmarked'}
+
+        atthist = AttendanceCorrectionHistory.objects.filter(applied_by_id = emp_idd)
+        data = {'cal':cal,'emp':emp,'atthist':atthist}
+
+        return render(request,'ams/view_att_correction_apply.html',data)
+
+    else:
+
+        all_emp = Employee.objects.filter(Q(agent_status='Active'),
+                                          Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name))
+
+        atthist = AttendanceCorrectionHistory.objects.filter(applied_by_id=emp_idd)
+        data = {'all_emp':all_emp,'emp':emp,'atthist':atthist}
+
+        return render(request,'ams/view_att_correction.html',data)
+
+def applyCorrection(request):
+
+    applied_by = request.user.profile.emp_name
+    applied_by_id = request.user.profile.emp_id
+
+    if request.method == 'POST':
+
+        id = request.POST['id']
+        att_new = request.POST['att_new']
+        att_old = request.POST['att_old']
+        date = request.POST['date']
+        emp_id = request.POST['emp_id']
+        emp_obj = Employee.objects.get(emp_id=emp_id)
+
+        if att_old == 'Unmarked':
+
+            cal = EcplCalander()
+            cal.team = emp_obj.emp_process
+            cal.date = date
+            cal.emp_name = emp_obj.emp_name
+            cal.emp_id = emp_id
+            cal.emp_desi = emp_obj.emp_desi
+            cal.att_actual = att_new
+            cal.approved_on = datetime.today()
+            cal.appoved_by =applied_by
+            cal.applied_status = True
+            cal.rm1 = emp_obj.emp_rm1
+            cal.rm2 = emp_obj.emp_rm2
+            cal.rm3 = emp_obj.emp_rm3
+
+            cal.save()
+
+            emp_name = cal.emp_name
+            emp_id = cal.emp_id
+
+            atthist = AttendanceCorrectionHistory()
+            atthist.applied_by = applied_by
+            atthist.applied_by_id = applied_by_id
+            atthist.applied_date = datetime.today()
+            atthist.date_for = date
+            atthist.att_old = att_old
+            atthist.att_new = att_new
+            atthist.emp_name = emp_name
+            atthist.emp_id = emp_id
+            atthist.cal_id = cal.id
+            atthist.save()
+
+            messages.info(request, 'Attendance Correction Request has been sent Successfully')
+            return redirect('/ams/attendance-correction')
+
+
+        cal = EcplCalander.objects.get(id=id)
+
+        emp_name = cal.emp_name
+        emp_id = cal.emp_id
+
+        atthist = AttendanceCorrectionHistory()
+        atthist.applied_by = applied_by
+        atthist.applied_by_id = applied_by_id
+        atthist.applied_date = datetime.today()
+        atthist.date_for = date
+        atthist.att_old = att_old
+        atthist.att_new = att_new
+        atthist.emp_name = emp_name
+        atthist.emp_id = emp_id
+        atthist.cal_id = id
+        atthist.save()
+
+        messages.info(request,'Attendance Correction Request has been sent Successfully')
+        return redirect('/ams/attendance-correction')
+
+    else:
+        pass
+
+
+def approveAttendanceRequest(request):
+
+    emp_idd = request.user.profile.emp_id
+    emp = Employee.objects.get(emp_id=emp_idd)
+
+    if request.method == 'POST':
+
+        id = request.POST['id']
+        cal_id = request.POST['cal_id']
+        hr_resp = request.POST['hr_resp']
+        comments = request.POST['comments']
+
+        hist = AttendanceCorrectionHistory.objects.get(id=id)
+        cal = EcplCalander.objects.get(id=cal_id)
+        cal.att_actual = hist.att_new
+
+        cal.save()
+        hist.status = True
+        hist.comments =comments
+        hist.approved_by = request.user.profile.emp_name
+        hist.hr_response = hr_resp
+
+        hist.save()
+
+        return redirect('/ams/approve-att-correction-req')
+
+        pass
+    else:
+
+        att_hist = AttendanceCorrectionHistory.objects.filter(status = False)
+
+        data = {'att_hist':att_hist,'emp':emp}
+
+        return render(request,'ams/hr_attendance_correction.html',data)

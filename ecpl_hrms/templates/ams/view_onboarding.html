@@ -11,15 +11,12 @@
 
         <div class="page-title">
           <div class="title_left">
-            <h3>View Teams</h3>
+            <h3>View Onboardings</h3>
           </div>
         </div>
         <div class="row">
           <div class="col-md-12">
             <div class="card">
-              <div class="card-header">
-                <h2>View Teams</h2>
-              </div>
               <div class="card-body">
                 <table  id="datatablex" class="table table-striped" style="max-width: 100% !important;">
                   <thead>
@@ -589,40 +586,7 @@
 
 
 
-    <script type="text/javascript">
-      $(document).ready(function() {
-          $('#datatablex').DataTable( {
-            "bPaginate": true,
-            "bLengthChange": true,
-            "bFilter": true,
-            "bInfo": true,
-              dom: 'lBfrtip',
-              buttons: [
-                    {
-                        extend: "copy",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                    {
-                        extend: "csv",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                    {
-                        extend: "excel",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                    {
-                        extend: "pdfHtml5",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                    {
-                        extend: "print",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                ],
-                responsive: true
-          } );
-      } );
-    </script>
+
 {% for i in onboard %}
 <script>
   var quali = document.getElementById("emp_high_qua{{i.id}}");

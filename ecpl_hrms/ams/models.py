@@ -47,20 +47,20 @@ class OnboardingnewHRC(models.Model):
     emp_desig=models.CharField(max_length=50)
     emp_process=models.CharField(max_length=50)
     emp_pan=models.CharField(max_length=50,null=True)
-    emp_aadhar=models.IntegerField()
+    emp_aadhar=models.CharField(max_length=50,null=True)
     emp_father_name=models.CharField(max_length=50)
     emp_marital_status=models.CharField(max_length=50)
     emp_email=models.EmailField()
-    emp_phone=models.IntegerField()
-    emp_alt_phone=models.IntegerField(null=True)
+    emp_phone=models.CharField(max_length=50,null=True)
+    emp_alt_phone=models.CharField(max_length=50,null=True)
     emp_present_address=models.CharField(max_length=500)
     emp_permanent_address=models.CharField(max_length=500)
     emp_blood=models.CharField(max_length=5)
     emp_emergency_person=models.CharField(max_length=50)
-    emp_emergency_number=models.IntegerField()
+    emp_emergency_number=models.CharField(max_length=50,null=True)
     emp_emergency_address=models.CharField(max_length=500)
     emp_emergency_person_two=models.CharField(max_length=50,null=True)
-    emp_emergency_number_two=models.IntegerField(null=True)
+    emp_emergency_number_two=models.CharField(max_length=50,null=True)
     emp_emergency_address_two=models.CharField(max_length=500,null=True)
     emp_edu_qualification=models.CharField(max_length=50)
     emp_quali_other = models.CharField(null=True,max_length=100)
@@ -187,7 +187,7 @@ class EmployeeLeaveBalance(models.Model):
     team = models.CharField(max_length=50,null=True)
     pl_balance = models.IntegerField()
     sl_balance = models.IntegerField()
-
+    present_count = models.IntegerField(default=0)
 
 
 class LeaveTable(models.Model):
@@ -223,3 +223,24 @@ class AgentActiveStatusHist(models.Model):
     date = models.DateField()
     reason = models.TextField()
     changed_by = models.CharField(max_length=30)
+
+
+class AttendanceCorrectionHistory(models.Model):
+    applied_by = models.CharField(max_length=30,null=True,blank=True)
+    applied_by_id = models.CharField(max_length=30,null=True,blank=True)
+    applied_date = models.DateField()
+    date_for =  models.DateField()
+    att_old = models.CharField(max_length=30,null=True,blank=True)
+    att_new = models.CharField(max_length=30,null=True,blank=True)
+    emp_name = models.CharField(max_length=30,null=True,blank=True)
+    emp_id = models.CharField(max_length=30,null=True,blank=True)
+    approved_by = models.CharField(max_length=30,null=True,blank=True)
+    status = models.BooleanField(default=False)
+    cal_id = models.IntegerField()
+    hr_response = models.CharField(max_length=30,default='Pending by HR')
+    comments = models.TextField(null=True,blank=True)
+
+
+
+
+

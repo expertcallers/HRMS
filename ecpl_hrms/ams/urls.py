@@ -76,5 +76,12 @@ urlpatterns = [
     #Attrition
     path('attrition',viewAttrition),
 
+    #Attendance Correction
+    path('attendance-correction',attendanceCorrection),
+    path('apply-attendance-correction',applyCorrection),
+    path('approve-att-correction-req',approveAttendanceRequest),
+
+
+
 
 ]
