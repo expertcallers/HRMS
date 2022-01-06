@@ -1418,7 +1418,7 @@ def mappingHomePage(request):
     emp_id = request.user.profile.emp_id
     user_nm = request.user.profile.emp_name
     emp = Employee.objects.get(emp_id=emp_id)
-    employees = Employee.objects.filter(Q(emp_rm1=user_nm) | Q(emp_rm2=user_nm) | Q(emp_rm3=user_nm),Q(agent_status = 'Active'))
+    employees = Employee.objects.filter(Q(emp_rm1=user_nm),Q(agent_status = 'Active'))
     rms = Employee.objects.exclude(emp_desi__in=['Client Relationship Officer', 'Patrolling Officer']).order_by(
         'emp_name')
     teams = Campaigns.objects.all()
