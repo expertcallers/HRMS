@@ -147,7 +147,7 @@ def agentDashBoard(request):
 
         dict = {}
         try:
-            st = EcplCalander.objects.get(Q(date=i),Q(emp_name = emp_name)).att_actual
+            st = EcplCalander.objects.get(Q(date=i),Q(emp_id = emp_id)).att_actual
 
         except EcplCalander.DoesNotExist:
             st = 'Unmarked'
@@ -1237,7 +1237,9 @@ def viewTeamAttendance(request):
         rm = request.user.profile.emp_name
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
-        emp_name = request.POST['emp_name']
+        emp_id = request.POST['emp_id']
+        emp_obj = Employee.objects.get(emp_id=emp_id)
+
         start_date = start_date
         end_date = end_date
         start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
@@ -1250,7 +1252,7 @@ def viewTeamAttendance(request):
             date_list.append(day)
 
 
-        if emp_name == 'All':
+        if emp_id == 'All':
 
 
             all_emp = Employee.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=rm) | Q(emp_rm2=rm) | Q(emp_rm3=rm))
@@ -1294,7 +1296,7 @@ def viewTeamAttendance(request):
         for i in date_list:
             agt_cal = {}
             try:
-                agt_calendar = EcplCalander.objects.get(date=i, emp_name=emp_name)
+                agt_calendar = EcplCalander.objects.get(date=i, emp_id=emp_id)
                 agt_cal['date']=i
                 agt_cal['status']=agt_calendar.att_actual
                 agt_cal['approved_on'] = agt_calendar.approved_on
@@ -1306,7 +1308,7 @@ def viewTeamAttendance(request):
                 agt_cal['status'] = 'Unmarked'
                 agt_cal['approved_on'] = 'NA'
                 agt_cal['team'] = 'NA'
-                agt_cal['emp_name'] = emp_name
+                agt_cal['emp_name'] = emp_obj.emp_name
 
             agt_cal_list.append(agt_cal)
 
@@ -1345,13 +1347,13 @@ def teamAttendanceReport(request):
         agent_list = []
         agents = Employee.objects.filter(emp_process=team_name,agent_status = 'Active')
         for i in agents:
-            agent_list.append(i.emp_name)
+            agent_list.append(i.emp_id)
 
         for i in date_list:
             for j in agent_list:
                 agt_cal = {}
                 try:
-                    agt_calendar = EcplCalander.objects.get(date=i, emp_name=j,team=team_name)
+                    agt_calendar = EcplCalander.objects.get(date=i, emp_id=j,team=team_name)
                     agt_cal['date'] = i
                     agt_cal['status'] = agt_calendar.att_actual
                     agt_cal['approved_on'] = agt_calendar.approved_on
