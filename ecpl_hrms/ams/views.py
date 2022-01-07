@@ -36,7 +36,7 @@ agent_list = [ 'Client Relationship Officer ','MIS Executive','Patrolling office
 def loginPage(request):
     logout(request)
     form = AuthenticationForm()
-    teams = Campaigns.objects.all()
+    teams = Campaigns.objects.all().order_by('name')
 
     data = {'teams':teams,'form':form}
     return render(request,'ams/login.html',data)
@@ -72,24 +72,26 @@ def loginAndRedirect(request):
         else:
             form = AuthenticationForm()
             messages.info(request,'Invalid Credentials')
-            teams = Campaigns.objects.all()
+            teams = Campaigns.objects.all().order_by('name')
             data = {'teams': teams, 'form': form}
             return render(request, 'ams/login.html', data)
     else:
         logout(request)
         form = AuthenticationForm()
-        teams = Campaigns.objects.all()
+        teams = Campaigns.objects.all().order_by('name')
         data = {'teams': teams, 'form': form}
         return render(request, 'ams/login.html', data)
 
 @login_required
 def redirectTOAllDashBoards(request,id):
+
     if request.user.profile.emp_desi in tl_am_list:
         return redirect('/ams/tl-dashboard')
     elif request.user.profile.emp_desi in hr_list:
         return redirect('/ams/hr-dashboard')
     else:
         return HttpResponse('<h1>Not Authorised</h1>')
+
 
 def logoutView(request):
     logout(request)
@@ -115,9 +117,6 @@ def change_password(request):
         form = PasswordChangeForm(request.user)
     return render(request,'ams/change-password.html', {'form': form})
 
-
-def teamDashboard(request):
-    return render(request,'ams/team-dashboard.html')
 
 @login_required
 def agentDashBoard(request):
@@ -1239,7 +1238,6 @@ def viewTeamAttendance(request):
         end_date = request.POST['end_date']
         emp_id = request.POST['emp_id']
 
-
         start_date = start_date
         end_date = end_date
         start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
@@ -1273,12 +1271,14 @@ def viewTeamAttendance(request):
                         agt_cal['team'] = agt_calendar.team
                         agt_cal['emp_name'] = agt_calendar.emp_name
 
+
                     except EcplCalander.DoesNotExist:
                         agt_cal['date'] = k
                         agt_cal['status'] = 'Unmarked'
                         agt_cal['approved_on'] = 'NA'
                         agt_cal['team'] = j.emp_process
                         agt_cal['emp_name'] = j.emp_name
+
 
                     agt_cal_list.append(agt_cal)
 
@@ -1351,6 +1351,7 @@ def teamAttendanceReport(request):
 
         for i in date_list:
             for j in agent_list:
+                emp_obj =Employee.objects.get(emp_id=j)
                 agt_cal = {}
                 try:
                     agt_calendar = EcplCalander.objects.get(date=i, emp_id=j,team=team_name)
@@ -1359,12 +1360,20 @@ def teamAttendanceReport(request):
                     agt_cal['approved_on'] = agt_calendar.approved_on
                     agt_cal['team'] = agt_calendar.team
                     agt_cal['emp_name'] = agt_calendar.emp_name
+                    agt_cal['rm1'] = agt_calendar.rm1
+                    agt_cal['rm2'] = agt_calendar.rm2
+                    agt_cal['rm3'] = agt_calendar.rm3
+
                 except EcplCalander.DoesNotExist:
                     agt_cal['date'] = i
                     agt_cal['status'] = 'Unmarked'
                     agt_cal['approved_on'] = 'NA'
                     agt_cal['team'] = team_name
-                    agt_cal['emp_name'] = j
+                    agt_cal['emp_name'] = emp_obj.emp_name
+                    agt_cal['rm1'] = emp_obj.emp_rm1
+                    agt_cal['rm2'] = emp_obj.emp_rm2
+                    agt_cal['rm3'] = emp_obj.emp_rm3
+
                 agt_cal_list.append(agt_cal)
 
         emp_id = request.user.profile.emp_id

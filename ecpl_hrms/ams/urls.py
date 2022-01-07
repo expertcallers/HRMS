@@ -17,71 +17,70 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
+    # Login
     path('',loginPage),
     path('login/',loginAndRedirect),
     path('login',loginAndRedirect),
     path('logout',logoutView),
-    path('dashboard-redirect/<int:id>',redirectTOAllDashBoards),
     path('change-password',change_password),
-    path('team-dashboard',teamDashboard),
+    path('upload-image',uploadImageToDB),
+    path('ams-agent-settings',agentSettings),
+    path('rm-settings',rmSettings),
+    path('edit-employee-profile-status',editAgentStatus),
+
+    # Dashboard Redirect
+    path('dashboard-redirect/<int:id>',redirectTOAllDashBoards),
     path('agent-dashboard',agentDashBoard),
-    path('ams-update-attendance',newSingleAttandance),
     path('tl-dashboard',tlDashboard),
     path('manager-dashboard',managerDashboard),
     path('hr-dashboard',hrDashboard),
-    path('add-new-user',addNewUserHR),
-    path('viewusers',viewUsersHR),
-    path('view-employee-profile/<int:id>/<int:on_id>',viewEmployeeProfile),
 
-    path('onboarding',on_boarding),
-    path('view-onboarding',viewOnBoarding),
-    path('edit-onboarding/<int:id>',on_boarding_update),
+    # Attendance
+    path('ams-update-attendance',newSingleAttandance),
     path('apply-attendance',applyAttendace),
     path('team-attendance',teamAttendance),
-
     path('view-emp-attendance',viewTeamAttendance),
     path('team-attendance-report',teamAttendanceReport),
-
-    path('ams-apply_leave',applyLeave),
-    path('view-leave-list',viewleaveListRM1),
-    path('approve-leave-rm1',approveLeaveRM1),
-
-    path('rm-approval/<int:id>',rmApproval),
     path('view-att-requests',attRequests),
-    path('ams-agent-settings',agentSettings),
-    path('rm-settings',rmSettings),
-    path('view-all-employees-oms/<str:name>',viewallOMS),
-    path('upload-image',uploadImageToDB),
-
-    # Mappingview-leave-request-mgr
-
-    path('rm-mapping-index',mappingHomePage),
-    path('create-mapping-ticket',createMappingTicket),
-    path('view-mapping-tickets',viewMappingTicketsHr),
-    path('approve-mapping-ticket',approveMappingTicket),
-
-    path('mapping-application-status',viewMappingApplicationStatus),
-    path('view-leave-request-mgr',viewAndApproveLeaveRequestMgr),
-
-    path('add-newteam',addNewTeam),
-    path('view-all-teams',viewTeam),
-
-    path('add-new-job',jobRequisition),
-    path('view-job-table',jobRequisitionReportTable),
-    path('view-job-table-rm',jobRequisitionReportTableRM),
-    path('update-job-status/<int:id>',updateJobForm),
-
-    path('edit-employee-profile-status',editAgentStatus),
-
-    #Attrition
-    path('attrition',viewAttrition),
 
     #Attendance Correction
     path('attendance-correction',attendanceCorrection),
     path('apply-attendance-correction',applyCorrection),
     path('approve-att-correction-req',approveAttendanceRequest),
 
+    # User Managfement, Onboarding
+    path('add-new-user',addNewUserHR),
+    path('viewusers',viewUsersHR),
+    path('view-employee-profile/<int:id>/<int:on_id>',viewEmployeeProfile),
+    path('onboarding',on_boarding),
+    path('view-onboarding',viewOnBoarding),
+    path('edit-onboarding/<int:id>',on_boarding_update),
+    path('view-all-employees-oms/<str:name>',viewallOMS),
 
+    # Team Management
+    path('add-newteam', addNewTeam),
+    path('view-all-teams', viewTeam),
 
+    # Job Requesition Form
+    path('add-new-job', jobRequisition),
+    path('view-job-table', jobRequisitionReportTable),
+    path('view-job-table-rm', jobRequisitionReportTableRM),
+    path('update-job-status/<int:id>', updateJobForm),
 
+    # Leave Management
+    path('ams-apply_leave',applyLeave),
+    path('view-leave-list',viewleaveListRM1),
+    path('approve-leave-rm1',approveLeaveRM1),
+    path('rm-approval/<int:id>',rmApproval),
+    path('view-leave-request-mgr',viewAndApproveLeaveRequestMgr),
+
+    # Mapping
+    path('rm-mapping-index',mappingHomePage),
+    path('create-mapping-ticket',createMappingTicket),
+    path('view-mapping-tickets',viewMappingTicketsHr),
+    path('approve-mapping-ticket',approveMappingTicket),
+    path('mapping-application-status',viewMappingApplicationStatus),
+
+    #Attrition
+    path('attrition',viewAttrition),
 ]
