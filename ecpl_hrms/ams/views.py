@@ -1355,6 +1355,7 @@ def teamAttendanceReport(request):
                     try:
                         agt_calendar = EcplCalander.objects.get(date=i, emp_id=j)
                         agt_cal['date'] = i
+                        agt_cal['emp_id'] = j
                         agt_cal['status'] = agt_calendar.att_actual
                         agt_cal['approved_on'] = agt_calendar.approved_on
                         agt_cal['team'] = agt_calendar.team
@@ -1365,6 +1366,7 @@ def teamAttendanceReport(request):
 
                     except EcplCalander.DoesNotExist:
                         agt_cal['date'] = i
+                        agt_cal['emp_id'] = j
                         agt_cal['status'] = 'Unmarked'
                         agt_cal['approved_on'] = 'NA'
                         agt_cal['team'] = emp_obj.emp_process
@@ -1399,6 +1401,7 @@ def teamAttendanceReport(request):
                 try:
                     agt_calendar = EcplCalander.objects.get(date=i, emp_id=j)
                     agt_cal['date'] = i
+                    agt_cal['emp_id'] = j
                     agt_cal['status'] = agt_calendar.att_actual
                     agt_cal['approved_on'] = agt_calendar.approved_on
                     agt_cal['team'] = agt_calendar.team
@@ -1409,6 +1412,7 @@ def teamAttendanceReport(request):
 
                 except EcplCalander.DoesNotExist:
                     agt_cal['date'] = i
+                    agt_cal['emp_id'] = j
                     agt_cal['status'] = 'Unmarked'
                     agt_cal['approved_on'] = 'NA'
                     agt_cal['team'] = emp_obj.emp_process
