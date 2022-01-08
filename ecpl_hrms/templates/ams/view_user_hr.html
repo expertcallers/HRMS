@@ -33,6 +33,7 @@
                             <th>RM2</th>
                             <th>RM3</th>
                             <th>Process</th>
+                            <th>Emp Status</th>
                             <th>Action</th>
                         </tr>
                   </thead>
@@ -45,6 +46,7 @@
                             <th>RM2</th>
                             <th>RM3</th>
                             <th>Process</th>
+                            <th>Emp Status</th>
                             <th>Action</th>
                         </tr>
                   </tfoot>
@@ -58,6 +60,7 @@
                               <td>{{i.emp_rm2}}</td>
                               <td>{{i.emp_rm3}}</td>
                               <td>{{i.emp_process}}</td>
+                              <td>{{i.agent_status}}</td>
                               <td>
                               {% if i.on_id %}
                               <a href="/ams/view-employee-profile/{{i.id}}/{{i.on_id}}">

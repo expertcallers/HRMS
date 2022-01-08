@@ -150,6 +150,7 @@
                         <label for="emp_name">Team Name</label>
                         <select id="emp_name" name="team_name" class="form-control select2" required>
                           <option selected disabled value="">Select from below</option>
+                          <option value="All Team">All Team</option>
                           {% for t in team %}
                           <option value="{{t.name}}">{{t.name}}</option>
                           {% endfor %}

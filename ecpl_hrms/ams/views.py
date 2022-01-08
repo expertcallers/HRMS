@@ -121,45 +121,46 @@ def change_password(request):
 @login_required
 def agentDashBoard(request):
 
-    emp_name = request.user.profile.emp_name
-    emp_id = request.user.profile.emp_id
-    emp = Employee.objects.get(emp_id = emp_id)
-    #attendance status
-    cal = LeaveTable.objects.filter(Q(emp_id=emp_id),Q(leave_type__in=['SL','PL'])).order_by('-applied_date')[:5]
+    if request.user.profile.emp_desi in agent_list:
 
-    # Month view
-    ########### Month View ############
-    month_days = []
-    todays_date = date.today()
-    year = todays_date.year
-    month = todays_date.month
-    a, num_days = calendar.monthrange(year, month)
-    start_date = date(year, month, 1)
-    end_date = date(year, month, num_days)
-    delta = timedelta(days=1)
-    while start_date <= end_date:
-        month_days.append(start_date.strftime("%Y-%m-%d"))
-        start_date += delta
+        emp_name = request.user.profile.emp_name
+        emp_id = request.user.profile.emp_id
+        emp = Employee.objects.get(emp_id = emp_id)
+        #attendance status
+        cal = LeaveTable.objects.filter(Q(emp_id=emp_id),Q(leave_type__in=['SL','PL'])).order_by('-applied_date')[:5]
 
-    month_cal = []
-    for i in month_days:
+        # Month view
+        ########### Month View ############
+        month_days = []
+        todays_date = date.today()
+        year = todays_date.year
+        month = todays_date.month
+        a, num_days = calendar.monthrange(year, month)
+        start_date = date(year, month, 1)
+        end_date = date(year, month, num_days)
+        delta = timedelta(days=1)
+        while start_date <= end_date:
+            month_days.append(start_date.strftime("%Y-%m-%d"))
+            start_date += delta
 
-        dict = {}
-        try:
-            st = EcplCalander.objects.get(Q(date=i),Q(emp_id = emp_id)).att_actual
+        month_cal = []
+        for i in month_days:
 
-        except EcplCalander.DoesNotExist:
-            st = 'Unmarked'
-        dict['dt'] = i
-        dict['st'] = st
-        month_cal.append(dict)
+            dict = {}
+            try:
+                st = EcplCalander.objects.get(Q(date=i),Q(emp_id = emp_id)).att_actual
 
+            except EcplCalander.DoesNotExist:
+                st = 'Unmarked'
+            dict['dt'] = i
+            dict['st'] = st
+            month_cal.append(dict)
 
-    data = {'emp':emp,'cal':cal,'month_cal':month_cal,
+        data = {'emp':emp,'cal':cal,'month_cal':month_cal}
 
-         }
-
-    return render(request,'ams/agent-dashboard-new.html',data)
+        return render(request,'ams/agent-dashboard-new.html',data)
+    else:
+        return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
 
 @login_required
 def tlDashboard(request):
@@ -221,7 +222,6 @@ def tlDashboard(request):
             dict['dt'] = i
             dict['st'] = st
             month_cal.append(dict)
-
 
 
         data = {'emp_name': emp_name, 'emp': emp, 'att_details':att_details,
@@ -427,10 +427,7 @@ def viewallOMS(request,name):
     else:
 
         messages.info(request,'Bad Request')
-
         return redirect('/ams/tl-dashboard')
-
-
 
 
 @login_required
@@ -445,8 +442,8 @@ def hrDashboard(request):
         all_job_count = JobRequisition.objects.all().count()
         teams = Campaigns.objects.all()
 
+        # Att Request Count
         att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False).count()
-
 
         data = {'emp':emp,'all_users_count':all_users_count,'all_team_count':all_team_count,
                 'all_job_count':all_job_count,'att_requests_count':att_requests_count,
@@ -1342,10 +1339,56 @@ def teamAttendanceReport(request):
             day = start_date + timedelta(days=i)
             date_list.append(day)
 
+        if team_name == 'All Team':
+
+            agt_cal_list = []
+            agent_list = []
+            agents = Employee.objects.all()
+
+            for i in agents:
+                agent_list.append(i.emp_id)
+
+            for i in date_list:
+                for j in agent_list:
+                    emp_obj = Employee.objects.get(emp_id=j)
+                    agt_cal = {}
+                    try:
+                        agt_calendar = EcplCalander.objects.get(date=i, emp_id=j)
+                        agt_cal['date'] = i
+                        agt_cal['status'] = agt_calendar.att_actual
+                        agt_cal['approved_on'] = agt_calendar.approved_on
+                        agt_cal['team'] = agt_calendar.team
+                        agt_cal['emp_name'] = agt_calendar.emp_name
+                        agt_cal['rm1'] = agt_calendar.rm1
+                        agt_cal['rm2'] = agt_calendar.rm2
+                        agt_cal['rm3'] = agt_calendar.rm3
+
+                    except EcplCalander.DoesNotExist:
+                        agt_cal['date'] = i
+                        agt_cal['status'] = 'Unmarked'
+                        agt_cal['approved_on'] = 'NA'
+                        agt_cal['team'] = emp_obj.emp_process
+                        agt_cal['emp_name'] = emp_obj.emp_name
+                        agt_cal['rm1'] = emp_obj.emp_rm1
+                        agt_cal['rm2'] = emp_obj.emp_rm2
+                        agt_cal['rm3'] = emp_obj.emp_rm3
+
+                    agt_cal_list.append(agt_cal)
+
+            emp_id = request.user.profile.emp_id
+            emp = Employee.objects.get(emp_id=emp_id)
+
+            data = {'agt_cal_list': agt_cal_list,
+                    'emp': emp}
+
+            return render(request, 'ams/agent-calander-status.html', data)
+
+
+
         agt_cal_list = []
 
         agent_list = []
-        agents = Employee.objects.filter(emp_process=team_name,agent_status = 'Active')
+        agents = Employee.objects.filter(emp_process=team_name)
         for i in agents:
             agent_list.append(i.emp_id)
 
@@ -1354,7 +1397,7 @@ def teamAttendanceReport(request):
                 emp_obj =Employee.objects.get(emp_id=j)
                 agt_cal = {}
                 try:
-                    agt_calendar = EcplCalander.objects.get(date=i, emp_id=j,team=team_name)
+                    agt_calendar = EcplCalander.objects.get(date=i, emp_id=j)
                     agt_cal['date'] = i
                     agt_cal['status'] = agt_calendar.att_actual
                     agt_cal['approved_on'] = agt_calendar.approved_on
@@ -1368,7 +1411,7 @@ def teamAttendanceReport(request):
                     agt_cal['date'] = i
                     agt_cal['status'] = 'Unmarked'
                     agt_cal['approved_on'] = 'NA'
-                    agt_cal['team'] = team_name
+                    agt_cal['team'] = emp_obj.emp_process
                     agt_cal['emp_name'] = emp_obj.emp_name
                     agt_cal['rm1'] = emp_obj.emp_rm1
                     agt_cal['rm2'] = emp_obj.emp_rm2
@@ -1877,7 +1920,7 @@ def viewAttrition(request):
 
         cal = EcplCalander.objects.filter(emp_id=emp_id,att_actual='Attrition')
         for i in cal:
-            i.att_actual = 'Disabled'
+            i.att_actual = 'Attrition - approved'
             i.save()
 
 
