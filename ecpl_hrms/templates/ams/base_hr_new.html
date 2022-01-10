@@ -44,11 +44,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 
+     <link rel="stylesheet" href="{% static 'assets/css/monthly.css' %}">
 
     <style type="text/css">
       .select2-container {
         width: 100% !important;
       }
+       .monthly-prev, .monthly-next{
+            display:none;
+          }
     </style>
   </head>
 
@@ -205,7 +209,49 @@
     <script src="{% static 'assets/build/js/custom.min.js' %}"></script>
 
 
+    <script type="text/javascript" src="{% static 'assets/js/monthly.js' %}"></script>
+      <script type="text/javascript">
+          var sampleEvents = {
+          "monthly": [
+              {% for c in month_cal %}
+              {
+                  "id": 1,
+                  "name": "{{c.st}}",
+                  "startdate": "{{c.dt}}",
+                  "enddate": "",
+                  "starttime": "",
+                  "endtime": "",
+                  {% if c.st == 'Unmarked' %}
+                  "color": "grey",
+                  {% elif c.st == 'Holiday' %}
+                  "color": "black",
+                  {% elif c.st == 'Week OFF' %}
+                  "color": "blue",
+                  {% elif c.st == 'Comp OFF' %}
+                  "color": "blue",
+                  {% elif c.st == 'Absent' %}
+                  "color": "red",
+                  {% elif c.st == 'present' %}
+                  "color": "green",
+                  {% else %}
+                  "color": "grey",
+                  {% endif %}
 
+                  "url": ""
+              },
+              {% endfor %}
+          ]
+          };
+          $(document).ready( function() {
+              $('#mycalendarid').monthly({
+                  mode: 'event',
+                  dataType: 'json',
+                  jsonURL: '',
+                  weekStart:'Mon',
+                  events: sampleEvents
+              });
+          });
+      </script>
 
 
     <!-- The follwing two tags to be added Can be added to base file-->

@@ -83,4 +83,7 @@ urlpatterns = [
 
     #Attrition
     path('attrition',viewAttrition),
+
+    # calnder Start
+    #path('start-calander',startCalandarForAllAgents)
 ]

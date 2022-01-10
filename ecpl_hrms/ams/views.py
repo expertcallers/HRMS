@@ -444,9 +444,40 @@ def hrDashboard(request):
 
         # Att Request Count
         att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False).count()
+        attrition_request_count = EcplCalander.objects.filter(att_actual='Attrition').distinct().count()
+
+        # Month view
+        ########### Month View ############
+        month_days = []
+        todays_date = date.today()
+        year = todays_date.year
+        month = todays_date.month
+        a, num_days = calendar.monthrange(year, month)
+        start_date = date(year, month, 1)
+        end_date = date(year, month, num_days)
+        delta = timedelta(days=1)
+        while start_date <= end_date:
+            month_days.append(start_date.strftime("%Y-%m-%d"))
+            start_date += delta
+
+        month_cal = []
+        for i in month_days:
+
+            dict = {}
+            try:
+                st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id)).att_actual
+
+            except EcplCalander.DoesNotExist:
+                st = 'Unmarked'
+            dict['dt'] = i
+            dict['st'] = st
+            month_cal.append(dict)
+
+
 
         data = {'emp':emp,'all_users_count':all_users_count,'all_team_count':all_team_count,
                 'all_job_count':all_job_count,'att_requests_count':att_requests_count,
+                'attrition_request_count':attrition_request_count,'month_cal':month_cal,
                 'team':teams}
 
         return render(request,'ams/hr_dashboard.html',data)
@@ -1982,6 +2013,7 @@ def applyCorrection(request):
         att_new = request.POST['att_new']
         att_old = request.POST['att_old']
         date = request.POST['date']
+        reason = request.POST['reason']
         emp_id = request.POST['emp_id']
         emp_obj = Employee.objects.get(emp_id=emp_id)
 
@@ -2016,6 +2048,7 @@ def applyCorrection(request):
             atthist.emp_name = emp_name
             atthist.emp_id = emp_id
             atthist.cal_id = cal.id
+            atthist.reason = reason
             atthist.save()
 
             messages.info(request, 'Attendance Correction Request has been sent Successfully')
@@ -2037,6 +2070,7 @@ def applyCorrection(request):
         atthist.emp_name = emp_name
         atthist.emp_id = emp_id
         atthist.cal_id = id
+        atthist.reason = reason
         atthist.save()
 
         messages.info(request,'Attendance Correction Request has been sent Successfully')
@@ -2080,3 +2114,39 @@ def approveAttendanceRequest(request):
         data = {'att_hist':att_hist,'emp':emp}
 
         return render(request,'ams/hr_attendance_correction.html',data)
+
+
+def startCalandarForAllAgents(request):
+
+    todays_date = date.today()
+    year = todays_date.year
+    month = todays_date.month
+
+    a,num_days = calendar.monthrange(year, month)
+    start_date = date(year, month, 1)
+    end_date = date(year, month, num_days)
+
+    delta = end_date - start_date  # returns timedelta
+
+    date_list = []
+    for i in range(delta.days + 1):
+        day = start_date + timedelta(days=i)
+        date_list.append(day)
+
+    emps = Employee.objects.all()
+
+    for i in date_list:
+        for j in emps:
+
+            try:
+                cal = EcplCalander.objects.get(date=i,emp_id=j.emp_id)
+
+            except EcplCalander.DoesNotExist:
+
+                cal = EcplCalander.objects.create(date= i,emp_id=j.emp_id,team=j.emp_process,emp_name=j.emp_name,
+                                                  rm1= j.emp_rm1,rm2=j.emp_rm2,rm3=j.emp_rm3,emp_desi = j.emp_desi,
+                                                  att_actual= 'Unmarked')
+                cal.save()
+
+
+

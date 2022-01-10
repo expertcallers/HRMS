@@ -106,10 +106,10 @@
                   <span title="Leave Request" id="widgetCardIcon" class="imagecard">
                     <i class="fa fa-calendar-times"></i>
                   </span>
-                  <div class="card-data widgetCardData" style="background:  #dcdcdc;;">
-                    <h2 class="box-title mt-5" style="color: #2A3F54;">Leave Request</h2>
-                    <h1 id="attrition"><span style="font-size:18px">Coming Soon</span></h1>
-                    <a href="#" title="Style Builder" class="anchor disabled btn btn-default" style="background: #1ABB9C; color: #fff;">
+                  <div class="card-data widgetCardData">
+                    <h2 class="box-title mt-5" style="color: #2A3F54;">Attrition Request</h2>
+                    <h1 id="attrition">{{attrition_request_count}}</h1>
+                    <a href="/ams/attrition" title="Style Builder" class="anchor btn btn-default" style="background: #1ABB9C; color: #fff;">
                       View All
                     </a>
                   </div>
@@ -169,6 +169,20 @@
                       </div>
                     </div>
                   </form>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="row mt-3">
+                <div class="col-md-12">
+                  <div class="card">
+                    <div class="card-header">
+                      <h2>Month Calender - {{emp.emp_name}}</h2>
+                    </div>
+                    <div class="card-body">
+                      <div class="monthly" id="mycalendarid"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

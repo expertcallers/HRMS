@@ -239,6 +239,7 @@ class AttendanceCorrectionHistory(models.Model):
     cal_id = models.IntegerField()
     hr_response = models.CharField(max_length=30,default='Pending by HR')
     comments = models.TextField(null=True,blank=True)
+    reason = models.TextField(null=True,blank=True)
 
 
 
