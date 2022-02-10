@@ -47,6 +47,7 @@ urlpatterns = [
     path('attendance-correction',attendanceCorrection),
     path('apply-attendance-correction',applyCorrection),
     path('approve-att-correction-req',approveAttendanceRequest),
+    path('week-attendance',weekAttendanceReport),
 
     # User Managfement, Onboarding
     path('add-new-user',addNewUserHR),
@@ -80,6 +81,9 @@ urlpatterns = [
     path('view-mapping-tickets',viewMappingTicketsHr),
     path('approve-mapping-ticket',approveMappingTicket),
     path('mapping-application-status',viewMappingApplicationStatus),
+
+    # Status Changes
+    path('change-emp-status',applyEmpStatusChange),
 
     #Attrition
     path('attrition',viewAttrition),

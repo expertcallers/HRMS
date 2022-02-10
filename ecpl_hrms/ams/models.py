@@ -1,28 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils import timezone
 
-
-# Create your models here.
-class Employees(models.Model):
-    emp_id = models.IntegerField(unique=True)
-    emp_name = models.CharField(max_length=200)
-    emp_desi = models.CharField(max_length=200)
-    rm1 = models.CharField(max_length=200)
-    rm2 = models.CharField(max_length=200)
-    rm3 = models.CharField(max_length=200)
-    process = models.CharField(max_length=300)
-
-class Attendace(models.Model):
-    emp_id = models.IntegerField(unique=True)
-    emp_name = models.CharField(max_length=300)
-    date_time = models.DateTimeField(default=timezone.now)
-    process = models.CharField(max_length=300)
-    marked_by_id = models.IntegerField()
-    marked_by_name = models.CharField(max_length=300)
-    attendance_type = models.CharField(max_length=100,default="Unmarked")
-    remarks = models.TextField()
-
+# Attendance - Master ++
 class EcplCalander(models.Model):
     team = models.CharField(max_length=300)
     date = models.DateField()
@@ -37,9 +16,8 @@ class EcplCalander(models.Model):
     rm2 = models.CharField(max_length=200, null=True)
     rm3 = models.CharField(max_length=200, null=True)
 
-
+# Onboarding - Master +
 class OnboardingnewHRC(models.Model):
-
     hr_name = models.ForeignKey(User,on_delete=models.CASCADE,related_name='hrname',null=True)
     submit_date=models.DateTimeField(default="2000-01-01 01:01")
     emp_name=models.CharField(max_length=50)
@@ -106,7 +84,7 @@ class OnboardingnewHRC(models.Model):
 
     user_created = models.BooleanField(default=False)
 
-
+# Mapping Tickets - request - approval ++
 class MappingTickets(models.Model):
     emp_name=models.CharField(max_length=50)
     emp_id = models.CharField(max_length=10)
@@ -126,20 +104,17 @@ class MappingTickets(models.Model):
     approved_date=models.DateTimeField(null=True,blank=True)
     status=models.BooleanField(default=False)
 
-
+# Campaigns - teams +
 class Campaigns(models.Model):
     name=models.CharField(max_length=100)
     om = models.CharField(max_length=50)
     created_by = models.CharField(max_length=50,null=True,blank=True)
     created_date = models.DateField(null=True,blank=True)
-
     def __str__(self):
         return self.name
 
-
-
+# Job Requisition - Master +
 class JobRequisition(models.Model):
-
     user_name = models.ForeignKey(User, on_delete=models.CASCADE, related_name='log_user', null=True)
     req_date = models.DateField(null=True)
     hc_req = models.IntegerField(null=True)
@@ -161,18 +136,14 @@ class JobRequisition(models.Model):
     working_from = models.CharField(max_length=20, null=True, blank=True)
     working_to = models.CharField(max_length=20, null=True, blank=True)
     week_no_days = models.IntegerField(null=True, blank=True)
-
     week_from = models.CharField(max_length=20, null=True, blank=True)
     week_to = models.CharField(max_length=20, null=True, blank=True)
-
     requisition_typ = models.CharField(max_length=50, null=True, blank=True)
     candidate_name = models.TextField(default="", null=True)
     closure_date = models.DateField(null=True)
     source = models.CharField(max_length=50, null=True, blank=True)
-
     source_empref_emp_name = models.CharField(max_length=150, null=True, blank=True)
     source_empref_emp_id = models.CharField(max_length=20, null=True)
-
     source_social = models.CharField(max_length=100, null=True, blank=True)
     source_partners = models.CharField(max_length=100, null=True, blank=True)
     recruited_people = models.IntegerField(null=True, blank=True)
@@ -180,7 +151,7 @@ class JobRequisition(models.Model):
     candidate_remark = models.TextField()
     status = models.BooleanField(default=False)
 
-
+# Leave Balance - PL - SL +
 class EmployeeLeaveBalance(models.Model):
     emp_id = models.CharField(max_length=10,null=True)
     emp_name = models.CharField(max_length=50,null=True)
@@ -189,9 +160,8 @@ class EmployeeLeaveBalance(models.Model):
     sl_balance = models.IntegerField()
     present_count = models.IntegerField(default=0)
 
-
+# Leave apply - save - approval ++
 class LeaveTable(models.Model):
-
     emp_name = models.CharField(max_length=50,null=True)
     emp_id = models.CharField(max_length=50, null=True)
     emp_desi = models.CharField(max_length=50, null=True)
@@ -209,12 +179,11 @@ class LeaveTable(models.Model):
     manager_approval = models.BooleanField(default=False)
     manager_reason = models.TextField(null=True)
     manager_status = models.CharField(max_length=50, null=True, blank=True)
-
     emp_rm1 = models.CharField(max_length=50, null=True)
     emp_rm2 = models.CharField(max_length=50, null=True)
     emp_rm3 = models.CharField(max_length=50, null=True)
 
-
+# Agent status change history - att - ben - training +
 class AgentActiveStatusHist(models.Model):
     emp_id = models.CharField(max_length=20,null=True,blank=True)
     emp_name = models.CharField(max_length=30,null=True,blank=True)
@@ -223,8 +192,12 @@ class AgentActiveStatusHist(models.Model):
     date = models.DateField()
     reason = models.TextField()
     changed_by = models.CharField(max_length=30)
+    approved_by = models.CharField(max_length=50)
+    hr_response = models.TextField(null=True,blank=True)
+    status_by_hr = models.CharField(max_length=50)
+    ticket_status = models.BooleanField(default=False)
 
-
+# Attendance correction history - send - approve ++
 class AttendanceCorrectionHistory(models.Model):
     applied_by = models.CharField(max_length=30,null=True,blank=True)
     applied_by_id = models.CharField(max_length=30,null=True,blank=True)

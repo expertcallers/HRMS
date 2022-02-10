@@ -1,0 +1,334 @@
+{% extends 'ams/base-rm.html' %}
+
+{% load static %}
+{% block main %}
+<style>
+  td.name {
+    text-align: left;
+    background: #2A3F54;
+    color: #fff;
+  }
+  td, th {
+    text-align: center;
+    font-weight: 600;
+    border: none !important;
+    text-transform: capitalize;
+  }
+  th {
+    font-size: 16px;
+    background: #2A3F54;
+    color: #1ABB9C;
+  }
+  .unmarked {
+    background: #a52a2a;
+    color: #fff;
+  }
+  .absent {
+    background: #ff0000;
+    color: #fff;
+  }
+  .present {
+    background: #008c00;
+    color: #fff;
+  }
+  .comp {
+    background: #8C8C8C;
+    color: #fff;
+  }
+  .week {
+    background: #000000;
+    color: #fff;
+  }
+  .half {
+    background: #0000FF;
+    color: #fff;
+  }
+  .holiday {
+    background: #FF8FFF;
+    color: #fff;
+  }
+  .training {
+    background: #6990ce;
+    color: #fff;
+  }
+  .PL {
+    background: #FFFF00;
+    color: #000;
+  }
+  .SL {
+    background: #FFD3DF;
+    color: #000;
+  }
+
+</style>
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>Week's Attendance Report</h3>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <table  id="datatable_week" class="table " style="max-width: 100% !important;">
+                    <thead>
+                      <tr>
+                        <th>Employee</th>
+                        <th>Sunday</th>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                        <th>Saturday</th>
+                      </tr>
+                    </thead>
+                    <tfoot>
+                      <tr>
+                        <th>Employee</th>
+                        <th>Sunday</th>
+                        <th>Monday</th>
+                        <th>Tuesday</th>
+                        <th>Wednesday</th>
+                        <th>Thursday</th>
+                        <th>Friday</th>
+                        <th>Saturday</th>
+                      </tr>
+                    </tfoot>
+                    <tbody>
+
+                      {% for i in cal %}
+                      <tr>
+                        <td class="name">{{i.name}} ({{i.emp_id}})</td>
+                        <td id="sun_{{i.emp_id}}">{{i.sund}}</td>
+                        <td id="mon_{{i.emp_id}}">{{i.mon}}</td>
+                        <td id="tue_{{i.emp_id}}">{{i.tue}}</td>
+                        <td id="wed_{{i.emp_id}}">{{i.wed}}</td>
+                        <td id="thur_{{i.emp_id}}">{{i.thur}}</td>
+                        <td id="fri_{{i.emp_id}}">{{i.fri}}</td>
+                        <td id="sat_{{i.emp_id}}">{{i.sat}}</td>
+                      </tr>
+                      {% endfor %}
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+      {% for i in cal %}
+
+
+          // Monday
+          $mon = $('#mon_{{i.emp_id}}');
+          if ($mon.html() == "Unmarked") {
+            $mon.attr("class","unmarked");
+          } else if ($mon.html() == "present") {
+            $mon.attr("class","present");
+          } else if ($mon.html() == "Absent"){
+            $mon.attr("class","absent");
+          } else if ($mon.html() == "Week OFF"){
+            $mon.attr("class","week");
+          } else if ($mon.html() == "Comp OFF"){
+            $mon.attr("class","comp");
+          } else if ($mon.html() == "Half Day"){
+            $mon.attr("class","half");
+          } else if ($mon.html() == "Holiday"){
+            $mon.attr("class","holiday");
+          } else if ($mon.html() == "Training"){
+            $mon.attr("class","training");
+          } else if ($mon.html() == "SL"){
+            $mon.attr("class","SL");
+          } else if ($mon.html() == "PL"){
+            $mon.attr("class","PL");
+          } else {
+            $mon.attr("class","attrition");
+          }
+
+          // Tuesday
+          $tue = $('#tue_{{i.emp_id}}');
+          if ($tue.html() == "Unmarked") {
+            $tue.attr("class","unmarked");
+          } else if ($tue.html() == "present") {
+            $tue.attr("class","present");
+          } else if ($tue.html() == "Absent"){
+            $tue.attr("class","absent");
+          } else if ($tue.html() == "Week OFF"){
+            $tue.attr("class","week");
+          } else if ($tue.html() == "Comp OFF"){
+            $tue.attr("class","comp");
+          } else if ($tue.html() == "Half Day"){
+            $tue.attr("class","half");
+          } else if ($tue.html() == "Holiday"){
+            $tue.attr("class","holiday");
+          } else if ($tue.html() == "Training"){
+            $tue.attr("class","training");
+          } else if ($tue.html() == "SL"){
+            $tue.attr("class","SL");
+          } else if ($tue.html() == "PL"){
+            $tue.attr("class","PL");
+          } else {
+            $tue.attr("class","attrition");
+          }
+
+          // Wednesday
+          $wed = $('#wed_{{i.emp_id}}');
+          if ($wed.html() == "Unmarked") {
+            $wed.attr("class","unmarked");
+          } else if ($wed.html() == "present") {
+            $wed.attr("class","present");
+          } else if ($wed.html() == "Absent"){
+            $wed.attr("class","absent");
+          } else if ($wed.html() == "Week OFF"){
+            $wed.attr("class","week");
+          } else if ($wed.html() == "Comp OFF"){
+            $wed.attr("class","comp");
+          } else if ($wed.html() == "Half Day"){
+            $wed.attr("class","half");
+          } else if ($wed.html() == "Holiday"){
+            $wed.attr("class","holiday");
+          } else if ($wed.html() == "Training"){
+            $wed.attr("class","training");
+          } else if ($wed.html() == "SL"){
+            $wed.attr("class","SL");
+          } else if ($wed.html() == "PL"){
+            $wed.attr("class","PL");
+          } else {
+            $wed.attr("class","attrition");
+          }
+
+          // Thursday
+          $thur = $('#thur_{{i.emp_id}}');
+          if ($thur.html() == "Unmarked") {
+            $thur.attr("class","unmarked");
+          } else if ($thur.html() == "present") {
+            $thur.attr("class","present");
+          } else if ($thur.html() == "Absent"){
+            $thur.attr("class","absent");
+          } else if ($thur.html() == "Week OFF"){
+            $thur.attr("class","week");
+          } else if ($thur.html() == "Comp OFF"){
+            $thur.attr("class","comp");
+          } else if ($thur.html() == "Half Day"){
+            $thur.attr("class","half");
+          } else if ($thur.html() == "Holiday"){
+            $thur.attr("class","holiday");
+          } else if ($thur.html() == "Training"){
+            $thur.attr("class","training");
+          } else if ($thur.html() == "SL"){
+            $thur.attr("class","SL");
+          } else if ($thur.html() == "PL"){
+            $thur.attr("class","PL");
+          } else {
+            $thur.attr("class","attrition");
+          }
+
+          // Friday
+          $fri = $('#fri_{{i.emp_id}}');
+          if ($fri.html() == "Unmarked") {
+            $fri.attr("class","unmarked");
+          } else if ($fri.html() == "present") {
+            $fri.attr("class","present");
+          } else if ($fri.html() == "Absent"){
+            $fri.attr("class","absent");
+          } else if ($fri.html() == "Week OFF"){
+            $fri.attr("class","week");
+          } else if ($fri.html() == "Comp OFF"){
+            $fri.attr("class","comp");
+          } else if ($fri.html() == "Half Day"){
+            $fri.attr("class","half");
+          } else if ($fri.html() == "Holiday"){
+            $fri.attr("class","holiday");
+          } else if ($fri.html() == "Training"){
+            $fri.attr("class","training");
+          } else if ($fri.html() == "SL"){
+            $fri.attr("class","SL");
+          } else if ($fri.html() == "PL"){
+            $fri.attr("class","PL");
+          } else {
+            $fri.attr("class","attrition");
+          }
+
+          // Saturday
+          $sat = $('#sat_{{i.emp_id}}');
+          if ($sat.html() == "Unmarked") {
+            $sat.attr("class","unmarked");
+          } else if ($sat.html() == "present") {
+            $sat.attr("class","present");
+          } else if ($sat.html() == "Absent"){
+            $sat.attr("class","absent");
+          } else if ($sat.html() == "Week OFF"){
+            $sat.attr("class","week");
+          } else if ($sat.html() == "Comp OFF"){
+            $sat.attr("class","comp");
+          } else if ($sat.html() == "Half Day"){
+            $sat.attr("class","half");
+          } else if ($sat.html() == "Holiday"){
+            $sat.attr("class","holiday");
+          } else if ($sat.html() == "Training"){
+            $sat.attr("class","training");
+          } else if ($sat.html() == "SL"){
+            $sat.attr("class","SL");
+          } else if ($sat.html() == "PL"){
+            $sat.attr("class","PL");
+          } else {
+            $sat.attr("class","attrition");
+          }
+
+          // Sunday
+          $sun = $('#sun_{{i.emp_id}}');
+          if ($sun.html() == "Unmarked") {
+            $sun.attr("class","unmarked");
+          } else if ($sun.html() == "present") {
+            $sun.attr("class","present");
+          } else if ($sun.html() == "Absent"){
+            $sun.attr("class","absent");
+          } else if ($sun.html() == "Week OFF"){
+            $sun.attr("class","week");
+          } else if ($sun.html() == "Comp OFF"){
+            $sun.attr("class","comp");
+          } else if ($sun.html() == "Half Day"){
+            $sun.attr("class","half");
+          } else if ($sun.html() == "Holiday"){
+            $sun.attr("class","holiday");
+          } else if ($sun.html() == "Training"){
+            $sun.attr("class","training");
+          } else if ($sun.html() == "SL"){
+            $sun.attr("class","SL");
+          } else if ($sun.html() == "PL"){
+            $sun.attr("class","PL");
+          } else {
+            $sun.attr("class","attrition");
+          }
+      {% endfor %}
+
+        $('#datatable_week').DataTable({
+              dom: 'lBfrtip',
+              buttons: [
+                    {
+                        extend: "copy",
+                        className: "btn btn-success btn-sm ml-1"
+                    },
+                    {
+                        extend: "csv",
+                        className: "btn btn-success btn-sm ml-1"
+                    },
+                    {
+                        extend: "excel",
+                        className: "btn btn-success btn-sm ml-1"
+                    },
+                ],
+                responsive: true,
+                "pageLength": 50
+          } );
+      } );
+    </script>
+{% endblock %}

@@ -7,25 +7,30 @@ from django.shortcuts import render, redirect
 from .models import *
 from calendar import Calendar, monthrange
 from django.contrib import messages
-from datetime import date, timedelta
+from datetime import timedelta
 import calendar
+from datetime import date
+from django.db.models import Q
+c = Calendar()
+
+# Getting Model from other Apps
 from django.apps import apps
 Employee = apps.get_model('mapping', 'Employee')
 Profile = apps.get_model('mapping','Profile')
 
-c = Calendar()
-from datetime import date
-from django.db.models import Q
-
+# TL and AM List
 tl_am_list = ['Team Leader','Assistant Manager', 'Subject Matter Expert', 'Trainer','Learning and Development Head',
               'Process Trainer','Trainer Sales',
               ]
 
+# Manager List
 manager_list = ['Quality Head','Operations Manager','Service Delivery Manager','Command Centre Head']
 
+# HR List
 hr_list = ['HR','HR Manager','Manager ER','HR Lead','Sr Recruiter','MIS Executive HR',
 'Lead HRBP','Employee Relations Specialist','Payroll Specialist','Recruiter','HR Generalist']
 
+#Agent List
 agent_list = [ 'Client Relationship Officer ','MIS Executive','Patrolling officer',
                'Data Analyst','Business Development Executive','Content Developer',
                'Junior Developer','Web Developer','Trainee Developer',
@@ -37,14 +42,12 @@ def loginPage(request):
     logout(request)
     form = AuthenticationForm()
     teams = Campaigns.objects.all().order_by('name')
-
     data = {'teams':teams,'form':form}
     return render(request,'ams/login.html',data)
 
 def loginAndRedirect(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)  # Login form
-        team = request.POST['team']
 
         if form.is_valid():
             # login the user
@@ -53,11 +56,6 @@ def loginAndRedirect(request):
 
             if request.user.profile.pc == False:
                 return redirect('/ams/change-password')
-
-            if team != request.user.profile.emp_process:
-                logout(request)
-                messages.info(request,'Invalid Team')
-                return redirect('/ams')
 
             if request.user.profile.emp_desi in tl_am_list:
                 return redirect('/ams/tl-dashboard')
@@ -444,7 +442,8 @@ def hrDashboard(request):
 
         # Att Request Count
         att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False).count()
-        attrition_request_count = EcplCalander.objects.filter(att_actual='Attrition').distinct().count()
+
+        attrition_request_count = AgentActiveStatusHist.objects.all().count()
 
         # Month view
         ########### Month View ############
@@ -1149,6 +1148,7 @@ def teamAttendance(request):
         emp_s = Employee.objects.filter(Q(emp_rm1=user_nm) | Q(emp_rm2=user_nm) | Q(emp_rm3=user_nm),agent_status = 'Active')
         if emp_s.count()<1:
             return HttpResponse('<h1>RM1 name and user name not matching </h1>')
+
         ############## Todays Attendance ###################
         todays_list_list = []
         for i in emp_s:
@@ -1280,7 +1280,6 @@ def viewTeamAttendance(request):
 
         if emp_id == 'All':
 
-
             all_emp = Employee.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=rm) | Q(emp_rm2=rm) | Q(emp_rm3=rm))
 
             agt_cal_list = []
@@ -1298,6 +1297,10 @@ def viewTeamAttendance(request):
                         agt_cal['approved_on'] = agt_calendar.approved_on
                         agt_cal['team'] = agt_calendar.team
                         agt_cal['emp_name'] = agt_calendar.emp_name
+                        agt_cal['emp_id'] = agt_calendar.emp_id
+                        agt_cal['rm1'] = agt_calendar.rm1
+                        agt_cal['rm2'] = agt_calendar.rm2
+                        agt_cal['rm3'] = agt_calendar.rm3
 
 
                     except EcplCalander.DoesNotExist:
@@ -1306,6 +1309,10 @@ def viewTeamAttendance(request):
                         agt_cal['approved_on'] = 'NA'
                         agt_cal['team'] = j.emp_process
                         agt_cal['emp_name'] = j.emp_name
+                        agt_cal['emp_id'] = j.emp_id
+                        agt_cal['rm1'] = j.emp_rm1
+                        agt_cal['rm2'] = j.emp_rm2
+                        agt_cal['rm3'] = j.emp_rm3
 
 
                     agt_cal_list.append(agt_cal)
@@ -1330,6 +1337,10 @@ def viewTeamAttendance(request):
                 agt_cal['approved_on'] = agt_calendar.approved_on
                 agt_cal['team'] = agt_calendar.team
                 agt_cal['emp_name'] = agt_calendar.emp_name
+                agt_cal['emp_id'] = agt_calendar.emp_id
+                agt_cal['rm1'] = agt_calendar.rm1
+                agt_cal['rm2'] = agt_calendar.rm2
+                agt_cal['rm3'] = agt_calendar.rm3
 
             except EcplCalander.DoesNotExist:
                 agt_cal['date'] = i
@@ -1337,6 +1348,10 @@ def viewTeamAttendance(request):
                 agt_cal['approved_on'] = 'NA'
                 agt_cal['team'] = 'NA'
                 agt_cal['emp_name'] = emp_obj.emp_name
+                agt_cal['emp_id'] = emp_obj.emp_id
+                agt_cal['rm1'] = emp_obj.emp_rm1
+                agt_cal['rm2'] = emp_obj.emp_rm2
+                agt_cal['rm3'] = emp_obj.emp_rm3
 
             agt_cal_list.append(agt_cal)
 
@@ -1350,6 +1365,62 @@ def viewTeamAttendance(request):
 
     else:
         return HttpResponse('<h2>*** GET not available ***</h2>')
+
+
+def weekAttendanceReport(request):
+    empobj = Employee.objects.get(emp_id = request.user.profile.emp_id)
+    day = date.today()
+    start = day - timedelta(days=day.weekday())
+    start = start + timedelta(days=-1)
+
+    start_year = start.year
+    start_month = start.month
+    start_day = start.day
+    end = start + timedelta(days=6)
+
+    start = date(start_year, start_month, start_day)
+    end_year = end.year
+    end_month = end.month
+    end_day = end.day
+    end = date(end_year, end_month, end_day)
+    weeks = ['sund', 'mon', 'tue', 'wed', 'thur', 'fri', 'sat']
+    emp_id_list = []
+    ems = Employee.objects.filter(emp_rm1=request.user.profile.emp_name)
+    for i in ems:
+        emp_id_list.append(i.emp_id)
+    weekdays = []
+    delta = timedelta(days=1)
+    while start <= end:
+        weekdays.append(start.strftime("%Y-%m-%d"))
+        start += delta
+    lst = []  # main data
+    for j in emp_id_list:
+        if len(emp_id_list) > 0:
+            emp = Employee.objects.get(emp_id=j)
+        else:
+            break
+        samp = {}
+        samp['name'] = emp.emp_name
+        samp["emp_id"] = emp.emp_id
+        for i in weekdays:
+            try:
+                calobj = EcplCalander.objects.get(date=i, emp_id=j)
+                att = calobj.att_actual
+                samp[i] = att
+            except EcplCalander.DoesNotExist:
+                att = 'Unmarked'
+                samp[i] = att
+        ### making key static
+        j = 0
+        for i in weekdays:
+            a = weeks[j]
+            samp[a] = samp[i]
+            del samp[i]
+            j += 1
+        lst.append(samp)
+    data = {"cal": lst,'emp':empobj}
+    return render(request, 'ams/week_attendace_report.html', data)
+
 
 @login_required
 def teamAttendanceReport(request):
@@ -1922,49 +1993,38 @@ def editAgentStatus(request):
         return HttpResponse('<h1>Not Get Method</h1>')
 
 @login_required
-def viewAttrition(request):
+def viewAttrition(request): # For all Agent Status CHanges >>
+
     emp_idd = request.user.profile.emp_id
     emp = Employee.objects.get(emp_id=emp_idd)
 
     if request.method == 'POST':
 
-        emp_id = request.POST['emp_id']
-        try:
-            prof = Profile.objects.get(emp_id = emp_id)
-            prof.agent_status = 'Attrition'
-            prof.save()
+        id = request.POST['id']
+        new_status = request.POST['new_status']
+        hr_response = request.POST['hr_response']
 
-        except Profile.DoesNotExist:
-            messages.info(request,'Incorrect Employee Id, Please contact Admin')
-            att = EcplCalander.objects.filter(att_actual='Attrition').distinct()
+        agnt = AgentActiveStatusHist.objects.get(id=id)
+        agnt.status_by_hr = new_status
+        agnt.hr_response = hr_response
+        agnt.ticket_status = True
+        agnt.approved_by = request.user.profile.emp_name
+        agnt.save()
 
-            data = {'att': att,'emp':emp}
-            return render(request, 'ams/view_attrition.html', data)
-
-        try:
-            prof = Employee.objects.get(emp_id = emp_id)
-            prof.agent_status = 'Attrition'
-            prof.save()
-
-        except Employee.DoesNotExist:
-            messages.info(request,'Incorrect Employee Id, Please contact Admin')
-            att = EcplCalander.objects.filter(att_actual='Attrition').distinct()
-
-            data = {'att': att,'emp':emp}
-            return render(request, 'ams/view_attrition.html', data)
-
-        cal = EcplCalander.objects.filter(emp_id=emp_id,att_actual='Attrition')
-        for i in cal:
-            i.att_actual = 'Attrition - approved'
-            i.save()
+        em = Employee.objects.get(emp_id=agnt.emp_id)
+        em.agent_status = new_status
+        em.save()
+        pr = Profile.objects.get(emp_id=agnt.emp_id)
+        pr.agent_status = new_status
+        pr.save()
 
 
-        att = EcplCalander.objects.filter(att_actual='Attrition').distinct()
+        att = AgentActiveStatusHist.objects.filter(ticket_status=False)
         data = {'att': att,'emp':emp}
         return render(request, 'ams/view_attrition.html', data)
 
     else:
-        att = EcplCalander.objects.filter(att_actual = 'Attrition').distinct()
+        att = AgentActiveStatusHist.objects.filter(ticket_status = False)
 
         data = {'att':att,'emp':emp}
         return render(request,'ams/view_attrition.html',data)
@@ -2114,6 +2174,32 @@ def approveAttendanceRequest(request):
         data = {'att_hist':att_hist,'emp':emp}
 
         return render(request,'ams/hr_attendance_correction.html',data)
+
+
+
+def applyEmpStatusChange(request):
+    if request.method == 'POST':
+        emp_id = request.POST['emp_id']
+        new_status = request.POST['newstatus']
+        reason = request.POST['reason']
+        emp = Employee.objects.get(emp_id=emp_id)
+
+        # Creating Ticket
+        t= AgentActiveStatusHist()
+        t.emp_id = emp_id
+        t.emp_name = emp.emp_name
+        t.current_status = emp.agent_status
+        t.new_status = new_status
+        t.date = datetime.now()
+        t.reason = reason
+        t.changed_by = request.user.profile.emp_name
+
+        t.save()
+        messages.info(request,'Ticket for agent status change has been submitted successfully ! ')
+        return redirect('/ams/rm-mapping-index')
+
+
+
 
 
 def startCalandarForAllAgents(request):

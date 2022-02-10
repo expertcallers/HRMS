@@ -109,6 +109,7 @@
           <!-- page content -->
         <div class="right_col" role="main">
           <div class="row">
+            <h2>Mapping Hierarchy <span style="font-size:10px">Direct Reporting</span></h2>
             <div class="col-md-12">
               <div class="tree">
                 <ul>
@@ -166,7 +167,8 @@
                           <td>{{e.emp_desi}}</td>
                           <td>{{e.emp_process}}</td>
                           <td>
-                            <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#e{{e.id}}">Edit</button>
+                            <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#map_{{e.id}}">Mapping</button>
+                            <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#status_{{e.id}}">Status</button>
                           </td>
                      </tr>
                     {% endfor %}
@@ -180,13 +182,88 @@
         <!-- /page content -->
     <!-- Modal -->
     {% for e in employees %}
-    <div class="modal fade" id="e{{e.id}}" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="status_{{e.id}}" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+        <form action="/ams/change-emp-status" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLong">Status - {{e.emp_name}} | {{e.emp_id}}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <div class="row">
+                <div class="col-md-12">
+                  <input type="hidden" value="{{e.emp_name}}" name="emp_name">
+                  <input type="hidden" value="{{e.emp_id}}" name="emp_id">
+                  <input type="hidden" value="{{e.emp_desi}}" name="emp_desi">
+                  <input type="hidden" value="{{e.emp_process}}" name="emp_process">
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+
+                    <label for="rm1_{{e.id}}">RM1</label>
+                    <input type="text" class="form-control" disabled value="{{e.emp_rm1}}">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="rm2_{{e.id}}">RM2</label>
+                    <input type="text" class="form-control" disabled value="{{e.emp_rm2}}">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="rm3_{{e.id}}">RM3</label>
+                    <input type="text" class="form-control" disabled value="{{e.emp_rm3}}">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="oldstatus_{{e.id}}">Current Status</label>
+                    <input type="text" class="form-control" id="oldstatus_{{e.id}}" disabled value="{{e.agent_status}}">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="newstatus_{{e.id}}">New Status</label>
+                    <select id="newstatus_{{e.id}}" class="form-control" name="newstatus" required>
+                      <option value="" disabled selected>Please Select</option>
+                      <option value="Attrition">Attrition</option>
+                      <option value="Bench">Bench</option>
+                      <option value="Training">Training</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="comment_{{e.id}}">Reason</label>
+                    <textarea class="form-control" id="comment_{{e.id}}" name="reason" required></textarea>
+                  </div>
+                </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" onclick="return confirmm();" class="btn btn-primary">Save changes</button>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+
+    <!-- Modal -->
+    {% for e in employees %}
+    <div class="modal fade" id="map_{{e.id}}" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
         <form action="/ams/create-mapping-ticket" method="POST" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">{{e.emp_name}} | {{e.emp_id}}</h5>
+            <h5 class="modal-title" id="exampleModalLongTitle">Mapping - {{e.emp_name}} | {{e.emp_id}}</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
