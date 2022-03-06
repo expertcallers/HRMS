@@ -1,0 +1,5 @@
+ecpl_hrms/db.sqlite3
+
+ecpl_hrms/mapping/__pycache__/models.cpython-310.pyc
+ecpl_hrms/mapping/__pycache__/views.cpython-310.pyc
+ecpl_hrms/ams/__pycache__/admin.cpython-310.pyc

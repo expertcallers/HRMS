@@ -173,7 +173,7 @@ def tlDashboard(request):
         today = date.today()
         today = str(today)
         # All Active Today
-        att_details = EcplCalander.objects.filter(date = today,rm1=emp_name)
+        att_details = EcplCalander.objects.filter(Q(date = today),Q(rm1=emp_name),~Q(att_actual='Unmarked'))
         #counts
         emp_count = Employee.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name)).distinct().count()
         present_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name),Q(date=today),Q(att_actual='present')).count()
@@ -213,7 +213,7 @@ def tlDashboard(request):
 
             dict = {}
             try:
-                st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id)).att_actual
+                st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id),~Q(att_actual='Unmarked')).att_actual
 
             except EcplCalander.DoesNotExist:
                 st = 'Unmarked'
@@ -351,7 +351,7 @@ def viewAndApproveLeaveRequestMgr(request):
             for i in month_days:
 
                 try:
-                    cal = EcplCalander.objects.get(date = i,emp_id=emp_id)
+                    cal = EcplCalander.objects.get(Q(date = i),Q(emp_id=emp_id),~Q(att_actual='Unmarked'))
                     cal.att_actual = att_actual
                     cal.save()
 
@@ -359,7 +359,7 @@ def viewAndApproveLeaveRequestMgr(request):
 
                     cal = EcplCalander.objects.create(
                             team=team, date=i, emp_id=emp_id,
-                            att_actual=att_actual, applied_status=True,
+                            att_actual=att_actual,
                             rm1=rm1, rm2=rm2, rm3=rm3,
                             approved_on=now, emp_desi=emp_desi, appoved_by=request.user.profile.emp_name,
                             emp_name=emp_name
@@ -940,7 +940,7 @@ def applyAttendace(request):
         team = request.POST['emp_team']
         now = datetime.now()
         try:
-            cal = EcplCalander.objects.get(date=ddate,emp_id=emp_id)
+            cal = EcplCalander.objects.get(Q(date=ddate),Q(emp_id=emp_id),~Q(att_actual='Unmarked'))
             messages.info(request,'*** Already Marked in Calendar, Please Refresh the page and try again ***')
             return redirect('/ams/team-attendance')
 
@@ -948,7 +948,7 @@ def applyAttendace(request):
 
             cal = EcplCalander.objects.create(
                 team = team, date = ddate, emp_id = emp_id,
-                att_actual = att_actual,applied_status = True,
+                att_actual = att_actual,
                 rm1 = rm1, rm2 = rm2, rm3 = rm3,
                 approved_on = now, emp_desi = emp_desi,appoved_by = request.user.profile.emp_name,
                 emp_name = emp_name
@@ -975,7 +975,7 @@ def newSingleAttandance(request):
         now = datetime.now()
 
         try:
-            cal = EcplCalander.objects.get(date=ddate,emp_id=emp_id)
+            cal = EcplCalander.objects.get(Q(date=ddate),Q(emp_id=emp_id),~Q(att_actual='Unmarked'))
             messages.info(request,'*** Already Marked in Calendar, Please Refresh the page and try again ***')
             return redirect('/ams/team-attendance')
 
@@ -983,7 +983,7 @@ def newSingleAttandance(request):
 
             cal = EcplCalander.objects.create(
                 team=team, date=ddate, emp_id=emp_id,
-                att_actual=att_actual, applied_status=True,
+                att_actual=att_actual,
                 rm1=rm1, rm2=rm2, rm3=rm3,
                 approved_on=now, emp_desi=emp_desi, appoved_by=request.user.profile.emp_name,
                 emp_name=emp_name
@@ -1003,7 +1003,7 @@ def newSingleAttandance(request):
         for i in emp_s:
             todays_list = {}
             try:
-                cal_day = EcplCalander.objects.get(date=today, applied_status=True, emp_id=i.emp_id)
+                cal_day = EcplCalander.objects.get(Q(date=today),Q(emp_id=i.emp_id),~Q(att_actual='Unmarked'))
                 tdy_date = today
                 todays_list['id'] = i.id
                 todays_list['emp_id'] = i.emp_id
@@ -1015,6 +1015,8 @@ def newSingleAttandance(request):
                 todays_list['rm3'] = i.emp_rm3
                 todays_list['emp_desi'] = i.emp_desi
                 todays_list['emp_team'] = i.emp_process
+
+                print('-----------------')
 
             except EcplCalander.DoesNotExist:
                 tdy_date = today
@@ -1036,7 +1038,7 @@ def newSingleAttandance(request):
         for i in emp_s:
             ystday_list = {}
             try:
-                cal_day = EcplCalander.objects.get(date=yesterday, applied_status=True, emp_id=i.emp_id)
+                cal_day = EcplCalander.objects.get(Q(date=yesterday),Q(emp_id=i.emp_id),~Q(att_actual='Unmarked'))
                 tdy_date = yesterday
                 ystday_list['id'] = i.id
                 ystday_list['emp_id'] = i.emp_id
@@ -1068,7 +1070,7 @@ def newSingleAttandance(request):
         for i in emp_s:
             dby_list = {}
             try:
-                cal_day = EcplCalander.objects.get(date=dby_date, applied_status=True, emp_id=i.emp_id)
+                cal_day = EcplCalander.objects.get(Q(date=dby_date), Q(emp_id=i.emp_id),~Q(att_actual='Unmarked'))
                 tdy_date = dby_date
                 dby_list['id'] = i.id
                 dby_list['emp_id'] = i.emp_id
@@ -1154,7 +1156,7 @@ def teamAttendance(request):
         for i in emp_s:
             todays_list = {}
             try:
-                cal_day = EcplCalander.objects.get(date=today, applied_status=True, emp_id=i.emp_id)
+                cal_day = EcplCalander.objects.get(Q(date=today), Q(emp_id=i.emp_id),~Q(att_actual = 'Unmarked'))
                 tdy_date = today
                 todays_list['id']=i.id
                 todays_list['emp_id']=i.emp_id
@@ -1187,7 +1189,7 @@ def teamAttendance(request):
         for i in emp_s:
             ystday_list = {}
             try:
-                cal_day = EcplCalander.objects.get(date=yesterday, applied_status=True, emp_id=i.emp_id)
+                cal_day = EcplCalander.objects.get(Q(date=yesterday), Q(emp_id=i.emp_id),~Q(att_actual = 'Unmarked'))
                 tdy_date = yesterday
                 ystday_list['id']=i.id
                 ystday_list['emp_id']=i.emp_id
@@ -1220,7 +1222,7 @@ def teamAttendance(request):
         for i in emp_s:
             dby_list = {}
             try:
-                cal_day = EcplCalander.objects.get(date=dby_date, applied_status=True, emp_id=i.emp_id)
+                cal_day = EcplCalander.objects.get(Q(date=dby_date), Q(emp_id=i.emp_id),~Q(att_actual = 'Unmarked'))
                 tdy_date = dby_date
                 dby_list['id']=i.id
                 dby_list['emp_id']=i.emp_id
@@ -2042,7 +2044,8 @@ def attendanceCorrection(request):
         emp_obj = Employee.objects.get(emp_id = emp_id)
 
         try:
-            cal = EcplCalander.objects.get(date = date,emp_id = emp_id)
+            cal = EcplCalander.objects.get(Q(date = date),Q(emp_id = emp_id),~Q(att_actual='Unmarked'))
+
 
         except EcplCalander.DoesNotExist:
             cal = {'date':date,'emp_name':emp_obj.emp_name,'emp_id':emp_id,'team':emp_obj.emp_process,'att_actual':'Unmarked'}
@@ -2088,7 +2091,6 @@ def applyCorrection(request):
             cal.att_actual = att_new
             cal.approved_on = datetime.today()
             cal.appoved_by =applied_by
-            cal.applied_status = True
             cal.rm1 = emp_obj.emp_rm1
             cal.rm2 = emp_obj.emp_rm2
             cal.rm3 = emp_obj.emp_rm3
@@ -2235,4 +2237,34 @@ def startCalandarForAllAgents(request):
                 cal.save()
 
 
+
+
+def test(request):
+
+    start_date = '21/02/22'
+    start_date = datetime.strptime(start_date, '%d/%m/%y').date()
+    end_date = '25/02/22'
+    end_date = datetime.strptime(end_date, '%d/%m/%y').date()
+    delta = end_date - start_date  # returns timedelta
+
+    date_list = []
+    for i in range(delta.days + 1):
+        day = start_date + timedelta(days=i)
+        date_list.append(day)
+
+    emps = Employee.objects.all()
+
+    for i in date_list:
+        for j in emps:
+            try:
+                cal = EcplCalander.objects.get(date=i, emp_id=j.emp_id)
+                print('Exist',i,j.emp_id)
+
+            except EcplCalander.DoesNotExist:
+
+                cal = EcplCalander.objects.create(date=i, emp_id=j.emp_id, team=j.emp_process, emp_name=j.emp_name,
+                                                  rm1=j.emp_rm1, rm2=j.emp_rm2, rm3=j.emp_rm3, emp_desi=j.emp_desi,
+                                                  att_actual='Unmarked')
+                cal.save()
+                print(cal.date,cal.emp_name)
 

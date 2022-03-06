@@ -2,8 +2,6 @@ from django.contrib.auth.models import User
 from django.db import models
 import datetime
 
-# Create your models here.
-
 class Employee(models.Model):
     emp_id = models.CharField(max_length=200,null=True)
     emp_name = models.CharField(max_length=200)
@@ -30,7 +28,7 @@ class Profile(models.Model):
     emp_rm2 = models.CharField(max_length=200)
     emp_rm3 = models.CharField(max_length=200)
     emp_process = models.CharField(max_length=200)
-    extra_id = models.IntegerField(default=1)
+
     pc = models.BooleanField(default=False)
     img = models.ImageField(upload_to='users/',default="users/default.png")
     doj = models.DateField(null=True,blank=True)

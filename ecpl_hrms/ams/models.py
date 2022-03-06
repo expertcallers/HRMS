@@ -11,7 +11,6 @@ class EcplCalander(models.Model):
     att_actual = models.CharField(max_length=50,null=True)
     approved_on = models.DateTimeField(null=True)
     appoved_by = models.CharField(max_length=300,null=True)
-    applied_status = models.BooleanField(default=False)
     rm1 = models.CharField(max_length=200,null=True)
     rm2 = models.CharField(max_length=200, null=True)
     rm3 = models.CharField(max_length=200, null=True)
@@ -183,19 +182,6 @@ class LeaveTable(models.Model):
     emp_rm2 = models.CharField(max_length=50, null=True)
     emp_rm3 = models.CharField(max_length=50, null=True)
 
-# Agent status change history - att - ben - training +
-class AgentActiveStatusHist(models.Model):
-    emp_id = models.CharField(max_length=20,null=True,blank=True)
-    emp_name = models.CharField(max_length=30,null=True,blank=True)
-    current_status = models.CharField(max_length=20,null=True,blank=True)
-    new_status = models.CharField(max_length=20,null=True,blank=True)
-    date = models.DateField()
-    reason = models.TextField()
-    changed_by = models.CharField(max_length=30)
-    approved_by = models.CharField(max_length=50)
-    hr_response = models.TextField(null=True,blank=True)
-    status_by_hr = models.CharField(max_length=50)
-    ticket_status = models.BooleanField(default=False)
 
 # Attendance correction history - send - approve ++
 class AttendanceCorrectionHistory(models.Model):
@@ -215,6 +201,18 @@ class AttendanceCorrectionHistory(models.Model):
     reason = models.TextField(null=True,blank=True)
 
 
-
+# Agent status change history - att - ben - training +
+class AgentActiveStatusHist(models.Model):
+    emp_id = models.CharField(max_length=20,null=True,blank=True)
+    emp_name = models.CharField(max_length=30,null=True,blank=True)
+    current_status = models.CharField(max_length=20,null=True,blank=True)
+    new_status = models.CharField(max_length=20,null=True,blank=True)
+    date = models.DateField()
+    reason = models.TextField()
+    changed_by = models.CharField(max_length=30)
+    approved_by = models.CharField(max_length=50)
+    hr_response = models.TextField(null=True,blank=True)
+    status_by_hr = models.CharField(max_length=50)
+    ticket_status = models.BooleanField(default=False)
 
 

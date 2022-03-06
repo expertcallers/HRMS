@@ -90,4 +90,6 @@ urlpatterns = [
 
     # calnder Start
     #path('start-calander',startCalandarForAllAgents)
+
+    path('test',test),
 ]

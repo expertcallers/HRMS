@@ -9,5 +9,5 @@ admin.site.register(Campaigns)
 
 admin.site.register(EmployeeLeaveBalance)
 admin.site.register(AgentActiveStatusHist)
-admin.site.register(AgentActiveStatusHist)
+
 
