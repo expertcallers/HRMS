@@ -168,7 +168,7 @@ def updateToSystem(request):
 
 
 def createUserandProfile(request): # Need to work
-    emp = Profile.objects.all()
+    emp = Data.objects.all()
     for i in emp:
         user = User.objects.filter(username=i.emp_id)
         if user.exists():
@@ -180,9 +180,14 @@ def createUserandProfile(request): # Need to work
                 profile = Profile.objects.create(
                     emp_id=i.emp_id, emp_name=i.emp_name, emp_desi=i.emp_desi,
                     emp_rm1=i.emp_rm1, emp_rm2=i.emp_rm2, emp_rm3=i.emp_rm3,
-                    emp_process=i.emp_process, user=usr
+                    emp_process=i.emp_process, user=usr, 
+                    emp_rm1_id = i.emp_rm1_id,
+                    emp_rm2_id = i.emp_rm2_id,
+                    emp_rm3_id = i.emp_rm3_id,
+                    emp_process_id = i.emp_process_id,
                 )
                 profile.save()
+                
 
         else:
             user = User.objects.create_user(username=i.emp_id, password=str(i.emp_id))
@@ -191,7 +196,11 @@ def createUserandProfile(request): # Need to work
             profile = Profile.objects.create(
                 emp_id = i.emp_id,emp_name = i.emp_name, emp_desi = i.emp_desi,
                 emp_rm1 = i.emp_rm1, emp_rm2 = i.emp_rm2, emp_rm3 = i.emp_rm3,
-                emp_process = i.emp_process, user = usr
+                emp_process = i.emp_process, user = usr,
+                 emp_rm1_id = i.emp_rm1_id,
+                    emp_rm2_id = i.emp_rm2_id,
+                    emp_rm3_id = i.emp_rm3_id,
+                    emp_process_id = i.emp_process_id,
                                           )
             profile.save()
 
