@@ -71,7 +71,7 @@ def change_password(request): # Corrected
             user.save()
             user.profile.save()
             logout(request)
-            return redirect('/')
+            return redirect('/mapping/login')
         else:
             messages.error(request, 'Please correct the error below.')
     else:
@@ -220,7 +220,8 @@ def exportMapping(request):
     import xlwt
 
     if request.method == 'POST':
-        team = request.POST['team']
+        team_id = request.POST['team_id']
+        print(team_id)
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="mapping.xls"'
         wb = xlwt.Workbook(encoding='utf-8')
@@ -239,12 +240,12 @@ def exportMapping(request):
         # Sheet body, remaining rows
         font_style = xlwt.XFStyle()
 
-        if team =='all':
+        if team_id =='all':
             rows = Profile.objects.all().values_list(
             'emp_id', 'emp_name', 'emp_desi', 'emp_rm1', 'emp_rm2', 'emp_rm3', 'emp_process'
             )
         else:
-            rows = Profile.objects.filter(emp_process = team).values_list(
+            rows = Profile.objects.filter(emp_process_id = team_id).values_list(
                 'emp_id', 'emp_name', 'emp_desi', 'emp_rm1', 'emp_rm2', 'emp_rm3', 'emp_process'
                 )
 
