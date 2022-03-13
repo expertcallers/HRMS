@@ -5,10 +5,8 @@ from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import *
-
 from django.apps import apps
 Campaigns = apps.get_model('ams', 'Campaigns')
-
 from django.db.models import Avg, Max, Min, Sum, Q
 from itertools import chain
 manager_list = ['Associate Director','Assistant Manager','Team Leader','Operations Manager','Trainer','Command Centre Head','Process Trainer','Learning and Development Head','Service Delivery Manager','Trainer Sales',
@@ -16,36 +14,29 @@ manager_list = ['Associate Director','Assistant Manager','Team Leader','Operatio
 
 # Create your views here.
 @login_required
-def employeeMapping(request):
+def employeeMapping(request): # Corrected
     if request.method == 'POST':
-
         emp_name = request.POST['emp_name']
-        employees = Employee.objects.filter(agent_status = 'Active',emp_name__icontains=emp_name)
+        employees = Profile.objects.filter(agent_status = 'Active',emp_name__icontains=emp_name)
         if employees:
             messages.info(request,'Search Result')
         else:
             messages.info(request,'The requested employee not found')
-
-        ## Largest Employee ID
-        emp = Employee.objects.all().order_by('-emp_id')[:1]
-
+        ## Last Added Employee ID
+        emp = Profile.objects.all().order_by('-id')[:1]
         teams = Campaigns.objects.all()
         data = {'employees': employees,'teams':teams,'emp_name':emp_name,'emp':emp}
         return render(request, 'mapping/index.html', data)
     else:
-
-        ## Largest Employee ID
-        emp = Employee.objects.all().order_by('-emp_id')[:1]
-
-        employees = Employee.objects.all()
+        ## Last Added Employee ID
+        emp = Profile.objects.all().order_by('-id')[:1]
+        employees = Profile.objects.all()
         teams = Campaigns.objects.all()
         data = {'employees':employees,'teams':teams,'emp':emp}
         return render(request,'mapping/index.html',data)
 
-def mappingLogin(request):
-
+def mappingLogin(request): # Corrected
     if request.method == 'POST':
-
         form = AuthenticationForm(data=request.POST)  # Login form
         if form.is_valid():
             # login the user
@@ -53,7 +44,6 @@ def mappingLogin(request):
             login(request, user)
             if request.user.profile.pc == False:
                 return redirect('/mapping/change-password')
-
             return redirect('/mapping/home')
         else:
             form = AuthenticationForm()
@@ -64,13 +54,12 @@ def mappingLogin(request):
         form = AuthenticationForm()
         return render(request, 'mapping/login.html', {'form': form})
 
-
-def mappingLogout(request):
+def mappingLogout(request): # Corrected
     logout(request)
     return redirect('/mapping/login')
 
 @login_required
-def change_password(request):
+def change_password(request): # Corrected
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
@@ -90,25 +79,25 @@ def change_password(request):
     return render(request,'mapping/change-password.html', {'form': form})
 
 
-@login_required
+@login_required # Corrected
 def teamWiseData(request):
     if request.method == 'POST':
-        team = request.POST['team']
-        employees = Employee.objects.filter(emp_process=team,agent_status = 'Active')
+        team_id = request.POST['team_id']
+        employees = Profile.objects.filter(emp_process_id=team_id,agent_status = 'Active')
         messages.info(request, 'Search Result')
         teams = Campaigns.objects.all()
         data = {'employees': employees,'teams':teams}
         return render(request, 'mapping/index.html', data)
     else:
-        employees = Employee.objects.all()
+        employees = Profile.objects.all()
         data = {'employees':employees}
         return render(request,'mapping/index.html',data)
 
+@login_required # Corrected
 def empIDwiseData(request):
-
     if request.method == 'POST':
         emp_id = request.POST['emp_id']
-        employees = Employee.objects.filter(emp_id=emp_id,agent_status = 'Active')
+        employees = Profile.objects.filter(emp_id=emp_id,agent_status = 'Active')
         if employees:
             messages.info(request,'Search Result')
         else:
@@ -118,76 +107,59 @@ def empIDwiseData(request):
         data = {'employees': employees,'teams':teams,'emp_id':emp_id}
         return render(request, 'mapping/index.html', data)
     else:
-
-        employees = Employee.objects.all()
+        employees = Profile.objects.all()
         teams = Campaigns.objects.all()
         data = {'employees': employees, 'teams': teams}
         return render(request, 'mapping/index.html', data)
 
 
-@login_required
+@login_required # Corrected
 def updateEmployeeProfile(request):
     if request.method == 'POST':
         emp_id = request.POST['emp_id']
-        emp = Employee.objects.get(emp_id = emp_id)
+        emp = Profile.objects.get(emp_id = emp_id)
         teams = Campaigns.objects.all()
-        desis = Employee.objects.values_list('emp_desi', flat=True).distinct()
-
-
-        rm1s = Employee.objects.values_list('emp_rm1',flat=True).distinct()
-        rm2s = Employee.objects.values_list('emp_rm2',flat=True).distinct()
-        rm3s = Employee.objects.values_list('emp_rm3',flat=True).distinct()
-
-        rms = Employee.objects.filter(emp_desi__in = manager_list,agent_status = 'Active')
-
-        data = {'emp':emp,'teams':teams,'desis':desis,'rm1s':rm1s,'rm2s':rm2s,'rm3s':rm3s,
-
-                'rms':rms}
-
+        desis = Profile.objects.values_list('emp_desi', flat=True).distinct()
+        rms = Profile.objects.filter(emp_desi__in = manager_list,agent_status = 'Active')
+        data = {'emp':emp,'teams':teams,'desis':desis,'rms':rms}
         return render(request,'mapping/update-to-database.html',data)
     else:
-        employees = Employee.objects.all().order_by('emp_name')
+        employees = Profile.objects.all().order_by('emp_name')
         teams = Campaigns.objects.all()
         data = {'employees':employees,'teams':teams}
         return render(request,'mapping/update-employee-profile.html',data)
 
-@login_required
+@login_required # Corrected
 def updateToSystem(request):
     if request.method == 'POST':
         userr = request.user.profile.emp_name
         emp_name = request.POST['emp_name']
         emp_id = request.POST['emp_id']
         emp_desi = request.POST['emp_desi']
-        emp_process = request.POST['emp_process']
-        emp_rm1 = request.POST['emp_rm1']
-        emp_rm2 = request.POST['emp_rm2']
-        emp_rm3 = request.POST['emp_rm3']
-        history = emp_rm1 +"/" + emp_rm2+"/" + emp_rm3
-
-        id = request.POST['id']
+        emp_process_id = request.POST['emp_process_id']
+        emp_rm1_id = request.POST['emp_rm1_id']
+        emp_rm2_id = request.POST['emp_rm2_id']
+        emp_rm3_id = request.POST['emp_rm3_id']
+        history = emp_rm1_id +"/" + emp_rm2_id+"/" + emp_rm3_id
         pfl = Profile.objects.get(emp_id = emp_id)
+        rm1 = Profile.objects.get(emp_id = emp_rm1_id).emp_name
+        rm2 = Profile.objects.get(emp_id = emp_rm2_id).emp_name
+        rm3 = Profile.objects.get(emp_id = emp_rm3_id).emp_name
+        process = Campaigns.objects.get(id=emp_process_id).name
         pfl.emp_name = emp_name
         pfl.emp_id = emp_id
         pfl.emp_desi = emp_desi
-        pfl.emp_process = emp_process
-        pfl.emp_rm1 = emp_rm1
-        pfl.emp_rm2 = emp_rm2
-        pfl.emp_rm3 = emp_rm3
+        pfl.emp_process_id = emp_process_id
+        pfl.emp_rm1_id = emp_rm1_id
+        pfl.emp_rm2_id = emp_rm2_id
+        pfl.emp_rm3_id = emp_rm3_id
+        pfl.emp_rm1 = rm1
+        pfl.emp_rm2 = rm2
+        pfl.emp_rm3 = rm3
         pfl.save()
-
-        emp = Employee.objects.get(id=id)
-        emp.emp_name = emp_name
-        emp.emp_id = emp_id
-        emp.emp_desi = emp_desi
-        emp.emp_process = emp_process
-        emp.emp_rm1 = emp_rm1
-        emp.emp_rm2 = emp_rm2
-        emp.emp_rm3 = emp_rm3
-        emp.save()
         mh = MappingHistory.objects.create(
-            updated_by = userr,emp_name = emp_name, emp_id=emp_id, rm1=emp_rm1, rm2=emp_rm2, rm3=emp_rm3, team = emp_process,
-            history=history,
-            )
+            updated_by = userr,emp_name = emp_name, emp_id=emp_id, rm1=rm1, rm2=rm2, rm3=rm3, team = process,
+            history=history)
         mh.save()
         messages.info(request,'Employee Profile updated successfully !')
         return redirect('/mapping/home')
@@ -195,111 +167,8 @@ def updateToSystem(request):
         return redirect('/mapping/login')
 
 
-# Update Team's RMS
-
-def updateTeamRms(request):
-    if request.method == 'POST':
-        team = request.POST['team']
-        rm1s = Employee.objects.filter(emp_process=team).values_list('emp_rm1',flat=True).distinct().order_by(
-            'emp_rm1')
-        rm2s = Employee.objects.filter(emp_process=team).values_list('emp_rm2', flat=True).distinct().order_by(
-            'emp_rm2')
-        rm3s = Employee.objects.filter(emp_process=team).values_list('emp_rm3', flat=True).distinct().order_by(
-            'emp_rm3')
-        data = {'rm1s':rm1s,'rm2s':rm2s,'rm3s':rm3s,'team':team}
-        return render(request,'mapping/update-team-rms.html',data)
-
-    else:
-        pass
-
-
-def updateRM1forTeam(request,rm1,team):
-    rms = Employee.objects.exclude(emp_desi='Client Relationship Officer')
-    data = {'team':team,'rm1':rm1,'rms':rms}
-    return render(request,'mapping/rm1-team-details.html',data)
-
-def updateTeamRm1(request):
-    if request.method == 'POST':
-        userr = request.user.profile.emp_name
-        team = request.POST['team']
-        rm1 = request.POST['rm1']
-        new_rm1 = request.POST['new_rm1']
-
-        rm = Employee.objects.filter(emp_process = team, emp_rm1 = rm1,agent_status = 'Active')
-        for i in rm:
-            i.emp_rm1 = new_rm1
-            i.save()
-
-        pfl = Profile.objects.filter(emp_process = team, emp_rm1 = rm1)
-        for j in pfl:
-            j.emp_rm1 = new_rm1
-            j.save()
-
-        mh = MappingHistoryTeam.objects.create(updated_by = userr,team = team,category = "RM 1", new_value = new_rm1)
-        mh.save()
-        messages.info(request, 'Team RM1 updated successfully !')
-        return redirect('/mapping/home')
-
-# rm2
-def updateRM2forTeam(request,rm2,team):
-    rms = Employee.objects.exclude(emp_desi='Client Relationship Officer')
-    data = {'team':team,'rm2':rm2,'rms':rms}
-    return render(request,'mapping/rm2-team-details.html',data)
-
-def updateTeamRm2(request):
-    if request.method == 'POST':
-        userr = request.user.profile.emp_name
-        team = request.POST['team']
-        rm2 = request.POST['rm2']
-        new_rm2 = request.POST['new_rm2']
-
-        rm = Employee.objects.filter(emp_process = team, emp_rm2 = rm2,agent_status = 'Active')
-        for i in rm:
-            i.emp_rm2 = new_rm2
-            i.save()
-
-        pfl = Profile.objects.filter(emp_process=team, emp_rm2 = rm2)
-        for j in pfl:
-            j.emp_rm2 = new_rm2
-            j.save()
-
-        mh = MappingHistoryTeam.objects.create(updated_by=userr, team=team, category="RM 2", new_value=new_rm2)
-        mh.save()
-        messages.info(request, 'Team RM2 updated successfully !')
-        return redirect('/mapping/home')
-
-# rm3
-def updateRM3forTeam(request,rm3,team):
-    rms = Employee.objects.exclude(emp_desi='Client Relationship Officer')
-    data = {'team':team,'rm3':rm3,'rms':rms}
-    return render(request,'mapping/rm3-team-details.html',data)
-
-def updateTeamRm3(request):
-    if request.method == 'POST':
-        userr = request.user.profile.emp_name
-        team = request.POST['team']
-        rm3 = request.POST['rm3']
-        new_rm3 = request.POST['new_rm3']
-
-        rm = Employee.objects.filter(emp_process = team, emp_rm3 = rm3,agent_status = 'Active')
-        for i in rm:
-            i.emp_rm3 = new_rm3
-            i.save()
-
-        pfl = Profile.objects.filter(emp_process=team, emp_rm3 = rm3)
-        for j in pfl:
-            j.emp_rm3 = new_rm3
-            j.save()
-
-        mh = MappingHistoryTeam.objects.create(updated_by=userr, team=team, category="RM 3", new_value=new_rm3)
-        mh.save()
-        messages.info(request, 'Team RM3 updated successfully !')
-        return redirect('/mapping/home')
-
-
-def createUserandProfile(request):
-
-    emp = Employee.objects.all()
+def createUserandProfile(request): # Need to work
+    emp = Profile.objects.all()
     for i in emp:
         user = User.objects.filter(username=i.emp_id)
         if user.exists():
@@ -330,10 +199,8 @@ def createUserandProfile(request):
 
 
 def correct_process(request):
-
-    e = Employee.objects.all()
+    e = Profile.objects.all()
     for i in e:
-
         process = str(i.emp_process)
         i.emp_process = process
         i.save()
@@ -364,11 +231,11 @@ def exportMapping(request):
         font_style = xlwt.XFStyle()
 
         if team =='all':
-            rows = Employee.objects.all().values_list(
+            rows = Profile.objects.all().values_list(
             'emp_id', 'emp_name', 'emp_desi', 'emp_rm1', 'emp_rm2', 'emp_rm3', 'emp_process'
             )
         else:
-            rows = Employee.objects.filter(emp_process = team).values_list(
+            rows = Profile.objects.filter(emp_process = team).values_list(
                 'emp_id', 'emp_name', 'emp_desi', 'emp_rm1', 'emp_rm2', 'emp_rm3', 'emp_process'
                 )
 
@@ -385,23 +252,17 @@ def exportMapping(request):
 
         return response
 
-def nameChanger(request):
-    emp_new_rm1 = 'Harish Kumar S'
-    emp = Employee.objects.filter(emp_rm1='Harish Kumar',emp_process='Gubagoo',agent_status = 'Active')
-    for i in emp:
-        i.emp_rm1 = emp_new_rm1
-        i.save()
-
-
+@login_required # Corrected
 def searchForEmployee(request):
     emp_id = request.POST['emp_id']
     try:
-        emp = Employee.objects.get(emp_id=emp_id)
+        emp = Profile.objects.get(emp_id=emp_id)
         messages.info(request, 'Employee Found, Please select Below !')
-    except Employee.DoesNotExist:
+    except Profile.DoesNotExist:
         messages.info(request,'Not Found, Please search below !')
         emp=None
-    employees = Employee.objects.all().order_by('emp_name')
+    employees = Profile.objects.all().order_by('emp_name')
     teams = Campaigns.objects.all()
     data = {'emp':emp,'employees':employees,'teams':teams}
     return render(request,'mapping/update-employee-profile.html',data)
+    

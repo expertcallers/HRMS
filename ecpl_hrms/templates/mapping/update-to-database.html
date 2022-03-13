@@ -15,31 +15,31 @@
                    <p>Designation</p>
                    <input type="text" value="{{emp.emp_desi}}" name="emp_desi" class="form-control" readonly>
                    <p>Process</p>
-                   <select name="emp_process" id="" required class="form-control">
-                       <option value="{{emp.emp_process}}">{{emp.emp_process}}</option>
+                   <select name="emp_process_id" id="" required class="form-control">
+                       <option value="{{emp.emp_process_id}}">{{emp.emp_process}} - {{emp.emp_process_id}}</option>
                        {% for t in teams %}
-                       <option value="{{t.name}}">{{t.name}}</option>
+                       <option value="{{t.id}}">{{t.name}} - {{t.id}}</option>
                        {% endfor %}
                    </select>
                    <p>RM 1</p>
-                   <select name="emp_rm1" id="" required class="form-control">
-                       <option value="{{emp.emp_rm1}}">{{emp.emp_rm1}}</option>
+                   <select name="emp_rm1_id" id="" required class="form-control">
+                       <option value="{{emp.emp_rm1_id}}">{{emp.emp_rm1}} - {{emp.emp_rm1_id}}</option>
                        {% for t in rms %}
-                       <option value="{{t.emp_name}}">{{t.emp_name}} / {{t.emp_id}}</option>
+                       <option value="{{t.emp_id}}">{{t.emp_name}} / {{t.emp_id}}</option>
                        {% endfor %}
                    </select>
                    <p>RM 2</p>
-                   <select name="emp_rm2" id="" required class="form-control">
-                       <option value="{{emp.emp_rm2}}">{{emp.emp_rm2}}</option>
+                   <select name="emp_rm2_id" id="" required class="form-control">
+                       <option value="{{emp.emp_rm2_id}}">{{emp.emp_rm2}} - {{emp.emp_rm2_id}}</option>
                        {% for t in rms %}
-                       <option value="{{t.emp_name}}">{{t.emp_name}} / {{t.emp_id}}</option>
+                       <option value="{{t.emp_id}}">{{t.emp_name}} / {{t.emp_id}}</option>
                        {% endfor %}
                    </select>
                    <p>RM 3</p>
-                   <select name="emp_rm3" id="" required class="form-control">
-                       <option value="{{emp.emp_rm3}}">{{emp.emp_rm3}}</option>
+                   <select name="emp_rm3_id" id="" required class="form-control">
+                       <option value="{{emp.emp_rm3_id}}">{{emp.emp_rm3}} - {{emp.emp_rm3_id}}</option>
                        {% for t in rms %}
-                       <option value="{{t.emp_name}}">{{t.emp_name}} / {{t.emp_id}}</option>
+                       <option value="{{t.emp_id}}">{{t.emp_name}} / {{t.emp_id}}</option>
                        {% endfor %}
                    </select>
                    <br>

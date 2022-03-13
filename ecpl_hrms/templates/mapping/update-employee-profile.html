@@ -11,7 +11,7 @@
                <form action="/mapping/update-employee-profile/empid-search" method="POST" enctype="multipart/form-data">
                     {% csrf_token %}
                    <label>Search By Emp ID</label>
-                   <input type="number" name="emp_id" required>
+                   <input type="text" name="emp_id" required>
                    <button type="submit">Search</button>
                </form>
            </div>
@@ -36,22 +36,6 @@
                    <button type="submit" class="btn btn-secondary" style="width: 100px;">Edit</button>
                </form>
            </div>
-       </div>
-       <div class="col-lg-6" style="padding: 100px 60px;background: #eeeeee;box-shadow: 2px 2px 10px lightgrey;">
-           <div>
-               <h4>Edit Team Profile</h4>
-           </div>
-           <form action="/mapping/update-team-rm" method="POST" enctype="multipart/form-data">
-                   {% csrf_token %}
-                   <p>Select Team</p>
-                   <select name="team" id="">
-                       {% for t in teams %}
-                       <option value="{{t.name}}">{{t.name}}</option>
-                       {% endfor %}
-                   </select>
-                   <br><br>
-                   <button type="submit" class="btn btn-secondary" style="width: 100px;">Edit</button>
-           </form>
        </div>
    </center>
 </div>

@@ -9,13 +9,11 @@
                     <h4><b><u>Features</u></b></h4>
                 </div>
                 <div>
-                    {% if user.username == '107' %}
                     <div style="margin: 0px 40px;">
                         <i class="fa fa-address-card" aria-hidden="true" style="font-size: 24px;"></i>
                         <h5>Update RM1, RM2, RM3 and Team</h5>
                         <a href="/mapping/update-employee-profile">Click Here !</a>
                     </div>
-                    {% endif %}
                 </div>
                 <div style="margin-top:50px">
                     <div style="margin: 0px 40px;">
@@ -24,10 +22,10 @@
                         <form action="/mapping/export-mapping" method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
                             <label for="">Select Team</label>
-                            <select name="team" id="" class="form-control">
+                            <select name="team_id" id="" class="form-control">
                                 <option value="all">All</option>
                                 {% for t in teams %}
-                                <option value="{{t.name}}">{{t.name}}</option>
+                                <option value='123'>{{t.name}}</option>
                                 {% endfor %}
                             </select>
                             <br>
@@ -35,7 +33,7 @@
                         </form>
                     </div>
                 </div>
-                <div style="margin:50px 0px">
+                <!--<div style="margin:50px 0px">
                     <h6><b><u>Last Updated Employee</u></b></h6>
                     <div style="margin:0px 40px">
                         {% for e in emp %}
@@ -47,7 +45,7 @@
                         <p>{{e.emp_process}}</p>
                         {% endfor %}
                     </div>
-                </div>
+                </div>-->
             </div>
         </div>
         <div class="col-lg-9" style="background: whitesmoke;margin: 0px;padding: 0px;">
@@ -86,9 +84,9 @@
                             <form action="/mapping/team-wise" method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                                 <h5>Team</h5>
-                                <select name="team" id="" class="form-control">
+                                <select name="team_id" id="" class="form-control">
                                     {% for t in teams %}
-                                    <option value="{{t.name}}">{{t.name}}</option>
+                                    <option value="{{t.id}}">{{t.name}}</option>
                                     {% endfor %}
                                 </select>
                                 <br>
@@ -131,19 +129,6 @@
                 </table>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-
-
-<div class="container-lg" style="margin-top:50px">
-    <div class="row">
-        <div class="col-lg-9">
-
-        </div>
-        <div class="col-lg-3">
-
         </div>
     </div>
 </div>
