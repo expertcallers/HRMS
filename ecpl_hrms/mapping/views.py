@@ -96,6 +96,7 @@ def teamWiseData(request):
 @login_required # Corrected
 def empIDwiseData(request):
     if request.method == 'POST':
+        
         emp_id = request.POST['emp_id']
         employees = Profile.objects.filter(emp_id=emp_id,agent_status = 'Active')
         if employees:
@@ -150,6 +151,7 @@ def updateToSystem(request):
         pfl.emp_id = emp_id
         pfl.emp_desi = emp_desi
         pfl.emp_process_id = emp_process_id
+        pfl.emp_process = process
         pfl.emp_rm1_id = emp_rm1_id
         pfl.emp_rm2_id = emp_rm2_id
         pfl.emp_rm3_id = emp_rm3_id
@@ -221,7 +223,6 @@ def exportMapping(request):
 
     if request.method == 'POST':
         team_id = request.POST['team_id']
-        print(team_id)
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="mapping.xls"'
         wb = xlwt.Workbook(encoding='utf-8')
