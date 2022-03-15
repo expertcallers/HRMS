@@ -9,42 +9,57 @@ from django.apps import apps
 Campaigns = apps.get_model('ams', 'Campaigns')
 from django.db.models import Avg, Max, Min, Sum, Q
 from itertools import chain
-manager_list = ['Associate Director','Assistant Manager','Team Leader','Operations Manager','Trainer','Command Centre Head','Process Trainer','Learning and Development Head','Service Delivery Manager','Trainer Sales',
-                        'Team Leader - GB','Head-CC','Quality Head']
+import xlwt
 
-# Create your views here.
+# Manager List
+manager_list = ['Team Leader','Assistant Manager','Subject Matter Expert', 'Trainer','Learning and Development Head',
+              'Process Trainer','Trainer Sales',
+              'Quality Head','Operations Manager','Service Delivery Manager','Command Centre Head',
+              'HR','HR Manager','Manager ER','HR Lead','Sr Recruiter','MIS Executive HR',
+              'Lead HRBP','Employee Relations Specialist','Payroll Specialist','Recruiter','HR Generalist',
+              ]
+
+# Mapping Home Page
 @login_required
-def employeeMapping(request): # Corrected
-    if request.method == 'POST':
-        emp_name = request.POST['emp_name']
-        employees = Profile.objects.filter(agent_status = 'Active',emp_name__icontains=emp_name)
-        if employees:
-            messages.info(request,'Search Result')
+def employeeMapping(request): 
+    if request.user.profile.emp_desi in manager_list:
+        if request.method == 'POST':
+            emp_name = request.POST['emp_name']
+            employees = Profile.objects.filter(agent_status = 'Active',emp_name__icontains=emp_name)
+            if employees:
+                messages.info(request,'Search Result')
+            else:
+                messages.info(request,'The requested employee not found')
+            teams = Campaigns.objects.all()
+            data = {'employees': employees,'teams':teams,'emp_name':emp_name,}
+            return render(request, 'mapping/index.html', data)
         else:
-            messages.info(request,'The requested employee not found')
-        ## Last Added Employee ID
-        emp = Profile.objects.all().order_by('-id')[:1]
-        teams = Campaigns.objects.all()
-        data = {'employees': employees,'teams':teams,'emp_name':emp_name,'emp':emp}
-        return render(request, 'mapping/index.html', data)
+            employees = Profile.objects.all()
+            teams = Campaigns.objects.all()
+            data = {'employees':employees,'teams':teams,}
+            return render(request,'mapping/index.html',data)
     else:
-        ## Last Added Employee ID
-        emp = Profile.objects.all().order_by('-id')[:1]
-        employees = Profile.objects.all()
-        teams = Campaigns.objects.all()
-        data = {'employees':employees,'teams':teams,'emp':emp}
-        return render(request,'mapping/index.html',data)
+        logout(request)
+        form = AuthenticationForm()
+        m='Not Authorised to view this page !'
+        return render(request,'mapping/login.html',{'form':form,'m':m})
 
-def mappingLogin(request): # Corrected
+# Login Page 
+def mappingLogin(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)  # Login form
         if form.is_valid():
             # login the user
             user = form.get_user()
             login(request, user)
-            if request.user.profile.pc == False:
-                return redirect('/mapping/change-password')
-            return redirect('/mapping/home')
+            if request.user.profile.emp_desi in manager_list:
+                if request.user.profile.pc == False:
+                    return redirect('/mapping/change-password')
+                return redirect('/mapping/home')
+            else:
+                form = AuthenticationForm()
+                m='Not Authorised to view this page !'
+                return render(request,'mapping/login.html',{'form':form,'m':m})
         else:
             form = AuthenticationForm()
             m='Invalid Credentials !'
@@ -54,7 +69,7 @@ def mappingLogin(request): # Corrected
         form = AuthenticationForm()
         return render(request, 'mapping/login.html', {'form': form})
 
-def mappingLogout(request): # Corrected
+def mappingLogout(request):
     logout(request)
     return redirect('/mapping/login')
 
@@ -95,15 +110,13 @@ def teamWiseData(request):
 
 @login_required # Corrected
 def empIDwiseData(request):
-    if request.method == 'POST':
-        
+    if request.method == 'POST':        
         emp_id = request.POST['emp_id']
         employees = Profile.objects.filter(emp_id=emp_id,agent_status = 'Active')
         if employees:
             messages.info(request,'Search Result')
         else:
             messages.info(request,'The requested employee not found')
-
         teams = Campaigns.objects.all()
         data = {'employees': employees,'teams':teams,'emp_id':emp_id}
         return render(request, 'mapping/index.html', data)
@@ -112,7 +125,6 @@ def empIDwiseData(request):
         teams = Campaigns.objects.all()
         data = {'employees': employees, 'teams': teams}
         return render(request, 'mapping/index.html', data)
-
 
 @login_required # Corrected
 def updateEmployeeProfile(request):
@@ -130,7 +142,7 @@ def updateEmployeeProfile(request):
         data = {'employees':employees,'teams':teams}
         return render(request,'mapping/update-employee-profile.html',data)
 
-@login_required # Corrected
+@login_required
 def updateToSystem(request):
     if request.method == 'POST':
         userr = request.user.profile.emp_name
@@ -140,9 +152,13 @@ def updateToSystem(request):
         emp_process_id = request.POST['emp_process_id']
         emp_rm1_id = request.POST['emp_rm1_id']
         emp_rm2_id = request.POST['emp_rm2_id']
-        emp_rm3_id = request.POST['emp_rm3_id']
-        history = emp_rm1_id +"/" + emp_rm2_id+"/" + emp_rm3_id
+        emp_rm3_id = request.POST['emp_rm3_id']        
         pfl = Profile.objects.get(emp_id = emp_id)
+        old_rm1 = Profile.objects.get(emp_id = emp_id).emp_rm1
+        old_rm2 = Profile.objects.get(emp_id = emp_id).emp_rm2
+        old_rm3 = Profile.objects.get(emp_id = emp_id).emp_rm3
+        old_process = Profile.objects.get(emp_id = emp_id).emp_process
+        history = old_rm1 +"/" + old_rm2 +"/" + old_rm3 + "/"+ old_process
         rm1 = Profile.objects.get(emp_id = emp_rm1_id).emp_name
         rm2 = Profile.objects.get(emp_id = emp_rm2_id).emp_name
         rm3 = Profile.objects.get(emp_id = emp_rm3_id).emp_name
@@ -188,8 +204,7 @@ def createUserandProfile(request): # Need to work
                     emp_rm3_id = i.emp_rm3_id,
                     emp_process_id = i.emp_process_id,
                 )
-                profile.save()
-                
+                profile.save()              
 
         else:
             user = User.objects.create_user(username=i.emp_id, password=str(i.emp_id))
@@ -206,21 +221,8 @@ def createUserandProfile(request): # Need to work
                                           )
             profile.save()
 
-
-
-
-def correct_process(request):
-    e = Profile.objects.all()
-    for i in e:
-        process = str(i.emp_process)
-        i.emp_process = process
-        i.save()
-#        print(i.emp_process)
-
-
+@login_required
 def exportMapping(request):
-    import xlwt
-
     if request.method == 'POST':
         team_id = request.POST['team_id']
         response = HttpResponse(content_type='application/ms-excel')
@@ -234,13 +236,10 @@ def exportMapping(request):
         columns = [
                     'Emp ID','Emp Name','Designation','RM 1','RM 2','RM 3','Team'
                   ]
-
         for col_num in range(len(columns)):
             ws.write(row_num, col_num, columns[col_num], font_style)  # at 0 row 0 column
-
         # Sheet body, remaining rows
         font_style = xlwt.XFStyle()
-
         if team_id =='all':
             rows = Profile.objects.all().values_list(
             'emp_id', 'emp_name', 'emp_desi', 'emp_rm1', 'emp_rm2', 'emp_rm3', 'emp_process'
@@ -249,31 +248,35 @@ def exportMapping(request):
             rows = Profile.objects.filter(emp_process_id = team_id).values_list(
                 'emp_id', 'emp_name', 'emp_desi', 'emp_rm1', 'emp_rm2', 'emp_rm3', 'emp_process'
                 )
-
         import datetime
         rows = [[x.strftime("%Y-%m-%d %H:%M") if isinstance(x, datetime.datetime) else x for x in row] for row in
                 rows]
-
         for row in rows:
             row_num += 1
             for col_num in range(len(row)):
                 ws.write(row_num, col_num, row[col_num], font_style)
-
         wb.save(response)
-
         return response
 
 @login_required # Corrected
 def searchForEmployee(request):
-    emp_id = request.POST['emp_id']
-    try:
-        emp = Profile.objects.get(emp_id=emp_id)
-        messages.info(request, 'Employee Found, Please select Below !')
-    except Profile.DoesNotExist:
-        messages.info(request,'Not Found, Please search below !')
+    if request.method == 'POST':
+        emp_id = request.POST['emp_id']
+        try:
+            emp = Profile.objects.get(emp_id=emp_id)
+            messages.info(request, 'Employee Found, Please select Below !')
+        except Profile.DoesNotExist:
+            messages.info(request,'Not Found, Please search below !')
+            emp=None
+        employees = Profile.objects.all().order_by('emp_name')
+        teams = Campaigns.objects.all()
+        data = {'emp':emp,'employees':employees,'teams':teams}
+        return render(request,'mapping/update-employee-profile.html',data)
+    else:
         emp=None
-    employees = Profile.objects.all().order_by('emp_name')
-    teams = Campaigns.objects.all()
-    data = {'emp':emp,'employees':employees,'teams':teams}
-    return render(request,'mapping/update-employee-profile.html',data)
+        employees = Profile.objects.all().order_by('emp_name')
+        teams = Campaigns.objects.all()
+        data = {'emp':emp,'employees':employees,'teams':teams}
+        return render(request,'mapping/update-employee-profile.html',data)
+
     

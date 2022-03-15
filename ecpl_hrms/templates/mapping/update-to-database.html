@@ -16,9 +16,9 @@
                    <input type="text" value="{{emp.emp_desi}}" name="emp_desi" class="form-control" readonly>
                    <p>Process</p>
                    <select name="emp_process_id" id="" required class="form-control">
-                       <option value="{{emp.emp_process_id}}">{{emp.emp_process}} - {{emp.emp_process_id}}</option>
+                       <option value="{{emp.emp_process_id}}">{{emp.emp_process}}</option>
                        {% for t in teams %}
-                       <option value="{{t.id}}">{{t.name}} - {{t.id}}</option>
+                       <option value="{{t.id}}">{{t.name}}</option>
                        {% endfor %}
                    </select>
                    <p>RM 1</p>
