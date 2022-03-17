@@ -91,5 +91,8 @@ urlpatterns = [
     # calnder Start
     #path('start-calander',startCalandarForAllAgents)
 
-    path('test',test),
+    path('apply-escalation', applyEscalation),
+    path('view-leave-escalation-mgr', viewEscalation),
+    path('add-attendance', addAttendance),
+
 ]

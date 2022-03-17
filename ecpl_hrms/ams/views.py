@@ -1,4 +1,6 @@
 from datetime import datetime
+
+import pytz
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
@@ -11,6 +13,7 @@ from datetime import timedelta
 import calendar
 from datetime import date
 from django.db.models import Q
+
 c = Calendar()
 
 # Getting Model from other Apps
@@ -274,6 +277,9 @@ def managerDashboard(request):
         #Leave Requests
         leave_req_count = LeaveTable.objects.filter(emp_rm3=mgr_name,tl_status='Approved',manager_approval=False).count()
 
+        #Leave Requests
+        leave_esc_count = LeaveTable.objects.filter(emp_rm3=mgr_name,manager_approval=False,escalation=True).count()
+
         # Month view
         ########### Month View ############
         month_days = []
@@ -306,14 +312,13 @@ def managerDashboard(request):
                 'all_tls':all_tls,'all_tls_count':all_tls_count,
                 'all_ams': all_ams, 'all_ams_count': all_ams_count,
                 'map_tickets_counts':map_tickets_counts,
-                'leave_req_count':leave_req_count,'all_emp':all_emp,'month_cal':month_cal,
+                'leave_req_count':leave_req_count,'leave_esc_count':leave_esc_count,'all_emp':all_emp,'month_cal':month_cal,
                 }
         return render(request,'ams/manager-dashboard.html',data)
     else:
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
 
 def viewAndApproveLeaveRequestMgr(request):
-
     if request.method == 'POST':
         id = request.POST["id"]
         e = LeaveTable.objects.get(id=id)
@@ -348,32 +353,27 @@ def viewAndApproveLeaveRequestMgr(request):
                 start_date += delta
 
             for i in month_days:
-
                 try:
-                    cal = EcplCalander.objects.get(Q(date = i),Q(emp_id=emp_id),~Q(att_actual='Unmarked'))
+                    cal = EcplCalander.objects.get(Q(date = i),Q(emp_id=emp_id))
                     cal.att_actual = att_actual
+                    cal.appoved_by = request.user.profile.emp_name
+                    cal.approved_on = now
                     cal.save()
-
                 except EcplCalander.DoesNotExist:
-
                     cal = EcplCalander.objects.create(
                             team=team, date=i, emp_id=emp_id,
                             att_actual=att_actual,
                             rm1=rm1, rm2=rm2, rm3=rm3,
+                            rm1_id=e.emp_rm1_id,rm2_id=e.emp_rm2_id, rm3_id=e.emp_rm3_id,
                             approved_on=now, emp_desi=emp_desi, appoved_by=request.user.profile.emp_name,
                             emp_name=emp_name
                         )
                     cal.save()
-
-
         else:
-
             manager_approval = True
             manager_status = 'Rejected'
             status = 'Rejected'
-
             leave_balance = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
-
             if leave_type == 'PL':
                 leave_balance.pl_balance += int(no_days)
                 leave_balance.save()
@@ -877,20 +877,13 @@ def addNewUserHR(request):
             usr = User.objects.get(username=emp_id)
             #Creating Profile
             profile = Profile.objects.create(
-                emp_id=emp_id, emp_name=emp_name, emp_desi=emp_desi,
+                user_id=user,emp_id=emp_id, emp_name=emp_name, emp_desi=emp_desi,
                 emp_rm1=emp_rm1, emp_rm2=emp_rm2, emp_rm3=emp_rm3,
                 emp_process=emp_process, user=usr,doj=emp_doj,on_id=on_id,
-            )
-            #creating Employee table(Mapping)
-            emp = Profile.objects.create(
-                emp_id=emp_id, emp_name=emp_name, emp_desi=emp_desi,
-                emp_rm1=emp_rm1, emp_rm2=emp_rm2, emp_rm3=emp_rm3,
-                emp_process=emp_process,on_id=on_id,
             )
             onb_obj.user_created = True
             onb_obj.save()
             profile.save()
-            emp.save()
         messages.info(request,'User and Profile Successfully Created')
         return redirect('/ams/add-new-user')
 
@@ -939,20 +932,15 @@ def applyAttendace(request):
         team = request.POST['emp_team']
         now = datetime.now()
         try:
-            cal = EcplCalander.objects.get(Q(date=ddate),Q(emp_id=emp_id),~Q(att_actual='Unmarked'))
-            messages.info(request,'*** Already Marked in Calendar, Please Refresh the page and try again ***')
+            cal = EcplCalander.objects.get(Q(date=ddate), Q(emp_id=emp_id), ~Q(att_actual='Unmarked'))
+            messages.info(request, '*** Already Marked in Calendar, Please Refresh the page and try again ***')
             return redirect('/ams/team-attendance')
 
         except EcplCalander.DoesNotExist:
-
-            cal = EcplCalander.objects.create(
-                team = team, date = ddate, emp_id = emp_id,
-                att_actual = att_actual,
-                rm1 = rm1, rm2 = rm2, rm3 = rm3,
-                approved_on = now, emp_desi = emp_desi,appoved_by = request.user.profile.emp_name,
-                emp_name = emp_name
-            )
-
+            cal = EcplCalander.objects.get(emp_id=emp_id, date=ddate)
+            cal.att_actual = att_actual
+            cal.approved_on = now
+            cal.appoved_by = request.user.profile.emp_name
         cal.save()
         return redirect('/ams/team-attendance')
     else:
@@ -979,15 +967,10 @@ def newSingleAttandance(request):
             return redirect('/ams/team-attendance')
 
         except EcplCalander.DoesNotExist:
-
-            cal = EcplCalander.objects.create(
-                team=team, date=ddate, emp_id=emp_id,
-                att_actual=att_actual,
-                rm1=rm1, rm2=rm2, rm3=rm3,
-                approved_on=now, emp_desi=emp_desi, appoved_by=request.user.profile.emp_name,
-                emp_name=emp_name
-            )
-
+            cal = EcplCalander.objects.get(emp_id=emp_id,date=ddate)
+            cal.att_actual = att_actual
+            cal.approved_on = now
+            cal.appoved_by = request.user.profile.emp_name
         cal.save()
         return redirect('/ams/ams-update-attendance')
 
@@ -1260,109 +1243,21 @@ def teamAttendance(request):
 
 @login_required
 def viewTeamAttendance(request):
-
     if request.method == 'POST':
         rm = request.user.profile.emp_name
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
         emp_id = request.POST['emp_id']
 
-        start_date = start_date
-        end_date = end_date
-        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
-        end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
-        delta = end_date - start_date  # returns timedelta
-
-        date_list = []
-        for i in range(delta.days + 1):
-            day = start_date + timedelta(days=i)
-            date_list.append(day)
-
-
         if emp_id == 'All':
-
-            all_emp = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=rm) | Q(emp_rm2=rm) | Q(emp_rm3=rm))
-
-            agt_cal_list = []
-
-            for k in date_list:
-
-                for j in all_emp:
-
-                    agt_cal = {}
-
-                    try:
-                        agt_calendar = EcplCalander.objects.get(date=k, emp_id=j.emp_id)
-                        agt_cal['date'] = k
-                        agt_cal['status'] = agt_calendar.att_actual
-                        agt_cal['approved_on'] = agt_calendar.approved_on
-                        agt_cal['team'] = agt_calendar.team
-                        agt_cal['emp_name'] = agt_calendar.emp_name
-                        agt_cal['emp_id'] = agt_calendar.emp_id
-                        agt_cal['rm1'] = agt_calendar.rm1
-                        agt_cal['rm2'] = agt_calendar.rm2
-                        agt_cal['rm3'] = agt_calendar.rm3
-
-
-                    except EcplCalander.DoesNotExist:
-                        agt_cal['date'] = k
-                        agt_cal['status'] = 'Unmarked'
-                        agt_cal['approved_on'] = 'NA'
-                        agt_cal['team'] = j.emp_process
-                        agt_cal['emp_name'] = j.emp_name
-                        agt_cal['emp_id'] = j.emp_id
-                        agt_cal['rm1'] = j.emp_rm1
-                        agt_cal['rm2'] = j.emp_rm2
-                        agt_cal['rm3'] = j.emp_rm3
-
-
-                    agt_cal_list.append(agt_cal)
-
-            emp_id = request.user.profile.emp_id
-            emp = Profile.objects.get(emp_id=emp_id)
-
-            data = {'agt_cal_list': agt_cal_list,
-                        'emp': emp}
-
-            return render(request, 'ams/agent-calander-status.html', data)
-
-        emp_obj = Profile.objects.get(emp_id=emp_id)
-        agt_cal_list = []
-
-        for i in date_list:
-            agt_cal = {}
-            try:
-                agt_calendar = EcplCalander.objects.get(date=i, emp_id=emp_id)
-                agt_cal['date']=i
-                agt_cal['status']=agt_calendar.att_actual
-                agt_cal['approved_on'] = agt_calendar.approved_on
-                agt_cal['team'] = agt_calendar.team
-                agt_cal['emp_name'] = agt_calendar.emp_name
-                agt_cal['emp_id'] = agt_calendar.emp_id
-                agt_cal['rm1'] = agt_calendar.rm1
-                agt_cal['rm2'] = agt_calendar.rm2
-                agt_cal['rm3'] = agt_calendar.rm3
-
-            except EcplCalander.DoesNotExist:
-                agt_cal['date'] = i
-                agt_cal['status'] = 'Unmarked'
-                agt_cal['approved_on'] = 'NA'
-                agt_cal['team'] = 'NA'
-                agt_cal['emp_name'] = emp_obj.emp_name
-                agt_cal['emp_id'] = emp_obj.emp_id
-                agt_cal['rm1'] = emp_obj.emp_rm1
-                agt_cal['rm2'] = emp_obj.emp_rm2
-                agt_cal['rm3'] = emp_obj.emp_rm3
-
-            agt_cal_list.append(agt_cal)
-
+            cal = EcplCalander.objects.filter(Q(rm1=rm) | Q(rm2=rm) | Q(rm3=rm),date__range=[start_date,end_date])
+        else:
+            cal = EcplCalander.objects.filter(Q(rm1=rm) | Q(rm2=rm) | Q(rm3=rm), date__range=[start_date, end_date],
+                                              emp_id=emp_id)
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
-
-        data = {'agt_cal_list':agt_cal_list,
-                'emp':emp}
-
-        return render(request,'ams/agent-calander-status.html',data)
+        data = {'agt_cal_list': cal, 'emp': emp}
+        return render(request, 'ams/agent-calander-status.html', data)
 
     else:
         return HttpResponse('<h2>*** GET not available ***</h2>')
@@ -1856,15 +1751,17 @@ def updateJobForm(request,id):
 
 @login_required
 def applyLeave(request):
-
     if request.method == 'POST':
         emp_name = request.POST["emp_name"]
         emp_id = request.POST["emp_id"]
         emp_desi = request.POST["emp_desi"]
         emp_process = request.POST["emp_process"]
-        emp_rm1 = request.POST["emp_rm1"]
-        emp_rm2 = request.POST["emp_rm2"]
-        emp_rm3 = request.POST["emp_rm3"]
+        emp_rm1_id = request.POST["emp_rm1"]
+        emp_rm2_id = request.POST["emp_rm2"]
+        emp_rm3_id = request.POST["emp_rm3"]
+        emp_rm1 = Profile.objects.get(emp_id=emp_rm1_id).emp_name
+        emp_rm2 = Profile.objects.get(emp_id=emp_rm2_id).emp_name
+        emp_rm3 = Profile.objects.get(emp_id=emp_rm3_id).emp_name
         leave_type = request.POST["type"]
         start_date = request.POST["startdate"]
         end_date = request.POST["enddate"]
@@ -1886,14 +1783,15 @@ def applyLeave(request):
         e.emp_rm1 = emp_rm1
         e.emp_rm2 = emp_rm2
         e.emp_rm3 = emp_rm3
+        e.emp_rm1_id = emp_rm1_id
+        e.emp_rm2_id = emp_rm2_id
+        e.emp_rm3_id = emp_rm3_id
 
         if emp_desi in manager_list or emp_desi in tl_am_list:
             e.tl_status = 'Approved'
             e.tl_approval = True
             e.tl_reason = 'Self Approved'
-
         e.save()
-
 
 
         leave_balance = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
@@ -1912,13 +1810,20 @@ def applyLeave(request):
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
         leave = LeaveTable.objects.filter(emp_id=emp_id)
-
+        try:
+            Profile.objects.get(emp_id=emp_id,doj=None)
+            doj = date(2020,1,1)
+            today = date.today()
+            probation = (today - doj).days
+        except Profile.DoesNotExist:
+            doj = emp.doj
+            today = date.today()
+            probation = (today - doj).days
         try:
             leave_balance = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
         except EmployeeLeaveBalance.DoesNotExist:
             leave_balance = {'sl_balance':0,'pl_balance':0}
-
-        data = {'emp': emp,'leave':leave,'leave_balance':leave_balance}
+        data = {'emp': emp,'leave':leave,'leave_balance':leave_balance,'probation':probation}
         return render(request,'ams/apply-leave.html',data)
 
 @login_required
@@ -1932,7 +1837,6 @@ def viewleaveListRM1(request):
 
 @login_required
 def approveLeaveRM1(request):
-
     if request.method == "POST":
         id = request.POST["id"]
         e = LeaveTable.objects.get(id=id)
@@ -1968,7 +1872,32 @@ def approveLeaveRM1(request):
         e.save()
 
         return redirect('/ams/view-leave-list')
-
+@login_required
+def applyEscalation(request):
+    if request.method == "POST":
+        id = request.POST["id"]
+        reason = request.POST['reason']
+        e = LeaveTable.objects.get(id=id)
+        e.escalation = True
+        e.escalation_reason = reason
+        e.save()
+        emp_id = e.emp_id
+        no_days = e.no_days
+        type = e.leave_type
+        a = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
+        if type == "PL":
+            a.pl_balance = a.pl_balance-no_days
+        else:
+            a.sl_balance = a.sl_balance - no_days
+        a.save()
+        return redirect('/ams/view-leave-list')
+    else:
+        pass
+@login_required
+def viewEscalation(request):
+    leave_request = LeaveTable.objects.filter(emp_rm3=request.user.profile.emp_name, tl_approval=True,escalation=True,manager_approval=False)
+    data = { 'leave_request': leave_request}
+    return render(request, 'ams/leave_escalation.html', data)
 
 @login_required
 def editAgentStatus(request):
@@ -2200,70 +2129,37 @@ def applyEmpStatusChange(request):
         return redirect('/ams/rm-mapping-index')
 
 
+def addAttendance(request):
+    if request.method == 'POST':
+        id = request.POST['month']
+        month = AddAttendanceMonths.objects.get(id=id).month_number
+        year = AddAttendanceMonths.objects.get(id=id).year
+        start_date = date(year,month,1)
+        last = calendar.monthrange(year, month)[1]
+        last_date = date(year,month,last)
+        delta = last_date - start_date
 
-
-
-def startCalandarForAllAgents(request):
-
-    todays_date = date.today()
-    year = todays_date.year
-    month = todays_date.month
-
-    a,num_days = calendar.monthrange(year, month)
-    start_date = date(year, month, 1)
-    end_date = date(year, month, num_days)
-
-    delta = end_date - start_date  # returns timedelta
-
-    date_list = []
-    for i in range(delta.days + 1):
-        day = start_date + timedelta(days=i)
-        date_list.append(day)
-
-    emps = Profile.objects.all()
-
-    for i in date_list:
-        for j in emps:
-
-            try:
-                cal = EcplCalander.objects.get(date=i,emp_id=j.emp_id)
-
-            except EcplCalander.DoesNotExist:
-
-                cal = EcplCalander.objects.create(date= i,emp_id=j.emp_id,team=j.emp_process,emp_name=j.emp_name,
-                                                  rm1= j.emp_rm1,rm2=j.emp_rm2,rm3=j.emp_rm3,emp_desi = j.emp_desi,
-                                                  att_actual= 'Unmarked')
-                cal.save()
-
-
-
-
-def test(request):
-
-    start_date = '21/02/22'
-    start_date = datetime.strptime(start_date, '%d/%m/%y').date()
-    end_date = '25/02/22'
-    end_date = datetime.strptime(end_date, '%d/%m/%y').date()
-    delta = end_date - start_date  # returns timedelta
-
-    date_list = []
-    for i in range(delta.days + 1):
-        day = start_date + timedelta(days=i)
-        date_list.append(day)
-
-    emps = Profile.objects.all()
-
-    for i in date_list:
-        for j in emps:
-            try:
-                cal = EcplCalander.objects.get(date=i, emp_id=j.emp_id)
-                print('Exist',i,j.emp_id)
-
-            except EcplCalander.DoesNotExist:
-
-                cal = EcplCalander.objects.create(date=i, emp_id=j.emp_id, team=j.emp_process, emp_name=j.emp_name,
-                                                  rm1=j.emp_rm1, rm2=j.emp_rm2, rm3=j.emp_rm3, emp_desi=j.emp_desi,
-                                                  att_actual='Unmarked')
-                cal.save()
-                print(cal.date,cal.emp_name)
-
+        date_list = []
+        for i in range(delta.days + 1):
+            day = start_date + timedelta(days=i)
+            date_list.append(day)
+        profile = Profile.objects.all()
+        for i in date_list:
+            for j in profile:
+                try:
+                    EcplCalander.objects.get(emp_id=j.emp_id,date=i)
+                    pass
+                except EcplCalander.DoesNotExist:
+                    cal = EcplCalander.objects.create(date=i, emp_id=j.emp_id, team=j.emp_process, emp_name=j.emp_name,
+                                                      rm1=j.emp_rm1, rm2=j.emp_rm2, rm3=j.emp_rm3,rm1_id=j.emp_rm1_id,
+                                                      rm2_id=j.emp_rm2_id, rm3_id=j.emp_rm3_id, emp_desi=j.emp_desi,
+                                                      att_actual='Unmarked')
+                    cal.save()
+        e = AddAttendanceMonths.objects.get(id=id)
+        e.created = True
+        e.save()
+        return redirect('/ams/add-attendance')
+    else:
+        months = AddAttendanceMonths.objects.filter(created=False)
+        data = {'months':months}
+        return render(request, 'ams/admin/add_attendance.html',data)

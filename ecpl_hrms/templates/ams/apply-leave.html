@@ -21,7 +21,13 @@
                   <h4>Privilege Leave Balance</h4>
                 </div>
                 <div class="card-body" align="center">
-                  <h1 style="font-size: 64px;" id="leave_bal">{{leave_balance.pl_balance}}</h1>
+                  <h1 style="font-size: 64px;" id="leave_bal">
+                    {% if probation >=  90 %}
+                      {{leave_balance.pl_balance}}
+                    {% else %}
+                      <span style="font-size:25px">Probation Period</span>
+                    {% endif %}
+                  </h1>
                 </div>
               </div>
             </div>
@@ -31,7 +37,13 @@
                   <h4>Sick Leave Balance</h4>
                 </div>
                 <div class="card-body" align="center">
-                  <h1 style="font-size: 64px;" id="s_leave_bal">{{leave_balance.sl_balance}}</h1>
+                  <h1 style="font-size: 64px;" id="s_leave_bal">
+                    {% if probation >=  90 %}
+                      {{leave_balance.sl_balance}}
+                    {% else %}
+                      <span style="font-size:25px">Probation Period</span>
+                    {% endif %}
+                  </h1>
                 </div>
               </div>
             </div>
@@ -80,9 +92,9 @@
                         <input type="hidden" name="emp_name" value="{{emp.emp_name}}">
                         <input type="hidden" name="emp_process" value="{{emp.emp_process}}">
                         <input type="hidden" name="emp_desi" value="{{emp.emp_desi}}">
-                        <input type="hidden" name="emp_rm1" value="{{emp.emp_rm1}}">
-                        <input type="hidden" name="emp_rm2" value="{{emp.emp_rm2}}">
-                        <input type="hidden" name="emp_rm3" value="{{emp.emp_rm3}}">
+                        <input type="hidden" name="emp_rm1" value="{{emp.emp_rm1_id}}">
+                        <input type="hidden" name="emp_rm2" value="{{emp.emp_rm2_id}}">
+                        <input type="hidden" name="emp_rm3" value="{{emp.emp_rm3_id}}">
                       </div>
                       <div class="col-md-12 mt-4 pt-1" id="mybutton">
                         <button class="form-control btn btn-success" onclick="return confirmm();" id="mysubmit">Submit</button>
@@ -139,12 +151,16 @@
                               <td>{{i.no_days}}</td>
                               <td>{{i.leave_type}}</td>
                               <td><p>{{i.agent_reason}}</p></td>
-
                               <td>{{i.tl_approval}}</td>
                               <td><p>{{i.tl_reason}}</p></td>
                               <td>{{i.manager_approval}}</td>
                               <td><p>{{i.manager_reason}}</p></td>
-                              <td>{{i.status}}</td>
+                              <td align="center">
+                                {{i.status}}
+                                {% if i.tl_status == "Rejected" and i.manager_approval == False %}<br>
+                                <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#view_{{i.id}}">Escalate</button>
+                                {% endif %}
+                              </td>
                           </tr>
                         {% endfor %}
                         </tbody>
@@ -158,6 +174,63 @@
         </div>
         <!-- /page content -->
 
-
+    <!-- Start Escalate Pop-Up -->
+        {% for i in leave %}
+      <div class="modal fade" id="view_{{i.id}}" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">View Request</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+              <form action="/ams/apply-escalation" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-6 mt-2">
+                    <label for="emp_name">Employee Name</label>
+                    <input type="text" disabled value="{{i.emp_name}}" id="emp_name" class="form-control">
+                  </div>
+                  <div class="col-md-6 mt-2">
+                    <label for="emp_id">Employee ID</label>
+                    <input type="text" disabled value="{{i.emp_id}}"  name="emp_id" id="emp_id" class="form-control">
+                  </div>
+                  <div class="col-md-4 mt-2">
+                    <label for="app_on">Applied On</label>
+                    <input type="text" disabled value="{{i.applied_date}}" id="app_on" class="form-control">
+                  </div>
+                  <div class="col-md-8 mt-2">
+                    <label for="app_for">Applied For Dates</label>
+                    <input type="text" disabled value="{{i.start_date}} to {{i.end_date}}" id="app_for" class="form-control">
+                  </div>
+                  <div class="col-md-6 mt-2">
+                    <label for="num_days">Number of Days</label>
+                    <input type="text" disabled value="{{i.no_days}}" id="num_days" class="form-control">
+                  </div>
+                  <div class="col-md-6 mt-2">
+                    <label for="leave_type">Leave Type</label>
+                    <input type="text" disabled  value="{{i.leave_type}}" id="leave_type" class="form-control">
+                  </div>
+                  <div class="col-md-6 mt-2">
+                    <label for="reason_esc">Reason / Comments</label>
+                    <textarea id="reason_esc" name="reason" class="form-control" rows="3" required></textarea>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <input type="hidden" name="id" value="{{i.id}}">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" onclick="return confirmm();" class="btn btn-success">Escalate</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+        {% endfor %}
+    <!-- End EscalatePop-Up -->
 
 {% endblock %}
