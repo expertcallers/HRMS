@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
-
 # Attendance - Master ++
+
 class EcplCalander(models.Model):
     team = models.CharField(max_length=300)
     date = models.DateField()
@@ -11,9 +11,12 @@ class EcplCalander(models.Model):
     att_actual = models.CharField(max_length=50,null=True)
     approved_on = models.DateTimeField(null=True)
     appoved_by = models.CharField(max_length=300,null=True)
-    rm1 = models.CharField(max_length=200,null=True)
+    rm1 = models.CharField(max_length=200, null=True)
     rm2 = models.CharField(max_length=200, null=True)
     rm3 = models.CharField(max_length=200, null=True)
+    rm1_id = models.CharField(max_length=30, null=True)
+    rm2_id = models.CharField(max_length=30, null=True)
+    rm3_id = models.CharField(max_length=30, null=True)
 
 # Onboarding - Master +
 class OnboardingnewHRC(models.Model):
@@ -80,7 +83,6 @@ class OnboardingnewHRC(models.Model):
     emp_upload_experience_two=models.ImageField(upload_to='Experience/',null=True)
     emp_upload_experience_three=models.ImageField(upload_to='Experience/',null=True)
     emp_upload_bank=models.ImageField(upload_to='Passbook/',null=True)
-
     user_created = models.BooleanField(default=False)
 
 # Mapping Tickets - request - approval ++
@@ -180,6 +182,11 @@ class LeaveTable(models.Model):
     emp_rm1 = models.CharField(max_length=50, null=True)
     emp_rm2 = models.CharField(max_length=50, null=True)
     emp_rm3 = models.CharField(max_length=50, null=True)
+    emp_rm1_id = models.CharField(max_length=50, null=True)
+    emp_rm2_id = models.CharField(max_length=50, null=True)
+    emp_rm3_id = models.CharField(max_length=50, null=True)
+    escalation = models.BooleanField(default=False)
+    escalation_reason = models.TextField(null=True)
 
 
 # Attendance correction history - send - approve ++
@@ -214,4 +221,8 @@ class AgentActiveStatusHist(models.Model):
     status_by_hr = models.CharField(max_length=50)
     ticket_status = models.BooleanField(default=False)
 
-
+class AddAttendanceMonths(models.Model):
+    month = models.CharField(max_length=30)
+    month_number = models.IntegerField()
+    year = models.IntegerField()
+    created = models.BooleanField(default=False,null=True,blank=True)

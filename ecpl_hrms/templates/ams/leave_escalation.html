@@ -53,7 +53,6 @@
                                   <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#view_{{i.id}}">View</button>
                               </td>
                           </tr>
-
                         {% endfor %}
                         </tbody>
                       </table>
@@ -67,7 +66,7 @@
         <!-- /page content -->
 
 
-    <!-- Start New Designation Pop-Up -->
+    <!-- Start Escalation Pop-Up -->
         {% for i in leave_request %}
       <div class="modal fade" id="view_{{i.id}}" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -78,7 +77,7 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-              <form action="/ams/approve-leave-rm1" method="POST" enctype="multipart/form-data">
+              <form action="/ams/view-leave-request-mgr" method="POST" enctype="multipart/form-data">
               {% csrf_token %}
               <div class="modal-body">
                 <div class="row">
@@ -107,27 +106,40 @@
                     <input type="text" readonly  value="{{i.leave_type}}" id="leave_type" class="form-control">
                   </div>
                   <div class="col-md-4 mt-2">
+                    <label for="tl_app">TL Status</label>
+                    <input type="text" readonly value="{{i.tl_status}}" id="tl_app" class="form-control">
+                  </div>
+                  <div class="col-md-4 mt-2">
+                    <label for="reason">Employee Reason</label>
+                    <textarea id="reason" name="reason" class="form-control" rows="3" readonly>{{i.agent_reason}}</textarea>
+                  </div>
+                  <div class="col-md-4 mt-2">
+                    <label for="tl_reason">TL Comments</label>
+                    <textarea id="tl_reason" readonly class="form-control" rows="3">{{i.tl_reason}}</textarea>
+                  </div>
+                  <div class="col-md-4 mt-2">
+                    <label for="esc_reason">Escalation Reason</label>
+                    <textarea id="esc_reason" readonly class="form-control" rows="3">{{i.escalation_reason}}</textarea>
+                  </div>
+                  <div class="col-md-6 mt-2">
                     <label for="app">Select</label>
                     <div id="app" style="width:100%; display: inline-flex;">
-                      <select name="tl_response" id="" class="form-control">
+                      <select name="tl_response" class="form-control">
                         <option value="Approve" class="form-control">Approve</option>
                         <option value="Reject" class="form-control">Reject</option>
                       </select>
                     </div>
                   </div>
                   <div class="col-md-6 mt-2">
-                    <label for="reason">Employee Reason</label>
-                    <textarea id="reason" name="reason" class="form-control" rows="3" readonly>{{i.agent_reason}}</textarea>
+                    <label for="om_reason">Comments</label>
+                    <textarea id="om_reason" name="tl_reason" class="form-control" rows="3" required></textarea>
                   </div>
-                  <div class="col-md-6 mt-2">
-                    <label for="tl_reason">Reason</label>
-                    <textarea id="tl_reason" name="tl_reason" class="form-control" rows="3" required></textarea>
-                  </div>
+
                 </div>
               </div>
-                <div>
-                  <input type="hidden" name="id" value="{{i.id}}">s
-                </div>
+              <div>
+                <input type="hidden" name="id" value="{{i.id}}">
+              </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 <button type="submit" onclick="return confirmm();" class="btn btn-success">Submit</button>
@@ -137,7 +149,7 @@
         </div>
       </div>
         {% endfor %}
-    <!-- End New Designation Pop-Up -->
+    <!-- End Escalation Pop-Up -->
 
 
 
