@@ -158,7 +158,9 @@ def updateToSystem(request):
         old_rm2 = Profile.objects.get(emp_id = emp_id).emp_rm2
         old_rm3 = Profile.objects.get(emp_id = emp_id).emp_rm3
         old_process = Profile.objects.get(emp_id = emp_id).emp_process
+
         history = old_rm1 +"/" + old_rm2 +"/" + old_rm3 + "/"+ old_process
+        
         rm1 = Profile.objects.get(emp_id = emp_rm1_id).emp_name
         rm2 = Profile.objects.get(emp_id = emp_rm2_id).emp_name
         rm3 = Profile.objects.get(emp_id = emp_rm3_id).emp_name
