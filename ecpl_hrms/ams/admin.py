@@ -4,6 +4,7 @@ from .models import *
 class ProfileSearch(admin.ModelAdmin):
     search_fields = ('emp_name','emp_id',"att_actual")
     list_display = ('emp_name','emp_id',"date","att_actual")
+    filter = ('emp_id',"date","att_actual")
 
 
 admin.site.register(EcplCalander,ProfileSearch)

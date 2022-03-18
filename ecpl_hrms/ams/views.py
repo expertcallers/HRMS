@@ -923,13 +923,7 @@ def applyAttendace(request):
     if request.method == 'POST':
         ddate = request.POST['date']
         att_actual = request.POST['att_actual']
-        emp_name = request.POST['emp_name']
-        rm1 = request.POST['rm1']
-        rm2 = request.POST['rm2']
-        rm3 = request.POST['rm3']
         emp_id = request.POST['emp_id']
-        emp_desi = request.POST['emp_desi']
-        team = request.POST['emp_team']
         now = datetime.now()
         try:
             cal = EcplCalander.objects.get(Q(date=ddate), Q(emp_id=emp_id), ~Q(att_actual='Unmarked'))
@@ -952,20 +946,12 @@ def newSingleAttandance(request):
     if request.method == 'POST':
         ddate = request.POST['date']
         att_actual = request.POST['att_actual']
-        emp_name = request.POST['emp_name']
-        rm1 = request.POST['rm1']
-        rm2 = request.POST['rm2']
-        rm3 = request.POST['rm3']
         emp_id = request.POST['emp_id']
-        emp_desi = request.POST['emp_desi']
-        team = request.POST['emp_team']
         now = datetime.now()
-
         try:
             cal = EcplCalander.objects.get(Q(date=ddate),Q(emp_id=emp_id),~Q(att_actual='Unmarked'))
             messages.info(request,'*** Already Marked in Calendar, Please Refresh the page and try again ***')
             return redirect('/ams/team-attendance')
-
         except EcplCalander.DoesNotExist:
             cal = EcplCalander.objects.get(emp_id=emp_id,date=ddate)
             cal.att_actual = att_actual
@@ -981,104 +967,15 @@ def newSingleAttandance(request):
         dby_date = yesterday - timedelta(days=1)
         emp_s = Profile.objects.filter(agent_status = 'Active',emp_id=request.user.profile.emp_id)
         ############## Todays Attendance ###################
-        todays_list_list = []
-        for i in emp_s:
-            todays_list = {}
-            try:
-                cal_day = EcplCalander.objects.get(Q(date=today),Q(emp_id=i.emp_id),~Q(att_actual='Unmarked'))
-                tdy_date = today
-                todays_list['id'] = i.id
-                todays_list['emp_id'] = i.emp_id
-                todays_list['name'] = i.emp_name
-                todays_list['status'] = 'Applied'
-                todays_list['date'] = str(today)
-                todays_list['rm1'] = i.emp_rm1
-                todays_list['rm2'] = i.emp_rm2
-                todays_list['rm3'] = i.emp_rm3
-                todays_list['emp_desi'] = i.emp_desi
-                todays_list['emp_team'] = i.emp_process
-
-                print('-----------------')
-
-            except EcplCalander.DoesNotExist:
-                tdy_date = today
-                todays_list['id'] = i.id
-                todays_list['emp_id'] = i.emp_id
-                todays_list['name'] = i.emp_name
-                todays_list['status'] = str(today)
-                todays_list['date'] = str(today)
-                todays_list['rm1'] = i.emp_rm1
-                todays_list['rm2'] = i.emp_rm2
-                todays_list['rm3'] = i.emp_rm3
-                todays_list['emp_desi'] = i.emp_desi
-                todays_list['emp_team'] = i.emp_process
-
-            todays_list_list.append(todays_list)
+        todays_list_list = EcplCalander.objects.filter(Q(date=today), Q(emp_id=request.user.profile.emp_id),
+                                                       Q(att_actual='Unmarked'))
 
         ############## Yesterdays Attendance ###################
-        ystday_list_list = []
-        for i in emp_s:
-            ystday_list = {}
-            try:
-                cal_day = EcplCalander.objects.get(Q(date=yesterday),Q(emp_id=i.emp_id),~Q(att_actual='Unmarked'))
-                tdy_date = yesterday
-                ystday_list['id'] = i.id
-                ystday_list['emp_id'] = i.emp_id
-                ystday_list['name'] = i.emp_name
-                ystday_list['status'] = 'Applied'
-                ystday_list['date'] = str(yesterday)
-                ystday_list['rm1'] = i.emp_rm1
-                ystday_list['rm2'] = i.emp_rm2
-                ystday_list['rm3'] = i.emp_rm3
-                ystday_list['emp_desi'] = i.emp_desi
-                ystday_list['emp_team'] = i.emp_process
+        ystday_list_list = EcplCalander.objects.filter(Q(date=yesterday), Q(emp_id=request.user.profile.emp_id),
+                                                    Q(att_actual='Unmarked'))
 
-            except EcplCalander.DoesNotExist:
-                tdy_date = yesterday
-                ystday_list['id'] = i.id
-                ystday_list['emp_id'] = i.emp_id
-                ystday_list['name'] = i.emp_name
-                ystday_list['status'] = str(yesterday)
-                ystday_list['date'] = str(yesterday)
-                ystday_list['rm1'] = i.emp_rm1
-                ystday_list['rm2'] = i.emp_rm2
-                ystday_list['rm3'] = i.emp_rm3
-                ystday_list['emp_desi'] = i.emp_desi
-                ystday_list['emp_team'] = i.emp_process
-
-            ystday_list_list.append(ystday_list)
         ############## Day befor Yesterdays Attendance ###################
-        dby_list_list = []
-        for i in emp_s:
-            dby_list = {}
-            try:
-                cal_day = EcplCalander.objects.get(Q(date=dby_date), Q(emp_id=i.emp_id),~Q(att_actual='Unmarked'))
-                tdy_date = dby_date
-                dby_list['id'] = i.id
-                dby_list['emp_id'] = i.emp_id
-                dby_list['name'] = i.emp_name
-                dby_list['status'] = 'Applied'
-                dby_list['date'] = str(dby_date)
-                dby_list['rm1'] = i.emp_rm1
-                dby_list['rm2'] = i.emp_rm2
-                dby_list['rm3'] = i.emp_rm3
-                dby_list['emp_desi'] = i.emp_desi
-                dby_list['emp_team'] = i.emp_process
-
-            except EcplCalander.DoesNotExist:
-                tdy_date = dby_date
-                dby_list['id'] = i.id
-                dby_list['emp_id'] = i.emp_id
-                dby_list['name'] = i.emp_name
-                dby_list['status'] = str(dby_date)
-                dby_list['date'] = str(dby_date)
-                dby_list['rm1'] = i.emp_rm1
-                dby_list['rm2'] = i.emp_rm2
-                dby_list['rm3'] = i.emp_rm3
-                dby_list['emp_desi'] = i.emp_desi
-                dby_list['emp_team'] = i.emp_process
-
-            dby_list_list.append(dby_list)
+        dby_list_list = EcplCalander.objects.filter(Q(date=dby_date), Q(emp_id=request.user.profile.emp_id),Q(att_actual='Unmarked'))
 
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
@@ -1122,137 +1019,44 @@ def attRequests(request):
 @login_required
 def teamAttendance(request):
     user_nm = request.user.profile.emp_name
-    if request.method == 'POST':
-        return HttpResponse('<h1>*** POST Not Available ***</h1>')
-    else:
-        ######### Dates #################################
-        today = date.today()
-        yesterday = today - timedelta(days=1)
-        dby_date = yesterday - timedelta(days=1)
-        emp_s = Profile.objects.filter(Q(emp_rm1=user_nm) | Q(emp_rm2=user_nm) | Q(emp_rm3=user_nm),agent_status = 'Active')
-        if emp_s.count()<1:
-            return HttpResponse('<h1>RM1 name and user name not matching </h1>')
+    user_nm_id = request.user.profile.emp_id
+    ######### Dates #################################
+    today = date.today()
+    yesterday = today - timedelta(days=1)
+    dby_date = yesterday - timedelta(days=1)
+    ############## Todays Attendance ###################
+    todays_list_list = EcplCalander.objects.filter(Q(date=today), Q(rm1_id=user_nm_id) | Q(rm2_id=user_nm_id) | Q(rm3_id=user_nm_id),
+                                                   Q(att_actual = 'Unmarked'))
 
-        ############## Todays Attendance ###################
-        todays_list_list = []
-        for i in emp_s:
-            todays_list = {}
-            try:
-                cal_day = EcplCalander.objects.get(Q(date=today), Q(emp_id=i.emp_id),~Q(att_actual = 'Unmarked'))
-                tdy_date = today
-                todays_list['id']=i.id
-                todays_list['emp_id']=i.emp_id
-                todays_list['name'] = i.emp_name
-                todays_list['status'] = 'Applied'
-                todays_list['date'] = str(today)
-                todays_list['rm1'] = i.emp_rm1
-                todays_list['rm2'] = i.emp_rm2
-                todays_list['rm3'] = i.emp_rm3
-                todays_list['emp_desi'] = i.emp_desi
-                todays_list['emp_team'] = i.emp_process
 
-            except EcplCalander.DoesNotExist:
-                tdy_date = today
-                todays_list['id'] = i.id
-                todays_list['emp_id'] = i.emp_id
-                todays_list['name'] = i.emp_name
-                todays_list['status'] = str(today)
-                todays_list['date'] = str(today)
-                todays_list['rm1'] = i.emp_rm1
-                todays_list['rm2'] = i.emp_rm2
-                todays_list['rm3'] = i.emp_rm3
-                todays_list['emp_desi'] = i.emp_desi
-                todays_list['emp_team'] = i.emp_process
+    ############## Yesterdays Attendance ###################
+    ystday_list_list = EcplCalander.objects.filter(Q(date=yesterday), Q(rm1_id=user_nm_id) | Q(rm2_id=user_nm_id) | Q(rm3_id=user_nm_id),
+                                                   Q(att_actual='Unmarked'))
 
-            todays_list_list.append(todays_list)
+    ############## Bay befor Yesterdays Attendance ###################
+    dby_list_list = EcplCalander.objects.filter(Q(date=dby_date), Q(rm1_id=user_nm_id) | Q(rm2_id=user_nm_id) | Q(rm3_id=user_nm_id),
+                                                   Q(att_actual='Unmarked'))
+    emp_id = request.user.profile.emp_id
+    emp = Profile.objects.get(emp_id=emp_id)
 
-        ############## Yesterdays Attendance ###################
-        ystday_list_list = []
-        for i in emp_s:
-            ystday_list = {}
-            try:
-                cal_day = EcplCalander.objects.get(Q(date=yesterday), Q(emp_id=i.emp_id),~Q(att_actual = 'Unmarked'))
-                tdy_date = yesterday
-                ystday_list['id']=i.id
-                ystday_list['emp_id']=i.emp_id
-                ystday_list['name'] = i.emp_name
-                ystday_list['status'] = 'Applied'
-                ystday_list['date'] = str(yesterday)
-                ystday_list['rm1'] = i.emp_rm1
-                ystday_list['rm2'] = i.emp_rm2
-                ystday_list['rm3'] = i.emp_rm3
-                ystday_list['emp_desi'] = i.emp_desi
-                ystday_list['emp_team'] = i.emp_process
+    data = {'todays_att':todays_list_list,
+            'ystdays_att':ystday_list_list,
+            'dbys_att':dby_list_list,'emp':emp}
 
-            except EcplCalander.DoesNotExist:
-                tdy_date = yesterday
-                ystday_list['id'] = i.id
-                ystday_list['emp_id'] = i.emp_id
-                ystday_list['name'] = i.emp_name
-                ystday_list['status'] = str(yesterday)
-                ystday_list['date'] = str(yesterday)
-                ystday_list['rm1'] = i.emp_rm1
-                ystday_list['rm2'] = i.emp_rm2
-                ystday_list['rm3'] = i.emp_rm3
-                ystday_list['emp_desi'] = i.emp_desi
-                ystday_list['emp_team'] = i.emp_process
-
-            ystday_list_list.append(ystday_list)
-
-        ############## Bay befor Yesterdays Attendance ###################
-        dby_list_list = []
-        for i in emp_s:
-            dby_list = {}
-            try:
-                cal_day = EcplCalander.objects.get(Q(date=dby_date), Q(emp_id=i.emp_id),~Q(att_actual = 'Unmarked'))
-                tdy_date = dby_date
-                dby_list['id']=i.id
-                dby_list['emp_id']=i.emp_id
-                dby_list['name'] = i.emp_name
-                dby_list['status'] = 'Applied'
-                dby_list['date'] = str(dby_date)
-                dby_list['rm1'] = i.emp_rm1
-                dby_list['rm2'] = i.emp_rm2
-                dby_list['rm3'] = i.emp_rm3
-                dby_list['emp_desi'] = i.emp_desi
-                dby_list['emp_team'] = i.emp_process
-
-            except EcplCalander.DoesNotExist:
-                tdy_date = dby_date
-                dby_list['id'] = i.id
-                dby_list['emp_id'] = i.emp_id
-                dby_list['name'] = i.emp_name
-                dby_list['status'] = str(dby_date)
-                dby_list['date'] = str(dby_date)
-                dby_list['rm1'] = i.emp_rm1
-                dby_list['rm2'] = i.emp_rm2
-                dby_list['rm3'] = i.emp_rm3
-                dby_list['emp_desi'] = i.emp_desi
-                dby_list['emp_team'] = i.emp_process
-
-            dby_list_list.append(dby_list)
-
-        emp_id = request.user.profile.emp_id
-        emp = Profile.objects.get(emp_id=emp_id)
-
-        data = {'todays_att':todays_list_list,
-                'ystdays_att':ystday_list_list,
-                'dbys_att':dby_list_list,'emp':emp}
-
-        return render(request,'ams/team_attendance.html',data)
+    return render(request,'ams/team_attendance.html',data)
 
 @login_required
 def viewTeamAttendance(request):
     if request.method == 'POST':
-        rm = request.user.profile.emp_name
+        rm = request.user.profile.emp_id
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
         emp_id = request.POST['emp_id']
 
         if emp_id == 'All':
-            cal = EcplCalander.objects.filter(Q(rm1=rm) | Q(rm2=rm) | Q(rm3=rm),date__range=[start_date,end_date])
+            cal = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),date__range=[start_date,end_date])
         else:
-            cal = EcplCalander.objects.filter(Q(rm1=rm) | Q(rm2=rm) | Q(rm3=rm), date__range=[start_date, end_date],
+            cal = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm), date__range=[start_date, end_date],
                                               emp_id=emp_id)
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
@@ -2143,7 +1947,7 @@ def addAttendance(request):
         for i in range(delta.days + 1):
             day = start_date + timedelta(days=i)
             date_list.append(day)
-        profile = Profile.objects.all()
+        profile = Profile.objects.filter(agent_status='Active')
         for i in date_list:
             for j in profile:
                 try:

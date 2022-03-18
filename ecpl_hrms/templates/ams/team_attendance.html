@@ -52,16 +52,16 @@
                     {% else %}
                     <tr>
                       <td class="align-middle">{{i.date}}</td>
-                      <td class="align-middle">{{i.name}}</td>
+                      <td class="align-middle">{{i.emp_name}}</td>
                       <td class="align-middle">{{i.emp_id}}</td>
                       <td class="align-middle">{{i.emp_desi}}</td>
-                      <td class="align-middle">{{i.emp_team}}</td>
+                      <td class="align-middle">{{i.team}}</td>
 
                       <td class="align-middle">
                         <form action="/ams/apply-attendance" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                           <div>
-                            <input type="hidden" value="{{i.date}}" name="date">
+                            <input type="hidden" value="{{i.date}}" id="mydate_1_{{i.id}}" name="date">
                             <input type="hidden" value="{{i.emp_id}}" name="emp_id">
                             <input type="hidden" value="{{i.name}}" name="emp_name">
                             <input type="hidden" value="{{i.rm1}}" name="rm1">
@@ -79,6 +79,8 @@
                                 <option value="Half Day">Half Day</option>
                                 <option value="Holiday">Holiday</option>
                                 <option value="Absent">Absent</option>
+                                <option value="NCNS">NCNS</option>
+                                <option value="Bench">Bench</option>
                                 <option value="Training">Training</option>
                                 <option value="Attrition">Attrition</option>
                               </select>
@@ -135,16 +137,16 @@
                     {% else %}
                     <tr>
                       <td class="align-middle">{{i.date}}</td>
-                      <td class="align-middle">{{i.name}}</td>
+                      <td class="align-middle">{{i.emp_name}}</td>
                       <td class="align-middle">{{i.emp_id}}</td>
                       <td class="align-middle">{{i.emp_desi}}</td>
-                      <td class="align-middle">{{i.emp_team}}</td>
+                      <td class="align-middle">{{i.team}}</td>
 
                       <td class="align-middle">
                         <form action="/ams/apply-attendance" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                           <div>
-                            <input type="hidden" value="{{i.date}}" name="date">
+                            <input type="hidden" value="{{i.date}}" id="mydate_2_{{i.id}}" name="date">
                             <input type="hidden" value="{{i.emp_id}}" name="emp_id">
                             <input type="hidden" value="{{i.name}}" name="emp_name">
                             <input type="hidden" value="{{i.rm1}}" name="rm1">
@@ -162,6 +164,8 @@
                                 <option value="Half Day">Half Day</option>
                                 <option value="Holiday">Holiday</option>
                                 <option value="Absent">Absent</option>
+                                <option value="NCNS">NCNS</option>
+                                <option value="Bench">Bench</option>
                                 <option value="Training">Training</option>
                                 <option value="Attrition">Attrition</option>
                               </select>
@@ -218,16 +222,16 @@
                     {% else %}
                     <tr>
                       <td class="align-middle">{{i.date}}</td>
-                      <td class="align-middle">{{i.name}}</td>
+                      <td class="align-middle">{{i.emp_name}}</td>
                       <td class="align-middle">{{i.emp_id}}</td>
                       <td class="align-middle">{{i.emp_desi}}</td>
-                      <td class="align-middle">{{i.emp_team}}</td>
+                      <td class="align-middle">{{i.team}}</td>
 
                       <td class="align-middle">
                         <form action="/ams/apply-attendance" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                           <div>
-                            <input type="hidden" value="{{i.date}}" name="date">
+                            <input type="hidden" value="{{i.date}}" id="mydate_3_{{i.id}}" name="date">
                             <input type="hidden" value="{{i.emp_id}}" name="emp_id">
                             <input type="hidden" value="{{i.name}}" name="emp_name">
                             <input type="hidden" value="{{i.rm1}}" name="rm1">
@@ -245,6 +249,8 @@
                                 <option value="Half Day">Half Day</option>
                                 <option value="Holiday">Holiday</option>
                                 <option value="Absent">Absent</option>
+                                <option value="NCNS">NCNS</option>
+                                <option value="Bench">Bench</option>
                                 <option value="Training">Training</option>
                                 <option value="Attrition">Attrition</option>
                               </select>
@@ -270,6 +276,9 @@
 
       </div>
     </div>
+
+{% endblock %}
+{% block script %}
     <script>
       $( document ).ready(function() {
         $today = new Date();
@@ -285,5 +294,19 @@
         $("#tttyesdate").html(moment($they).format('DD-MMM-YYYY')); 
       });   
     </script>
+<script>
+{% for i in todays_att %}
+  $today = $("#mydate_1_{{i.id}}").val();
+  $("#mydate_1_{{i.id}}").val(moment($today).format("YYYY-MM-DD"));
+{% endfor %}
+{% for i in ystdays_att %}
+  $yesterday = $("#mydate_2_{{i.id}}").val();
+  $("#mydate_2_{{i.id}}").val(moment($yesterday).format("YYYY-MM-DD"));
+{% endfor %}
+{% for i in dbys_att %}
+  $d_yes = $("#mydate_3_{{i.id}}").val();
+  $("#mydate_3_{{i.id}}").val(moment($d_yes).format("YYYY-MM-DD"));
+{% endfor %}
+</script>
 
 {% endblock %}
