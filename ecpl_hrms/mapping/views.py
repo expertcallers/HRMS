@@ -17,6 +17,8 @@ manager_list = ['Team Leader','Assistant Manager','Subject Matter Expert', 'Trai
               'Quality Head','Operations Manager','Service Delivery Manager','Command Centre Head',
               'HR','HR Manager','Manager ER','HR Lead','Sr Recruiter','MIS Executive HR',
               'Lead HRBP','Employee Relations Specialist','Payroll Specialist','Recruiter','HR Generalist',
+              'Associate Director','Chief Executive Officer','Chief Compliance Officer','Chief Technology Officer',
+              'Managing Director','Vice President','HR Manager','Manager ER','HR Lead','Lead HRBP',
               ]
 
 # Mapping Home Page
@@ -133,7 +135,7 @@ def updateEmployeeProfile(request):
         emp = Profile.objects.get(emp_id = emp_id)
         teams = Campaigns.objects.all()
         desis = Profile.objects.values_list('emp_desi', flat=True).distinct()
-        rms = Profile.objects.filter(emp_desi__in = manager_list,agent_status = 'Active')
+        rms = Profile.objects.filter(emp_desi__in = manager_list,agent_status = 'Active').order_by('emp_name')
         data = {'emp':emp,'teams':teams,'desis':desis,'rms':rms}
         return render(request,'mapping/update-to-database.html',data)
     else:
