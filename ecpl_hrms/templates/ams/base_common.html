@@ -333,7 +333,8 @@
               alert('{% for m in messages %}{{m}}{% endfor %}');
               {% endif %}
            </script>
-
+        {% block script %}
+        {% endblock %}
 
   </body>
 </html>
