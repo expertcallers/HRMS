@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 import pytz
@@ -12,7 +13,7 @@ from django.contrib import messages
 from datetime import timedelta
 import calendar
 from datetime import date
-from django.db.models import Q
+from django.db.models import Q, Sum, Max
 
 c = Calendar()
 
@@ -33,7 +34,7 @@ hr_list = ['HR','HR Manager','Manager ER','HR Lead','Sr Recruiter','MIS Executiv
 'Lead HRBP','Employee Relations Specialist','Payroll Specialist','Recruiter','HR Generalist']
 
 #Agent List
-agent_list = [ 'Client Relationship Officer ','MIS Executive','Patrolling officer',
+agent_list = [ 'Client Relationship Officer','MIS Executive','Patrolling officer',
                'Data Analyst','Business Development Executive','Content Developer',
                'Junior Developer','Web Developer','Trainee Developer',
                'Jr Dev',
@@ -351,7 +352,16 @@ def viewAndApproveLeaveRequestMgr(request):
             while start_date <= end_date:
                 month_days.append(start_date.strftime("%Y-%m-%d"))
                 start_date += delta
-
+            leave_history = leaveHistory()
+            leave_history.leave_type = leave_type
+            leave_history.transaction = 'Debit'
+            leave_history.date = date.today()
+            leave_history.no_days = int(no_days)
+            leave_history.emp_id = emp_id
+            pl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).pl_balance
+            sl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).sl_balance
+            leave_history.total = pl+sl
+            leave_history.save()
             for i in month_days:
                 try:
                     cal = EcplCalander.objects.get(Q(date = i),Q(emp_id=emp_id))
@@ -929,13 +939,16 @@ def applyAttendace(request):
             cal = EcplCalander.objects.get(Q(date=ddate), Q(emp_id=emp_id), ~Q(att_actual='Unmarked'))
             messages.info(request, '*** Already Marked in Calendar, Please Refresh the page and try again ***')
             return redirect('/ams/team-attendance')
-
         except EcplCalander.DoesNotExist:
             cal = EcplCalander.objects.get(emp_id=emp_id, date=ddate)
             cal.att_actual = att_actual
             cal.approved_on = now
             cal.appoved_by = request.user.profile.emp_name
         cal.save()
+        if att_actual == "present":
+            leave = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
+            leave.present_count += 1
+            leave.save()
         return redirect('/ams/team-attendance')
     else:
         return HttpResponse('<h1>*** GET not available ***</h1>')
@@ -1627,7 +1640,11 @@ def applyLeave(request):
             leave_balance = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
         except EmployeeLeaveBalance.DoesNotExist:
             leave_balance = {'sl_balance':0,'pl_balance':0}
-        data = {'emp': emp,'leave':leave,'leave_balance':leave_balance,'probation':probation}
+
+        leave_his = leaveHistory.objects.filter(emp_id=emp_id).values('date','transaction',
+                                                                  'leave_type','total').annotate(no_days=Sum('no_days'))
+
+        data = {'emp': emp,'leave':leave,'leave_balance':leave_balance,'probation':probation,'leave_his':leave_his}
         return render(request,'ams/apply-leave.html',data)
 
 @login_required
@@ -1674,8 +1691,8 @@ def approveLeaveRM1(request):
         e.tl_status = tl_status
         e.status = status
         e.save()
-
         return redirect('/ams/view-leave-list')
+
 @login_required
 def applyEscalation(request):
     if request.method == "POST":
@@ -1967,3 +1984,33 @@ def addAttendance(request):
         months = AddAttendanceMonths.objects.filter(created=False)
         data = {'months':months}
         return render(request, 'ams/admin/add_attendance.html',data)
+
+def SLProofSubmit(request):
+    if request.method == 'POST':
+        id = request.POST['id']
+        proof = request.FILES['proof']
+        leave = LeaveTable.objects.get(id=id)
+        last_date = leave.end_date
+        timee = (date.today() - last_date).days
+        if timee <= 2:
+            leave.proof = proof
+            leave.save()
+            return redirect('/ams/ams-apply_leave')
+        else:
+            messages.info(request, "The time has exceeded cannot upload now :)")
+            return redirect('/ams/ams-apply_leave')
+    else:
+        for i in LeaveTable.objects.all():
+            i.delete()
+
+def test(request):
+    emp = EmployeeLeaveBalance.objects.all()
+    for i in emp:
+        while i.present_count >= 20:
+            if i.present_count >= 20:
+                i.pl_balance += 1
+                i.present_count -= 20
+                i.save()
+                e = leaveHistory.objects.create(emp_id=i.emp_id,date=date.today(),
+                                                leave_type="PL",transaction="Credit",no_days=1,total=i.pl_balance+i.sl_balance)
+                e.save()

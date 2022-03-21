@@ -187,6 +187,7 @@ class LeaveTable(models.Model):
     emp_rm3_id = models.CharField(max_length=50, null=True)
     escalation = models.BooleanField(default=False)
     escalation_reason = models.TextField(null=True)
+    proof = models.FileField(null=True, blank=True,upload_to='Uploads/SL_Proof')
 
 
 # Attendance correction history - send - approve ++
@@ -226,3 +227,11 @@ class AddAttendanceMonths(models.Model):
     month_number = models.IntegerField()
     year = models.IntegerField()
     created = models.BooleanField(default=False,null=True,blank=True)
+
+class leaveHistory(models.Model):
+    emp_id = models.CharField(max_length=30)
+    date = models.DateField()
+    leave_type = models.CharField(max_length=30)
+    transaction = models.CharField(max_length=30)
+    no_days = models.IntegerField()
+    total = models.IntegerField(null=True,blank=True)

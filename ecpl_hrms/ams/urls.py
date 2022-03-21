@@ -74,6 +74,9 @@ urlpatterns = [
     path('approve-leave-rm1',approveLeaveRM1),
     path('rm-approval/<int:id>',rmApproval),
     path('view-leave-request-mgr',viewAndApproveLeaveRequestMgr),
+    path('sl-proof', SLProofSubmit),
+    path('apply-escalation', applyEscalation),
+    path('view-leave-escalation-mgr', viewEscalation),
 
     # Mapping
     path('rm-mapping-index',mappingHomePage),
@@ -91,8 +94,7 @@ urlpatterns = [
     # calnder Start
     #path('start-calander',startCalandarForAllAgents)
 
-    path('apply-escalation', applyEscalation),
-    path('view-leave-escalation-mgr', viewEscalation),
     path('add-attendance', addAttendance),
+    path('test', test),
 
 ]

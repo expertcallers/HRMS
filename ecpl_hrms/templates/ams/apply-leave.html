@@ -5,7 +5,7 @@
         <!-- page content -->
         <div class="right_col" role="main">
           <div class="row mb-3">
-            <div class="col-md-4">
+            <div class="col-md-3">
               <div class="card">
                 <div class="card-header">
                   <h4>Total Leave Balance</h4>
@@ -15,7 +15,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
               <div class="card">
                 <div class="card-header">
                   <h4>Privilege Leave Balance</h4>
@@ -31,7 +31,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
               <div class="card">
                 <div class="card-header">
                   <h4>Sick Leave Balance</h4>
@@ -46,6 +46,9 @@
                   </h1>
                 </div>
               </div>
+            </div>
+            <div class="col-md-3 mt-5 pt-5" align="center">
+              <button class="btn btn-success btn-lg" data-toggle="modal" data-target="#leave_bal_history">Know your Leave Balance History</button>
             </div>
           </div>
           <form action="/ams/ams-apply_leave" method="POST" enctype="multipart/form-data">
@@ -160,6 +163,9 @@
                                 {% if i.tl_status == "Rejected" and i.manager_approval == False %}<br>
                                 <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#view_{{i.id}}">Escalate</button>
                                 {% endif %}
+                                {% if i.leave_type == "SL" and i.no_days > 1 and i.manager_approval == False %}<br>
+                                <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#proof_{{i.id}}">Proof</button>
+                                {% endif %}
                               </td>
                           </tr>
                         {% endfor %}
@@ -176,6 +182,7 @@
 
     <!-- Start Escalate Pop-Up -->
         {% for i in leave %}
+{% if i.tl_status == "Rejected" and i.manager_approval == False %}
       <div class="modal fade" id="view_{{i.id}}" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
           <div class="modal-content">
@@ -230,7 +237,153 @@
           </div>
         </div>
       </div>
+{% endif %}
         {% endfor %}
     <!-- End EscalatePop-Up -->
 
+
+    <!-- Start Proof Pop-Up -->
+        {% for i in leave %}
+{% if i.leave_type == "SL" and i.no_days > 1 and i.manager_approval == False %}
+      <div class="modal fade" id="proof_{{i.id}}" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="View_Request">View Request</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form action="/ams/sl-proof" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-6 mt-2">
+                    <label for="proof_emp_name">Employee Name</label>
+                    <input type="text" disabled value="{{i.emp_name}}" id="proof_emp_name" class="form-control">
+                  </div>
+                  <div class="col-md-6 mt-2">
+                    <label for="proof_emp_id">Employee ID</label>
+                    <input type="text" disabled value="{{i.emp_id}}"  name="emp_id" id="proof_emp_id" class="form-control">
+                  </div>
+                  <div class="col-md-4 mt-2">
+                    <label for="proof_app_on">Applied On</label>
+                    <input type="text" disabled value="{{i.applied_date}}" id="proof_app_on" class="form-control">
+                  </div>
+                  <div class="col-md-8 mt-2">
+                    <label for="proof_app_for">Applied For Dates</label>
+                    <input type="text" disabled value="{{i.start_date}} to {{i.end_date}}" id="proof_app_for" class="form-control">
+                  </div>
+                  <div class="col-md-6 mt-2">
+                    <label for="proof_num_days">Number of Days</label>
+                    <input type="text" disabled value="{{i.no_days}}" id="proof_num_days" class="form-control">
+                  </div>
+                  <div class="col-md-6 mt-2">
+                    <label for="proof_leave_type">Leave Type</label>
+                    <input type="text" disabled  value="{{i.leave_type}}" id="proof_leave_type" class="form-control">
+                  </div>
+                  <div class="col-md-6 mt-2">
+                    <label for="proof">Upload Proof</label>
+                    {% if i.proof %}
+                    <a href="/{{i.proof}}" target="_blank">
+                      <button type="button" class="btn btn-primary form-control">View</button>
+                    </a>
+                    {% else %}
+                    <input type="file" id="proof" name="proof" class="form-control" required accept=".png, .jpg, .jpeg, .pdf">
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div>
+                <input type="hidden" name="id" value="{{i.id}}">
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                {% if i.proof%}
+                {% else %}
+                <button type="submit" onclick="return confirmm();" class="btn btn-success">Submit Proof</button>
+                {% endif %}
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+{% endif %}
+        {% endfor %}
+    <!-- End Proof Pop-Up -->
+
+
+    <!-- Start Leave Balance History Pop-Up -->
+
+      <div class="modal fade" id="leave_bal_history" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="View_bal_history">Leave Balance History</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-12">
+                    <table  id="datatable_two" class="table table-striped" style="width: 100% !important;">
+                      <thead>
+                          <tr>
+                            <th class="align-middle align-center" style="text-align: center;">Date</th>
+                            <th class="align-middle align-center" style="text-align: center;">Leave type</th>
+                            <th class="align-middle align-center" style="text-align: center;">Transaction</th>
+                            <th class="align-middle align-center" style="text-align: center;">Number of days</th>
+                            <th class="align-middle align-center" style="text-align: center;">Total Balance</th>
+                          </tr>
+                      </thead>
+                      <tfoot>
+                          <tr>
+                            <th class="align-middle align-center" style="text-align: center;">Date</th>
+                            <th class="align-middle align-center" style="text-align: center;">Leave type</th>
+                            <th class="align-middle align-center" style="text-align: center;">Transaction</th>
+                            <th class="align-middle align-center" style="text-align: center;">Number of days</th>
+                            <th class="align-middle align-center" style="text-align: center;">Total Balance</th>
+                          </tr>
+                      </tfoot>
+                      <tbody>
+                        {% for i in leave_his %}
+                          <tr>
+                            <td>{{i.date}}</td>
+                            <td>{{i.leave_type}}</td>
+                            <td>{{i.transaction}}</td>
+                            <td>{{i.no_days}}</td>
+                            <td>{{i.total}}</td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- End Leave Balance History Pop-Up -->
+<script>
+  $(document).ready(function() {
+      var upload=document.getElementById("proof");
+      upload.addEventListener("change",()=>{
+          var fileInput = document.getElementById('proof');
+          var filePath = fileInput.value;
+          var allowedExtensions =  /(\.jpg|\.jpeg|\.png|\.pdf)$/i;
+          if (!allowedExtensions.exec(filePath)) {
+              fileInput.setCustomValidity("Only PDF files and Images (.png, .jpg, .jpeg) are accepted");
+              fileInput.reportValidity();
+              return false;
+          } else {
+              fileInput.setCustomValidity("");
+          }
+      })
+  });
+</script>
 {% endblock %}
