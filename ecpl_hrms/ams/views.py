@@ -951,14 +951,18 @@ def applyAttendace(request):
             cal.att_actual = att_actual
             cal.approved_on = now
             cal.appoved_by = request.user.profile.emp_name
-        cal.save()
         if att_actual == "present":
-            leave = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
-            leave.present_count += 1
-            leave.save()
+            try:
+                leave = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
+                leave.present_count += 1
+                leave.save()
+                cal.save()
+            except EmployeeLeaveBalance.DoesNotExist:
+                return HttpResponse('<h1>*** Employee Leave Balance details does not exist, Please contact Admin to resolve this and try again ***</h1>')
+
         return redirect('/ams/team-attendance')
     else:
-        return HttpResponse('<h1>*** GET not available ***</h1>')
+        return HttpResponse('<h1>*** Page not available ***</h1>')
 
 @login_required
 def newSingleAttandance(request):
