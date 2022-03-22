@@ -3,6 +3,7 @@ from django.db import models
 # Attendance - Master ++
 
 class EcplCalander(models.Model):
+    unique_id = models.CharField(max_length=150,null=True,blank=True)
     team = models.CharField(max_length=300)
     date = models.DateField()
     emp_name = models.CharField(max_length=300)
@@ -20,6 +21,7 @@ class EcplCalander(models.Model):
 
 # Onboarding - Master +
 class OnboardingnewHRC(models.Model):
+    unique_id = models.CharField(max_length=150,null=True,blank=True)
     hr_name = models.ForeignKey(User,on_delete=models.CASCADE,related_name='hrname',null=True)
     submit_date=models.DateTimeField(default="2000-01-01 01:01")
     emp_name=models.CharField(max_length=50)
@@ -87,6 +89,7 @@ class OnboardingnewHRC(models.Model):
 
 # Mapping Tickets - request - approval ++
 class MappingTickets(models.Model):
+    unique_id = models.CharField(max_length=150,null=True,blank=True)
     emp_name=models.CharField(max_length=50)
     emp_id = models.CharField(max_length=10)
     emp_desi = models.CharField(max_length=50)
@@ -107,6 +110,7 @@ class MappingTickets(models.Model):
 
 # Campaigns - teams +
 class Campaigns(models.Model):
+    unique_id = models.CharField(max_length=150,null=True,blank=True)
     name=models.CharField(max_length=100)
     om = models.CharField(max_length=50)
     created_by = models.CharField(max_length=50,null=True,blank=True)
@@ -115,6 +119,7 @@ class Campaigns(models.Model):
 
 # Job Requisition - Master +
 class JobRequisition(models.Model):
+    unique_id = models.CharField(max_length=150,null=True,blank=True)
     user_name = models.ForeignKey(User, on_delete=models.CASCADE, related_name='log_user', null=True)
     req_date = models.DateField(null=True)
     hc_req = models.IntegerField(null=True)
@@ -153,6 +158,7 @@ class JobRequisition(models.Model):
 
 # Leave Balance - PL - SL +
 class EmployeeLeaveBalance(models.Model):
+    unique_id = models.CharField(max_length=150,null=True,blank=True)
     emp_id = models.CharField(max_length=10,null=True)
     emp_name = models.CharField(max_length=50,null=True)
     team = models.CharField(max_length=50,null=True)
@@ -162,6 +168,7 @@ class EmployeeLeaveBalance(models.Model):
 
 # Leave apply - save - approval ++
 class LeaveTable(models.Model):
+    unique_id = models.CharField(max_length=150,null=True,blank=True)
     emp_name = models.CharField(max_length=50,null=True)
     emp_id = models.CharField(max_length=50, null=True)
     emp_desi = models.CharField(max_length=50, null=True)
@@ -192,6 +199,7 @@ class LeaveTable(models.Model):
 
 # Attendance correction history - send - approve ++
 class AttendanceCorrectionHistory(models.Model):
+    unique_id = models.CharField(max_length=150,null=True,blank=True)
     applied_by = models.CharField(max_length=30,null=True,blank=True)
     applied_by_id = models.CharField(max_length=30,null=True,blank=True)
     applied_date = models.DateField()
@@ -210,6 +218,7 @@ class AttendanceCorrectionHistory(models.Model):
 
 # Agent status change history - att - ben - training +
 class AgentActiveStatusHist(models.Model):
+    unique_id = models.CharField(max_length=150,null=True,blank=True)
     emp_id = models.CharField(max_length=20,null=True,blank=True)
     emp_name = models.CharField(max_length=30,null=True,blank=True)
     current_status = models.CharField(max_length=20,null=True,blank=True)
@@ -223,12 +232,15 @@ class AgentActiveStatusHist(models.Model):
     ticket_status = models.BooleanField(default=False)
 
 class AddAttendanceMonths(models.Model):
+    unique_id = models.CharField(max_length=150,null=True,blank=True)
     month = models.CharField(max_length=30)
     month_number = models.IntegerField()
     year = models.IntegerField()
-    created = models.BooleanField(default=False,null=True,blank=True)
+    created = models.BooleanField(default=False)
+    leave = models.BooleanField(default=False)
 
 class leaveHistory(models.Model):
+    unique_id = models.CharField(max_length=150,null=True,blank=True)
     emp_id = models.CharField(max_length=30)
     date = models.DateField()
     leave_type = models.CharField(max_length=30)

@@ -955,7 +955,6 @@ def applyAttendace(request):
 
 @login_required
 def newSingleAttandance(request):
-
     if request.method == 'POST':
         ddate = request.POST['date']
         att_actual = request.POST['att_actual']
@@ -971,8 +970,11 @@ def newSingleAttandance(request):
             cal.approved_on = now
             cal.appoved_by = request.user.profile.emp_name
         cal.save()
+        if att_actual == "present":
+            leave = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
+            leave.present_count += 1
+            leave.save()
         return redirect('/ams/ams-update-attendance')
-
     else:
         ######### Dates #################################
         today = date.today()
@@ -1019,16 +1021,60 @@ def rmApproval(request,id):
         return redirect('/ams/view-att-requests')
 
 
+@login_required
 def attRequests(request):
-
     emp_name = request.user.profile.emp_name
     id = request.user.profile.emp_id
     cal = EcplCalander.objects.filter(approved_status=False, rm1=emp_name)
     emp = Profile.objects.get(emp_id=id)
-
     data = {'cal':cal,'emp':emp}
     return render(request,'ams/req_att.html',data)
 
+@login_required
+def addLeaveBalance(request):
+    emp_desi = request.user.profile.emp_desi
+    if emp_desi in hr_list:
+        if request.method == 'POST':
+            unique_id = request.POST['csrfmiddlewaretoken']
+            emp = EmployeeLeaveBalance.objects.all()
+            for i in emp:
+                try:
+                    EmployeeLeaveBalance.objects.get(unique_id=i.unique_id)
+                    pass
+                except EmployeeLeaveBalance.DoesNotExist:
+                    i.unique_id = unique_id
+                    i.sl_balance += 1
+                    i.save()
+                try:
+                    leaveHistory.objects.get(unique_id=unique_id)
+                    pass
+                except leaveHistory.DoesNotExist:
+                    e = leaveHistory.objects.create(unique_id=unique_id,emp_id=i.emp_id, date=date.today(),
+                                                    leave_type="SL", transaction="Credit", no_days=1,
+                                                    total=i.pl_balance + i.sl_balance)
+                    e.save()
+                while i.present_count >= 20:
+                    if i.present_count >= 20:
+                        i.pl_balance += 1
+                        i.present_count -= 20
+                        i.save()
+                        e = leaveHistory.objects.create(emp_id=i.emp_id, date=date.today(),
+                                                        leave_type="PL", transaction="Credit", no_days=1,
+                                                        total=i.pl_balance + i.sl_balance)
+                        e.save()
+            id = request.POST['month']
+            e = AddAttendanceMonths.objects.get(id=id)
+            e.leave = True
+            e.save()
+            messages.info(request, "Leave Balance Added for the selected month")
+            return redirect('/ams/add-leave-bal')
+        else:
+            leave = AddAttendanceMonths.objects.filter(leave=False)
+            data = {'months':leave}
+            return render(request, 'ams/add_leave_bal.html', data)
+    else:
+        messages.info(request, "Unauthorized access you have been Logged out :)")
+        return redirect('/ams/')
 @login_required
 def teamAttendance(request):
     user_nm = request.user.profile.emp_name
@@ -2004,13 +2050,4 @@ def SLProofSubmit(request):
             i.delete()
 
 def test(request):
-    emp = EmployeeLeaveBalance.objects.all()
-    for i in emp:
-        while i.present_count >= 20:
-            if i.present_count >= 20:
-                i.pl_balance += 1
-                i.present_count -= 20
-                i.save()
-                e = leaveHistory.objects.create(emp_id=i.emp_id,date=date.today(),
-                                                leave_type="PL",transaction="Credit",no_days=1,total=i.pl_balance+i.sl_balance)
-                e.save()
+    pass

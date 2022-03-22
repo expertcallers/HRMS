@@ -42,6 +42,7 @@ urlpatterns = [
     path('view-emp-attendance',viewTeamAttendance),
     path('team-attendance-report',teamAttendanceReport),
     path('view-att-requests',attRequests),
+    path('add-leave-bal', addLeaveBalance),
 
     #Attendance Correction
     path('attendance-correction',attendanceCorrection),

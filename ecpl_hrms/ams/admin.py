@@ -15,15 +15,18 @@ class LeaveHistorySearch(admin.ModelAdmin):
     list_display = ('date','emp_id',"leave_type","transaction","no_days",'total')
     filter = ('emp_id',"date")
 
+class AddAttendanceMonthsSearch(admin.ModelAdmin):
+    search_fields = ('month','year')
+    list_display = ('month','month_number',"year","created", "leave",)
 
-admin.site.register(EcplCalander,AttendanceSearch)
+
+
+admin.site.register(EcplCalander, AttendanceSearch)
 admin.site.register(OnboardingnewHRC)
 admin.site.register(JobRequisition)
 admin.site.register(Campaigns)
-admin.site.register(EmployeeLeaveBalance,LeaveSearch)
+admin.site.register(EmployeeLeaveBalance, LeaveSearch)
 admin.site.register(AgentActiveStatusHist)
 admin.site.register(LeaveTable)
-admin.site.register(AddAttendanceMonths)
-admin.site.register(leaveHistory,LeaveHistorySearch)
-
-
+admin.site.register(AddAttendanceMonths, AddAttendanceMonthsSearch)
+admin.site.register(leaveHistory, LeaveHistorySearch)
