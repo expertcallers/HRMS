@@ -19,9 +19,9 @@ from .views import *
 urlpatterns = [
     # Login
     path('',loginPage),
-    #path('login/',loginAndRedirect),
-    #path('login',loginAndRedirect),
-    #path('logout',logoutView),
+    path('login/',loginAndRedirect),
+    path('login',loginAndRedirect),
+    path('logout',logoutView),
     path('change-password',change_password),
     path('upload-image',uploadImageToDB),
     path('ams-agent-settings',agentSettings),
