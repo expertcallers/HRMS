@@ -891,9 +891,14 @@ def addNewUserHR(request):
                 emp_rm1=emp_rm1, emp_rm2=emp_rm2, emp_rm3=emp_rm3,
                 emp_process=emp_process, user=usr,doj=emp_doj,on_id=on_id,
             )
+            leave = EmployeeLeaveBalance.objects.create(
+                emp_id=emp_id, emp_name=emp_name, team=emp_process, pl_balance=0,
+                sl_balance=0, present_count=0
+            )
             onb_obj.user_created = True
             onb_obj.save()
             profile.save()
+            leave.save()
         messages.info(request,'User and Profile Successfully Created')
         return redirect('/ams/add-new-user')
 
@@ -921,10 +926,12 @@ def viewEmployeeProfile(request,id,on_id):
     emp = Profile.objects.get(emp_id=emp_id)
 
     profile = Profile.objects.get(id=id)
-
-    onboarding = OnboardingnewHRC.objects.get(id=on_id)
-    
-    data = {'profile': profile, 'onboard': onboarding,'emp':emp}
+    print(on_id,"on_id")
+    if on_id == "None":
+        onboarding = ""
+    else:
+        onboarding = OnboardingnewHRC.objects.get(id=int(on_id))
+    data = {'profile': profile, 'onboard': onboarding,'emp':emp,"on":on_id}
 
     return render(request,'ams/emp_profile_view.html',data)
 
@@ -1039,29 +1046,28 @@ def addLeaveBalance(request):
             emp = EmployeeLeaveBalance.objects.all()
             for i in emp:
                 try:
-                    EmployeeLeaveBalance.objects.get(unique_id=i.unique_id)
+                    EmployeeLeaveBalance.objects.get(emp_id=i.emp_id, unique_id=unique_id)
                     pass
                 except EmployeeLeaveBalance.DoesNotExist:
                     i.unique_id = unique_id
                     i.sl_balance += 1
+                    cal = EcplCalander.objects.filter(Q(emp_id=i.emp_id),
+                                                      Q(att_actual='present') | Q(att_actual='Week OFF') |
+                                                      Q(att_actual='Comp OFF') | Q(att_actual='Holiday')).count()
+                    half = (EcplCalander.objects.filter(emp_id=i.emp_id, att_actual='Half Day').count()) / 2
+                    cal += half
+                    pl = round(cal / 20, 2)
+                    i.pl_balance += pl
                     i.save()
-                try:
-                    leaveHistory.objects.get(unique_id=unique_id)
-                    pass
-                except leaveHistory.DoesNotExist:
-                    e = leaveHistory.objects.create(unique_id=unique_id,emp_id=i.emp_id, date=date.today(),
+                    pl_leave = leaveHistory.objects.create(unique_id=unique_id,emp_id=i.emp_id, date=date.today(),
+                                                    leave_type="PL", transaction="Credit", no_days=pl,
+                                                    total=i.pl_balance + i.sl_balance)
+                    sl_leave = leaveHistory.objects.create(unique_id=unique_id,emp_id=i.emp_id, date=date.today(),
                                                     leave_type="SL", transaction="Credit", no_days=1,
                                                     total=i.pl_balance + i.sl_balance)
-                    e.save()
-                while i.present_count >= 20:
-                    if i.present_count >= 20:
-                        i.pl_balance += 1
-                        i.present_count -= 20
-                        i.save()
-                        e = leaveHistory.objects.create(emp_id=i.emp_id, date=date.today(),
-                                                        leave_type="PL", transaction="Credit", no_days=1,
-                                                        total=i.pl_balance + i.sl_balance)
-                        e.save()
+                    pl_leave.save()
+                    sl_leave.save()
+
             id = request.POST['month']
             e = AddAttendanceMonths.objects.get(id=id)
             e.leave = True
@@ -1069,7 +1075,9 @@ def addLeaveBalance(request):
             messages.info(request, "Leave Balance Added for the selected month")
             return redirect('/ams/add-leave-bal')
         else:
-            leave = AddAttendanceMonths.objects.filter(leave=False)
+            month = datetime.now().month
+            year = datetime.now().year
+            leave = AddAttendanceMonths.objects.filter(leave=False,month_number=month,year=year)
             data = {'months':leave}
             return render(request, 'ams/add_leave_bal.html', data)
     else:

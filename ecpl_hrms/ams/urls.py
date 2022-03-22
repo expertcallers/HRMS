@@ -53,7 +53,7 @@ urlpatterns = [
     # User Managfement, Onboarding
     path('add-new-user',addNewUserHR),
     path('viewusers',viewUsersHR),
-    path('view-employee-profile/<int:id>/<int:on_id>',viewEmployeeProfile),
+    path('view-employee-profile/<int:id>/<str:on_id>',viewEmployeeProfile),
     path('onboarding',on_boarding),
     path('view-onboarding',viewOnBoarding),
     path('edit-onboarding/<int:id>',on_boarding_update),

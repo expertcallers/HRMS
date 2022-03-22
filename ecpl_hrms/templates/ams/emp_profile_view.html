@@ -14,6 +14,7 @@
             <div class="col-md-12">
               <div class="card">
                 <div class="card-body">
+                {% if on != "None" %}
                   <div class="row">
                     <div class="col-md-12">
                       <h4>Personal Details</h4>
@@ -509,9 +510,10 @@
                     </div>
                     {% endif %}
                   </div>
+                {% endif %}
                   <div class="row mt-4">
                     <div class="col-md-12">
-                      <h4>Officail Details</h4>
+                      <h4>Official Details</h4>
                       <!-- <p>Person to be contacted in case of emergency.</p> -->
                       <hr>
                     </div>
@@ -578,7 +580,7 @@
                           {% csrf_token %}
                           <div class="col-md-4">
                             <div class="form-group">
-                              <label for="new_status">New Status</label>                   
+                              <label for="new_status">New Status</label>
                               <select class="form-control select2" name="new_status" id="new_status" required>
                                 <option value="" selected disabled>Please Select</option>
                                 <option value="Attrition">Attrition</option>
@@ -590,13 +592,13 @@
                           </div>
                           <div class="col-md-4">
                             <div class="form-group">
-                              <label for="reason">Reason</label>                   
+                              <label for="reason">Reason</label>
                               <textarea id="reason" class="form-control" rows="3" name="reason" required></textarea>
                             </div>
                           </div>
                           <div class="col-md-4">
                             <div class="form-group">
-                              <button class="form-control btn btn-primary mt-4">submit</button>                    
+                              <button class="form-control btn btn-primary mt-4">submit</button>
                             </div>
                           </div>
                         </form>
