@@ -162,8 +162,8 @@ class EmployeeLeaveBalance(models.Model):
     emp_id = models.CharField(max_length=10,null=True)
     emp_name = models.CharField(max_length=50,null=True)
     team = models.CharField(max_length=50,null=True)
-    pl_balance = models.IntegerField()
-    sl_balance = models.IntegerField()
+    pl_balance = models.FloatField()
+    sl_balance = models.FloatField()
     present_count = models.IntegerField(default=0)
 
 # Leave apply - save - approval ++
