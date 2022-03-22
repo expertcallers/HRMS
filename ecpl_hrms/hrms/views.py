@@ -4,4 +4,4 @@ from django.shortcuts import render, redirect
 # Create your views here.
 def indexHrms(request):
 
-    return redirect('/ams/login')
+    return redirect('/mapping/login')

@@ -43,10 +43,11 @@ agent_list = [ 'Client Relationship Officer','MIS Executive','Patrolling officer
 # Create your views here.
 def loginPage(request):
     logout(request)
-    form = AuthenticationForm()
-    teams = Campaigns.objects.all().order_by('name')
-    data = {'teams':teams,'form':form}
-    return render(request,'ams/login.html',data)
+    #form = AuthenticationForm()
+    #teams = Campaigns.objects.all().order_by('name')
+    #data = {'teams':teams,'form':form}
+    #return render(request,'ams/login.html',data)
+    return redirect('mapping/login/test')
 
 def loginAndRedirect(request):
     if request.method == 'POST':
