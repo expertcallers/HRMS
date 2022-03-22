@@ -19,9 +19,9 @@ from .views import *
 urlpatterns = [
     # Login
     path('',loginPage),
-    #path('login/',loginAndRedirect),
-    #path('login',loginAndRedirect),
-    #path('logout',logoutView),
+    path('login/',loginAndRedirect),
+    path('login',loginAndRedirect),
+    path('logout',logoutView),
     path('change-password',change_password),
     path('upload-image',uploadImageToDB),
     path('ams-agent-settings',agentSettings),
@@ -78,6 +78,7 @@ urlpatterns = [
     path('sl-proof', SLProofSubmit),
     path('apply-escalation', applyEscalation),
     path('view-leave-escalation-mgr', viewEscalation),
+    path('leave-history', viewLeaveHistory),
 
     # Mapping
     path('rm-mapping-index',mappingHomePage),

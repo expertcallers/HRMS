@@ -561,49 +561,48 @@
                     </div>
                   </div>
 
-
-                    <div class="row mt-4">
-                      <div class="col-md-12">
-                        <h4>Status</h4>
-                        <!-- <p>Person to be contacted in case of emergency.</p> -->
-                        <hr>
-                      </div>
-                      <div class="col-md-3">
-                        <div class="form-group">
-                          <label for="emp_status">Current Status</label>
-                          <p> {{profile.agent_status}}</p>
-                          <input type="text" value="{{profile.agent_status}}" readonly id="emp_status" class="form-control">
-                        </div>
-                      </div>
-                      <div class="col-md-9">
-                        <form action="/ams/edit-employee-profile-status" method="POST" enctype="multipart/form-data">
-                          {% csrf_token %}
-                          <div class="col-md-4">
-                            <div class="form-group">
-                              <label for="new_status">New Status</label>
-                              <select class="form-control select2" name="new_status" id="new_status" required>
-                                <option value="" selected disabled>Please Select</option>
-                                <option value="Attrition">Attrition</option>
-                                <option value="Bench">Bench</option>
-                                <option value="Training">Training</option>
-                              </select>
-                              <input type="hidden" value="{{profile.id}}" name="id" id="">
-                            </div>
-                          </div>
-                          <div class="col-md-4">
-                            <div class="form-group">
-                              <label for="reason">Reason</label>
-                              <textarea id="reason" class="form-control" rows="3" name="reason" required></textarea>
-                            </div>
-                          </div>
-                          <div class="col-md-4">
-                            <div class="form-group">
-                              <button class="form-control btn btn-primary mt-4">submit</button>
-                            </div>
-                          </div>
-                        </form>
+                  <div class="row mt-4">
+                    <div class="col-md-12">
+                      <h4>Status</h4>
+                      <!-- <p>Person to be contacted in case of emergency.</p> -->
+                      <hr>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_status">Current Status</label>
+                        <p> {{profile.agent_status}}</p>
+                        <input type="text" value="{{profile.agent_status}}" readonly id="emp_status" class="form-control">
                       </div>
                     </div>
+                    <div class="col-md-9">
+                      <form action="/ams/edit-employee-profile-status" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label for="new_status">New Status</label>
+                            <select class="form-control select2" name="new_status" id="new_status" required>
+                              <option value="" selected disabled>Please Select</option>
+                              <option value="Attrition">Attrition</option>
+                              <option value="Bench">Bench</option>
+                              <option value="Training">Training</option>
+                            </select>
+                            <input type="hidden" value="{{profile.id}}" name="id" id="">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label for="reason">Reason</label>
+                            <textarea id="reason" class="form-control" rows="3" name="reason" required></textarea>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <button class="form-control btn btn-primary mt-4">submit</button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
 
                 </div>
               </div>

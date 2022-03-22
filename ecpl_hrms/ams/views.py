@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 
+import monthdelta as monthdelta
 import pytz
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -14,7 +15,6 @@ from datetime import timedelta
 import calendar
 from datetime import date
 from django.db.models import Q, Sum, Max
-
 c = Calendar()
 
 # Getting Model from other Apps
@@ -43,11 +43,10 @@ agent_list = [ 'Client Relationship Officer','MIS Executive','Patrolling officer
 # Create your views here.
 def loginPage(request):
     logout(request)
-    #form = AuthenticationForm()
-    #teams = Campaigns.objects.all().order_by('name')
-    #data = {'teams':teams,'form':form}
-    #return render(request,'ams/login.html',data)
-    return redirect('mapping/login/test')
+    form = AuthenticationForm()
+    teams = Campaigns.objects.all().order_by('name')
+    data = {'teams':teams,'form':form}
+    return render(request,'ams/login.html',data)
 
 def loginAndRedirect(request):
     if request.method == 'POST':
@@ -1045,6 +1044,12 @@ def addLeaveBalance(request):
         if request.method == 'POST':
             unique_id = request.POST['csrfmiddlewaretoken']
             emp = EmployeeLeaveBalance.objects.all()
+            month = date.today().month
+            year = date.today().year
+            start_date = date(year, month, 1)
+            start_date = start_date - monthdelta.monthdelta(1)
+            end_date = date(year, month, 1)
+            end_date = end_date - timedelta(days=1)
             for i in emp:
                 try:
                     EmployeeLeaveBalance.objects.get(emp_id=i.emp_id, unique_id=unique_id)
@@ -1054,8 +1059,10 @@ def addLeaveBalance(request):
                     i.sl_balance += 1
                     cal = EcplCalander.objects.filter(Q(emp_id=i.emp_id),
                                                       Q(att_actual='present') | Q(att_actual='Week OFF') |
-                                                      Q(att_actual='Comp OFF') | Q(att_actual='Holiday')).count()
-                    half = (EcplCalander.objects.filter(emp_id=i.emp_id, att_actual='Half Day').count()) / 2
+                                                      Q(att_actual='Comp OFF') | Q(att_actual='Holiday'),
+                                                      date__range=[start_date,end_date]).count()
+                    half = (EcplCalander.objects.filter(emp_id=i.emp_id, att_actual='Half Day',
+                                                        date__range=[start_date,end_date]).count()) / 2
                     cal += half
                     pl = round(cal / 20, 2)
                     i.pl_balance += pl
@@ -1639,9 +1646,11 @@ def applyLeave(request):
         end_date = request.POST["enddate"]
         no_days = request.POST["leave_days"]
         agent_reason = request.POST["reason"]
+        unique_id = request.POST['csrfmiddlewaretoken']
 
 
         e = LeaveTable()
+        e.unique_id = unique_id
         e.applied_date = date.today()
         e.leave_type = leave_type
         e.start_date = start_date
@@ -1774,6 +1783,13 @@ def viewEscalation(request):
     leave_request = LeaveTable.objects.filter(emp_rm3=request.user.profile.emp_name, tl_approval=True,escalation=True,manager_approval=False)
     data = { 'leave_request': leave_request}
     return render(request, 'ams/leave_escalation.html', data)
+
+@login_required
+def viewLeaveHistory(request):
+    emp_id = request.user.profile.emp_id
+    leave = LeaveTable.objects.filter(Q(emp_rm1_id=emp_id)|Q(emp_rm2_id=emp_id)|Q(emp_rm3_id=emp_id))
+    data = {'leave': leave}
+    return render(request, 'ams/view_employee_leave_history.html', data)
 
 @login_required
 def editAgentStatus(request):
@@ -2008,6 +2024,7 @@ def applyEmpStatusChange(request):
 def addAttendance(request):
     if request.method == 'POST':
         id = request.POST['month']
+        unique_id = request.POST['csrfmiddlewaretoken']
         month = AddAttendanceMonths.objects.get(id=id).month_number
         year = AddAttendanceMonths.objects.get(id=id).year
         start_date = date(year,month,1)
@@ -2026,7 +2043,7 @@ def addAttendance(request):
                     EcplCalander.objects.get(emp_id=j.emp_id,date=i)
                     pass
                 except EcplCalander.DoesNotExist:
-                    cal = EcplCalander.objects.create(date=i, emp_id=j.emp_id, team=j.emp_process, emp_name=j.emp_name,
+                    cal = EcplCalander.objects.create(unique_id=unique_id,date=i, emp_id=j.emp_id, team=j.emp_process, emp_name=j.emp_name,
                                                       rm1=j.emp_rm1, rm2=j.emp_rm2, rm3=j.emp_rm3,rm1_id=j.emp_rm1_id,
                                                       rm2_id=j.emp_rm2_id, rm3_id=j.emp_rm3_id, emp_desi=j.emp_desi,
                                                       att_actual='Unmarked')

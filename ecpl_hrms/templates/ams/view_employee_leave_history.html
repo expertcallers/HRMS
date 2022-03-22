@@ -1,0 +1,113 @@
+{% extends 'ams/base_common.html' %}
+{% block main %}
+{% load static %}
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+          <div class="page-title">
+            <div class="title_left">
+              <h3>Employees Leave History</h3>
+            </div>
+          </div>
+
+          <div class="row mt-4 pb-4">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <table  id="datatablex" class="table table-striped" style="max-width: 100% !important;">
+                        <thead>
+                          <tr>
+                            <th class="align-middle align-center" style="text-align: center;">Applied On</th>
+                            <th class="align-middle align-center" style="text-align: center;">Applied For Dates</th>
+                            <th class="align-middle align-center" style="text-align: center;">Number of days</th>
+                            <th class="align-middle align-center" style="text-align: center;">Leave Type</th>
+                            <th class="align-middle align-center" style="width: 250px;text-align: center;">Reason</th>
+                            <th class="align-middle align-center" style="text-align: center;">TL Approval</th>
+                            <th class="align-middle align-center" style="text-align: center;">TL Comments</th>
+                            <th class="align-middle align-center" style="text-align: center;">OM Approval</th>
+                            <th class="align-middle align-center" style="text-align: center;">OM Comments</th>
+                            <th class="align-middle align-center" style="text-align: center;">Status</th>
+                          </tr>
+                        </thead>
+                        <tfoot>
+                          <tr>
+                            <th class="align-middle align-center" style="text-align: center;">Applied On</th>
+                            <th class="align-middle align-center" style="text-align: center;">Applied For Dates</th>
+                            <th class="align-middle align-center" style="text-align: center;">Number of days</th>
+                            <th class="align-middle align-center" style="text-align: center;">Leave Type</th>
+                            <th class="align-middle align-center" style="width: 250px;text-align: center;">Reason</th>
+                            <th class="align-middle align-center" style="text-align: center;">TL Approval</th>
+                            <th class="align-middle align-center" style="text-align: center;">TL Comments</th>
+                            <th class="align-middle align-center" style="text-align: center;">OM Approval</th>
+                            <th class="align-middle align-center" style="text-align: center;">OM Comments</th>
+                            <th class="align-middle align-center" style="text-align: center;">Status</th>
+                          </tr>
+                        </tfoot>
+                        <tbody>
+                        {% for i in leave %}
+                          <tr>
+                              <td>{{i.applied_date}}</td>
+                              <td>{{i.start_date}} to {{i.end_date}}</td>
+                              <td>{{i.no_days}}</td>
+                              <td>{{i.leave_type}}</td>
+                              <td><p>{{i.agent_reason}}</p></td>
+                              <td>{{i.tl_approval}}</td>
+                              <td><p>{{i.tl_reason}}</p></td>
+                              <td>{{i.manager_approval}}</td>
+                              <td><p>{{i.manager_reason}}</p></td>
+                              <td align="center">
+                                {{i.status}}
+                                {% if i.tl_status == "Rejected" and i.manager_approval == False %}<br>
+                                <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#view_{{i.id}}">Escalate</button>
+                                {% endif %}
+                                {% if i.leave_type == "SL" and i.no_days > 1 and i.manager_approval == False %}<br>
+                                <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#proof_{{i.id}}">Proof</button>
+                                {% endif %}
+                              </td>
+                          </tr>
+                        {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+
+
+      </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+      $( document ).ready(function() {
+        $today = new Date();
+        $yesterday = new Date($today);
+        $they = new Date($yesterday);
+        $yesterday.setDate($today.getDate() - 1);
+        $they.setDate($yesterday.getDate() - 1);
+        $("#todaydate").html(moment($today).format('YYYY-MM-DD'));
+        $("#yesdate").html(moment($yesterday).format('YYYY-MM-DD'));
+        $("#tyesdate").html(moment($they).format('YYYY-MM-DD'));
+        $("#ttodaydate").html(moment($today).format('DD-MMM-YYYY'));
+        $("#ttyesdate").html(moment($yesterday).format('DD-MMM-YYYY'));
+        $("#tttyesdate").html(moment($they).format('DD-MMM-YYYY'));
+      });
+    </script>
+
+<script>
+  $today = $("#mydate_1").val();
+  $("#mydate_1").val(moment($today).format("YYYY-MM-DD"));
+  $yesterday = $("#mydate_2").val();
+  $("#mydate_2").val(moment($yesterday).format("YYYY-MM-DD"));
+  $d_yes = $("#mydate_3").val();
+  $("#mydate_3").val(moment($d_yes).format("YYYY-MM-DD"));
+</script>
+
+{% endblock %}
