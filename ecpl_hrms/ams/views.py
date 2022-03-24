@@ -560,7 +560,19 @@ def on_boarding(request):
         emp_upload_experience_two = request.FILES.get("emp_up_cer_2")
         emp_upload_experience_three = request.FILES.get("emp_up_cer_3")
         emp_upload_bank = request.FILES.get("emp_up_bank")
+
+        esic =request.POST["esic"]
+        pf =request.POST["pf"]
+        tds =request.POST["tds"]
+        pt =request.POST["pt"]
+
+
+
         e = OnboardingnewHRC()
+        e.esic = esic
+        e.pf = pf
+        e.tds = tds
+        e.pt = pt
         e.submit_date = datetime.now()
         e.emp_name = emp_name
         e.emp_dob = emp_dob

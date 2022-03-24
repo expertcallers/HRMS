@@ -86,6 +86,10 @@ class OnboardingnewHRC(models.Model):
     emp_upload_experience_two=models.ImageField(upload_to='Experience/',null=True)
     emp_upload_experience_three=models.ImageField(upload_to='Experience/',null=True)
     emp_upload_bank=models.ImageField(upload_to='Passbook/',null=True)
+    esic = models.CharField(max_length=20,null=True,blank=True)
+    pf = models.CharField(max_length=20,null=True,blank=True)
+    tds = models.CharField(max_length=20,null=True,blank=True)
+    pt = models.CharField(max_length=20,null=True,blank=True)
     user_created = models.BooleanField(default=False)
 
 # Mapping Tickets - request - approval ++
