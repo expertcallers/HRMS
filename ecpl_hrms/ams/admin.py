@@ -23,7 +23,6 @@ class AddAttendanceMonthsSearch(admin.ModelAdmin):
 
 admin.site.register(EcplCalander, AttendanceSearch)
 admin.site.register(OnboardingnewHRC)
-admin.site.register(JobRequisition)
 admin.site.register(Campaigns)
 admin.site.register(EmployeeLeaveBalance, LeaveSearch)
 admin.site.register(AgentActiveStatusHist)

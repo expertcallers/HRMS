@@ -18,6 +18,7 @@ class EcplCalander(models.Model):
     rm1_id = models.CharField(max_length=30, null=True)
     rm2_id = models.CharField(max_length=30, null=True)
     rm3_id = models.CharField(max_length=30, null=True)
+    team_id = models.IntegerField(null=True,blank=True)
 
 # Onboarding - Master +
 class OnboardingnewHRC(models.Model):
@@ -117,44 +118,6 @@ class Campaigns(models.Model):
     def __str__(self):
         return self.name
 
-# Job Requisition - Master +
-class JobRequisition(models.Model):
-    unique_id = models.CharField(max_length=150,null=True,blank=True)
-    user_name = models.ForeignKey(User, on_delete=models.CASCADE, related_name='log_user', null=True)
-    req_date = models.DateField(null=True)
-    hc_req = models.IntegerField(null=True)
-    req_raised_by = models.CharField(max_length=150, null=True, blank=True)
-    department = models.CharField(max_length=50, null=True)
-    designation = models.CharField(max_length=50, null=True, blank=True)
-    process_typ_one = models.CharField(max_length=50, null=True, blank=True)
-    process_typ_two = models.CharField(max_length=50, null=True, blank=True)
-    process_typ_three = models.CharField(max_length=50, null=True, blank=True)
-    salary_rang_frm = models.IntegerField(null=True)
-    salary_rang_to = models.IntegerField(null=True)
-    qualification = models.CharField(max_length=100, null=True, blank=True)
-    other_quali = models.CharField(max_length=150, null=True, blank=True)
-    skills_set = models.TextField(default="", null=True)
-    languages = models.TextField(default="", null=True)
-    shift_timing = models.CharField(max_length=20, null=True, blank=True)
-    shift_timing_frm = models.CharField(max_length=20, null=True, blank=True)
-    shift_timing_to = models.CharField(max_length=20, null=True, blank=True)
-    working_from = models.CharField(max_length=20, null=True, blank=True)
-    working_to = models.CharField(max_length=20, null=True, blank=True)
-    week_no_days = models.IntegerField(null=True, blank=True)
-    week_from = models.CharField(max_length=20, null=True, blank=True)
-    week_to = models.CharField(max_length=20, null=True, blank=True)
-    requisition_typ = models.CharField(max_length=50, null=True, blank=True)
-    candidate_name = models.TextField(default="", null=True)
-    closure_date = models.DateField(null=True)
-    source = models.CharField(max_length=50, null=True, blank=True)
-    source_empref_emp_name = models.CharField(max_length=150, null=True, blank=True)
-    source_empref_emp_id = models.CharField(max_length=20, null=True)
-    source_social = models.CharField(max_length=100, null=True, blank=True)
-    source_partners = models.CharField(max_length=100, null=True, blank=True)
-    recruited_people = models.IntegerField(null=True, blank=True)
-    request_status = models.CharField(null=True, blank=True, max_length=20, default="Pending")
-    candidate_remark = models.TextField()
-    status = models.BooleanField(default=False)
 
 # Leave Balance - PL - SL +
 class EmployeeLeaveBalance(models.Model):

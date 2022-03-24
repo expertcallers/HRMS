@@ -100,6 +100,7 @@ def change_password(request): # Corrected
 def teamWiseData(request):
     if request.method == 'POST':
         team_id = request.POST['team_id']
+        print(team_id)
         employees = Profile.objects.filter(emp_process_id=team_id,agent_status = 'Active')
         messages.info(request, 'Search Result')
         teams = Campaigns.objects.all()

@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
-
-import monthdelta as monthdelta
+from telnetlib import EC
+from tkinter import E
 import pytz
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -168,6 +168,7 @@ def tlDashboard(request):
     usr_desi = request.user.profile.emp_desi
     if usr_desi in tl_am_list:
         emp_name = request.user.profile.emp_name
+
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
         #All Employees
@@ -176,7 +177,7 @@ def tlDashboard(request):
         today = date.today()
         today = str(today)
         # All Active Today
-        att_details = EcplCalander.objects.filter(Q(date = today),Q(rm1=emp_name),~Q(att_actual='Unmarked'))
+        att_details = EcplCalander.objects.filter(Q(date = today),Q(rm1_id=emp_id))
         #counts
         emp_count = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name)).distinct().count()
         present_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name),Q(date=today),Q(att_actual='present')).count()
@@ -446,7 +447,6 @@ def hrDashboard(request):
         emp = Profile.objects.get(emp_id=emp_id)
         all_users_count = Profile.objects.all().count()
         all_team_count = Campaigns.objects.all().count()
-        all_job_count = JobRequisition.objects.all().count()
         teams = Campaigns.objects.all()
 
         # Att Request Count
@@ -484,7 +484,7 @@ def hrDashboard(request):
 
 
         data = {'emp':emp,'all_users_count':all_users_count,'all_team_count':all_team_count,
-                'all_job_count':all_job_count,'att_requests_count':att_requests_count,
+                'att_requests_count':att_requests_count,
                 'attrition_request_count':attrition_request_count,'month_cal':month_cal,
                 'team':teams}
 
@@ -942,6 +942,18 @@ def applyAttendace(request):
         att_actual = request.POST['att_actual']
         emp_id = request.POST['emp_id']
         now = datetime.now()
+
+        prof = Profile.objects.get(emp_id=emp_id)
+        rm1 = prof.emp_rm1
+        rm2 = prof.emp_rm2
+        rm3 = prof.emp_rm3
+        rm1_id = prof.emp_rm1_id
+        rm2_id = prof.emp_rm2_id
+        rm3_id = prof.emp_rm3_id
+        desi = prof.emp_desi
+        team = prof.emp_process
+        team_id = prof.emp_process_id
+
         try:
             cal = EcplCalander.objects.get(Q(date=ddate), Q(emp_id=emp_id), ~Q(att_actual='Unmarked'))
             messages.info(request, '*** Already Marked in Calendar, Please Refresh the page and try again ***')
@@ -951,14 +963,32 @@ def applyAttendace(request):
             cal.att_actual = att_actual
             cal.approved_on = now
             cal.appoved_by = request.user.profile.emp_name
-        if att_actual == "present":
-            try:
-                leave = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
-                leave.present_count += 1
-                leave.save()
-                cal.save()
-            except EmployeeLeaveBalance.DoesNotExist:
-                return HttpResponse('<h1>*** Employee Leave Balance details does not exist, Please contact Admin to resolve this and try again ***</h1>')
+            cal.rm1 = rm1
+            cal.rm2 = rm2
+            cal.rm3 = rm3
+            cal.rm1_id = rm1_id
+            cal.rm2_id = rm2_id
+            cal.rm3_id = rm3_id
+            cal.emp_desi = desi
+            cal.team = team
+            cal.team_id = team_id
+            cal.save()
+
+        if att_actual == 'Attrition' or att_actual == 'Bench':
+            usr = Profile.objects.get(emp_id=emp_id)
+            usr.agent_status = att_actual
+            usr.save()
+        if att_actual == 'NCNS':
+            today = date.today()
+            yesterday = today - timedelta(days=1)
+            dby_date = yesterday - timedelta(days=1)
+            date_range = [dby_date,today]            
+            ncns_count = EcplCalander.objects.filter(emp_id=emp_id,date__range=date_range,att_actual='NCNS').count()
+            print(ncns_count,'dfffffffffffff')
+            if ncns_count >= 3:
+                usr = Profile.objects.get(emp_id=emp_id)
+                usr.agent_status = att_actual
+                usr.save()
 
         return redirect('/ams/team-attendance')
     else:
@@ -971,6 +1001,18 @@ def newSingleAttandance(request):
         att_actual = request.POST['att_actual']
         emp_id = request.POST['emp_id']
         now = datetime.now()
+
+        prof = Profile.objects.get(emp_id=emp_id)
+        rm1 = prof.emp_rm1
+        rm2 = prof.emp_rm2
+        rm3 = prof.emp_rm3
+        rm1_id = prof.emp_rm1_id
+        rm2_id = prof.emp_rm2_id
+        rm3_id = prof.emp_rm3_id
+        desi = prof.emp_desi
+        team = prof.emp_process
+        team_id = prof.emp_process_id
+
         try:
             cal = EcplCalander.objects.get(Q(date=ddate),Q(emp_id=emp_id),~Q(att_actual='Unmarked'))
             messages.info(request,'*** Already Marked in Calendar, Please Refresh the page and try again ***')
@@ -980,35 +1022,51 @@ def newSingleAttandance(request):
             cal.att_actual = att_actual
             cal.approved_on = now
             cal.appoved_by = request.user.profile.emp_name
-        cal.save()
-        if att_actual == "present":
-            leave = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
-            leave.present_count += 1
-            leave.save()
+            cal.rm1 = rm1
+            cal.rm2 = rm2
+            cal.rm3 = rm3
+            cal.rm1_id = rm1_id
+            cal.rm2_id = rm2_id
+            cal.rm3_id = rm3_id
+            cal.emp_desi = desi
+            cal.team = team
+            cal.team_id = team_id
+            cal.save()
+
+        if att_actual == 'Attrition' or att_actual == 'Bench':
+            usr = Profile.objects.get(emp_id=emp_id)
+            usr.agent_status = att_actual
+            usr.save()
+        if att_actual == 'NCNS':
+            today = date.today()
+            yesterday = today - timedelta(days=1)
+            dby_date = yesterday - timedelta(days=1)
+            date_range = [dby_date,today]            
+            ncns_count = EcplCalander.objects.filter(emp_id=emp_id,date__range=date_range,att_actual='NCNS').count()
+            if ncns_count >= 3:
+                usr = Profile.objects.get(emp_id=emp_id)
+                usr.agent_status = att_actual
+                usr.save()
+
         return redirect('/ams/ams-update-attendance')
     else:
-        ######### Dates #################################
+
         today = date.today()
         yesterday = today - timedelta(days=1)
         dby_date = yesterday - timedelta(days=1)
-        emp_s = Profile.objects.filter(agent_status = 'Active',emp_id=request.user.profile.emp_id)
-        ############## Todays Attendance ###################
-        todays_list_list = EcplCalander.objects.filter(Q(date=today), Q(emp_id=request.user.profile.emp_id),
-                                                       Q(att_actual='Unmarked'))
-
-        ############## Yesterdays Attendance ###################
-        ystday_list_list = EcplCalander.objects.filter(Q(date=yesterday), Q(emp_id=request.user.profile.emp_id),
-                                                    Q(att_actual='Unmarked'))
-
-        ############## Day befor Yesterdays Attendance ###################
-        dby_list_list = EcplCalander.objects.filter(Q(date=dby_date), Q(emp_id=request.user.profile.emp_id),Q(att_actual='Unmarked'))
-
         emp_id = request.user.profile.emp_id
+        # Today
+        todays_list_list = EcplCalander.objects.filter(Q(date=today), Q(emp_id=emp_id),Q(att_actual='Unmarked'))
+        # Yesterday
+        ystday_list_list = EcplCalander.objects.filter(Q(date=yesterday), Q(emp_id=emp_id),Q(att_actual='Unmarked'))
+        # Day before yesterday
+        dby_list_list = EcplCalander.objects.filter(Q(date=dby_date), Q(emp_id=emp_id),Q(att_actual='Unmarked'))
+        
         emp = Profile.objects.get(emp_id=emp_id)
-
         data = {'todays_att': todays_list_list,
                 'ystdays_att': ystday_list_list,
-                'dbys_att': dby_list_list,'emp':emp}
+                'dbys_att': dby_list_list,
+                'emp':emp}
 
         return render(request, 'ams/attendance.html', data)
 
@@ -1095,33 +1153,29 @@ def addLeaveBalance(request):
     else:
         messages.info(request, "Unauthorized access you have been Logged out :)")
         return redirect('/ams/')
+
 @login_required
-def teamAttendance(request):
-    user_nm = request.user.profile.emp_name
-    user_nm_id = request.user.profile.emp_id
-    ######### Dates #################################
+def teamAttendance(request):   
     today = date.today()
     yesterday = today - timedelta(days=1)
     dby_date = yesterday - timedelta(days=1)
-    ############## Todays Attendance ###################
-    todays_list_list = EcplCalander.objects.filter(Q(date=today), Q(rm1_id=user_nm_id) | Q(rm2_id=user_nm_id) | Q(rm3_id=user_nm_id),
-                                                   Q(att_actual = 'Unmarked'))
-
-
-    ############## Yesterdays Attendance ###################
-    ystday_list_list = EcplCalander.objects.filter(Q(date=yesterday), Q(rm1_id=user_nm_id) | Q(rm2_id=user_nm_id) | Q(rm3_id=user_nm_id),
-                                                   Q(att_actual='Unmarked'))
-
-    ############## Bay befor Yesterdays Attendance ###################
-    dby_list_list = EcplCalander.objects.filter(Q(date=dby_date), Q(rm1_id=user_nm_id) | Q(rm2_id=user_nm_id) | Q(rm3_id=user_nm_id),
-                                                   Q(att_actual='Unmarked'))
-    emp_id = request.user.profile.emp_id
-    emp = Profile.objects.get(emp_id=emp_id)
+    user_empid = request.user.profile.emp_id
+    emp_list = []
+    emps = Profile.objects.filter(Q(emp_rm1_id=user_empid) | Q(emp_rm2_id=user_empid) | Q(emp_rm3_id=user_empid),Q(agent_status='Active'))
+    for i in emps:
+        emp_list.append(i.emp_id)
+    # Today 
+    todays_list_list = EcplCalander.objects.filter(Q(date=today),Q(att_actual = 'Unmarked'),Q(emp_id__in=emp_list))
+    # Yesterday
+    ystday_list_list = EcplCalander.objects.filter(Q(date=yesterday),Q(att_actual = 'Unmarked'),Q(emp_id__in=emp_list))
+    # Day Before Yesterday
+    dby_list_list = EcplCalander.objects.filter(Q(date=dby_date),Q(att_actual = 'Unmarked'),Q(emp_id__in=emp_list))
+    emp = Profile.objects.get(emp_id=user_empid)
 
     data = {'todays_att':todays_list_list,
             'ystdays_att':ystday_list_list,
-            'dbys_att':dby_list_list,'emp':emp}
-
+            'dbys_att':dby_list_list,
+            'emp':emp}
     return render(request,'ams/team_attendance.html',data)
 
 @login_required
@@ -2047,10 +2101,7 @@ def addAttendance(request):
                     EcplCalander.objects.get(emp_id=j.emp_id,date=i)
                     pass
                 except EcplCalander.DoesNotExist:
-                    cal = EcplCalander.objects.create(unique_id=unique_id,date=i, emp_id=j.emp_id, team=j.emp_process, emp_name=j.emp_name,
-                                                      rm1=j.emp_rm1, rm2=j.emp_rm2, rm3=j.emp_rm3,rm1_id=j.emp_rm1_id,
-                                                      rm2_id=j.emp_rm2_id, rm3_id=j.emp_rm3_id, emp_desi=j.emp_desi,
-                                                      att_actual='Unmarked')
+                    cal = EcplCalander.objects.create(date=i,emp_id=j.emp_id,att_actual='Unmarked',emp_name=j.emp_name)
                     cal.save()
         e = AddAttendanceMonths.objects.get(id=id)
         e.created = True
@@ -2080,4 +2131,9 @@ def SLProofSubmit(request):
             i.delete()
 
 def test(request):
-    pass
+    
+    a = Profile.objects.all()
+    b = EcplCalander.objects.all()
+    c = a.union(b).values('emp_id')
+
+    print(c)
