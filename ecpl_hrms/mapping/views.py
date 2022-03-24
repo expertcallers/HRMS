@@ -13,12 +13,13 @@ import xlwt
 
 # Manager List
 manager_list = ['Team Leader','Assistant Manager','Subject Matter Expert', 'Trainer','Learning and Development Head',
-              'Process Trainer','Trainer Sales',
+              'Process Trainer','Sales Trainer',
               'Quality Head','Operations Manager','Service Delivery Manager','Command Centre Head',
               'HR','HR Manager','Manager ER','HR Lead','Sr Recruiter','MIS Executive HR',
               'Lead HRBP','Employee Relations Specialist','Payroll Specialist','Recruiter','HR Generalist',
               'Associate Director','Chief Executive Officer','Chief Compliance Officer','Chief Technology Officer',
-              'Managing Director','Vice President','HR Manager','Manager ER','HR Lead','Lead HRBP',
+              'Managing Director','Vice President','Board member',
+              'IT Manager',
               ]
 
 # Mapping Home Page
@@ -32,12 +33,12 @@ def employeeMapping(request):
                 messages.info(request,'Search Result')
             else:
                 messages.info(request,'The requested employee not found')
-            teams = Campaigns.objects.all()
+            teams = Campaigns.objects.all().order_by('name')
             data = {'employees': employees,'teams':teams,'emp_name':emp_name,}
             return render(request, 'mapping/index.html', data)
         else:
             employees = Profile.objects.all()
-            teams = Campaigns.objects.all()
+            teams = Campaigns.objects.all().order_by('name')
             data = {'employees':employees,'teams':teams,}
             return render(request,'mapping/index.html',data)
     else:
@@ -103,7 +104,7 @@ def teamWiseData(request):
         print(team_id)
         employees = Profile.objects.filter(emp_process_id=team_id,agent_status = 'Active')
         messages.info(request, 'Search Result')
-        teams = Campaigns.objects.all()
+        teams = Campaigns.objects.all().order_by('name')
         data = {'employees': employees,'teams':teams}
         return render(request, 'mapping/index.html', data)
     else:
@@ -207,7 +208,7 @@ def createUserandProfile(request): # Need to work
                     emp_rm1_id = i.emp_rm1_id,
                     emp_rm2_id = i.emp_rm2_id,
                     emp_rm3_id = i.emp_rm3_id,
-                    emp_process_id = i.emp_process_id,
+                    emp_process_id = int(i.emp_process_id),
                 )
                 profile.save()              
 
