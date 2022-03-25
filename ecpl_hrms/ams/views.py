@@ -281,6 +281,8 @@ def managerDashboard(request):
 
         #Leave Requests
         leave_esc_count = LeaveTable.objects.filter(emp_rm3=mgr_name,manager_approval=False,escalation=True).count()
+        # Attendance 
+        att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False).count()
 
         # Month view
         ########### Month View ############
@@ -313,7 +315,7 @@ def managerDashboard(request):
         data = {'emp':emp,'count_all_emps':count_all_emps,
                 'all_tls':all_tls,'all_tls_count':all_tls_count,
                 'all_ams': all_ams, 'all_ams_count': all_ams_count,
-                'map_tickets_counts':map_tickets_counts,
+                'map_tickets_counts':map_tickets_counts,'att_requests_count':att_requests_count,
                 'leave_req_count':leave_req_count,'leave_esc_count':leave_esc_count,'all_emp':all_emp,'month_cal':month_cal,
                 }
         return render(request,'ams/manager-dashboard.html',data)
@@ -448,9 +450,7 @@ def hrDashboard(request):
         all_users_count = Profile.objects.all().count()
         all_team_count = Campaigns.objects.all().count()
         teams = Campaigns.objects.all()
-
-        # Att Request Count
-        att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False).count()
+      
 
         attrition_request_count = AgentActiveStatusHist.objects.all().count()
 
@@ -484,7 +484,6 @@ def hrDashboard(request):
 
 
         data = {'emp':emp,'all_users_count':all_users_count,'all_team_count':all_team_count,
-                'att_requests_count':att_requests_count,
                 'attrition_request_count':attrition_request_count,'month_cal':month_cal,
                 'team':teams}
 
@@ -996,7 +995,6 @@ def applyAttendace(request):
             dby_date = yesterday - timedelta(days=1)
             date_range = [dby_date,today]            
             ncns_count = EcplCalander.objects.filter(emp_id=emp_id,date__range=date_range,att_actual='NCNS').count()
-            print(ncns_count,'dfffffffffffff')
             if ncns_count >= 3:
                 usr = Profile.objects.get(emp_id=emp_id)
                 usr.agent_status = att_actual
@@ -1230,7 +1228,7 @@ def weekAttendanceReport(request):
     end = date(end_year, end_month, end_day)
     weeks = ['sund', 'mon', 'tue', 'wed', 'thur', 'fri', 'sat']
     emp_id_list = []
-    ems = Profile.objects.filter(emp_rm1=request.user.profile.emp_name)
+    ems = Profile.objects.filter(emp_rm1_id=request.user.profile.emp_id)
     for i in ems:
         emp_id_list.append(i.emp_id)
     weekdays = []
@@ -1561,142 +1559,6 @@ def viewTeam(request):
         messages.info(request,'*** You are not authorised to view this page ***')
         return redirect('ams/logout')
 
-@login_required
-def jobRequisition(request):
-    if request.method == "POST":
-        log_user = request.user
-        req_date = request.POST["req_date"]
-        hc_req = request.POST["hc_required"]
-        req_raised_by = request.POST["req_rais_by"]
-        department = request.POST["department"]
-        designation = request.POST["designation"]
-        process_typ_one = request.POST["pro_type_1"]
-        process_typ_two = request.POST["pro_type_2"]
-        process_typ_three = request.POST["pro_type_3"]
-        salary_rang_frm = request.POST["sal_from"]
-        salary_rang_to = request.POST["sal_to"]
-        qualification = request.POST["quali"]
-        other_quali = request.POST["other_quali"]
-        skills_set = request.POST["skills"]
-        languages = request.POST.getlist("lang")
-        shift_timing = request.POST["shift"]
-        shift_timing_frm = request.POST["shift_from"]
-        shift_timing_to = request.POST["shift_to"]
-        working_from = request.POST["work_from"]
-        working_to = request.POST["work_to"]
-        week_no_days = request.POST["num_off"]
-        week_from = request.POST.get("off_from")
-        week_to = request.POST.get("off_to")
-        requisition_typ = request.POST["req_type"]
-        e = JobRequisition()
-        e.req_date = req_date
-        e.hc_req = hc_req
-        e.req_raised_by = req_raised_by
-        e.department = department
-        e.designation = designation
-        e.process_typ_one = process_typ_one
-        e.process_typ_two = process_typ_two
-        e.process_typ_three = process_typ_three
-        e.salary_rang_frm = salary_rang_frm
-        e.salary_rang_to = salary_rang_to
-        e.qualification = qualification
-        e.other_quali = other_quali
-        e.skills_set = skills_set
-        e.languages = languages
-        e.shift_timing = shift_timing
-        e.shift_timing_frm = shift_timing_frm
-        e.shift_timing_to = shift_timing_to
-        e.working_from = working_from
-        e.working_to = working_to
-        e.week_no_days = week_no_days
-        if week_from:
-            e.week_from = week_from
-        if week_to:
-            e.week_to = week_to
-        e.requisition_typ = requisition_typ
-        e.user_name = log_user
-        e.save()
-
-        emp_id = request.user.profile.emp_id
-        emp = Profile.objects.get(emp_id=emp_id)
-        data = {'emp': emp}
-        return render(request, "ams/job_requisition.html", data)
-
-    else:
-        emp_id = request.user.profile.emp_id
-        emp = Profile.objects.get(emp_id=emp_id)
-        data = {'emp':emp}
-        return render(request, "ams/job_requisition.html",data)
-
-@login_required
-def jobRequisitionReportTable(request):
-    job = JobRequisition.objects.all()
-    emp_id = request.user.profile.emp_id
-    emp = Profile.objects.get(emp_id=emp_id)
-    data = {'emp':emp,'job':job}
-    return render(request, "ams/job_requisition_report_table.html", data)
-
-@login_required
-def jobRequisitionReportTableRM(request):
-
-    job = JobRequisition.objects.filter(req_raised_by = request.user.profile.emp_name)
-    emp_id = request.user.profile.emp_id
-    emp = Profile.objects.get(emp_id=emp_id)
-    data = {'emp':emp,'job':job}
-    return render(request, "ams/job_requisition_report_table_rm.html", data)
-
-@login_required
-def viewJobEditRequisition(request):
-    if request.method == 'POST':
-        rowid = request.POST.get("rowid")
-        job = JobRequisition.objects.get(id=rowid)
-        emp_id = request.user.profile.emp_id
-        emp = Profile.objects.get(emp_id=emp_id)
-        data = {'emp':emp,'job':job}
-        return render(request, "ams/job_requisition_edit.html", data)
-    else:
-        return HttpResponse('<h1>No Get method Available</h1>')
-
-@login_required
-def updateJobForm(request,id):
-
-    if request.method == 'POST':
-        log_user = request.user
-        job = JobRequisition.objects.get(id=id)
-        candidate_name = request.POST["cand_name"]
-        closure_date = request.POST["clos_date"]
-        source = request.POST["source"]
-        source_empref_emp_name = request.POST["emp_name"]
-        source_empref_emp_id = request.POST["emp_id"]
-        source_social = request.POST.get('social')
-        source_partners = request.POST.get("partner")
-        recruited_people = request.POST["rec_peo"]
-        request_status = request.POST.get("req_status")
-        candidate_remark = request.POST["can_remark"]
-
-        job.candidate_remark = candidate_remark
-        job.candidate_name = candidate_name
-        job.closure_date = closure_date
-        job.source = source
-        job.source_empref_emp_name = source_empref_emp_name
-        job.source_empref_emp_id = source_empref_emp_id
-        job.source_social = source_social
-        job.source_partners = source_partners
-        job.recruited_people = recruited_people
-        job.user_name = log_user
-        if request_status:
-            job.request_status = request_status
-        if request_status == "Completed":
-            job.status = True
-        job.save()
-
-        return redirect("/ams/view-job-table")
-    else:
-        job = JobRequisition.objects.get(id=id)
-        emp_id = request.user.profile.emp_id
-        emp = Profile.objects.get(emp_id=emp_id)
-        data = {'job':job,'emp':emp}
-        return render(request, "ams/job_requisition_edit.html", data)
 
 @login_required
 def applyLeave(request):
@@ -1922,37 +1784,18 @@ def viewAttrition(request): # For all Agent Status CHanges >>
         return render(request,'ams/view_attrition.html',data)
 
 def attendanceCorrection(request):
-
-    emp_name = request.user.profile.emp_name
     emp_idd = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_idd)
-
     if request.method == 'POST':
         date = request.POST['date']
-        emp_id = request.POST['emp_id']
-
-        emp_obj = Profile.objects.get(emp_id = emp_id)
-
-        try:
-            cal = EcplCalander.objects.get(Q(date = date),Q(emp_id = emp_id),~Q(att_actual='Unmarked'))
-
-
-        except EcplCalander.DoesNotExist:
-            cal = {'date':date,'emp_name':emp_obj.emp_name,'emp_id':emp_id,'team':emp_obj.emp_process,'att_actual':'Unmarked'}
-
-        atthist = AttendanceCorrectionHistory.objects.filter(applied_by_id = emp_idd)
-        data = {'cal':cal,'emp':emp,'atthist':atthist}
-
+        emp_id = request.POST['emp_id']        
+        cal = EcplCalander.objects.get(Q(date = date),Q(emp_id = emp_id))
+        data = {'cal':cal,'emp':emp}
         return render(request,'ams/view_att_correction_apply.html',data)
-
     else:
-
-        all_emp = Profile.objects.filter(Q(agent_status='Active'),
-                                          Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name))
-
+        all_emp = Profile.objects.filter(Q(agent_status='Active'),Q(emp_rm1_id=emp_idd) | Q(emp_rm2_id=emp_idd) | Q(emp_rm3_id=emp_idd))
         atthist = AttendanceCorrectionHistory.objects.filter(applied_by_id=emp_idd)
         data = {'all_emp':all_emp,'emp':emp,'atthist':atthist}
-
         return render(request,'ams/view_att_correction.html',data)
 
 def applyCorrection(request):
@@ -1961,7 +1804,6 @@ def applyCorrection(request):
     applied_by_id = request.user.profile.emp_id
 
     if request.method == 'POST':
-
         id = request.POST['id']
         att_new = request.POST['att_new']
         att_old = request.POST['att_old']
@@ -1969,49 +1811,9 @@ def applyCorrection(request):
         reason = request.POST['reason']
         emp_id = request.POST['emp_id']
         emp_obj = Profile.objects.get(emp_id=emp_id)
-
-        if att_old == 'Unmarked':
-
-            cal = EcplCalander()
-            cal.team = emp_obj.emp_process
-            cal.date = date
-            cal.emp_name = emp_obj.emp_name
-            cal.emp_id = emp_id
-            cal.emp_desi = emp_obj.emp_desi
-            cal.att_actual = att_new
-            cal.approved_on = datetime.today()
-            cal.appoved_by =applied_by
-            cal.rm1 = emp_obj.emp_rm1
-            cal.rm2 = emp_obj.emp_rm2
-            cal.rm3 = emp_obj.emp_rm3
-
-            cal.save()
-
-            emp_name = cal.emp_name
-            emp_id = cal.emp_id
-
-            atthist = AttendanceCorrectionHistory()
-            atthist.applied_by = applied_by
-            atthist.applied_by_id = applied_by_id
-            atthist.applied_date = datetime.today()
-            atthist.date_for = date
-            atthist.att_old = att_old
-            atthist.att_new = att_new
-            atthist.emp_name = emp_name
-            atthist.emp_id = emp_id
-            atthist.cal_id = cal.id
-            atthist.reason = reason
-            atthist.save()
-
-            messages.info(request, 'Attendance Correction Request has been sent Successfully')
-            return redirect('/ams/attendance-correction')
-
-
         cal = EcplCalander.objects.get(id=id)
-
         emp_name = cal.emp_name
         emp_id = cal.emp_id
-
         atthist = AttendanceCorrectionHistory()
         atthist.applied_by = applied_by
         atthist.applied_by_id = applied_by_id
@@ -2024,7 +1826,6 @@ def applyCorrection(request):
         atthist.cal_id = id
         atthist.reason = reason
         atthist.save()
-
         messages.info(request,'Attendance Correction Request has been sent Successfully')
         return redirect('/ams/attendance-correction')
 
@@ -2033,38 +1834,46 @@ def applyCorrection(request):
 
 
 def approveAttendanceRequest(request):
-
     emp_idd = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_idd)
-
     if request.method == 'POST':
-
         id = request.POST['id']
         cal_id = request.POST['cal_id']
-        hr_resp = request.POST['hr_resp']
+        om_resp = request.POST['om_resp']
         comments = request.POST['comments']
-
         hist = AttendanceCorrectionHistory.objects.get(id=id)
         cal = EcplCalander.objects.get(id=cal_id)
-        cal.att_actual = hist.att_new
 
-        cal.save()
+        if om_resp == 'Approved':
+            cal.att_actual = hist.att_new          
+            cal.save()
+            att_actual = hist.att_new
+            if att_actual == 'Attrition' or att_actual == 'Bench':
+                usr = Profile.objects.get(emp_id=cal.emp_id)
+                usr.agent_status = att_actual
+                usr.save()
+            if att_actual == 'NCNS':
+                today = cal.date
+                yesterday = today - timedelta(days=1)
+                dby_date = yesterday - timedelta(days=1)
+                tmr = today + timedelta(days=1)
+                daftmr = tmr + timedelta(days=1)
+                date_range = [dby_date,today]            
+                ncns_count = EcplCalander.objects.filter(emp_id=cal.emp_id,date__range=date_range,att_actual='NCNS').count()
+                if ncns_count >= 3:
+                    usr = Profile.objects.get(emp_id=cal.emp_id)
+                    usr.agent_status = att_actual
+                    usr.save()
+
         hist.status = True
         hist.comments =comments
         hist.approved_by = request.user.profile.emp_name
-        hist.hr_response = hr_resp
-
+        hist.om_response = om_resp
         hist.save()
-
         return redirect('/ams/approve-att-correction-req')
-
-        pass
     else:
-
         att_hist = AttendanceCorrectionHistory.objects.filter(status = False)
-
         data = {'att_hist':att_hist,'emp':emp}
-
         return render(request,'ams/hr_attendance_correction.html',data)
 
 

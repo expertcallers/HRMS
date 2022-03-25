@@ -1,5 +1,4 @@
-{% extends 'ams/base_hr_new.html' %}
-
+{% extends 'ams/base-manager.html' %}
 {% load static %}
 {% block main %}
 
@@ -111,7 +110,7 @@
                   </div>
                   <div class="col-md-4 form-group">
                     <label for="hr_resp">Approve/Reject</label>
-                    <select id="hr_resp" name="hr_resp" class="form-control" required>
+                    <select id="hr_resp" name="om_resp" class="form-control" required>
                       <option value="" selected disabled>Please Select</option>
                       <option value="Approved">Approve</option>
                       <option value="Rejected">Reject</option>

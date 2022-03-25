@@ -27,9 +27,9 @@
                         <th style="min-width: 120px !important;">Date</th>
                         <th>Name</th>
                         <th>Emp ID</th>
-                        <th>Process</th>
                         <th>Current Status</th>
                         <th width="250">Actual Status</th>
+                        
                       </tr>
                     </thead>
                     <tfoot>
@@ -37,9 +37,9 @@
                         <th style="min-width: 120px !important;">Date</th>
                         <th>Name</th>
                         <th>Emp ID</th>
-                        <th>Process</th>
                         <th>Current Status</th>
                         <th>Actual Status</th>
+                        
                       </tr>
                     </tfoot>
                     <tbody>
@@ -49,9 +49,7 @@
                         <td>{{cal.date}}</td>
                         <td>{{cal.emp_name}}</td>
                         <td>{{cal.emp_id}}</td>
-                        <td>{{cal.team}}</td>
                         <td>{{cal.att_actual}}</td>
-
                         <td>
                           <form action="/ams/apply-attendance-correction" method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
@@ -67,7 +65,7 @@
                                     <option value="Week OFF">Week OFF</option>
                                     <option value="Comp OFF">Comp OFF</option>
                                     <option value="Half Day">Half Day</option>
-                                    <option value="Holiday">Holiday</option>
+                                    <option value="Client OFF">Client OFF</option>
                                     <option value="Absent">Absent</option>
                                     <option value="Training">Training</option>
                                     <option value="Attrition">Attrition</option>
@@ -76,7 +74,7 @@
                                     <option value="SL">SL</option>
                                     <option value="ML">ML</option>
                               </select>
-                                <input type="text" name="reason" class="form-control" style="width:200px;margin-right:4px;" required>
+                                <input type="text" placeholder="Reason for Correction" name="reason" class="form-control" style="width:200px;margin-right:4px;" required>
                               <button class="btn btn-secondary">Apply</button>
                             </div>
 

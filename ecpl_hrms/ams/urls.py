@@ -63,12 +63,6 @@ urlpatterns = [
     path('add-newteam', addNewTeam),
     path('view-all-teams', viewTeam),
 
-    # Job Requesition Form
-    path('add-new-job', jobRequisition),
-    path('view-job-table', jobRequisitionReportTable),
-    path('view-job-table-rm', jobRequisitionReportTableRM),
-    path('update-job-status/<int:id>', updateJobForm),
-
     # Leave Management
     path('ams-apply_leave',applyLeave),
     path('view-leave-list',viewleaveListRM1),
