@@ -37,35 +37,38 @@ hr_list = ['HR','HR Manager','Manager ER','HR Lead','Sr Recruiter','MIS Executiv
 agent_list = [ 'Client Relationship Officer','MIS Executive','Patrolling officer',
                'Data Analyst','Business Development Executive','Content Developer',
                'Junior Developer','Web Developer','Trainee Developer',
-               'Jr Dev',
+               'Jr Dev','CRO',
                 ]
 
+rm_list = ['Team Leader','Assistant Manager','Subject Matter Expert', 'Trainer','Learning and Development Head',
+              'Process Trainer','Sales Trainer',
+              'Quality Head','Operations Manager','Service Delivery Manager','Command Centre Head',
+              'HR','HR Manager','Manager ER','HR Lead','Sr Recruiter','MIS Executive HR',
+              'Lead HRBP','Employee Relations Specialist','Payroll Specialist','Recruiter','HR Generalist',
+              'Associate Director','Chief Executive Officer','Chief Compliance Officer','Chief Technology Officer',
+              'Managing Director','Vice President','Board member',
+              'IT Manager',
+              ]                
+
 # Create your views here.
-def loginPage(request):
+def loginPage(request): # Test1
     logout(request)
     form = AuthenticationForm()
-    teams = Campaigns.objects.all().order_by('name')
-    data = {'teams':teams,'form':form}
+    data = {'form':form}
     return render(request,'ams/login.html',data)
 
-def loginAndRedirect(request):
+def loginAndRedirect(request): # Test1
     if request.method == 'POST':
-        form = AuthenticationForm(data=request.POST)  # Login form
-
+        form = AuthenticationForm(data=request.POST)
         if form.is_valid():
-            # login the user
             user = form.get_user()
             login(request, user)
-
             if request.user.profile.pc == False:
                 return redirect('/ams/change-password')
-
             if request.user.profile.emp_desi in tl_am_list:
                 return redirect('/ams/tl-dashboard')
-
             elif request.user.profile.emp_desi in manager_list:
                 return redirect('/ams/manager-dashboard')
-
             elif request.user.profile.emp_desi in hr_list:
                 return redirect('/ams/hr-dashboard')
             else:
@@ -73,38 +76,37 @@ def loginAndRedirect(request):
         else:
             form = AuthenticationForm()
             messages.info(request,'Invalid Credentials')
-            teams = Campaigns.objects.all().order_by('name')
-            data = {'teams': teams, 'form': form}
+            data = {'form': form}
             return render(request, 'ams/login.html', data)
     else:
         logout(request)
         form = AuthenticationForm()
-        teams = Campaigns.objects.all().order_by('name')
-        data = {'teams': teams, 'form': form}
+        data = {'form': form}
         return render(request, 'ams/login.html', data)
 
 @login_required
-def redirectTOAllDashBoards(request,id):
-
+def redirectTOAllDashBoards(request,id): # Test1
     if request.user.profile.emp_desi in tl_am_list:
         return redirect('/ams/tl-dashboard')
     elif request.user.profile.emp_desi in hr_list:
         return redirect('/ams/hr-dashboard')
+    elif request.user.profile.emp_desi in manager_list:
+        return redirect('/ams/manager-dashboard')    
     else:
-        return HttpResponse('<h1>Not Authorised</h1>')
+        return HttpResponse('<h1>Not Authorised to view this page</h1>')
 
 
-def logoutView(request):
+def logoutView(request): # Test1
     logout(request)
     return redirect('/ams/')
 
 @login_required
-def change_password(request):
+def change_password(request): # Test1
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)  # Important!
+            update_session_auth_hash(request, user)
             messages.success(request, 'Your password was successfully updated!')
             user = request.user
             user.profile.pc = True
@@ -120,18 +122,13 @@ def change_password(request):
 
 
 @login_required
-def agentDashBoard(request):
-
+def agentDashBoard(request): # Test1
     if request.user.profile.emp_desi in agent_list:
-
-        emp_name = request.user.profile.emp_name
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id = emp_id)
-        #attendance status
-        cal = LeaveTable.objects.filter(Q(emp_id=emp_id),Q(leave_type__in=['SL','PL'])).order_by('-applied_date')[:5]
-
+        # Leave status
+        leave_hist = LeaveTable.objects.filter(Q(emp_id=emp_id),Q(leave_type__in=['SL','PL','ML'])).order_by('-applied_date')[:5]
         # Month view
-        ########### Month View ############
         month_days = []
         todays_date = date.today()
         year = todays_date.year
@@ -143,63 +140,54 @@ def agentDashBoard(request):
         while start_date <= end_date:
             month_days.append(start_date.strftime("%Y-%m-%d"))
             start_date += delta
-
         month_cal = []
         for i in month_days:
-
             dict = {}
             try:
                 st = EcplCalander.objects.get(Q(date=i),Q(emp_id = emp_id)).att_actual
-
             except EcplCalander.DoesNotExist:
                 st = 'Unmarked'
             dict['dt'] = i
             dict['st'] = st
             month_cal.append(dict)
-
-        data = {'emp':emp,'cal':cal,'month_cal':month_cal}
-
+        data = {'emp':emp,'leave_hist':leave_hist,'month_cal':month_cal}
         return render(request,'ams/agent-dashboard-new.html',data)
     else:
         return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
 
 @login_required
-def tlDashboard(request):
+def tlDashboard(request): # Test1
     usr_desi = request.user.profile.emp_desi
     if usr_desi in tl_am_list:
         emp_name = request.user.profile.emp_name
-
         emp_id = request.user.profile.emp_id
-        emp = Profile.objects.get(emp_id=emp_id)
+        prof = Profile.objects.get(emp_id=emp_id)
         #All Employees
-        all_emp = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name))
-        # details
-        today = date.today()
-        today = str(today)
+        all_emp = Profile.objects.filter(Q(agent_status='Active'),Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
         # All Active Today
+        today = date.today()        
         att_details = EcplCalander.objects.filter(Q(date = today),Q(rm1_id=emp_id))
         #counts
-        emp_count = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name)).distinct().count()
-        present_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name),Q(date=today),Q(att_actual='present')).count()
-        absent_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Absent')).count()
-        week_off_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Week OFF')).count()
-        comp_off_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Comp OFF')).count()
-        half_day_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Half Day')).count()
-        holiday_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Holiday')).count()
-        sl_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='SL')).count()
-        pl_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='PL')).count()
-        attrition_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Attrition')).count()
-        training_count = EcplCalander.objects.filter(Q(rm1=emp_name) | Q(rm2=emp_name) | Q(rm3=emp_name), Q(date=today), Q(att_actual='Training')).count()
-
-        unmarked_count = emp_count - (present_count + absent_count + week_off_count + comp_off_count + half_day_count + holiday_count + sl_count + pl_count + attrition_count + training_count)
-        # Mapping Tickets >>
-        map_tickets_counts = MappingTickets.objects.filter(new_rm3 = emp_name,status=False).count()
-
+        emp_count = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct().count()
+        def allCounts(cat):
+            return EcplCalander.objects.filter(Q(rm1_id=emp_id) | Q(rm2_id=emp_id) | Q(rm3_id=emp_id),Q(date=today),Q(att_actual=cat)).count()
+        present_count = allCounts('present')
+        absent_count = allCounts('Absent')
+        week_off_count = allCounts('Week OFF')
+        comp_off_count = allCounts('Comp OFF')
+        half_day_count = allCounts('Half Day')
+        client_off_count = allCounts('Client OFF')
+        sl_count = allCounts('SL')
+        pl_count = allCounts('PL')
+        attrition_count = allCounts('Attrition')
+        training_count = allCounts('Training')
+        unmarked_count = allCounts('Unmarked')
+        print(present_count)
+        # Mapping Tickets 
+        map_tickets_counts = MappingTickets.objects.filter(new_rm3_id = emp_id,status=False).count()
         #Leaves
-        leave_req_count = LeaveTable.objects.filter(emp_rm1 = emp_name,tl_approval = False).count()
-
+        leave_req_count = LeaveTable.objects.filter(emp_rm1_id = emp_id,tl_approval = False).count()
         # Month view
-        ########### Month View ############
         month_days = []
         todays_date = date.today()
         year = todays_date.year
@@ -211,31 +199,24 @@ def tlDashboard(request):
         while start_date <= end_date:
             month_days.append(start_date.strftime("%Y-%m-%d"))
             start_date += delta
-
         month_cal = []
         for i in month_days:
-
             dict = {}
             try:
                 st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id),~Q(att_actual='Unmarked')).att_actual
-
             except EcplCalander.DoesNotExist:
                 st = 'Unmarked'
             dict['dt'] = i
             dict['st'] = st
             month_cal.append(dict)
 
-
-        data = {'emp_name': emp_name, 'emp': emp, 'att_details':att_details,
-                'emp_count':emp_count,
+        data = {'emp_name': emp_name, 'emp': prof, 'att_details':att_details,'emp_count':emp_count,
                 'present_count':present_count,'absent_count':absent_count,'week_off_count':week_off_count,
-                'comp_off_count':comp_off_count,'half_day_count':half_day_count,'holiday_count':holiday_count,
+                'comp_off_count':comp_off_count,'half_day_count':half_day_count,'client_off_count':client_off_count,
                 'unmarked_count':unmarked_count,'map_tickets_counts':map_tickets_counts,
                 'all_emp':all_emp,'sl_count':sl_count,'pl_count':pl_count,'attrition_count':attrition_count,
-                'training_count':training_count,
-                'leave_req_count':leave_req_count,
-                'month_cal': month_cal,
-                }
+                'training_count':training_count,'leave_req_count':leave_req_count,'month_cal': month_cal}
+
         return render(request, 'ams/rm-dashboard-new.html', data)
     elif usr_desi in manager_list:
         return redirect('/ams/manager-dashboard')
@@ -247,45 +228,32 @@ def tlDashboard(request):
         return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
 
 @login_required
-def managerDashboard(request):
+def managerDashboard(request): # Test1
     if request.user.profile.emp_desi in manager_list:
         mgr_name = request.user.profile.emp_name
         emp_id = request.user.profile.emp_id
         # All Employees
-        all_emps = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=mgr_name) |Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name))
+        all_emps = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1_id=emp_id) |Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
         # count of all employees
         count_all_emps = all_emps.count()
-
         # TLS
-        all_tls = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=mgr_name) |Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name),Q(emp_desi='Team Leader'))
+        all_tls = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1_id=emp_id) |Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id),Q(emp_desi='Team Leader')).distinct()
         # TLS Count
         all_tls_count=all_tls.count()
-
         # AMS
-        all_ams = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=mgr_name) | Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name),
-                                         Q(emp_desi='Assistant Manager'))
+        all_ams = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id),Q(emp_desi='Assistant Manager')).distinct()
         # TLS Count
         all_ams_count = all_ams.count()
-
-        emp= Profile.objects.get(emp_name = mgr_name)
-
-        # All Employees
-        all_emp = Profile.objects.filter(Q(agent_status='Active'),
-                                          Q(emp_rm1=mgr_name) | Q(emp_rm2=mgr_name) | Q(emp_rm3=mgr_name))
-
+        emp= Profile.objects.get(emp_id = emp_id)      
         #Mapping Tickets
-        map_tickets_counts = MappingTickets.objects.filter(new_rm3=mgr_name, status=False).count()
-
+        map_tickets_counts = MappingTickets.objects.filter(new_rm3_id=emp_id, status=False).count()
         #Leave Requests
-        leave_req_count = LeaveTable.objects.filter(emp_rm3=mgr_name,tl_status='Approved',manager_approval=False).count()
-
-        #Leave Requests
-        leave_esc_count = LeaveTable.objects.filter(emp_rm3=mgr_name,manager_approval=False,escalation=True).count()
+        leave_req_count = LeaveTable.objects.filter(emp_rm3_id=emp_id,tl_status='Approved',manager_approval=False).count()
+        #Leave Escalation Count
+        leave_esc_count = LeaveTable.objects.filter(emp_rm3_id=emp_id,manager_approval=False,escalation=True).count()
         # Attendance 
-        att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False).count()
-
+        att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False,rm3_id=emp_id).count()
         # Month view
-        ########### Month View ############
         month_days = []
         todays_date = date.today()
         year = todays_date.year
@@ -297,26 +265,21 @@ def managerDashboard(request):
         while start_date <= end_date:
             month_days.append(start_date.strftime("%Y-%m-%d"))
             start_date += delta
-
         month_cal = []
         for i in month_days:
-
             dict = {}
             try:
                 st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id)).att_actual
-
             except EcplCalander.DoesNotExist:
                 st = 'Unmarked'
             dict['dt'] = i
             dict['st'] = st
             month_cal.append(dict)
 
-
-        data = {'emp':emp,'count_all_emps':count_all_emps,
-                'all_tls':all_tls,'all_tls_count':all_tls_count,
+        data = {'emp':emp,'count_all_emps':count_all_emps,'all_tls':all_tls,'all_tls_count':all_tls_count,
                 'all_ams': all_ams, 'all_ams_count': all_ams_count,
                 'map_tickets_counts':map_tickets_counts,'att_requests_count':att_requests_count,
-                'leave_req_count':leave_req_count,'leave_esc_count':leave_esc_count,'all_emp':all_emp,'month_cal':month_cal,
+                'leave_req_count':leave_req_count,'leave_esc_count':leave_esc_count,'all_emp':all_emps,'month_cal':month_cal,
                 }
         return render(request,'ams/manager-dashboard.html',data)
     else:
@@ -412,32 +375,24 @@ def viewAndApproveLeaveRequestMgr(request):
         return render(request,'ams/leave_approval_rm3.html',data)
 
 @login_required
-def viewallOMS(request,name):
-    emp_name = request.user.profile.emp_name
+def viewallOMS(request,name): # Test1
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
-
     if name == 'Agent':
-
-        all_emp = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name))
-
+        all_emp = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
         data = {'emp':emp,'all_emp':all_emp}
         return render(request,'ams/view_all_emp_om.html',data)
-
     elif name == 'TL':
-        all_emp = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name), Q(emp_desi='Team Leader'))
+        all_emp = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id), Q(emp_desi='Team Leader')).distinct()
         data = {'emp': emp, 'all_emp': all_emp}
         return render(request, 'ams/view_all_emp_om.html', data)
-
     elif name == 'AM':
-        all_emp = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1=emp_name) | Q(emp_rm2=emp_name) | Q(emp_rm3=emp_name), Q(emp_desi='Assistant Manager'))
+        all_emp = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id), Q(emp_desi='Assistant Manager')).distinct()
         data = {'emp': emp, 'all_emp': all_emp}
         return render(request, 'ams/view_all_emp_om.html', data)
-
     else:
-
         messages.info(request,'Bad Request')
-        return redirect('/ams/tl-dashboard')
+        return redirect('/ams/manager-dashboard')
 
 
 @login_required
@@ -1415,76 +1370,68 @@ def uploadImageToDB(request):
         pass
 
 @login_required
-def mappingHomePage(request):
+def mappingHomePage(request): # Test1
     emp_id = request.user.profile.emp_id
     user_nm = request.user.profile.emp_name
     emp = Profile.objects.get(emp_id=emp_id)
-    employees = Profile.objects.filter(Q(emp_rm1=user_nm),Q(agent_status = 'Active'))
-    rms = Profile.objects.exclude(emp_desi__in=['Client Relationship Officer', 'Patrolling Officer']).order_by(
-        'emp_name')
-    teams = Campaigns.objects.all()
+    employees = Profile.objects.filter(Q(emp_rm1_id=emp_id),Q(agent_status = 'Active'))
+    rms = Profile.objects.exclude(emp_desi__in=rm_list).order_by('emp_name')
+    teams = Campaigns.objects.all().order_by('name')
     data = {'emp': emp,'employees':employees,'rms':rms,'teams':teams}
-
     return render(request,'ams/mapping_home.html',data)
 
 @login_required
-def createMappingTicket(request):
-
+def createMappingTicket(request): # Test1
     if request.method == "POST":
         usr_name = request.user.profile.emp_name
+        usr_id = request.user.profile.emp_id
         dt = date.today()
-
-        emp_name = request.POST["emp_name"]
         emp_id = request.POST["emp_id"]
-        emp_desi = request.POST["emp_desi"]
-        emp_rm1 = request.POST["old_rm1"]
-        emp_rm2 = request.POST["old_rm2"]
-        emp_rm3 = request.POST["old_rm3"]
-        new_rm1 = request.POST["new_rm1"]
-        new_rm2 = request.POST["new_rm2"]
-        new_rm3 = request.POST["new_rm3"]
-        emp_process = request.POST["emp_process"]
+        prof = Profile.objects.get(emp_id=emp_id)
+        new_rm1_id = request.POST["new_rm1_id"]
+        new_rm2_id = request.POST["new_rm2_id"]
+        new_rm3_id = request.POST["new_rm3_id"]
         new_process = request.POST["new_process"]
         created_by = usr_name
         created_date = dt
         effective_date = request.POST["effective_date"]
-
         e = MappingTickets()
-        e.emp_name = emp_name
+        e.emp_name = prof.emp_name
         e.emp_id = emp_id
-        e.emp_desi = emp_desi
-        e.emp_rm1 = emp_rm1
-        e.emp_rm2 = emp_rm2
-        e.emp_rm3 = emp_rm3
-        e.new_rm1 = new_rm1
-        e.new_rm2 = new_rm2
-        e.new_rm3 = new_rm3
-        e.emp_process = emp_process
+        e.emp_desi = prof.emp_desi
+        e.emp_rm1 = prof.emp_rm1
+        e.emp_rm2 = prof.emp_rm2
+        e.emp_rm3 = prof.emp_rm3
+        e.emp_rm1_id = prof.emp_rm1_id
+        e.emp_rm2_id = prof.emp_rm2_id
+        e.emp_rm3_id = prof.emp_rm3_id
+        e.new_rm1 = Profile.objects.get(emp_id=new_rm1_id).emp_name
+        e.new_rm2 = Profile.objects.get(emp_id=new_rm2_id).emp_name
+        e.new_rm3 = Profile.objects.get(emp_id=new_rm3_id).emp_name
+        e.new_rm1_id = new_rm1_id
+        e.new_rm2_id = new_rm2_id
+        e.new_rm3_id = new_rm3_id
+        e.emp_process = prof.emp_process
         e.new_process = new_process
         e.created_by = created_by
+        e.created_by_id = usr_id
         e.created_date = created_date
         e.effective_date = effective_date
         e.save()
-
         return redirect('/ams/rm-mapping-index')
-
     else:
         return redirect('/ams/rm-mapping-index')
 
-
 @login_required
-def viewMappingTicketsHr(request):
-
-    usr = request.user.profile.emp_name
-    tickets = MappingTickets.objects.filter(status=False,new_rm3=usr).order_by('created_date')
-    emp_id = request.user.profile.emp_id
-    emp = Profile.objects.get(emp_id=emp_id)
+def viewMappingTicketsHr(request): # Test1
+    usr = request.user.profile.emp_id
+    tickets = MappingTickets.objects.filter(status=False,new_rm3_id=usr).order_by('created_date')
+    emp = Profile.objects.get(emp_id=usr)
     data = {'tickets':tickets,'emp':emp}
     return render(request,'ams/view_mapping_tickets.html',data)
 
 @login_required
-def approveMappingTicket(request):
-
+def approveMappingTicket(request): # Test1
     if request.method=='POST':
         usr_name = request.user.profile.emp_name
         id = request.POST['id']
@@ -1494,37 +1441,27 @@ def approveMappingTicket(request):
         ticket.approved_by = usr_name
         ticket.approved_date = td
         ticket.save()
-        emp_id = ticket.emp_id
-        emp = Profile.objects.get(emp_id=emp_id)
+        emp_id = ticket.emp_id   
         prof = Profile.objects.get(emp_id=emp_id)
-
-        emp.emp_rm1 = ticket.new_rm1
-        emp.emp_rm2 = ticket.new_rm2
-        emp.emp_rm3 = ticket.new_rm3
-        emp.emp_process = ticket.new_process
-
-        emp.save()
-
         prof.emp_rm1 = ticket.new_rm1
         prof.emp_rm2 = ticket.new_rm2
         prof.emp_rm3 = ticket.new_rm3
+        prof.emp_rm1_id = ticket.new_rm1_id
+        prof.emp_rm2_id = ticket.new_rm2_id
+        prof.emp_rm3_id = ticket.new_rm3_id
         prof.emp_process = ticket.new_process
         prof.save()
-
         return redirect('/ams/view-mapping-tickets')
     else:
         return redirect('/ams/logout')
 
 @login_required
-def viewMappingApplicationStatus(request):
-    usr = request.user.profile.emp_name
-    tickets = MappingTickets.objects.filter(created_by=usr).order_by('created_date')
-    emp_id = request.user.profile.emp_id
-    emp = Profile.objects.get(emp_id=emp_id)
+def viewMappingApplicationStatus(request): # Test1
+    usr = request.user.profile.emp_id
+    tickets = MappingTickets.objects.filter(created_by_id=usr).order_by('created_date')
+    emp = Profile.objects.get(emp_id=usr)
     data = {'tickets': tickets, 'emp': emp}
     return render(request, 'ams/view_mapping_status.html', data)
-
-
 
 @login_required
 def addNewTeam(request):
@@ -1561,26 +1498,25 @@ def viewTeam(request):
 
 
 @login_required
-def applyLeave(request):
+def applyLeave(request): # Test1
     if request.method == 'POST':
         emp_name = request.POST["emp_name"]
         emp_id = request.POST["emp_id"]
-        emp_desi = request.POST["emp_desi"]
-        emp_process = request.POST["emp_process"]
-        emp_rm1_id = request.POST["emp_rm1"]
-        emp_rm2_id = request.POST["emp_rm2"]
-        emp_rm3_id = request.POST["emp_rm3"]
-        emp_rm1 = Profile.objects.get(emp_id=emp_rm1_id).emp_name
-        emp_rm2 = Profile.objects.get(emp_id=emp_rm2_id).emp_name
-        emp_rm3 = Profile.objects.get(emp_id=emp_rm3_id).emp_name
+        prof = Profile.objects.get(emp_id=emp_id)
+        emp_desi = prof.emp_desi
+        emp_process = prof.emp_process
+        emp_rm1_id = prof.emp_rm1_id
+        emp_rm2_id = prof.emp_rm2_id
+        emp_rm3_id = prof.emp_rm3_id
+        emp_rm1 = prof.emp_rm1
+        emp_rm2 = prof.emp_rm2
+        emp_rm3 = prof.emp_rm3
         leave_type = request.POST["type"]
         start_date = request.POST["startdate"]
         end_date = request.POST["enddate"]
         no_days = request.POST["leave_days"]
         agent_reason = request.POST["reason"]
         unique_id = request.POST['csrfmiddlewaretoken']
-
-
         e = LeaveTable()
         e.unique_id = unique_id
         e.applied_date = date.today()
@@ -1599,23 +1535,19 @@ def applyLeave(request):
         e.emp_rm1_id = emp_rm1_id
         e.emp_rm2_id = emp_rm2_id
         e.emp_rm3_id = emp_rm3_id
-
         if emp_desi in manager_list or emp_desi in tl_am_list:
             e.tl_status = 'Approved'
             e.tl_approval = True
             e.tl_reason = 'Self Approved'
         e.save()
 
-
         leave_balance = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
-
         if leave_type == 'PL':
             leave_balance.pl_balance-=int(no_days)
             leave_balance.save()
         elif leave_type == 'SL':
             leave_balance.sl_balance-=int(no_days)
             leave_balance.save()
-
         return redirect('/ams/ams-apply_leave')
 
     else:
@@ -1636,10 +1568,8 @@ def applyLeave(request):
             leave_balance = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
         except EmployeeLeaveBalance.DoesNotExist:
             leave_balance = {'sl_balance':0,'pl_balance':0}
-
         leave_his = leaveHistory.objects.filter(emp_id=emp_id).values('date','transaction',
                                                                   'leave_type','total').annotate(no_days=Sum('no_days'))
-
         data = {'emp': emp,'leave':leave,'leave_balance':leave_balance,'probation':probation,'leave_his':leave_his}
         return render(request,'ams/apply-leave.html',data)
 
@@ -1823,6 +1753,8 @@ def applyCorrection(request):
         atthist.att_new = att_new
         atthist.emp_name = emp_name
         atthist.emp_id = emp_id
+        atthist.rm3_id = emp_obj.emp_rm3_id
+        atthist.rm3_name = emp_obj.emp_rm3
         atthist.cal_id = id
         atthist.reason = reason
         atthist.save()
@@ -1875,30 +1807,6 @@ def approveAttendanceRequest(request):
         att_hist = AttendanceCorrectionHistory.objects.filter(status = False)
         data = {'att_hist':att_hist,'emp':emp}
         return render(request,'ams/hr_attendance_correction.html',data)
-
-
-
-def applyEmpStatusChange(request):
-    if request.method == 'POST':
-        emp_id = request.POST['emp_id']
-        new_status = request.POST['newstatus']
-        reason = request.POST['reason']
-        emp = Profile.objects.get(emp_id=emp_id)
-
-        # Creating Ticket
-        t= AgentActiveStatusHist()
-        t.emp_id = emp_id
-        t.emp_name = emp.emp_name
-        t.current_status = emp.agent_status
-        t.new_status = new_status
-        t.date = datetime.now()
-        t.reason = reason
-        t.changed_by = request.user.profile.emp_name
-
-        t.save()
-        messages.info(request,'Ticket for agent status change has been submitted successfully ! ')
-        return redirect('/ams/rm-mapping-index')
-
 
 def addAttendance(request):
     if request.method == 'POST':

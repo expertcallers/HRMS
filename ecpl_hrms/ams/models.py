@@ -1,3 +1,4 @@
+from statistics import mode
 from django.contrib.auth.models import User
 from django.db import models
 # Attendance - Master ++
@@ -101,12 +102,19 @@ class MappingTickets(models.Model):
     emp_rm1 = models.CharField(max_length=50)
     emp_rm2 = models.CharField(max_length=50)
     emp_rm3 = models.CharField(max_length=50)
+    emp_rm1_id = models.CharField(max_length=50)
+    emp_rm2_id = models.CharField(max_length=50)
+    emp_rm3_id = models.CharField(max_length=50)
     new_rm1 = models.CharField(max_length=50)
     new_rm2 = models.CharField(max_length=50)
     new_rm3 = models.CharField(max_length=50)
+    new_rm1_id = models.CharField(max_length=50)
+    new_rm2_id = models.CharField(max_length=50)
+    new_rm3_id = models.CharField(max_length=50)
     emp_process = models.CharField(max_length=50)
     new_process = models.CharField(max_length=50)
-    created_by=models.TextField()
+    created_by=models.CharField(max_length=50)
+    created_by_id=models.CharField(max_length=50)
     created_date=models.DateTimeField()
     effective_date=models.DateField()
     approved_by=models.TextField(null=True,blank=True)
@@ -175,6 +183,8 @@ class AttendanceCorrectionHistory(models.Model):
     att_new = models.CharField(max_length=30,null=True,blank=True)
     emp_name = models.CharField(max_length=30,null=True,blank=True)
     emp_id = models.CharField(max_length=30,null=True,blank=True)
+    rm3_name = models.CharField(max_length=50)
+    rm3_id = models.CharField(max_length=50)
     approved_by = models.CharField(max_length=30,null=True,blank=True)
     status = models.BooleanField(default=False)
     cal_id = models.IntegerField()

@@ -82,7 +82,7 @@ urlpatterns = [
     path('mapping-application-status',viewMappingApplicationStatus),
 
     # Status Changes
-    path('change-emp-status',applyEmpStatusChange),
+   
 
     #Attrition
     path('attrition',viewAttrition),
