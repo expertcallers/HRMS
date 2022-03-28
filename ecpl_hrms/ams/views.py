@@ -1,8 +1,8 @@
 from asyncore import dispatcher_with_send
 import json
 from datetime import datetime
-from telnetlib import EC
-from tkinter import E
+#from telnetlib import EC
+#from tkinter import E
 import pytz
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
