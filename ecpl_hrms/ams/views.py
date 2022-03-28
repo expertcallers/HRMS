@@ -1557,7 +1557,6 @@ def addAttendance(request):
             for j in profile:
                 try:
                     EcplCalander.objects.get(emp_id=j.emp_id,date=i)
-                    pass
                 except EcplCalander.DoesNotExist:
                     cal = EcplCalander.objects.create(date=i,emp_id=j.emp_id,att_actual='Unmarked',emp_name=j.emp_name,emp_desi=j.emp_desi,
                         team=j.emp_process,team_id=j.emp_process_id,rm1=j.emp_rm1,rm2=j.emp_rm2,rm3=j.emp_rm3,rm1_id=j.emp_rm1_id,
