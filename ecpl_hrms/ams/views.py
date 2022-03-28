@@ -183,7 +183,7 @@ def tlDashboard(request): # Test1
         attrition_count = allCounts('Attrition')
         training_count = allCounts('Training')
         unmarked_count = allCounts('Unmarked')
-        print(present_count)
+    
         # Mapping Tickets 
         map_tickets_counts = MappingTickets.objects.filter(new_rm3_id = emp_id,status=False).count()
         #Leaves
@@ -1554,10 +1554,9 @@ def addAttendance(request):
             date_list.append(day)
         profile = Profile.objects.filter(agent_status='Active')
         for i in date_list:
-            for j in profile:
-                try:
-                    EcplCalander.objects.get(emp_id=j.emp_id,date=i)
-                except EcplCalander.DoesNotExist:
+            for j in profile:                
+                ec_cal= EcplCalander.objects.filter(emp_id=j.emp_id,date=i).count()
+                if ec_cal <1:
                     cal = EcplCalander.objects.create(date=i,emp_id=j.emp_id,att_actual='Unmarked',emp_name=j.emp_name,emp_desi=j.emp_desi,
                         team=j.emp_process,team_id=j.emp_process_id,rm1=j.emp_rm1,rm2=j.emp_rm2,rm3=j.emp_rm3,rm1_id=j.emp_rm1_id,
                         rm2_id=j.emp_rm2_id,rm3_id=j.emp_rm3_id)
