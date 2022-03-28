@@ -76,10 +76,10 @@
                     <div class="col-md-3">
                       <div class="form-group">
                         <label for="emp_rm1">RM1</label>
-                        <select name="emp_rm1" id="emp_rm1" class="form-control select2" required>
+                        <select name="emp_rm1_id" id="emp_rm1" class="form-control select2" required>
                           <option value="" selected disabled>Please select</option>
                           {% for r in rms %}
-                          <option value="{{r.emp_name}}">{{r.emp_name}} / {{r.emp_id}}</option>
+                          <option value="{{r.emp_id}}">{{r.emp_name}} / {{r.emp_id}}</option>
                           {% endfor %}
                         </select>
                       </div>
@@ -87,10 +87,10 @@
                     <div class="col-md-3">
                       <div class="form-group">
                         <label for="emp_rm2">RM2</label>
-                        <select name="emp_rm2" id="emp_rm2" class="form-control select2" required>
+                        <select name="emp_rm2_id" id="emp_rm2" class="form-control select2" required>
                           <option value="" selected disabled>Please select</option>
                           {% for r in rms %}
-                          <option value="{{r.emp_name}}">{{r.emp_name}} / {{r.emp_id}}</option>
+                          <option value="{{r.emp_id}}">{{r.emp_name}} / {{r.emp_id}}</option>
                           {% endfor %}
                         </select>
                       </div>
@@ -98,10 +98,10 @@
                     <div class="col-md-3">
                       <div class="form-group">
                         <label for="emp_rm3">RM3</label>
-                        <select name="emp_rm3" id="emp_rm3" class="form-control select2" required>
+                        <select name="emp_rm3_id" id="emp_rm3" class="form-control select2" required>
                           <option value="" selected disabled>Please select</option>
                           {% for r in rms %}
-                          <option value="{{r.emp_name}}">{{r.emp_name}} / {{r.emp_id}}</option>
+                          <option value="{{r.emp_id}}">{{r.emp_name}} / {{r.emp_id}}</option>
                           {% endfor %}
                         </select>
                       </div>
