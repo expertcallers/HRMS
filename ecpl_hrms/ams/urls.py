@@ -80,10 +80,6 @@ urlpatterns = [
     path('mapping-application-status',viewMappingApplicationStatus),
 
     # Status Changes
-   
-
-    #Attrition
-    path('attrition',viewAttrition),
 
     # calnder Start
     #path('start-calander',startCalandarForAllAgents)

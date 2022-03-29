@@ -1,8 +1,5 @@
-from asyncore import dispatcher_with_send
 import json
 from datetime import datetime
-#from telnetlib import EC
-#from tkinter import E
 import pytz
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -17,30 +14,23 @@ import calendar
 from datetime import date
 from django.db.models import Q, Sum, Max
 c = Calendar()
-
 # Getting Model from other Apps
 from django.apps import apps
 Profile = apps.get_model('mapping','Profile')
 
 # TL and AM List
 tl_am_list = ['Team Leader','Assistant Manager', 'Subject Matter Expert', 'Trainer','Learning and Development Head',
-              'Process Trainer','Trainer Sales',
-              ]
-
+              'Process Trainer','Trainer Sales']
 # Manager List
 manager_list = ['Quality Head','Operations Manager','Service Delivery Manager','Command Centre Head']
-
 # HR List
 hr_list = ['HR','HR Manager','Manager ER','HR Lead','Sr Recruiter','MIS Executive HR',
 'Lead HRBP','Employee Relations Specialist','Payroll Specialist','Recruiter','HR Generalist']
-
 #Agent List
 agent_list = [ 'Client Relationship Officer','MIS Executive','Patrolling officer',
                'Data Analyst','Business Development Executive','Content Developer',
-               'Junior Developer','Web Developer','Trainee Developer',
-               'Jr Dev','CRO',
+               'Junior Developer','Web Developer','Trainee Developer','Jr Dev','CRO',
                 ]
-
 rm_list = ['Team Leader','Assistant Manager','Subject Matter Expert', 'Trainer','Learning and Development Head',
               'Process Trainer','Sales Trainer',
               'Quality Head','Operations Manager','Service Delivery Manager','Command Centre Head',
@@ -48,8 +38,7 @@ rm_list = ['Team Leader','Assistant Manager','Subject Matter Expert', 'Trainer',
               'Lead HRBP','Employee Relations Specialist','Payroll Specialist','Recruiter','HR Generalist',
               'Associate Director','Chief Executive Officer','Chief Compliance Officer','Chief Technology Officer',
               'Managing Director','Vice President','Board member',
-              'IT Manager',
-              ]                
+              'IT Manager']                
 
 # Create your views here.
 def loginPage(request): # Test1
@@ -95,7 +84,6 @@ def redirectTOAllDashBoards(request,id): # Test1
         return redirect('/ams/manager-dashboard')    
     else:
         return HttpResponse('<h1>Not Authorised to view this page</h1>')
-
 
 def logoutView(request): # Test1
     logout(request)
@@ -362,10 +350,10 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
         e.save()
         return redirect('/ams/view-leave-request-mgr')
     else:
-        mgr_name = request.user.profile.emp_name
+        
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
-        leave_request = LeaveTable.objects.filter(emp_rm3=mgr_name,tl_status='Approved',manager_approval=False)
+        leave_request = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm1_id=emp_id),Q(tl_status='Approved'),Q(manager_approval=False))
         data = {'emp':emp,'leave_request':leave_request}
         return render(request,'ams/leave_approval_rm3.html',data)
 
@@ -767,7 +755,7 @@ def on_boarding_update(request,id): # Test1
         return render(request, "ams/edit_onboarding.html", data)
 
 @login_required
-def addNewUserHR(request):
+def addNewUserHR(request): # Test1  # calander pending
     if request.method == 'POST':
         on_id = request.POST['id']
         emp_name = request.POST["emp_name"]
@@ -1047,23 +1035,19 @@ def weekAttendanceReport(request): # Test1
     return render(request, 'ams/week_attendace_report.html', data)
 
 @login_required
-def teamAttendanceReport(request):
+def teamAttendanceReport(request): # Test 1
     if request.method == 'POST':
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
         team_name = request.POST['team_name']
         start_date = start_date
         end_date = end_date
-        #start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
-        #end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
-
         if team_name == 'All Team':
             agt_cal_list = EcplCalander.objects.filter(date__range=[start_date,end_date])           
             data = {'agt_cal_list': agt_cal_list,'emp': emp}
             return render(request, 'ams/agent-calander-status.html', data)
-
         agt_cal_list = EcplCalander.objects.filter(date__range=[start_date,end_date],team_id=team_name)
         data = {'agt_cal_list': agt_cal_list,'emp': emp}
         return render(request, 'ams/agent-calander-status.html', data)
@@ -1072,7 +1056,7 @@ def teamAttendanceReport(request):
 
 
 @login_required
-def agentSettings(request):
+def agentSettings(request): # Test1
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     form = PasswordChangeForm(request.user)
@@ -1080,7 +1064,7 @@ def agentSettings(request):
     return render(request,'ams/agent-settings.html',data)
 
 @login_required
-def rmSettings(request):
+def rmSettings(request): # Test1
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     form = PasswordChangeForm(request.user)
@@ -1088,18 +1072,19 @@ def rmSettings(request):
     return render(request,'ams/rm-settings.html',data)
 
 @login_required
-def uploadImageToDB(request):
+def uploadImageToDB(request): # Test1
     if request.method=='POST':
         user_image = request.FILES['user-img']
         id = request.POST['id']
         prof = Profile.objects.get(id=id)
         prof.img = user_image
         prof.save()
-
         if request.user.profile.emp_desi in tl_am_list:
             return redirect('/ams/tl-dashboard')
         elif request.user.profile.emp_desi in hr_list:
             return redirect('/ams/hr-dashboard')
+        elif request.profile.emp_desi in manager_list:
+            return redirect('/ams/manager-dashboard')    
         else:
             return redirect('/ams/agent-dashboard')
     else:
@@ -1108,7 +1093,6 @@ def uploadImageToDB(request):
 @login_required
 def mappingHomePage(request): # Test1
     emp_id = request.user.profile.emp_id
-    user_nm = request.user.profile.emp_name
     emp = Profile.objects.get(emp_id=emp_id)
     employees = Profile.objects.filter(Q(emp_rm1_id=emp_id),Q(agent_status = 'Active'))
     rms = Profile.objects.exclude(emp_desi__in=rm_list).order_by('emp_name')
@@ -1200,9 +1184,8 @@ def viewMappingApplicationStatus(request): # Test1
     return render(request, 'ams/view_mapping_status.html', data)
 
 @login_required
-def addNewTeam(request):
-
-    mgrs = Profile.objects.filter(emp_desi__in=manager_list,agent_status = 'Active')
+def addNewTeam(request): # Test1
+    mgrs = Profile.objects.filter(emp_desi__in=manager_list,agent_status ='Active')
     if request.method == "POST":
         usr = request.user.profile.emp_name
         om = request.POST["om"]
@@ -1211,9 +1194,7 @@ def addNewTeam(request):
         cam = Campaigns.objects.create(name=campaign,om=om,created_by=usr,created_date = today)
         cam.save()
         messages.info(request,'Team ' + campaign +' Created Successfully')
-
         return redirect('/ams/view-all-teams')
-
     else:
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
@@ -1221,7 +1202,7 @@ def addNewTeam(request):
         return render(request,"ams/add_team.html",data)
 
 @login_required
-def viewTeam(request):
+def viewTeam(request): # Test1
     if request.user.profile.emp_desi in hr_list:
         teams = Campaigns.objects.all()
         emp_id = request.user.profile.emp_id
@@ -1231,7 +1212,6 @@ def viewTeam(request):
     else:
         messages.info(request,'*** You are not authorised to view this page ***')
         return redirect('ams/logout')
-
 
 @login_required
 def applyLeave(request): # Test1
@@ -1271,12 +1251,17 @@ def applyLeave(request): # Test1
         e.emp_rm1_id = emp_rm1_id
         e.emp_rm2_id = emp_rm2_id
         e.emp_rm3_id = emp_rm3_id
+        rm1_desi = Profile.objects.get(emp_id=emp_rm1_id).emp_desi
+
+        if rm1_desi in manager_list:
+            e.tl_status = 'Approved'
+            e.tl_approval = True
+            e.tl_reason = 'OM as TL'
         if emp_desi in manager_list or emp_desi in tl_am_list:
             e.tl_status = 'Approved'
             e.tl_approval = True
             e.tl_reason = 'Self Approved'
         e.save()
-
         leave_balance = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
         if leave_type == 'PL':
             leave_balance.pl_balance-=int(no_days)
@@ -1285,19 +1270,22 @@ def applyLeave(request): # Test1
             leave_balance.sl_balance-=int(no_days)
             leave_balance.save()
         return redirect('/ams/ams-apply_leave')
-
     else:
-
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
         leave = LeaveTable.objects.filter(emp_id=emp_id)
+
+     
         try:
             Profile.objects.get(emp_id=emp_id,doj=None)
             doj = date(2020,1,1)
             today = date.today()
             probation = (today - doj).days
         except Profile.DoesNotExist:
-            doj = emp.doj
+            if emp.doj == None:
+                doj = date(2020,1,1)
+            else:
+                doj = emp.doj
             today = date.today()
             probation = (today - doj).days
         try:
@@ -1350,7 +1338,7 @@ def approveLeaveRM1(request): # Test1
         return redirect('/ams/view-leave-list')
 
 @login_required
-def applyEscalation(request):
+def applyEscalation(request): # Test1
     if request.method == "POST":
         id = request.POST["id"]
         reason = request.POST['reason']
@@ -1370,78 +1358,37 @@ def applyEscalation(request):
         return redirect('/ams/view-leave-list')
     else:
         pass
+
 @login_required
-def viewEscalation(request):
-    leave_request = LeaveTable.objects.filter(emp_rm3=request.user.profile.emp_name, tl_approval=True,escalation=True,manager_approval=False)
-    data = { 'leave_request': leave_request}
+def viewEscalation(request): # Test1
+    leave_request = LeaveTable.objects.filter(emp_rm3_id=request.user.profile.emp_id, tl_approval=True,escalation=True,manager_approval=False)
+    data = {'leave_request': leave_request}
     return render(request, 'ams/leave_escalation.html', data)
 
 @login_required
-def viewLeaveHistory(request):
+def viewLeaveHistory(request): # Test1
     emp_id = request.user.profile.emp_id
     leave = LeaveTable.objects.filter(Q(emp_rm1_id=emp_id)|Q(emp_rm2_id=emp_id)|Q(emp_rm3_id=emp_id))
     data = {'leave': leave}
     return render(request, 'ams/view_employee_leave_history.html', data)
 
 @login_required
-def editAgentStatus(request):
+def editAgentStatus(request): # Test1
     if request.method == 'POST':
-
         id = request.POST['id']
         agent_status = request.POST['new_status']
         reason = request.POST['reason']
         profile = Profile.objects.get(id=id)
-        emp = Profile.objects.get(emp_id = profile.emp_id)
-        emp.agent_status = agent_status
-        emp.save()
+        current_status = profile.agent_status
         profile.agent_status = agent_status
         profile.save()
-        sh = AgentActiveStatusHist.objects.create(emp_id = profile.emp_id,emp_name=profile.emp_name ,current_status = profile.agent_status,
-                                                  new_status= agent_status,
-                                                  date=date.today() ,reason =reason ,changed_by =request.user.profile.emp_name)
-
+        sh = AgentActiveStatusHist.objects.create(emp_id = profile.emp_id,emp_name=profile.emp_name ,current_status = current_status,
+                        new_status= agent_status,date=date.today() ,reason =reason ,changed_by =request.user.profile.emp_name)
         sh.save()
         return redirect('/ams/viewusers')
-
     else:
         return HttpResponse('<h1>Not Get Method</h1>')
 
-@login_required
-def viewAttrition(request): # For all Agent Status CHanges >>
-
-    emp_idd = request.user.profile.emp_id
-    emp = Profile.objects.get(emp_id=emp_idd)
-
-    if request.method == 'POST':
-
-        id = request.POST['id']
-        new_status = request.POST['new_status']
-        hr_response = request.POST['hr_response']
-
-        agnt = AgentActiveStatusHist.objects.get(id=id)
-        agnt.status_by_hr = new_status
-        agnt.hr_response = hr_response
-        agnt.ticket_status = True
-        agnt.approved_by = request.user.profile.emp_name
-        agnt.save()
-
-        em = Profile.objects.get(emp_id=agnt.emp_id)
-        em.agent_status = new_status
-        em.save()
-        pr = Profile.objects.get(emp_id=agnt.emp_id)
-        pr.agent_status = new_status
-        pr.save()
-
-
-        att = AgentActiveStatusHist.objects.filter(ticket_status=False)
-        data = {'att': att,'emp':emp}
-        return render(request, 'ams/view_attrition.html', data)
-
-    else:
-        att = AgentActiveStatusHist.objects.filter(ticket_status = False)
-
-        data = {'att':att,'emp':emp}
-        return render(request,'ams/view_attrition.html',data)
 
 def attendanceCorrection(request):
     emp_idd = request.user.profile.emp_id
