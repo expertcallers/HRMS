@@ -1392,6 +1392,7 @@ def editAgentStatus(request): # Test1
         return HttpResponse('<h1>Not Get Method</h1>')
 
 
+@login_required
 def attendanceCorrection(request):
     emp_idd = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_idd)
@@ -1407,11 +1408,10 @@ def attendanceCorrection(request):
         data = {'all_emp':all_emp,'emp':emp,'atthist':atthist}
         return render(request,'ams/view_att_correction.html',data)
 
+@login_required
 def applyCorrection(request):
-
     applied_by = request.user.profile.emp_name
     applied_by_id = request.user.profile.emp_id
-
     if request.method == 'POST':
         id = request.POST['id']
         att_new = request.POST['att_new']
@@ -1444,6 +1444,7 @@ def applyCorrection(request):
         pass
 
 
+@login_required
 def approveAttendanceRequest(request):
     emp_idd = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_idd)
@@ -1487,6 +1488,7 @@ def approveAttendanceRequest(request):
         data = {'att_hist':att_hist,'emp':emp}
         return render(request,'ams/hr_attendance_correction.html',data)
 
+@login_required
 def addAttendance(request):
     if request.method == 'POST':
         id = request.POST['month']
@@ -1528,6 +1530,7 @@ def addAttendance(request):
         data = {'months':months}
         return render(request, 'ams/admin/add_attendance.html',data)
 
+@login_required
 def SLProofSubmit(request):
     if request.method == 'POST':
         id = request.POST['id']
@@ -1542,10 +1545,6 @@ def SLProofSubmit(request):
         else:
             messages.info(request, "The time has exceeded cannot upload now :)")
             return redirect('/ams/ams-apply_leave')
-    else:
-        for i in LeaveTable.objects.all():
-            i.delete()
-
 
 
 @login_required
