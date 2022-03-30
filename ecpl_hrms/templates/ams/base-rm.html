@@ -51,7 +51,7 @@
           }
     </style>
   </head>
-  <body class="nav-md">
+  <body class="nav-md" oncontextmenu="alert('Right Click is Blocked'); return false">
   <div class="container body">
       <div class="main_container">
         <div class="col-md-3 left_col">
@@ -395,6 +395,28 @@
                 return false;
               }
           }
+  document.onkeydown = function(e) {
+      if(event.keyCode == 123) {
+         alert("F12 is blocked");
+         return false;
+      }
+      if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
+         alert("Inspect is blocked");
+         return false;
+      }
+      if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) {
+         alert("ctrl+shift+C is blocked");
+         return false;
+      }
+      if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
+         alert("Console is blocked");
+         return false;
+      }
+      if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+         alert("Source code is blocked");
+         return false;
+      }
+    }
         </script>
           <script>
 
