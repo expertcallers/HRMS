@@ -100,7 +100,7 @@
                 <div class="space"></div>
               </div>
             </div> -->
-            <div class="col-md-2">
+            <!--<div class="col-md-2">
               <div class="card-base">
                 <div class="card-icon">
                   <span title="Leave Request" id="widgetCardIcon" class="imagecard">
@@ -116,7 +116,7 @@
                 </div>
                 <div class="space"></div>
               </div>
-            </div>
+            </div>-->
           </div>
 
           <div class="row mt-4">
@@ -135,7 +135,7 @@
                           <option selected disabled value="">Select from below</option>
                           <option value="All Team">All Team</option>
                           {% for t in team %}
-                          <option value="{{t.name}}">{{t.name}}</option>
+                          <option value="{{t.id}}">{{t.name}}</option>
                           {% endfor %}
                         </select>
                       </div>

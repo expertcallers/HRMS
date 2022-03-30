@@ -41,7 +41,6 @@ urlpatterns = [
     path('team-attendance',teamAttendance),
     path('view-emp-attendance',viewTeamAttendance),
     path('team-attendance-report',teamAttendanceReport),
-    path('view-att-requests',attRequests),
     path('add-leave-bal', addLeaveBalance),
 
     #Attendance Correction
@@ -67,7 +66,6 @@ urlpatterns = [
     path('ams-apply_leave',applyLeave),
     path('view-leave-list',viewleaveListRM1),
     path('approve-leave-rm1',approveLeaveRM1),
-    path('rm-approval/<int:id>',rmApproval),
     path('view-leave-request-mgr',viewAndApproveLeaveRequestMgr),
     path('sl-proof', SLProofSubmit),
     path('apply-escalation', applyEscalation),
@@ -82,15 +80,11 @@ urlpatterns = [
     path('mapping-application-status',viewMappingApplicationStatus),
 
     # Status Changes
-    path('change-emp-status',applyEmpStatusChange),
-
-    #Attrition
-    path('attrition',viewAttrition),
 
     # calnder Start
     #path('start-calander',startCalandarForAllAgents)
 
     path('add-attendance', addAttendance),
-    path('test', test),
+
 
 ]

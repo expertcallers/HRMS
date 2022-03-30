@@ -150,15 +150,24 @@
                         <thead class="thead-dark">
                           <tr>
                             <th>Leave Dates</th>
-                            <th>Status</th>
+                            <th>TL Status</th>
+                            <th>Manager Status</th>
+                            <th>Final Status</th>
                             <th>Agent Comments</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {% for c in cal %}
+                          {% for c in leave_hist %}
                           <tr>
                             <td>{{c.start_date}} - {{c.end_date}}</td>
-                            <td>{{c.status}}</td>
+                            <td>{{c.tl_status}}</td>
+                            <td>{{c.manager_status}}</td>
+                            <td>{% if c.status == 'None' %}
+                                <small>Pending</small>
+                                {% else %}
+                                <p>{{c.status}}</p>
+                                {% endif %}
+                            </td>
                             <td>{{c.agent_reason}}</td>
 
                           </tr>
