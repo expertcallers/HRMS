@@ -1483,6 +1483,7 @@ def approveAttendanceRequest(request): # test1
         data = {'att_hist':att_hist,'emp':emp}
         return render(request,'ams/hr_attendance_correction.html',data)
 
+@login_required
 def addAttendance(request):
     if request.method == 'POST':
         id = request.POST['month']
@@ -1539,10 +1540,6 @@ def SLProofSubmit(request): # Test1
         else:
             messages.info(request, "The time has exceeded cannot upload now :)")
             return redirect('/ams/ams-apply_leave')
-    else:
-        for i in LeaveTable.objects.all():
-            i.delete()
-
 
 @login_required
 def addLeaveBalance(request):
