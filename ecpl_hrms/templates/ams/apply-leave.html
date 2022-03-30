@@ -23,7 +23,7 @@
                 <div class="card-body" align="center">
                   <h1 style="font-size: 64px;" id="leave_bal">
                     {% if probation >=  90 %}
-                      {{leave_balance.pl_balance}}
+                      {{leave_balance.pl_balance|floatformat:2}}
                     {% else %}
                       <span style="font-size:25px">Probation Period</span>
                     {% endif %}

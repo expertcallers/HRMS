@@ -18,6 +18,9 @@ class LeaveHistorySearch(admin.ModelAdmin):
 class AddAttendanceMonthsSearch(admin.ModelAdmin):
     search_fields = ('month','year')
     list_display = ('month','month_number',"year","created", "leave",)
+class DateStatus(admin.ModelAdmin):
+    search_fields = ('date','status')
+    list_display = ('date','status')
 
 
 
@@ -29,4 +32,5 @@ admin.site.register(AgentActiveStatusHist)
 admin.site.register(LeaveTable)
 admin.site.register(AddAttendanceMonths, AddAttendanceMonthsSearch)
 admin.site.register(leaveHistory, LeaveHistorySearch)
+admin.site.register(DaysForAttendance,DateStatus)
 admin.site.register(AttendanceCorrectionHistory)
