@@ -781,27 +781,46 @@ def addNewUserHR(request): # Test1  # calander pending
             user.save()
             usr = User.objects.get(username=emp_id)
             #Creating Profile
-            profile = Profile.objects.create(
+            Profile.objects.create(
                 user_id=user,emp_id=emp_id, emp_name=emp_name, emp_desi=emp_desi,
                 emp_rm1=emp_rm1, emp_rm2=emp_rm2, emp_rm3=emp_rm3,emp_rm1_id=emp_rm1_id,emp_rm2_id=emp_rm2_id,
                 emp_rm3_id=emp_rm3_id,emp_process=emp_process, user=usr,doj=emp_doj,on_id=on_id,
             )
-            leave = EmployeeLeaveBalance.objects.create(
+            # Creating Leave Balance
+            EmployeeLeaveBalance.objects.create(
                 emp_id=emp_id, emp_name=emp_name, team=emp_process, pl_balance=0,
                 sl_balance=0, present_count=0
             )
+            # Creating Attendance
+            start_date = date.today()
+            last_date = date(start_date.year, start_date.month + 2, 1) - timedelta(days=1)
+            delta = last_date - start_date
+            date_list = []
+            for i in range(delta.days + 1):
+                day = start_date + timedelta(days=i)
+                date_list.append(day)
+            j = Profile.objects.get(emp_id=emp_id)
+            for i in date_list:
+                try:
+                    EcplCalander.objects.filter(emp_id=j.emp_id, date=i)
+                except EcplCalander.DoesNotExists:
+                    EcplCalander.objects.create(date=i, emp_id=j.emp_id, att_actual='Unmarked',
+                                              emp_name=j.emp_name, emp_desi=j.emp_desi,
+                                              team=j.emp_process, team_id=j.emp_process_id, rm1=j.emp_rm1,
+                                              rm2=j.emp_rm2, rm3=j.emp_rm3, rm1_id=j.emp_rm1_id,
+                                              rm2_id=j.emp_rm2_id, rm3_id=j.emp_rm3_id)
+
             onb_obj.user_created = True
             onb_obj.save()
-            profile.save()
-            leave.save()
         messages.info(request,'User and Profile Successfully Created')
         return redirect('/ams/add-new-user')
     else:
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
         all_desi = Profile.objects.all().values('emp_desi').distinct().order_by('emp_desi')
-        rms = Profile.objects.exclude(emp_desi__in =['Client Relationship Officer','Patrolling Officer']).order_by('emp_name')
+        rms = Profile.objects.filter(emp_desi__in = rm_list).order_by('emp_name')
         all_team = Campaigns.objects.all()
+        
         onboarding = OnboardingnewHRC.objects.filter(user_created=False)
         data = {'emp': emp,'all_data':all_desi,'rms':rms,'all_team':all_team,'onboarding':onboarding}
         return render(request,'ams/hr_add_user.html',data)
@@ -1097,7 +1116,7 @@ def mappingHomePage(request): # Test1
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     employees = Profile.objects.filter(Q(emp_rm1_id=emp_id),Q(agent_status = 'Active'))
-    rms = Profile.objects.exclude(emp_desi__in=rm_list).order_by('emp_name')
+    rms = Profile.objects.filter(emp_desi__in=rm_list).order_by('emp_name')
     teams = Campaigns.objects.all().order_by('name')
     data = {'emp': emp,'employees':employees,'rms':rms,'teams':teams}
     return render(request,'ams/mapping_home.html',data)
