@@ -1277,7 +1277,6 @@ def applyLeave(request): # Test1
         emp = Profile.objects.get(emp_id=emp_id)
         leave = LeaveTable.objects.filter(emp_id=emp_id)
 
-     
         try:
             Profile.objects.get(emp_id=emp_id,doj=None)
             doj = date(2020,1,1)
@@ -1391,8 +1390,8 @@ def editAgentStatus(request): # Test1
     else:
         return HttpResponse('<h1>Not Get Method</h1>')
 
-
-def attendanceCorrection(request):
+@login_required
+def attendanceCorrection(request): # Test1
     emp_idd = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_idd)
     if request.method == 'POST':
@@ -1407,11 +1406,10 @@ def attendanceCorrection(request):
         data = {'all_emp':all_emp,'emp':emp,'atthist':atthist}
         return render(request,'ams/view_att_correction.html',data)
 
-def applyCorrection(request):
-
+@login_required
+def applyCorrection(request): # Test1
     applied_by = request.user.profile.emp_name
     applied_by_id = request.user.profile.emp_id
-
     if request.method == 'POST':
         id = request.POST['id']
         att_new = request.POST['att_new']
@@ -1439,12 +1437,11 @@ def applyCorrection(request):
         atthist.save()
         messages.info(request,'Attendance Correction Request has been sent Successfully')
         return redirect('/ams/attendance-correction')
-
     else:
         pass
 
-
-def approveAttendanceRequest(request):
+@login_required
+def approveAttendanceRequest(request): # test1
     emp_idd = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_idd)
     if request.method == 'POST':
@@ -1454,7 +1451,6 @@ def approveAttendanceRequest(request):
         comments = request.POST['comments']
         hist = AttendanceCorrectionHistory.objects.get(id=id)
         cal = EcplCalander.objects.get(id=cal_id)
-
         if om_resp == 'Approved':
             cal.att_actual = hist.att_new          
             cal.save()
@@ -1528,7 +1524,8 @@ def addAttendance(request):
         data = {'months':months}
         return render(request, 'ams/admin/add_attendance.html',data)
 
-def SLProofSubmit(request):
+@login_required
+def SLProofSubmit(request): # Test1
     if request.method == 'POST':
         id = request.POST['id']
         proof = request.FILES['proof']
@@ -1545,7 +1542,6 @@ def SLProofSubmit(request):
     else:
         for i in LeaveTable.objects.all():
             i.delete()
-
 
 
 @login_required
