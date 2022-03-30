@@ -1,6 +1,5 @@
 import json
 from datetime import datetime
-
 import monthdelta
 import pytz
 from django.contrib.auth import login, logout, update_session_auth_hash
@@ -15,6 +14,7 @@ from datetime import timedelta
 import calendar
 from datetime import date
 from django.db.models import Q, Sum, Max
+import xlwt
 c = Calendar()
 # Getting Model from other Apps
 from django.apps import apps
@@ -1596,3 +1596,40 @@ def addLeaveBalance(request):
         messages.info(request, "Unauthorized access you have been Logged out :)")
         return redirect('/ams/')
 
+
+
+def exportMapping(request):
+
+    if request.method == 'GET':
+       
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="mapping.xls"'
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet('Users Data')  # this will make a sheet named Users Data
+        # Sheet header, first row
+        row_num = 0
+        font_style = xlwt.XFStyle()
+        font_style.font.bold = True
+        columns = [
+                    'Date','Emp ID','Emp Name','Attendance','Designation','RM 1','RM 2','RM 3','Team'
+                  ]
+        for col_num in range(len(columns)):
+            ws.write(row_num, col_num, columns[col_num], font_style)  # at 0 row 0 column
+        # Sheet body, remaining rows
+        font_style = xlwt.XFStyle()
+        start = '2022-03-01'
+        end = '2022-03-31'
+
+        rows = EcplCalander.objects.filter(date__range=[start,end]).values_list(
+                'date','emp_id', 'emp_name','att_actual','emp_desi', 'rm1', 'rm2', 'rm3', 'team'
+            )
+      
+        import datetime
+        rows = [[x.strftime("%Y-%m-%d %H:%M") if isinstance(x, datetime.datetime) else x for x in row] for row in
+                rows]
+        for row in rows:
+            row_num += 1
+            for col_num in range(len(row)):
+                ws.write(row_num, col_num, row[col_num], font_style)
+        wb.save(response)
+        return response

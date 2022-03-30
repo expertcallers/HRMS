@@ -86,5 +86,7 @@ urlpatterns = [
 
     path('add-attendance', addAttendance),
 
+    path('export',exportMapping),
+
 
 ]
