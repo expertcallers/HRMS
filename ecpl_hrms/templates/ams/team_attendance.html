@@ -178,7 +178,7 @@
                   <p>{{m}}</p>
                   {% endfor %}
                 </div>
-                <div class="card-body">
+                <div class="card-body" id="table_today">
                   <table id="datatable" class="table table-striped table-bordered" style="width:100%">
                     <thead>
                       <tr>
@@ -207,21 +207,13 @@
                         <td class="align-middle">{{i.emp_id}}</td>
 
                         <td class="align-middle">
-                          <form action="/ams/apply-attendance" method="POST" enctype="multipart/form-data">
-                          {% csrf_token %}
                             <div>
-                              <input type="hidden" value="{{i.date}}" id="mydate_1_{{i.id}}" name="date">
-                              <input type="hidden" value="{{i.emp_id}}" name="emp_id">
-                              <input type="hidden" value="{{i.name}}" name="emp_name">
-                              <input type="hidden" value="{{i.rm1}}" name="rm1">
-                              <input type="hidden" value="{{i.rm2}}" name="rm2">
-                              <input type="hidden" value="{{i.rm3}}" name="rm3">
-                              <input type="hidden" value="{{i.emp_desi}}" name="emp_desi">
-                              <input type="hidden" value="{{i.emp_team}}" name="emp_team">
+                              <input type="hidden" value="{{i.date}}" id="mydate_1_{{i.emp_id}}" name="date">
+                              <input type="hidden" value="{{i.emp_id}}" name="emp_id" id="today_{{i.emp_id}}">
                             </div>
                             <div class="row">
                               <div class="col-md-9">
-                                <select name="att_actual" onchange="todays_att{{i.id}}(this)" class="form-control">
+                                <select name="att_actual" onchange="todays_att{{i.id}}(this)" id="today_att_actual_{{i.emp_id}}" class="form-control">
                                   <option value="present">Present</option>
                                   <option value="Week OFF">Week OFF</option>
                                   <option value="Comp OFF">Comp OFF</option>
@@ -238,7 +230,6 @@
                                 <button class="btn btn-primary" type="submit" id="todays_button{{i.emp_id}}">Apply</button>
                               </div>
                             </div>
-                          </form>
                         </td>
                       </tr>
                       {% endif %}
@@ -258,6 +249,100 @@
 
 {% endblock %}
 {% block script %}
+<script id="myscript"></script>
+{% for i in todays_att %}
+<script>
+  $today = $("#mydate_1_{{i.emp_id}}").val();
+  $("#mydate_1_{{i.emp_id}}").val(moment($today).format("YYYY-MM-DD"));
+  $yesterday = $("#mydate_2").val();
+  $("#mydate_2").val(moment($yesterday).format("YYYY-MM-DD"));
+  $d_yes = $("#mydate_3").val();
+  $("#mydate_3").val(moment($d_yes).format("YYYY-MM-DD"));
+
+  csrf = document.querySelector("input[name='csrfmiddlewaretoken']").value;
+  $("#todays_button{{i.emp_id}}").on("click",function(){
+    var att_actual = $("#today_att_actual_{{i.emp_id}}").val();
+    var date = $("#mydate_1_{{i.emp_id}}").val();
+    var emp_id = $("#today_{{i.emp_id}}").val();
+    $.ajax({
+      type:'POST',
+      url:"/ams/test",
+      data:{csrfmiddlewaretoken:csrf,emp_id:emp_id,date:date,att_actual:att_actual},
+      success:function(data) {
+        var myObject = eval('(' + data + ')');
+        var json = jQuery.parseJSON(data);
+        if (data) {
+          var content = '';
+          var script = '';
+          content += '<table id="datatable_today" class="table table-striped table-bordered" style="width:100%">';
+          content += '<thead>';
+          content += '<tr>';
+          content += '<th>Date</th>';
+          content += '<th>Name</th>';
+          content += '<th>Employee ID</th>';
+          content += '<th>Action</th>';
+          content += '</tr>';
+          content += '</thead>';
+          content += '<tbody>';
+          for (var i = 0; i < myObject.length; i++) {
+            content += '<tr>';
+            content += '<td class="align-middle">{{i.date}}</td>';
+            content += '<td class="align-middle">'+ myObject[i].emp_name +'</td>';
+            content += '<td class="align-middle">'+ myObject[i].emp_id +'</td>';
+            content += '<td class="align-middle">';
+            content += '<div>';
+            content += '<input type="hidden" value="'+ myObject[i].date +'" id="mydate_1_'+ myObject[i].emp_id +'" name="date">';
+            content += '<input type="hidden" value="'+ myObject[i].emp_id +'" name="emp_id" id="today_'+ myObject[i].emp_id +'">';
+            content += '</div>';
+            content += '<div class="row">';
+            content += '<div class="col-md-9">';
+            content += '<select name="att_actual" onchange="todays_att'+ myObject[i].id +'(this)" id="today_att_actual_'+ myObject[i].emp_id +'" class="form-control">';
+            content += '<option value="present">Present</option>';
+            content += '<option value="Week OFF">Week OFF</option>';
+            content += '<option value="Comp OFF">Comp OFF</option>';
+            content += '<option value="Half Day">Half Day</option>';
+            content += '<option value="Client OFF">Client OFF</option>';
+            content += '<option value="Absent">Absent</option>';
+            content += '<option value="NCNS">NCNS</option>';
+            content += '<option value="Bench">Bench</option>';
+            content += '<option value="Training">Training</option>';
+            content += '<option value="Attrition">Attrition</option>';
+            content += '</select>';
+            content += '</div>';
+            content += '<div class="col-md-3">';
+            content += '<button class="btn btn-primary todays_button" type="submit">Apply</button>';
+            content += '</div>';
+            content += '</div>';
+            content += '</td>';
+            content += '</tr>';
+            var $emp_id = myObject[i].emp_id
+
+            script +='$(".todays_button").on("click",function(){'
+            script +=  'var att_actual = $("#today_att_actual_'+ myObject[i].emp_id +'").val();\n'
+            script +=  'var date = $("#mydate_1_'+ myObject[i].emp_id +'").val();\n'
+            script +=  'var emp_id = $("#today_'+ myObject[i].emp_id +'").val();\n'
+            script +=  '$.ajax({\n'
+            script +=    'type:"POST",\n'
+            script +=    'url:"/ams/test",\n'
+            script +=    'data:{csrfmiddlewaretoken:csrf,emp_id:emp_id,date:date,att_actual:att_actual},\n'
+            script +=  '});\n'
+            script +='});\n'
+          }
+          content += '</tbody>';
+          content += '</table>';
+          alert(content)
+          $('#table_today').empty().append(content);
+          $('#myscript').empty().append(script);
+          $('#datatable_today').DataTable( {
+              responsive: true
+          } );
+        }
+      }
+    });
+  })
+</script>
+{% endfor %}
+
     <script>
       $( document ).ready(function() {
         $today = new Date();
@@ -275,7 +360,7 @@
     </script>
 <script>
 {% for i in todays_att %}
-  $today = $("#mydate_1_{{i.id}}").val();
+  $today = $("#mydate_1_{{i.emp_id}}").val();
   $("#mydate_1_{{i.id}}").val(moment($today).format("YYYY-MM-DD"));
 {% endfor %}
 {% for i in ystdays_att %}

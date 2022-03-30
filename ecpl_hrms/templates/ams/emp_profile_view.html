@@ -177,8 +177,8 @@
                     {% endif %}
                     <div class="col-md-3">
                       <div class="form-group">
-                        <label for="emp_cou">Course</label> 
-                        <input type="text" value="{{onboard.emp_edu_course}}" readonly id="emp_cou" class="form-control">
+                        <label for="emp_cour">Course</label>
+                        <input type="text" value="{{onboard.emp_edu_course}}" readonly id="emp_cour" class="form-control">
                       </div>
                     </div>
                     <div class="col-md-3">
@@ -305,8 +305,8 @@
                       <div class="form-group">
                         <label for="emp_pre_empl3">Period of Employment</label> 
                         <div style="display: inline-flex; width: 100%">
-                          <input type="text" value="{{onboard.emp_pre_period_of_employment_frm_three}}" readonly id="emp_pre_empl2" class="form-control">
-                          <input type="text" value="{{onboard.emp_pre_period_of_employment_to_three}}" readonly id="emp_pre2_empl2" class="form-control">
+                          <input type="text" value="{{onboard.emp_pre_period_of_employment_frm_three}}" readonly id="emp_pre_empl3" class="form-control">
+                          <input type="text" value="{{onboard.emp_pre_period_of_employment_to_three}}" readonly id="emp_pre2_empl3" class="form-control">
                         </div>                   
                       </div>
                     </div>
@@ -391,7 +391,7 @@
                     <div class="col-md-3 border">
                       <div class="form-group">
                         <label for="emp_up_aad_back">Aadhar Card Back</label>
-                        <a href="/media/{{onboard.emp_upload_aadhar_back}}" target="_blank">
+                        <a href="/media/{{onboard.emp_upload_aadhar_back}}"  target="_blank">
                           <center><button class="btn btn-primary form-control">View</button></center>
                         </a>
                       </div>
@@ -583,6 +583,7 @@
                             <select class="form-control select2" name="new_status" id="new_status" required>
                               <option value="" selected disabled>Please Select</option>
                               <option value="Attrition">Attrition</option>
+                              <option value="Active">Active</option>
                               <option value="Bench">Bench</option>
                               <option value="Training">Training</option>
                             </select>

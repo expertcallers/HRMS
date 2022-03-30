@@ -214,3 +214,7 @@ class leaveHistory(models.Model):
     transaction = models.CharField(max_length=30)
     no_days = models.IntegerField()
     total = models.IntegerField(null=True,blank=True)
+
+class DaysForAttendance(models.Model):
+    date = models.DateField()
+    status = models.BooleanField(default=False)

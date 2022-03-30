@@ -1,7 +1,6 @@
 import json
 from datetime import datetime
-from telnetlib import EC
-from tkinter import E
+from sms import send_sms
 import pytz
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
@@ -19,6 +18,8 @@ c = Calendar()
 
 # Getting Model from other Apps
 from django.apps import apps
+
+from twilio.rest import Client
 Profile = apps.get_model('mapping','Profile')
 
 # TL and AM List
@@ -1951,10 +1952,102 @@ def SLProofSubmit(request):
         for i in LeaveTable.objects.all():
             i.delete()
 
+from django.http import JsonResponse
+from django.core import serializers
+@login_required
 def test(request):
-    
-    a = Profile.objects.all()
-    b = EcplCalander.objects.all()
-    c = a.union(b).values('emp_id')
+    if request.method == 'POST':
+        ddate = request.POST['date']
+        att_actual = request.POST['att_actual']
+        emp_id = request.POST['emp_id']
+        now = datetime.now()
 
-    print(c)
+        prof = Profile.objects.get(emp_id=emp_id)
+        rm1 = prof.emp_rm1
+        rm2 = prof.emp_rm2
+        rm3 = prof.emp_rm3
+        rm1_id = prof.emp_rm1_id
+        rm2_id = prof.emp_rm2_id
+        rm3_id = prof.emp_rm3_id
+        desi = prof.emp_desi
+        team = prof.emp_process
+        team_id = prof.emp_process_id
+
+        try:
+            cal = EcplCalander.objects.get(Q(date=ddate), Q(emp_id=emp_id), ~Q(att_actual='Unmarked'))
+            messages.info(request, '*** Already Marked in Calendar, Please Refresh the page and try again ***')
+            return redirect('/ams/team-attendance')
+        except EcplCalander.DoesNotExist:
+            cal = EcplCalander.objects.get(emp_id=emp_id, date=ddate)
+            cal.att_actual = att_actual
+            cal.approved_on = now
+            cal.appoved_by = request.user.profile.emp_name
+            cal.rm1 = rm1
+            cal.rm2 = rm2
+            cal.rm3 = rm3
+            cal.rm1_id = rm1_id
+            cal.rm2_id = rm2_id
+            cal.rm3_id = rm3_id
+            cal.emp_desi = desi
+            cal.team = team
+            cal.team_id = team_id
+            cal.save()
+
+        if att_actual == 'Attrition' or att_actual == 'Bench':
+            usr = Profile.objects.get(emp_id=emp_id)
+            usr.agent_status = att_actual
+            usr.save()
+        if att_actual == 'NCNS':
+            today = date.today()
+            yesterday = today - timedelta(days=1)
+            dby_date = yesterday - timedelta(days=1)
+            date_range = [dby_date, today]
+            ncns_count = EcplCalander.objects.filter(emp_id=emp_id, date__range=date_range, att_actual='NCNS').count()
+            if ncns_count >= 3:
+                usr = Profile.objects.get(emp_id=emp_id)
+                usr.agent_status = att_actual
+                usr.save()
+        main_emp_id = request.user.profile.emp_id
+        today = date.today()
+        emp_list = []
+        emps = Profile.objects.filter(Q(emp_rm1_id=main_emp_id) | Q(emp_rm2_id=main_emp_id) | Q(emp_rm3_id=main_emp_id),Q(agent_status='Active'))
+        for i in emps:
+            emp_list.append(i.emp_id)
+        # Today
+        todays_list_list = EcplCalander.objects.filter(Q(date=today),Q(att_actual = 'Unmarked'),Q(emp_id__in=emp_list))
+
+        lst = []
+        for i in todays_list_list:
+            dic = {}
+            dic["date"] = str(i.date)
+            dic["emp_name"] = i.emp_name
+            dic["emp_id"] = i.emp_id
+            dic["id"] = i.id
+            lst.append(dic)
+
+        print(lst,"dic")
+        print(todays_list_list,"todays_list_list")
+        return HttpResponse(json.dumps(lst))
+    else:
+
+        today = date.today()
+        yesterday = today - timedelta(days=1)
+        dby_date = yesterday - timedelta(days=1)
+        emp_id = request.user.profile.emp_id
+        # Today
+        todays_list_list = EcplCalander.objects.filter(Q(date=today), Q(emp_id=emp_id), Q(att_actual='Unmarked'))
+
+        # Yesterday
+        ystday_list_list = EcplCalander.objects.filter(Q(date=yesterday), Q(emp_id=emp_id), Q(att_actual='Unmarked'))
+        # Day before yesterday
+        dby_list_list = EcplCalander.objects.filter(Q(date=dby_date), Q(emp_id=emp_id), Q(att_actual='Unmarked'))
+
+        emp = Profile.objects.get(emp_id=emp_id)
+        data = {'todays_att': todays_list_list,
+                'ystdays_att': ystday_list_list,
+                'dbys_att': dby_list_list,
+                'emp': emp}
+
+        return render(request, 'ams/attendance.html', data)
+
+
