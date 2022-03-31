@@ -1060,18 +1060,66 @@ def teamAttendanceReport(request): # Test 1
     if request.method == 'POST':
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
-        team_name = request.POST['team_name']
+        team_name = request.POST['team_name']      
         start_date = start_date
         end_date = end_date
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
         if team_name == 'All Team':
-            agt_cal_list = EcplCalander.objects.filter(date__range=[start_date,end_date])           
-            data = {'agt_cal_list': agt_cal_list,'emp': emp}
-            return render(request, 'ams/agent-calander-status.html', data)
-        agt_cal_list = EcplCalander.objects.filter(date__range=[start_date,end_date],team_id=team_name)
-        data = {'agt_cal_list': agt_cal_list,'emp': emp}
-        return render(request, 'ams/agent-calander-status.html', data)
+            response = HttpResponse(content_type='application/ms-excel')
+            response['Content-Disposition'] = 'attachment; filename="report.xls"'
+            wb = xlwt.Workbook(encoding='utf-8')
+            ws = wb.add_sheet('Users Data')  # this will make a sheet named Users Data
+            # Sheet header, first row
+            row_num = 0
+            font_style = xlwt.XFStyle()
+            font_style.font.bold = True
+            columns = [
+                        'Date','Emp ID','Emp Name','Attendance','Designation','RM 1','RM 2','RM 3','Team'
+                    ]
+            for col_num in range(len(columns)):
+                ws.write(row_num, col_num, columns[col_num], font_style)  # at 0 row 0 column
+            # Sheet body, remaining rows
+            font_style = xlwt.XFStyle()       
+            rows = EcplCalander.objects.filter(date__range=[start_date,end_date]).values_list(
+                    'date','emp_id', 'emp_name','att_actual','emp_desi', 'rm1', 'rm2', 'rm3', 'team'
+                )     
+            import datetime
+            rows = [[x.strftime("%Y-%m-%d %H:%M") if isinstance(x, datetime.datetime) else x for x in row] for row in
+                    rows]
+            for row in rows:
+                row_num += 1
+                for col_num in range(len(row)):
+                    ws.write(row_num, col_num, row[col_num], font_style)
+            wb.save(response)
+            return response
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="report.xls"'
+        wb = xlwt.Workbook(encoding='utf-8')
+        ws = wb.add_sheet('Users Data')  # this will make a sheet named Users Data
+        # Sheet header, first row
+        row_num = 0
+        font_style = xlwt.XFStyle()
+        font_style.font.bold = True
+        columns = [
+                        'Date','Emp ID','Emp Name','Attendance','Designation','RM 1','RM 2','RM 3','Team'
+                    ]
+        for col_num in range(len(columns)):
+            ws.write(row_num, col_num, columns[col_num], font_style)  # at 0 row 0 column
+            # Sheet body, remaining rows
+        font_style = xlwt.XFStyle()
+        rows = EcplCalander.objects.filter(date__range=[start_date,end_date],team=team_name).values_list(
+                    'date','emp_id', 'emp_name','att_actual','emp_desi', 'rm1', 'rm2', 'rm3', 'team'
+                )        
+        import datetime
+        rows = [[x.strftime("%Y-%m-%d %H:%M") if isinstance(x, datetime.datetime) else x for x in row] for row in
+                    rows]
+        for row in rows:
+            row_num += 1
+            for col_num in range(len(row)):
+                ws.write(row_num, col_num, row[col_num], font_style)
+        wb.save(response)
+        return response
     else:
         return HttpResponse('<h2>*** GET not available ***</h2>')
 
