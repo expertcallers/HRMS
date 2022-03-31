@@ -352,8 +352,8 @@
                             <td>{{i.date}}</td>
                             <td>{{i.leave_type}}</td>
                             <td>{{i.transaction}}</td>
-                            <td>{{i.no_days}}</td>
-                            <td>{{i.total}}</td>
+                            <td>{{i.no_days|floatformat:2}}</td>
+                            <td>{{i.total|floatformat:2}}</td>
                           </tr>
                         {% endfor %}
                       </tbody>

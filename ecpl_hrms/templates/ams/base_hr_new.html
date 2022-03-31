@@ -77,10 +77,10 @@
                 <img src="{{user.profile.img.url}}" alt="..." class="img-circle profile_img">
               </div>
               <div class="profile_info">
-                    <h2><i class="fa fa-user"></i><span>Name</span><br>{{emp.emp_name}}</h2>
-                    <h2><i class="fa fa-id-card"></i><span>Employee ID</span><br> {{emp.emp_id}}</h2>
-                    <h2><i class="fa fa-headset"></i><span>Designation</span><br> {{emp.emp_desi}}</h2>
-                    <h2><i class="fa fa-users"></i><span>Team</span><br>{{emp.emp_process}}</h2>
+                    <h2><i class="fa fa-user"></i><span>Name</span><br>{{request.user.profile.emp_name}}</h2>
+                    <h2><i class="fa fa-id-card"></i><span>Employee ID</span><br> {{request.user.profile.emp_id}}</h2>
+                    <h2><i class="fa fa-headset"></i><span>Designation</span><br> {{request.user.profile.emp_desi}}</h2>
+                    <h2><i class="fa fa-users"></i><span>Team</span><br>{{request.user.profile.emp_process}}</h2>
               </div>
             </div>
             <!-- /menu profile quick info -->
@@ -116,7 +116,7 @@
               <ul class=" navbar-right">
                 <li class="nav-item dropdown open" style="padding-left: 15px;">
                   <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{{user.profile.img.url}}" alt="">{{emp.emp_name}}
+                    <img src="{{user.profile.img.url}}" alt="">{{request.user.profile.emp_name}}
                   </a>
                   <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item"  href="/ams/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a>

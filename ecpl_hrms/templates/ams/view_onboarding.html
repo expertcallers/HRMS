@@ -619,9 +619,9 @@
                   <div class="form-group">
                     <label for="PT" style="font-size: 18px; font-weight: 600;">PT</label>
                     <div style="display: inline-flex; width: 100%" id="PT">
-                      <input type="radio" disabled name="pt" id="PT_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                      <input type="radio" disabled name="pt" id="PT_1" {% if i.pt == "Yes" %}checked{% endif %} value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
                       <label for="PT_1">Yes</label>
-                      <input type="radio" disabled name="pt" id="PT_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                      <input type="radio" disabled name="pt" id="PT_0" {% if i.pt == "No" %}checked{% endif %} value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
                       <label for="PT_0">No</label>
                     </div>
                   </div>

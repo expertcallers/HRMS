@@ -412,8 +412,24 @@ def hrDashboard(request): # Test1
             dict['dt'] = i
             dict['st'] = st
             month_cal.append(dict)
+
+        # Leave Requests
+        leave_req_count = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id)|Q(emp_rm2_id=emp_id)|Q(emp_rm1_id=emp_id),
+                                                    Q(tl_status='Approved'),
+                                                    Q(manager_approval=False)).count()
+        #Mapping Tickets
+        map_tickets_counts = MappingTickets.objects.filter(Q(new_rm3_id=emp_id)|Q(new_rm2_id=emp_id)|Q(new_rm1_id=emp_id),
+                                                           Q(status=False)).count()
+        #Leave Escalation Count
+        leave_esc_count = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id)|Q(emp_rm2_id=emp_id)|Q(emp_rm1_id=emp_id),
+                                                    Q(manager_approval=False),Q(escalation=True)).count()
+        # Attendance
+        att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False,rm3_id=emp_id).count()
+
         data = {'emp':emp,'all_users_count':all_users_count,'all_team_count':all_team_count,
-                'attrition_request_count':attrition_request_count,'month_cal':month_cal,'team':teams}
+                'attrition_request_count':attrition_request_count,'month_cal':month_cal,'team':teams,
+                "leave_req_count":leave_req_count,"map_tickets_counts":map_tickets_counts,
+                "leave_esc_count":leave_esc_count,"att_requests_count":att_requests_count}
         return render(request,'ams/hr_dashboard.html',data)
     else:
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
@@ -778,20 +794,30 @@ def addNewUserHR(request): # Test1  # calander pending
             return HttpResponse('<h1>User Already Exists</h1>')
         else:
             # Creating User
+            emp_process_id = Profile.objects.filter(emp_process=emp_process)
+            for i in emp_process_id:
+                emp_process_id = i.emp_process_id
+                break
             user = User.objects.create_user(username=emp_id, password=str(emp_id))
-            usr = User.objects.get(username=emp_id)
             #Creating Profile
             Profile.objects.create(
-                user=usr,emp_id=emp_id, emp_name=emp_name, emp_desi=emp_desi,
+                user=user,emp_id=emp_id, emp_name=emp_name, emp_desi=emp_desi,
                 emp_rm1=emp_rm1, emp_rm2=emp_rm2, emp_rm3=emp_rm3,emp_rm1_id=emp_rm1_id,emp_rm2_id=emp_rm2_id,
-                emp_rm3_id=emp_rm3_id,emp_process=emp_process,doj=emp_doj,on_id=on_id,
+                emp_rm3_id=emp_rm3_id,emp_process=emp_process,emp_process_id=emp_process_id,doj=emp_doj,on_id=on_id,
             )
             # Updating Last Emp ID
             try:
                 new_emp_id = int(emp_id) + 1
             except:
-                new_emp_id = '0000'
-                messages.info(request,"Please contact CC Team for updating the Last Emp ID. ")
+                profiles = Profile.objects.all().order_by('-id')
+                int_emp_id_lst = []
+                for i in profiles:
+                    try:
+                        j = int(i.emp_id)
+                        int_emp_id_lst.append(j)
+                    except:
+                        pass
+                new_emp_id = max(int_emp_id_lst) + 1
             last = LastEmpId.objects.get(emp_id=emp_id)
             last.emp_id = new_emp_id
             last.save()
@@ -811,8 +837,8 @@ def addNewUserHR(request): # Test1  # calander pending
             j = Profile.objects.get(emp_id=emp_id)
             for i in date_list:
                 try:
-                    EcplCalander.objects.filter(emp_id=j.emp_id, date=i)
-                except EcplCalander.DoesNotExists:
+                    EcplCalander.objects.get(emp_id=j.emp_id, date=i)
+                except EcplCalander.DoesNotExist:
                     EcplCalander.objects.create(date=i, emp_id=j.emp_id, att_actual='Unmarked',
                                               emp_name=j.emp_name, emp_desi=j.emp_desi,
                                               team=j.emp_process, team_id=j.emp_process_id, rm1=j.emp_rm1,
@@ -1269,8 +1295,7 @@ def addNewTeam(request): # Test1
         usr = request.user.profile.emp_name
         om = request.POST["om"]
         campaign = request.POST["campaign"]
-        today = date.today()
-        cam = Campaigns.objects.create(name=campaign,om=om,created_by=usr,created_date = today)
+        cam = Campaigns.objects.create(name=campaign,om=om,created_by=usr)
         cam.save()
         messages.info(request,'Team ' + campaign +' Created Successfully')
         return redirect('/ams/view-all-teams')
@@ -1556,7 +1581,7 @@ def approveAttendanceRequest(request): # test1
         hist.save()
         return redirect('/ams/approve-att-correction-req')
     else:
-        att_hist = AttendanceCorrectionHistory.objects.filter(status = False)
+        att_hist = AttendanceCorrectionHistory.objects.filter(status = False, rm3_id=emp_idd)
         data = {'att_hist':att_hist,'emp':emp}
         return render(request,'ams/hr_attendance_correction.html',data)
 
@@ -1648,15 +1673,13 @@ def addLeaveBalance(request):
                     pl = round(cal / 20, 2)
                     i.pl_balance += pl
                     i.save()
-                    pl_leave = leaveHistory.objects.create(unique_id=unique_id,emp_id=i.emp_id, date=date.today(),
+                    if pl > 0:
+                        leaveHistory.objects.create(unique_id=unique_id,emp_id=i.emp_id, date=date.today(),
                                                     leave_type="PL", transaction="Credit", no_days=pl,
                                                     total=i.pl_balance + i.sl_balance)
-                    sl_leave = leaveHistory.objects.create(unique_id=unique_id,emp_id=i.emp_id, date=date.today(),
+                    leaveHistory.objects.create(unique_id=unique_id,emp_id=i.emp_id, date=date.today(),
                                                     leave_type="SL", transaction="Credit", no_days=1,
                                                     total=i.pl_balance + i.sl_balance)
-                    pl_leave.save()
-                    sl_leave.save()
-
             id = request.POST['month']
             e = AddAttendanceMonths.objects.get(id=id)
             e.leave = True
