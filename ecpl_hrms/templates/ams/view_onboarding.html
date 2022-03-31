@@ -77,7 +77,7 @@
         <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLongTitle">Name</h5>
+              <h5 class="modal-title" id="exampleModalLongTitle">View Onboarding of {{i.emp_name}}</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -407,30 +407,30 @@
               </div>
 
               <div class="row mt-4">
-                      <div class="col-md-12">
-                        <h4>Documentation Form</h4>
-                        <!-- <p>Person to be contacted in case of emergency.</p> -->
-                        <hr>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label for="have_system">Do you have your own system/laptop?</label>
-                          <input type="text" id="have_system" readonly value="{{i.have_system}}" class="form-control">
-                        </div>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label for="require_system">Do you require a system to be provided from the company?</label>
-                          <input type="text" id="require_system" readonly value="{{i.require_system}}" class="form-control">
-                        </div>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label for="wifi">Do you have Wifi/Broadbrand services at home? if yes the amount can be claimed will be reimbursed by submitting the broadbrand bill every month</label>
-                          <input type="text" id="wifi" readonly value="{{i.wifi_broadband}}" class="form-control">
-                        </div>
-                      </div>
-                    </div>
+                <div class="col-md-12">
+                  <h4>Documentation Form</h4>
+                  <!-- <p>Person to be contacted in case of emergency.</p> -->
+                  <hr>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="have_system">Do you have your own system/laptop?</label>
+                    <input type="text" id="have_system" readonly value="{{i.have_system}}" class="form-control">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="require_system">Do you require a system to be provided from the company?</label>
+                    <input type="text" id="require_system" readonly value="{{i.require_system}}" class="form-control">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label for="wifi">Do you have Wifi/Broadbrand services at home? if yes the amount can be claimed will be reimbursed by submitting the broadbrand bill every month</label>
+                    <input type="text" id="wifi" readonly value="{{i.wifi_broadband}}" class="form-control">
+                  </div>
+                </div>
+              </div>
 
               <div class="row mt-4">
                 <div class="col-md-12">
@@ -573,6 +573,61 @@
                 </div>
                 {% endif %}
               </div>
+
+
+
+              <div class="row mt-4">
+                <div class="col-md-12">
+                  <h4>Important Form</h4>
+                  <!-- <p>Person to be contacted in case of emergency.</p> -->
+                  <hr>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="ESIC" style="font-size: 18px; font-weight: 600;">ESIC</label>
+                    <div style="display: inline-flex; width: 100%" id="ESIC">
+                      <input type="radio" disabled name="esic" {% if i.esic == "Yes" %}checked{% endif %} id="ESIC_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                      <label for="ESIC_1">Yes</label>
+                      <input type="radio" disabled name="esic" {% if i.esic == "No" %}checked{% endif %} id="ESIC_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                      <label for="ESIC_0">No</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="PF" style="font-size: 18px; font-weight: 600;">PF</label>
+                    <div style="display: inline-flex; width: 100%" id="PF">
+                      <input type="radio" disabled name="pf" {% if i.pf == "Yes" %}checked{% endif %} id="PF_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                      <label for="PF_1">Yes</label>
+                      <input type="radio" disabled name="pf" {% if i.pf == "No" %}checked{% endif %} id="PF_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                      <label for="PF_0">No</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="TDS" style="font-size: 18px; font-weight: 600;">TDS</label>
+                    <div style="display: inline-flex; width: 100%" id="TDS">
+                      <input type="radio" disabled name="tds" {% if i.tds == "Yes" %}checked{% endif %} id="TDS_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                      <label for="TDS_1">Yes</label>
+                      <input type="radio" disabled name="tds" {% if i.tds == "No" %}checked{% endif %} id="TDS_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                      <label for="TDS_0">No</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-group">
+                    <label for="PT" style="font-size: 18px; font-weight: 600;">PT</label>
+                    <div style="display: inline-flex; width: 100%" id="PT">
+                      <input type="radio" disabled name="pt" id="PT_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                      <label for="PT_1">Yes</label>
+                      <input type="radio" disabled name="pt" id="PT_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                      <label for="PT_0">No</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

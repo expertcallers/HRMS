@@ -37,7 +37,7 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_dob">Date Of Birth (DD/MM/YYYY)</label>
-                          <input type="date" name="emp_dob" required id="emp_dob" max="2006-01-01" class="form-control">
+                          <input type="date" name="emp_dob" required id="emp_dob" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
@@ -61,7 +61,7 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_aad">Aadhar Number</label>
-                          <input type="number" name="emp_aad" id="emp_aad" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==12) return false;" onfocusout="testing(this);" required class="form-control">
+                          <input type="number" min="1" name="emp_aad" id="emp_aad" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==12) return false;" onfocusout="testing(this);" required class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
@@ -88,7 +88,7 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_ph">Contact Number (Without +91 / 0)</label>
-                          <input type="number" required pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==10) return false;" name="emp_ph" id="emp_ph" class="form-control">
+                          <input type="number" min="1" required pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==10) return false;" name="emp_ph" id="emp_ph" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
@@ -106,7 +106,7 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_alph">Alternate Contact Number (Without +91 / 0)</label>
-                          <input type="number" name="emp_alph" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==10) return false;" id="emp_alph" class="form-control">
+                          <input type="number" min="1" name="emp_alph" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==10) return false;" id="emp_alph" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
@@ -141,7 +141,7 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_emer_ph">Phone Number (Without +91 / 0)</label>
-                          <input type="number" required pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==10) return false;" name="emp_emer_ph" id="emp_emer_ph" class="form-control">
+                          <input type="number" min="1" required pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==10) return false;" name="emp_emer_ph" id="emp_emer_ph" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
@@ -166,7 +166,7 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="emp_emer_ph2">Phone Number (Without +91 / 0)</label>
-                          <input type="number" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==10) return false;" required name="emp_emer_ph2" id="emp_emer_ph2" class="form-control">
+                          <input type="number" min="1" pattern="/^-?\d+\.?\d*$/" onKeyPress="if(this.value.length==10) return false;" required name="emp_emer_ph2" id="emp_emer_ph2" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-4">
@@ -276,7 +276,7 @@
                       <div class="col-md-3">
                         <div class="form-group">
                           <label for="emp_bank_no">Account Number</label>
-                          <input type="number" required name="emp_bank_no" id="emp_bank_no" class="form-control">
+                          <input type="number" min="1" onKeyPress="if(this.value.length==20) return false;" required name="emp_bank_no" id="emp_bank_no" class="form-control">
                         </div>
                       </div>
                       <div class="col-md-3">
@@ -509,7 +509,7 @@ function addMore() {
   n=n+1;
   var ex = document.getElementById('experience_1');
   if (n<=3) {
-    html = '<div class="row mt-4" id="experience_'+n+'">  <div class="col-md-12">    <h4>Previous Work / Experience '+n+'</h4>    <hr>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_exp_'+n+'">Experience in Years</label>      <input type="number" name="emp_exp_'+n+'" required min="0" value="0" id="emp_exp_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_ind_'+n+'">Industry (Ex : Agriculture/IT/BPO)</label>      <input type="text" name="emp_ind_'+n+'" required id="emp_ind_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_pre_org_'+n+'">Name of previous organisation</label>      <input type="text" name="emp_pre_org_'+n+'" required id="emp_pre_org_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_pre_desg_'+n+'">Previous Designation</label>      <input type="text" name="emp_pre_desg_'+n+'" required id="emp_pre_desg_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_pre_empl_'+n+'">Period of Employment</label>      <div style="display: inline-flex; width: 100%">        <input type="date" name="emp_pre_empl_from_'+n+'" id="emp_pre_empl_'+n+'" onchange="mydate'+n+'(this);" required placeholder="From" class="form-control">        <input type="date" name="emp_pre_empl_to_'+n+'" id="emp_pre_emplend_'+n+'" class="form-control" required placeholder="To">      </div>    </div>  </div></div>';
+    html = '<div class="row mt-4" id="experience_'+n+'">  <div class="col-md-12">    <h4>Previous Work / Experience '+n+'</h4>    <hr>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_exp_'+n+'">Experience in Years</label>      <input type="number" name="emp_exp_'+n+'" required min="0" value="0" id="emp_exp_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_ind_'+n+'">Industry (Ex : Agriculture/IT/BPO)</label>      <input type="text" name="emp_ind_'+n+'" id="emp_ind_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_pre_org_'+n+'">Name of previous organisation</label>      <input type="text" name="emp_pre_org_'+n+'" id="emp_pre_org_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_pre_desg_'+n+'">Previous Designation</label>      <input type="text" name="emp_pre_desg_'+n+'" id="emp_pre_desg_'+n+'" class="form-control">    </div>  </div>  <div class="col-md-4">    <div class="form-group">      <label for="emp_pre_empl_'+n+'">Period of Employment</label>      <div style="display: inline-flex; width: 100%">        <input type="date" name="emp_pre_empl_from_'+n+'" id="emp_pre_empl_'+n+'" onchange="mydate'+n+'(this);" placeholder="From" class="form-control">        <input type="date" name="emp_pre_empl_to_'+n+'" id="emp_pre_emplend_'+n+'" class="form-control" placeholder="To">      </div>    </div>  </div></div>';
     ex.insertAdjacentHTML('beforeend',html);
   } else {
     alert("Reached Maximum :)");
@@ -535,6 +535,16 @@ function addMore() {
   var MAX_FILE_SIZE = 500 * 1024; // 500KB
   $(document).ready(function() {
       $('.uploadFile').change(function() {
+          var fileInput = this;
+          var filePath = fileInput.value;
+          var allowedExtensions =  /(\.jpg|\.jpeg|\.png|\.pdf)$/i;
+          if (!allowedExtensions.exec(filePath)) {
+              fileInput.setCustomValidity("Only PDF files and Images (.png, .jpg, .jpeg) are accepted");
+              fileInput.reportValidity();
+              return false;
+          } else {
+              fileInput.setCustomValidity("");
+          }
           fileSize = this.files[0].size;
           if (fileSize > MAX_FILE_SIZE) {
               this.setCustomValidity("File must not exceed 500 KB!");
