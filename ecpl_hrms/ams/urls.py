@@ -79,14 +79,6 @@ urlpatterns = [
     path('approve-mapping-ticket',approveMappingTicket),
     path('mapping-application-status',viewMappingApplicationStatus),
 
-    # Status Changes
-
-    # calnder Start
-    #path('start-calander',startCalandarForAllAgents)
-
     path('add-attendance', addAttendance),
-
-    path('export',exportMapping),
-
 
 ]
