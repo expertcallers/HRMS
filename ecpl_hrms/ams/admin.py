@@ -39,4 +39,5 @@ admin.site.register(leaveHistory, LeaveHistorySearch)
 admin.site.register(DaysForAttendance,DateStatus)
 admin.site.register(AttendanceCorrectionHistory)
 admin.site.register(MappingTickets, MappingSearch)
+admin.site.register(LastEmpId)
 

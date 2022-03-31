@@ -124,7 +124,7 @@ class MappingTickets(models.Model):
 # Campaigns - teams +
 class Campaigns(models.Model):
     unique_id = models.CharField(max_length=150,null=True,blank=True)
-    name=models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     om = models.CharField(max_length=50)
     created_by = models.CharField(max_length=50,null=True,blank=True)
     def __str__(self):
@@ -228,3 +228,8 @@ class leaveHistory(models.Model):
 class DaysForAttendance(models.Model):
     date = models.DateField()
     status = models.BooleanField(default=False)
+
+class LastEmpId(models.Model):
+    emp_id = models.CharField(max_length=30)
+    def __str__(self):
+        return self.emp_id

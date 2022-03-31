@@ -593,7 +593,8 @@ def on_boarding_update(request,id): # Test1
     if request.method == "POST":
         id = request.POST["id"]
         e = OnboardingnewHRC.objects.get(id=id)
-        hrname = request.user.profile.emp_name
+        hrname = request.user.profile.emp_id
+        hrname = User.objects.get(username=hrname)
         emp_name = request.POST["emp_name"]
         emp_dob = request.POST["emp_dob"]
         emp_desig = request.POST["emp_desg"]
@@ -778,14 +779,22 @@ def addNewUserHR(request): # Test1  # calander pending
         else:
             # Creating User
             user = User.objects.create_user(username=emp_id, password=str(emp_id))
-            user.save()
             usr = User.objects.get(username=emp_id)
             #Creating Profile
             Profile.objects.create(
-                user_id=user,emp_id=emp_id, emp_name=emp_name, emp_desi=emp_desi,
+                user=usr,emp_id=emp_id, emp_name=emp_name, emp_desi=emp_desi,
                 emp_rm1=emp_rm1, emp_rm2=emp_rm2, emp_rm3=emp_rm3,emp_rm1_id=emp_rm1_id,emp_rm2_id=emp_rm2_id,
-                emp_rm3_id=emp_rm3_id,emp_process=emp_process, user=usr,doj=emp_doj,on_id=on_id,
+                emp_rm3_id=emp_rm3_id,emp_process=emp_process,doj=emp_doj,on_id=on_id,
             )
+            # Updating Last Emp ID
+            try:
+                new_emp_id = int(emp_id) + 1
+            except:
+                new_emp_id = '0000'
+                messages.info(request,"Please contact CC Team for updating the Last Emp ID. ")
+            last = LastEmpId.objects.get(emp_id=emp_id)
+            last.emp_id = new_emp_id
+            last.save()
             # Creating Leave Balance
             EmployeeLeaveBalance.objects.create(
                 emp_id=emp_id, emp_name=emp_name, team=emp_process, pl_balance=0,
@@ -816,13 +825,14 @@ def addNewUserHR(request): # Test1  # calander pending
         return redirect('/ams/add-new-user')
     else:
         emp_id = request.user.profile.emp_id
+        last_emp_id = LastEmpId.objects.get(id=1).emp_id
         emp = Profile.objects.get(emp_id=emp_id)
         all_desi = Profile.objects.all().values('emp_desi').distinct().order_by('emp_desi')
         rms = Profile.objects.filter(emp_desi__in = rm_list).order_by('emp_name')
         all_team = Campaigns.objects.all()
         
         onboarding = OnboardingnewHRC.objects.filter(user_created=False)
-        data = {'emp': emp,'all_data':all_desi,'rms':rms,'all_team':all_team,'onboarding':onboarding}
+        data = {'emp': emp,'all_data':all_desi,'rms':rms,'all_team':all_team,'onboarding':onboarding,"last_emp_id":last_emp_id}
         return render(request,'ams/hr_add_user.html',data)
 
 @login_required
