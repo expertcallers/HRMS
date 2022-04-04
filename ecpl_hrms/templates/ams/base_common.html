@@ -264,7 +264,7 @@
       var sbal = parseInt($('#s_leave_bal').html());
       $('#leave').daterangepicker({
               autoUpdateInput: false,
-              minDate: (day+"/"+month+"/"+year),
+              minDate: (day+"/"+(month-1)+"/"+year),
               autoApply: true,
               drops: 'auto',
               locale: {

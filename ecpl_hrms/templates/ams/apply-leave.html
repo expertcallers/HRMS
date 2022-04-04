@@ -160,10 +160,13 @@
                               <td><p>{{i.manager_reason}}</p></td>
                               <td align="center">
                                 {{i.status}}
-                                {% if i.tl_status == "Rejected" and i.manager_approval == False %}<br>
+                                {% if i.tl_status == "Rejected" and i.manager_approval == False and i.escalation == False %}<br>
                                 <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#view_{{i.id}}">Escalate</button>
                                 {% endif %}
-                                {% if i.leave_type == "SL" and i.no_days > 1 and i.manager_approval == False %}<br>
+                                {% if i.tl_status == "Rejected" and i.manager_approval == False and i.escalation == True %}
+                                <p>Applied for Escalation</p>
+                                {% endif %}
+                                {% if i.leave_type == "SL" and i.no_days > 1 and i.manager_approval == False %}
                                 <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#proof_{{i.id}}">Proof</button>
                                 {% endif %}
                               </td>
@@ -289,7 +292,7 @@
                       <button type="button" class="btn btn-primary form-control">View</button>
                     </a>
                     {% else %}
-                    <input type="file" id="proof" name="proof" class="form-control" required accept=".png, .jpg, .jpeg, .pdf">
+                    <input type="file" id="prooff_{{i.id}}" name="proof" class="form-control" required accept=".png, .jpg, .jpeg, .pdf">
                     {% endif %}
                   </div>
                 </div>
@@ -369,9 +372,11 @@
       </div>
 
     <!-- End Leave Balance History Pop-Up -->
+
+{% for i in leave %}
 <script>
   $(document).ready(function() {
-      var upload=document.getElementById("proof");
+      var upload=document.getElementById("prooff_{{i.id}}");
       upload.addEventListener("change",()=>{
           var fileInput = document.getElementById('proof');
           var filePath = fileInput.value;
@@ -386,4 +391,5 @@
       })
   });
 </script>
+{% endfor %}
 {% endblock %}
