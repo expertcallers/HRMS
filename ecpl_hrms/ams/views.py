@@ -1590,37 +1590,48 @@ def addAttendance(request):
     if request.method == 'POST':
         id = request.POST['month']
         unique_id = request.POST['csrfmiddlewaretoken']
-        month = AddAttendanceMonths.objects.get(id=id).month_number
-        year = AddAttendanceMonths.objects.get(id=id).year
-        start_date = date(year,month,1)
-        last = calendar.monthrange(year, month)[1]
-        last_date = date(year,month,last)
-        delta = last_date - start_date
-        date_list = []
-        for i in range(delta.days + 1):
-            day = start_date + timedelta(days=i)
-            try:
-                DaysForAttendance.objects.get(date=day)
-            except DaysForAttendance.DoesNotExist:
-                DaysForAttendance.objects.create(date=day)
-        days = DaysForAttendance.objects.filter(status=False,date__range=[start_date,last_date])
-        for i in days:
-            date_list.append(i.date)
+        # month = AddAttendanceMonths.objects.get(id=id).month_number
+        # year = AddAttendanceMonths.objects.get(id=id).year
+        # start_date = date(year,month,1)
+        # last = calendar.monthrange(year, month)[1]
+        # last_date = date(year,month,last)
+        # delta = last_date - start_date
+        # date_list = []
+        #
+        # for i in range(delta.days + 1):
+        #     day = start_date + timedelta(days=i)
+        #     try:
+        #         DaysForAttendance.objects.get(date=day)
+        #     except DaysForAttendance.DoesNotExist:
+        #         DaysForAttendance.objects.create(date=day)
+        # days = DaysForAttendance.objects.filter(status=False,date__range=[start_date,last_date])
+        # for i in days:
+        #     date_list.append(i.date)
+        # profile = Profile.objects.filter(agent_status='Active')
+        # for i in date_list:
+        #     for j in profile:
+        #         ec_cal= EcplCalander.objects.filter(emp_id=j.emp_id,date=i).count()
+        #         if ec_cal < 1:
+        #             EcplCalander.objects.create(date=i,emp_id=j.emp_id,att_actual='Unmarked',emp_name=j.emp_name,emp_desi=j.emp_desi,
+        #                 team=j.emp_process,team_id=j.emp_process_id,rm1=j.emp_rm1,rm2=j.emp_rm2,rm3=j.emp_rm3,rm1_id=j.emp_rm1_id,
+        #                 rm2_id=j.emp_rm2_id,rm3_id=j.emp_rm3_id)
+        #     days = DaysForAttendance.objects.get(date=i)
+        #     days.status = True
+        #     days.save()
+        # e = AddAttendanceMonths.objects.get(id=id)
+        # e.created = True
+        # e.save()
+
+
         profile = Profile.objects.filter(agent_status='Active')
-        for i in date_list:
-            for j in profile:                
-                ec_cal= EcplCalander.objects.filter(emp_id=j.emp_id,date=i).count()
-                if ec_cal < 1:
-                    cal = EcplCalander.objects.create(date=i,emp_id=j.emp_id,att_actual='Unmarked',emp_name=j.emp_name,emp_desi=j.emp_desi,
-                        team=j.emp_process,team_id=j.emp_process_id,rm1=j.emp_rm1,rm2=j.emp_rm2,rm3=j.emp_rm3,rm1_id=j.emp_rm1_id,
-                        rm2_id=j.emp_rm2_id,rm3_id=j.emp_rm3_id)
-                    cal.save()
-            days = DaysForAttendance.objects.get(date=i)
-            days.status = True
-            days.save()
-        e = AddAttendanceMonths.objects.get(id=id)
-        e.created = True
-        e.save()
+        i = date(2022,4,2)
+        for j in profile:
+            ec_cal= EcplCalander.objects.filter(emp_id=j.emp_id,date=i).count()
+            if ec_cal < 1:
+                EcplCalander.objects.create(date=i,emp_id=j.emp_id,att_actual='Unmarked',emp_name=j.emp_name,emp_desi=j.emp_desi,
+                    team=j.emp_process,team_id=j.emp_process_id,rm1=j.emp_rm1,rm2=j.emp_rm2,rm3=j.emp_rm3,rm1_id=j.emp_rm1_id,
+                    rm2_id=j.emp_rm2_id,rm3_id=j.emp_rm3_id)
+        messages.info(request,"Success :)")
         return redirect('/ams/add-attendance')
     else:
         months = AddAttendanceMonths.objects.filter(created=False)
