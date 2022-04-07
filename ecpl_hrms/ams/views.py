@@ -790,17 +790,14 @@ def addNewUserHR(request): # Test1  # calander pending
         emp_rm1 = Profile.objects.get(emp_id=emp_rm1_id)
         emp_rm2 = Profile.objects.get(emp_id=emp_rm2_id)
         emp_rm3 = Profile.objects.get(emp_id=emp_rm3_id)
-        emp_process = request.POST["emp_pro"]
+        emp_process_id = request.POST["emp_pro"]
+        emp_process = Campaigns.objects.get(id=emp_process_id).name
         usr = User.objects.filter(username=emp_id)
         onb_obj = OnboardingnewHRC.objects.get(id=on_id)
         if usr.exists():
             return HttpResponse('<h1>User Already Exists</h1>')
         else:
             # Creating User
-            emp_process_id = Profile.objects.filter(emp_process=emp_process)
-            for i in emp_process_id:
-                emp_process_id = i.emp_process_id
-                break
             user = User.objects.create_user(username=emp_id, password=str(emp_id))
             #Creating Profile
             Profile.objects.create(
@@ -854,14 +851,17 @@ def addNewUserHR(request): # Test1  # calander pending
         return redirect('/ams/add-new-user')
     else:
         emp_id = request.user.profile.emp_id
-        last_emp_id = LastEmpId.objects.get(id=1).emp_id
+        last_emp_id = LastEmpId.objects.all()
+        lst_emp_id = ""
+        for i in last_emp_id:
+            lst_emp_id = i.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
         all_desi = Profile.objects.all().values('emp_desi').distinct().order_by('emp_desi')
         rms = Profile.objects.filter(emp_desi__in = rm_list).order_by('emp_name')
         all_team = Campaigns.objects.all()
         
         onboarding = OnboardingnewHRC.objects.filter(user_created=False)
-        data = {'emp': emp,'all_data':all_desi,'rms':rms,'all_team':all_team,'onboarding':onboarding,"last_emp_id":last_emp_id}
+        data = {'emp': emp,'all_data':all_desi,'rms':rms,'all_team':all_team,'onboarding':onboarding,"last_emp_id":lst_emp_id}
         return render(request,'ams/hr_add_user.html',data)
 
 @login_required
