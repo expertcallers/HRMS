@@ -80,5 +80,6 @@ urlpatterns = [
     path('mapping-application-status',viewMappingApplicationStatus),
 
     path('add-attendance', addAttendance),
+    path('test', TestFun),
 
 ]

@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime,date
 import monthdelta
 import pytz
 from django.contrib.auth import login, logout, update_session_auth_hash
@@ -75,6 +75,9 @@ def loginAndRedirect(request): # Test1
         form = AuthenticationForm()
         data = {'form': form}
         return render(request, 'ams/login.html', data)
+
+
+
 
 @login_required
 def redirectTOAllDashBoards(request,id): # Test1
@@ -1588,20 +1591,28 @@ def approveAttendanceRequest(request): # test1
 @login_required
 def addAttendance(request):
     if request.method == 'POST':
-        id = request.POST['month']
+        selected_date = request.POST['date']
         unique_id = request.POST['csrfmiddlewaretoken']
-        month = AddAttendanceMonths.objects.get(id=id).month_number
-        year = AddAttendanceMonths.objects.get(id=id).year
-        start_date = date(year,month,1)
-        last = calendar.monthrange(year, month)[1]
-        last_date = date(year,month,last)
-        delta = last_date - start_date
-        date_list = []
+
 
         profile = Profile.objects.filter(agent_status='Active')
-        for i in range(delta.days + 1):
-            day = start_date + timedelta(days=i)
-            date_list.append(day)
+        i = selected_date
+        for j in profile:
+            EcplCalander.objects.create(date=i,emp_id=j.emp_id,att_actual='Unmarked',emp_name=j.emp_name,emp_desi=j.emp_desi,
+                team=j.emp_process,team_id=j.emp_process_id,rm1=j.emp_rm1,rm2=j.emp_rm2,rm3=j.emp_rm3,rm1_id=j.emp_rm1_id,
+                rm2_id=j.emp_rm2_id,rm3_id=j.emp_rm3_id)
+
+        # month = AddAttendanceMonths.objects.get(id=id).month_number
+        # year = AddAttendanceMonths.objects.get(id=id).year
+        # start_date = date(year,month,1)
+        # last = calendar.monthrange(year, month)[1]
+        # last_date = date(year,month,last)
+        # delta = last_date - start_date
+        # date_list = []
+        #
+        # for i in range(delta.days + 1):
+        #     day = start_date + timedelta(days=i)
+        #     date_list.append(day)
         #     try:
         #         DaysForAttendance.objects.get(date=day)
         #     except DaysForAttendance.DoesNotExist:
@@ -1610,29 +1621,35 @@ def addAttendance(request):
         # for i in days:
         #     date_list.append(i.date)
         # profile = Profile.objects.filter(agent_status='Active')
-        for i in date_list:
-            for j in profile:
-                EcplCalander.objects.create(date=i,emp_id=j.emp_id,att_actual='Unmarked',emp_name=j.emp_name,emp_desi=j.emp_desi,
-                    team=j.emp_process,team_id=j.emp_process_id,rm1=j.emp_rm1,rm2=j.emp_rm2,rm3=j.emp_rm3,rm1_id=j.emp_rm1_id,
-                    rm2_id=j.emp_rm2_id,rm3_id=j.emp_rm3_id)
-            # days = DaysForAttendance.objects.get(date=i)
-            # days.status = True
-            # days.save()
-        e = AddAttendanceMonths.objects.get(id=id)
-        e.created = True
-        e.save()
+        # for i in date_list:
+        #     for j in profile:
+        #         EcplCalander.objects.create(date=i,emp_id=j.emp_id,att_actual='Unmarked',emp_name=j.emp_name,emp_desi=j.emp_desi,
+        #             team=j.emp_process,team_id=j.emp_process_id,rm1=j.emp_rm1,rm2=j.emp_rm2,rm3=j.emp_rm3,rm1_id=j.emp_rm1_id,
+        #             rm2_id=j.emp_rm2_id,rm3_id=j.emp_rm3_id)
+        #     days = DaysForAttendance.objects.get(date=i)
+        #     days.status = True
+        #     days.save()
+        # e = AddAttendanceMonths.objects.get(id=id)
+        # e.created = True
+        # e.save()
 
-
-        # i = date(2022,4,2)
-        # for j in profile:
-        #     EcplCalander.objects.create(date=i,emp_id=j.emp_id,att_actual='Unmarked',emp_name=j.emp_name,emp_desi=j.emp_desi,
-        #         team=j.emp_process,team_id=j.emp_process_id,rm1=j.emp_rm1,rm2=j.emp_rm2,rm3=j.emp_rm3,rm1_id=j.emp_rm1_id,
-        #         rm2_id=j.emp_rm2_id,rm3_id=j.emp_rm3_id)
         messages.info(request,"Success :)")
         return redirect('/ams/add-attendance')
     else:
-        months = AddAttendanceMonths.objects.filter(created=False)
-        data = {'months':months}
+        today = date.today()
+        month = today.month
+        year = today.year
+        start_date = date(year,month,1)
+        last = calendar.monthrange(year, month)[1]
+        last_date = date(year,month,last)
+        dates = DaysForAttendance.objects.filter(status=False,date__range=[start_date,last_date])
+        date_list = []
+        for i in dates:
+            date_list.append(i.date)
+        new_date_list =[]
+        for i in date_list:
+            new_date_list.append(i.strftime("%Y/%m/%d"))
+        data = {'months':new_date_list}
         return render(request, 'ams/admin/add_attendance.html',data)
 
 @login_required
@@ -1741,3 +1758,15 @@ def exportMapping(request):
                 ws.write(row_num, col_num, row[col_num], font_style)
         wb.save(response)
         return response
+
+def TestFun(request):
+    start_date = date(2022,1,1)
+    end_date = date(2025,12,31)
+    while start_date <= end_date:
+        try:
+            DaysForAttendance.objects.get(date=start_date)
+            start_date += timedelta(days=1)
+        except DaysForAttendance.DoesNotExist:
+            DaysForAttendance.objects.create(date=start_date)
+            start_date += timedelta(days=1)
+    return HttpResponse("Success")
