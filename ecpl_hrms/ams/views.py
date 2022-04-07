@@ -1598,10 +1598,14 @@ def addAttendance(request):
         profile = Profile.objects.filter(agent_status='Active')
         i = selected_date
         for j in profile:
-            EcplCalander.objects.create(date=i,emp_id=j.emp_id,att_actual='Unmarked',emp_name=j.emp_name,emp_desi=j.emp_desi,
-                team=j.emp_process,team_id=j.emp_process_id,rm1=j.emp_rm1,rm2=j.emp_rm2,rm3=j.emp_rm3,rm1_id=j.emp_rm1_id,
-                rm2_id=j.emp_rm2_id,rm3_id=j.emp_rm3_id)
-
+            cal = EcplCalander.objects.filter(date=i,emp_id=j.emp_id).count()
+            if cal < 1:
+                EcplCalander.objects.create(date=i,emp_id=j.emp_id,att_actual='Unmarked',emp_name=j.emp_name,emp_desi=j.emp_desi,
+                    team=j.emp_process,team_id=j.emp_process_id,rm1=j.emp_rm1,rm2=j.emp_rm2,rm3=j.emp_rm3,rm1_id=j.emp_rm1_id,
+                    rm2_id=j.emp_rm2_id,rm3_id=j.emp_rm3_id)
+        days = DaysForAttendance.objects.get(date=i)
+        days.status = True
+        days.save()
         # month = AddAttendanceMonths.objects.get(id=id).month_number
         # year = AddAttendanceMonths.objects.get(id=id).year
         # start_date = date(year,month,1)
@@ -1632,7 +1636,6 @@ def addAttendance(request):
         # e = AddAttendanceMonths.objects.get(id=id)
         # e.created = True
         # e.save()
-
         messages.info(request,"Success :)")
         return redirect('/ams/add-attendance')
     else:
@@ -1648,7 +1651,7 @@ def addAttendance(request):
             date_list.append(i.date)
         new_date_list =[]
         for i in date_list:
-            new_date_list.append(i.strftime("%Y/%m/%d"))
+            new_date_list.append(i.strftime("%Y-%m-%d"))
         data = {'months':new_date_list}
         return render(request, 'ams/admin/add_attendance.html',data)
 
