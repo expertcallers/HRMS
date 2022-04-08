@@ -1,5 +1,5 @@
 import json
-from datetime import datetime,date
+from datetime import datetime, date
 import monthdelta
 import pytz
 from django.contrib.auth import login, logout, update_session_auth_hash
@@ -15,41 +15,45 @@ import calendar
 from datetime import date
 from django.db.models import Q, Sum, Max
 import xlwt
+
 c = Calendar()
 # Getting Model from other Apps
 from django.apps import apps
-Profile = apps.get_model('mapping','Profile')
+
+Profile = apps.get_model('mapping', 'Profile')
 
 # TL and AM List
-tl_am_list = ['Team Leader','Assistant Manager', 'Subject Matter Expert', 'Trainer','Learning and Development Head',
-              'Process Trainer','Trainer Sales']
+tl_am_list = ['Team Leader', 'Assistant Manager', 'Subject Matter Expert', 'Trainer', 'Learning and Development Head',
+              'Process Trainer', 'Trainer Sales']
 # Manager List
-manager_list = ['Quality Head','Operations Manager','Service Delivery Manager','Command Centre Head']
+manager_list = ['Quality Head', 'Operations Manager', 'Service Delivery Manager', 'Command Centre Head']
 # HR List
-hr_list = ['HR','HR Manager','Manager ER','HR Lead','Sr Recruiter','MIS Executive HR',
-'Lead HRBP','Employee Relations Specialist','Payroll Specialist','Recruiter','HR Generalist']
-#Agent List
-agent_list = [ 'Client Relationship Officer','MIS Executive','Patrolling officer',
-               'Data Analyst','Business Development Executive','Content Developer',
-               'Junior Developer','Web Developer','Trainee Developer','Jr Dev','CRO',
-                ]
-rm_list = ['Team Leader','Assistant Manager','Subject Matter Expert', 'Trainer','Learning and Development Head',
-              'Process Trainer','Sales Trainer',
-              'Quality Head','Operations Manager','Service Delivery Manager','Command Centre Head',
-              'HR','HR Manager','Manager ER','HR Lead','Sr Recruiter','MIS Executive HR',
-              'Lead HRBP','Employee Relations Specialist','Payroll Specialist','Recruiter','HR Generalist',
-              'Associate Director','Chief Executive Officer','Chief Compliance Officer','Chief Technology Officer',
-              'Managing Director','Vice President','Board member',
-              'IT Manager']                
+hr_list = ['HR', 'HR Manager', 'Manager ER', 'HR Lead', 'Sr Recruiter', 'MIS Executive HR',
+           'Lead HRBP', 'Employee Relations Specialist', 'Payroll Specialist', 'Recruiter', 'HR Generalist']
+# Agent List
+agent_list = ['Client Relationship Officer', 'MIS Executive', 'Patrolling officer',
+              'Data Analyst', 'Business Development Executive', 'Content Developer',
+              'Junior Developer', 'Web Developer', 'Trainee Developer', 'Jr Dev', 'CRO',
+              ]
+rm_list = ['Team Leader', 'Assistant Manager', 'Subject Matter Expert', 'Trainer', 'Learning and Development Head',
+           'Process Trainer', 'Sales Trainer',
+           'Quality Head', 'Operations Manager', 'Service Delivery Manager', 'Command Centre Head',
+           'HR', 'HR Manager', 'Manager ER', 'HR Lead', 'Sr Recruiter', 'MIS Executive HR',
+           'Lead HRBP', 'Employee Relations Specialist', 'Payroll Specialist', 'Recruiter', 'HR Generalist',
+           'Associate Director', 'Chief Executive Officer', 'Chief Compliance Officer', 'Chief Technology Officer',
+           'Managing Director', 'Vice President', 'Board member',
+           'IT Manager']
+
 
 # Create your views here.
-def loginPage(request): # Test1
+def loginPage(request):  # Test1
     logout(request)
     form = AuthenticationForm()
-    data = {'form':form}
-    return render(request,'ams/login.html',data)
+    data = {'form': form}
+    return render(request, 'ams/login.html', data)
 
-def loginAndRedirect(request): # Test1
+
+def loginAndRedirect(request):  # Test1
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
@@ -67,7 +71,7 @@ def loginAndRedirect(request): # Test1
                 return redirect('/ams/agent-dashboard')
         else:
             form = AuthenticationForm()
-            messages.info(request,'Invalid Credentials')
+            messages.info(request, 'Invalid Credentials')
             data = {'form': form}
             return render(request, 'ams/login.html', data)
     else:
@@ -77,25 +81,25 @@ def loginAndRedirect(request): # Test1
         return render(request, 'ams/login.html', data)
 
 
-
-
 @login_required
-def redirectTOAllDashBoards(request,id): # Test1
+def redirectTOAllDashBoards(request, id):  # Test1
     if request.user.profile.emp_desi in tl_am_list:
         return redirect('/ams/tl-dashboard')
     elif request.user.profile.emp_desi in hr_list:
         return redirect('/ams/hr-dashboard')
     elif request.user.profile.emp_desi in manager_list:
-        return redirect('/ams/manager-dashboard')    
+        return redirect('/ams/manager-dashboard')
     else:
         return HttpResponse('<h1>Not Authorised to view this page</h1>')
 
-def logoutView(request): # Test1
+
+def logoutView(request):  # Test1
     logout(request)
     return redirect('/ams/')
 
+
 @login_required
-def change_password(request): # Test1
+def change_password(request):  # Test1
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
@@ -112,16 +116,17 @@ def change_password(request): # Test1
             messages.error(request, 'Please correct the error below.')
     else:
         form = PasswordChangeForm(request.user)
-    return render(request,'ams/change-password.html', {'form': form})
+    return render(request, 'ams/change-password.html', {'form': form})
 
 
 @login_required
-def agentDashBoard(request): # Test1
+def agentDashBoard(request):  # Test1
     if request.user.profile.emp_desi in agent_list:
         emp_id = request.user.profile.emp_id
-        emp = Profile.objects.get(emp_id = emp_id)
+        emp = Profile.objects.get(emp_id=emp_id)
         # Leave status
-        leave_hist = LeaveTable.objects.filter(Q(emp_id=emp_id),Q(leave_type__in=['SL','PL','ML'])).order_by('-applied_date')[:5]
+        leave_hist = LeaveTable.objects.filter(Q(emp_id=emp_id), Q(leave_type__in=['SL', 'PL', 'ML'])).order_by(
+            '-applied_date')[:5]
         # Month view
         month_days = []
         todays_date = date.today()
@@ -138,33 +143,39 @@ def agentDashBoard(request): # Test1
         for i in month_days:
             dict = {}
             try:
-                st = EcplCalander.objects.get(Q(date=i),Q(emp_id = emp_id)).att_actual
+                st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id)).att_actual
             except EcplCalander.DoesNotExist:
                 st = 'Unmarked'
             dict['dt'] = i
             dict['st'] = st
             month_cal.append(dict)
-        data = {'emp':emp,'leave_hist':leave_hist,'month_cal':month_cal}
-        return render(request,'ams/agent-dashboard-new.html',data)
+        data = {'emp': emp, 'leave_hist': leave_hist, 'month_cal': month_cal}
+        return render(request, 'ams/agent-dashboard-new.html', data)
     else:
         return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
 
+
 @login_required
-def tlDashboard(request): # Test1
+def tlDashboard(request):  # Test1
     usr_desi = request.user.profile.emp_desi
     if usr_desi in tl_am_list:
         emp_name = request.user.profile.emp_name
         emp_id = request.user.profile.emp_id
         prof = Profile.objects.get(emp_id=emp_id)
-        #All Employees
-        all_emp = Profile.objects.filter(Q(agent_status='Active'),Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
+        # All Employees
+        all_emp = Profile.objects.filter(Q(agent_status='Active'),
+                                         Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
         # All Active Today
-        today = date.today()        
-        att_details = EcplCalander.objects.filter(Q(date = today),Q(rm1_id=emp_id))
-        #counts
-        emp_count = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct().count()
+        today = date.today()
+        att_details = EcplCalander.objects.filter(Q(date=today), Q(rm1_id=emp_id))
+        # counts
+        emp_count = Profile.objects.filter(Q(agent_status='Active'), Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(
+            emp_rm3_id=emp_id)).distinct().count()
+
         def allCounts(cat):
-            return EcplCalander.objects.filter(Q(rm1_id=emp_id) | Q(rm2_id=emp_id) | Q(rm3_id=emp_id),Q(date=today),Q(att_actual=cat)).count()
+            return EcplCalander.objects.filter(Q(rm1_id=emp_id) | Q(rm2_id=emp_id) | Q(rm3_id=emp_id), Q(date=today),
+                                               Q(att_actual=cat)).count()
+
         present_count = allCounts('present')
         absent_count = allCounts('Absent')
         week_off_count = allCounts('Week OFF')
@@ -176,11 +187,11 @@ def tlDashboard(request): # Test1
         attrition_count = allCounts('Attrition')
         training_count = allCounts('Training')
         unmarked_count = allCounts('Unmarked')
-    
+
         # Mapping Tickets 
-        map_tickets_counts = MappingTickets.objects.filter(new_rm3_id = emp_id,status=False).count()
-        #Leaves
-        leave_req_count = LeaveTable.objects.filter(emp_rm1_id = emp_id,tl_approval = False).count()
+        map_tickets_counts = MappingTickets.objects.filter(new_rm3_id=emp_id, status=False).count()
+        # Leaves
+        leave_req_count = LeaveTable.objects.filter(emp_rm1_id=emp_id, tl_approval=False).count()
         # Month view
         month_days = []
         todays_date = date.today()
@@ -197,19 +208,20 @@ def tlDashboard(request): # Test1
         for i in month_days:
             dict = {}
             try:
-                st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id),~Q(att_actual='Unmarked')).att_actual
+                st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id), ~Q(att_actual='Unmarked')).att_actual
             except EcplCalander.DoesNotExist:
                 st = 'Unmarked'
             dict['dt'] = i
             dict['st'] = st
             month_cal.append(dict)
 
-        data = {'emp_name': emp_name, 'emp': prof, 'att_details':att_details,'emp_count':emp_count,
-                'present_count':present_count,'absent_count':absent_count,'week_off_count':week_off_count,
-                'comp_off_count':comp_off_count,'half_day_count':half_day_count,'client_off_count':client_off_count,
-                'unmarked_count':unmarked_count,'map_tickets_counts':map_tickets_counts,
-                'all_emp':all_emp,'sl_count':sl_count,'pl_count':pl_count,'attrition_count':attrition_count,
-                'training_count':training_count,'leave_req_count':leave_req_count,'month_cal': month_cal}
+        data = {'emp_name': emp_name, 'emp': prof, 'att_details': att_details, 'emp_count': emp_count,
+                'present_count': present_count, 'absent_count': absent_count, 'week_off_count': week_off_count,
+                'comp_off_count': comp_off_count, 'half_day_count': half_day_count,
+                'client_off_count': client_off_count,
+                'unmarked_count': unmarked_count, 'map_tickets_counts': map_tickets_counts,
+                'all_emp': all_emp, 'sl_count': sl_count, 'pl_count': pl_count, 'attrition_count': attrition_count,
+                'training_count': training_count, 'leave_req_count': leave_req_count, 'month_cal': month_cal}
 
         return render(request, 'ams/rm-dashboard-new.html', data)
     elif usr_desi in manager_list:
@@ -221,32 +233,39 @@ def tlDashboard(request): # Test1
     else:
         return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
 
+
 @login_required
-def managerDashboard(request): # Test1
+def managerDashboard(request):  # Test1
     if request.user.profile.emp_desi in manager_list:
         mgr_name = request.user.profile.emp_name
         emp_id = request.user.profile.emp_id
         # All Employees
-        all_emps = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1_id=emp_id) |Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
+        all_emps = Profile.objects.filter(Q(agent_status='Active'),
+                                          Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
         # count of all employees
         count_all_emps = all_emps.count()
         # TLS
-        all_tls = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1_id=emp_id) |Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id),Q(emp_desi='Team Leader')).distinct()
+        all_tls = Profile.objects.filter(Q(agent_status='Active'),
+                                         Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id),
+                                         Q(emp_desi='Team Leader')).distinct()
         # TLS Count
-        all_tls_count=all_tls.count()
+        all_tls_count = all_tls.count()
         # AMS
-        all_ams = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id),Q(emp_desi='Assistant Manager')).distinct()
+        all_ams = Profile.objects.filter(Q(agent_status='Active'),
+                                         Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id),
+                                         Q(emp_desi='Assistant Manager')).distinct()
         # TLS Count
         all_ams_count = all_ams.count()
-        emp= Profile.objects.get(emp_id = emp_id)      
-        #Mapping Tickets
+        emp = Profile.objects.get(emp_id=emp_id)
+        # Mapping Tickets
         map_tickets_counts = MappingTickets.objects.filter(new_rm3_id=emp_id, status=False).count()
-        #Leave Requests
-        leave_req_count = LeaveTable.objects.filter(emp_rm3_id=emp_id,tl_status='Approved',manager_approval=False).count()
-        #Leave Escalation Count
-        leave_esc_count = LeaveTable.objects.filter(emp_rm3_id=emp_id,manager_approval=False,escalation=True).count()
+        # Leave Requests
+        leave_req_count = LeaveTable.objects.filter(emp_rm3_id=emp_id, tl_status='Approved',
+                                                    manager_approval=False).count()
+        # Leave Escalation Count
+        leave_esc_count = LeaveTable.objects.filter(emp_rm3_id=emp_id, manager_approval=False, escalation=True).count()
         # Attendance 
-        att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False,rm3_id=emp_id).count()
+        att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False, rm3_id=emp_id).count()
         # Month view
         month_days = []
         todays_date = date.today()
@@ -270,14 +289,16 @@ def managerDashboard(request): # Test1
             dict['st'] = st
             month_cal.append(dict)
 
-        data = {'emp':emp,'count_all_emps':count_all_emps,'all_tls':all_tls,'all_tls_count':all_tls_count,
+        data = {'emp': emp, 'count_all_emps': count_all_emps, 'all_tls': all_tls, 'all_tls_count': all_tls_count,
                 'all_ams': all_ams, 'all_ams_count': all_ams_count,
-                'map_tickets_counts':map_tickets_counts,'att_requests_count':att_requests_count,
-                'leave_req_count':leave_req_count,'leave_esc_count':leave_esc_count,'all_emp':all_emps,'month_cal':month_cal,
+                'map_tickets_counts': map_tickets_counts, 'att_requests_count': att_requests_count,
+                'leave_req_count': leave_req_count, 'leave_esc_count': leave_esc_count, 'all_emp': all_emps,
+                'month_cal': month_cal,
                 }
-        return render(request,'ams/manager-dashboard.html',data)
+        return render(request, 'ams/manager-dashboard.html', data)
     else:
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
+
 
 @login_required
 def viewAndApproveLeaveRequestMgr(request):  # Test1
@@ -294,7 +315,7 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
         rm3 = e.emp_rm3
         emp_desi = e.emp_desi
         emp_name = e.emp_name
-        now=datetime.now()
+        now = datetime.now()
         start_date = e.start_date
         end_date = e.end_date
         om_response = request.POST['tl_response']
@@ -318,24 +339,24 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
             leave_history.emp_id = emp_id
             pl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).pl_balance
             sl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).sl_balance
-            leave_history.total = pl+sl
+            leave_history.total = pl + sl
             leave_history.save()
             for i in month_days:
                 try:
-                    cal = EcplCalander.objects.get(Q(date = i),Q(emp_id=emp_id))
+                    cal = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id))
                     cal.att_actual = att_actual
                     cal.appoved_by = request.user.profile.emp_name
                     cal.approved_on = now
                     cal.save()
                 except EcplCalander.DoesNotExist:
                     cal = EcplCalander.objects.create(
-                            team=team, date=i, emp_id=emp_id,
-                            att_actual=att_actual,
-                            rm1=rm1, rm2=rm2, rm3=rm3,
-                            rm1_id=e.emp_rm1_id,rm2_id=e.emp_rm2_id, rm3_id=e.emp_rm3_id,
-                            approved_on=now, emp_desi=emp_desi, appoved_by=request.user.profile.emp_name,
-                            emp_name=emp_name
-                        )
+                        team=team, date=i, emp_id=emp_id,
+                        att_actual=att_actual,
+                        rm1=rm1, rm2=rm2, rm3=rm3,
+                        rm1_id=e.emp_rm1_id, rm2_id=e.emp_rm2_id, rm3_id=e.emp_rm3_id,
+                        approved_on=now, emp_desi=emp_desi, appoved_by=request.user.profile.emp_name,
+                        emp_name=emp_name
+                    )
                     cal.save()
         else:
             manager_approval = True
@@ -355,43 +376,50 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
         e.save()
         return redirect('/ams/view-leave-request-mgr')
     else:
-        
+
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
-        leave_request = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm1_id=emp_id),Q(tl_status='Approved'),Q(manager_approval=False))
-        data = {'emp':emp,'leave_request':leave_request}
-        return render(request,'ams/leave_approval_rm3.html',data)
+        leave_request = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm1_id=emp_id),
+                                                  Q(tl_status='Approved'), Q(manager_approval=False))
+        data = {'emp': emp, 'leave_request': leave_request}
+        return render(request, 'ams/leave_approval_rm3.html', data)
+
 
 @login_required
-def viewallOMS(request,name): # Test1
+def viewallOMS(request, name):  # Test1
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     if name == 'Agent':
-        all_emp = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
-        data = {'emp':emp,'all_emp':all_emp}
-        return render(request,'ams/view_all_emp_om.html',data)
+        all_emp = Profile.objects.filter(Q(agent_status='Active'),
+                                         Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
+        data = {'emp': emp, 'all_emp': all_emp}
+        return render(request, 'ams/view_all_emp_om.html', data)
     elif name == 'TL':
-        all_emp = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id), Q(emp_desi='Team Leader')).distinct()
+        all_emp = Profile.objects.filter(Q(agent_status='Active'),
+                                         Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id),
+                                         Q(emp_desi='Team Leader')).distinct()
         data = {'emp': emp, 'all_emp': all_emp}
         return render(request, 'ams/view_all_emp_om.html', data)
     elif name == 'AM':
-        all_emp = Profile.objects.filter(Q(agent_status = 'Active'),Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id), Q(emp_desi='Assistant Manager')).distinct()
+        all_emp = Profile.objects.filter(Q(agent_status='Active'),
+                                         Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id),
+                                         Q(emp_desi='Assistant Manager')).distinct()
         data = {'emp': emp, 'all_emp': all_emp}
         return render(request, 'ams/view_all_emp_om.html', data)
     else:
-        messages.info(request,'Bad Request')
+        messages.info(request, 'Bad Request')
         return redirect('/ams/manager-dashboard')
 
 
 @login_required
-def hrDashboard(request): # Test1
+def hrDashboard(request):  # Test1
     user_desi = request.user.profile.emp_desi
     if user_desi in hr_list:
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
         all_users_count = Profile.objects.all().count()
         all_team_count = Campaigns.objects.all().count()
-        teams = Campaigns.objects.all()    
+        teams = Campaigns.objects.all()
         attrition_request_count = AgentActiveStatusHist.objects.all().count()
         # Month view 
         month_days = []
@@ -417,28 +445,30 @@ def hrDashboard(request): # Test1
             month_cal.append(dict)
 
         # Leave Requests
-        leave_req_count = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id)|Q(emp_rm2_id=emp_id)|Q(emp_rm1_id=emp_id),
+        leave_req_count = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm1_id=emp_id),
                                                     Q(tl_status='Approved'),
                                                     Q(manager_approval=False)).count()
-        #Mapping Tickets
-        map_tickets_counts = MappingTickets.objects.filter(Q(new_rm3_id=emp_id)|Q(new_rm2_id=emp_id)|Q(new_rm1_id=emp_id),
-                                                           Q(status=False)).count()
-        #Leave Escalation Count
-        leave_esc_count = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id)|Q(emp_rm2_id=emp_id)|Q(emp_rm1_id=emp_id),
-                                                    Q(manager_approval=False),Q(escalation=True)).count()
+        # Mapping Tickets
+        map_tickets_counts = MappingTickets.objects.filter(
+            Q(new_rm3_id=emp_id) | Q(new_rm2_id=emp_id) | Q(new_rm1_id=emp_id),
+            Q(status=False)).count()
+        # Leave Escalation Count
+        leave_esc_count = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm1_id=emp_id),
+                                                    Q(manager_approval=False), Q(escalation=True)).count()
         # Attendance
-        att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False,rm3_id=emp_id).count()
+        att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False, rm3_id=emp_id).count()
 
-        data = {'emp':emp,'all_users_count':all_users_count,'all_team_count':all_team_count,
-                'attrition_request_count':attrition_request_count,'month_cal':month_cal,'team':teams,
-                "leave_req_count":leave_req_count,"map_tickets_counts":map_tickets_counts,
-                "leave_esc_count":leave_esc_count,"att_requests_count":att_requests_count}
-        return render(request,'ams/hr_dashboard.html',data)
+        data = {'emp': emp, 'all_users_count': all_users_count, 'all_team_count': all_team_count,
+                'attrition_request_count': attrition_request_count, 'month_cal': month_cal, 'team': teams,
+                "leave_req_count": leave_req_count, "map_tickets_counts": map_tickets_counts,
+                "leave_esc_count": leave_esc_count, "att_requests_count": att_requests_count}
+        return render(request, 'ams/hr_dashboard.html', data)
     else:
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
 
+
 @login_required
-def on_boarding(request): # Test1
+def on_boarding(request):  # Test1
     if request.method == "POST":
         hrname = request.user
         emp_name = request.POST["emp_name"]
@@ -488,7 +518,7 @@ def on_boarding(request): # Test1
         emp_bank_holder_name = request.POST["emp_bank_name"]
         emp_bank_name = request.POST["emp_bank_na"]
         emp_bank_acco_no = request.POST["emp_bank_no"]
-        emp_bank_ifsc = request.POST["emp_bank_ifsc"]        #
+        emp_bank_ifsc = request.POST["emp_bank_ifsc"]  #
         have_system = request.POST["have_system"]
         require_system = request.POST["require_system"]
         wifi_broadband = request.POST["wifi"]
@@ -504,10 +534,10 @@ def on_boarding(request): # Test1
         emp_upload_experience_two = request.FILES.get("emp_up_cer_2")
         emp_upload_experience_three = request.FILES.get("emp_up_cer_3")
         emp_upload_bank = request.FILES.get("emp_up_bank")
-        esic =request.POST["esic"]
-        pf =request.POST["pf"]
-        tds =request.POST["tds"]
-        pt =request.POST["pt"]
+        esic = request.POST["esic"]
+        pf = request.POST["pf"]
+        tds = request.POST["tds"]
+        pt = request.POST["pt"]
         e = OnboardingnewHRC()
         e.esic = esic
         e.pf = pf
@@ -535,7 +565,7 @@ def on_boarding(request): # Test1
         e.emp_emergency_number_two = emp_emergency_number2
         e.emp_emergency_address_two = emp_emergency_address2
         e.emp_edu_qualification = emp_edu_qualification
-        e.emp_quali_other=emp_quali_other
+        e.emp_quali_other = emp_quali_other
         e.emp_edu_course = emp_edu_course
         e.emp_edu_institute = emp_edu_institute
         # emp pevious experiance
@@ -599,16 +629,18 @@ def on_boarding(request): # Test1
         data = {'emp': emp}
         return render(request, 'ams/onboarding.html', data)
 
+
 @login_required
-def viewOnBoarding(request): # Test1
+def viewOnBoarding(request):  # Test1
     onboard = OnboardingnewHRC.objects.all()
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
-    data = {'onboard':onboard,'emp':emp}
+    data = {'onboard': onboard, 'emp': emp}
     return render(request, "ams/view_onboarding.html", data)
 
+
 @login_required
-def on_boarding_update(request,id): # Test1
+def on_boarding_update(request, id):  # Test1
     if request.method == "POST":
         id = request.POST["id"]
         e = OnboardingnewHRC.objects.get(id=id)
@@ -773,11 +805,12 @@ def on_boarding_update(request,id): # Test1
         onboard = OnboardingnewHRC.objects.get(id=id)
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
-        data = {"onboard": onboard,'emp':emp}
+        data = {"onboard": onboard, 'emp': emp}
         return render(request, "ams/edit_onboarding.html", data)
 
+
 @login_required
-def addNewUserHR(request): # Test1  # calander pending
+def addNewUserHR(request):  # Test1  # calander pending
     if request.method == 'POST':
         on_id = request.POST['id']
         emp_name = request.POST["emp_name"]
@@ -799,11 +832,11 @@ def addNewUserHR(request): # Test1  # calander pending
         else:
             # Creating User
             user = User.objects.create_user(username=emp_id, password=str(emp_id))
-            #Creating Profile
+            # Creating Profile
             Profile.objects.create(
-                user=user,emp_id=emp_id, emp_name=emp_name, emp_desi=emp_desi,
-                emp_rm1=emp_rm1, emp_rm2=emp_rm2, emp_rm3=emp_rm3,emp_rm1_id=emp_rm1_id,emp_rm2_id=emp_rm2_id,
-                emp_rm3_id=emp_rm3_id,emp_process=emp_process,emp_process_id=emp_process_id,doj=emp_doj,on_id=on_id,
+                user=user, emp_id=emp_id, emp_name=emp_name, emp_desi=emp_desi,
+                emp_rm1=emp_rm1, emp_rm2=emp_rm2, emp_rm3=emp_rm3, emp_rm1_id=emp_rm1_id, emp_rm2_id=emp_rm2_id,
+                emp_rm3_id=emp_rm3_id, emp_process=emp_process, emp_process_id=emp_process_id, doj=emp_doj, on_id=on_id,
             )
             # Updating Last Emp ID
             try:
@@ -840,14 +873,14 @@ def addNewUserHR(request): # Test1  # calander pending
                     EcplCalander.objects.get(emp_id=j.emp_id, date=i)
                 except EcplCalander.DoesNotExist:
                     EcplCalander.objects.create(date=i, emp_id=j.emp_id, att_actual='Unmarked',
-                                              emp_name=j.emp_name, emp_desi=j.emp_desi,
-                                              team=j.emp_process, team_id=j.emp_process_id, rm1=j.emp_rm1,
-                                              rm2=j.emp_rm2, rm3=j.emp_rm3, rm1_id=j.emp_rm1_id,
-                                              rm2_id=j.emp_rm2_id, rm3_id=j.emp_rm3_id)
+                                                emp_name=j.emp_name, emp_desi=j.emp_desi,
+                                                team=j.emp_process, team_id=j.emp_process_id, rm1=j.emp_rm1,
+                                                rm2=j.emp_rm2, rm3=j.emp_rm3, rm1_id=j.emp_rm1_id,
+                                                rm2_id=j.emp_rm2_id, rm3_id=j.emp_rm3_id)
 
             onb_obj.user_created = True
             onb_obj.save()
-        messages.info(request,'User and Profile Successfully Created')
+        messages.info(request, 'User and Profile Successfully Created')
         return redirect('/ams/add-new-user')
     else:
         emp_id = request.user.profile.emp_id
@@ -857,23 +890,26 @@ def addNewUserHR(request): # Test1  # calander pending
             lst_emp_id = i.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
         all_desi = Profile.objects.all().values('emp_desi').distinct().order_by('emp_desi')
-        rms = Profile.objects.filter(emp_desi__in = rm_list).order_by('emp_name')
+        rms = Profile.objects.filter(emp_desi__in=rm_list).order_by('emp_name')
         all_team = Campaigns.objects.all()
-        
+
         onboarding = OnboardingnewHRC.objects.filter(user_created=False)
-        data = {'emp': emp,'all_data':all_desi,'rms':rms,'all_team':all_team,'onboarding':onboarding,"last_emp_id":lst_emp_id}
-        return render(request,'ams/hr_add_user.html',data)
+        data = {'emp': emp, 'all_data': all_desi, 'rms': rms, 'all_team': all_team, 'onboarding': onboarding,
+                "last_emp_id": lst_emp_id}
+        return render(request, 'ams/hr_add_user.html', data)
+
 
 @login_required
-def viewUsersHR(request): # Test1
+def viewUsersHR(request):  # Test1
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     add = Profile.objects.all()
-    data = {'add':add,'emp':emp}
-    return render(request,'ams/view_user_hr.html',data)
+    data = {'add': add, 'emp': emp}
+    return render(request, 'ams/view_user_hr.html', data)
+
 
 @login_required
-def viewEmployeeProfile(request,id,on_id): #Test 1
+def viewEmployeeProfile(request, id, on_id):  # Test 1
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     profile = Profile.objects.get(id=id)
@@ -881,31 +917,34 @@ def viewEmployeeProfile(request,id,on_id): #Test 1
         onboarding = ""
     else:
         onboarding = OnboardingnewHRC.objects.get(id=int(on_id))
-    data = {'profile': profile, 'onboard': onboarding,'emp':emp,"on":on_id}
-    return render(request,'ams/emp_profile_view.html',data)
+    data = {'profile': profile, 'onboard': onboarding, 'emp': emp, "on": on_id}
+    return render(request, 'ams/emp_profile_view.html', data)
+
 
 @login_required
-def teamAttendance(request): # Team Attendance Page # Test1
+def teamAttendance(request):  # Team Attendance Page # Test1
     today = date.today()
     yesterday = today - timedelta(days=1)
     dby_date = yesterday - timedelta(days=1)
     user_empid = request.user.profile.emp_id
     emp_list = []
-    emps = Profile.objects.filter(Q(emp_rm1_id=user_empid) | Q(emp_rm2_id=user_empid) | Q(emp_rm3_id=user_empid),Q(agent_status='Active'))
+    emps = Profile.objects.filter(Q(emp_rm1_id=user_empid) | Q(emp_rm2_id=user_empid) | Q(emp_rm3_id=user_empid),
+                                  Q(agent_status='Active'))
     for i in emps:
         emp_list.append(i.emp_id)
     # Today 
-    todays_list_list = EcplCalander.objects.filter(Q(date=today),Q(att_actual = 'Unmarked'),Q(emp_id__in=emp_list))
+    todays_list_list = EcplCalander.objects.filter(Q(date=today), Q(att_actual='Unmarked'), Q(emp_id__in=emp_list))
     # Yesterday
-    ystday_list_list = EcplCalander.objects.filter(Q(date=yesterday),Q(att_actual = 'Unmarked'),Q(emp_id__in=emp_list))
+    ystday_list_list = EcplCalander.objects.filter(Q(date=yesterday), Q(att_actual='Unmarked'), Q(emp_id__in=emp_list))
     # Day Before Yesterday
-    dby_list_list = EcplCalander.objects.filter(Q(date=dby_date),Q(att_actual = 'Unmarked'),Q(emp_id__in=emp_list))
+    dby_list_list = EcplCalander.objects.filter(Q(date=dby_date), Q(att_actual='Unmarked'), Q(emp_id__in=emp_list))
     emp = Profile.objects.get(emp_id=user_empid)
-    data = {'todays_att':todays_list_list,'ystdays_att':ystday_list_list,'dbys_att':dby_list_list,'emp':emp}
-    return render(request,'ams/team_attendance.html',data)
+    data = {'todays_att': todays_list_list, 'ystdays_att': ystday_list_list, 'dbys_att': dby_list_list, 'emp': emp}
+    return render(request, 'ams/team_attendance.html', data)
+
 
 @login_required
-def applyAttendace(request): # Test1
+def applyAttendace(request):  # Test1
     if request.method == 'POST':
         ddate = request.POST['date']
         att_actual = request.POST['att_actual']
@@ -948,8 +987,8 @@ def applyAttendace(request): # Test1
             today = date.today()
             yesterday = today - timedelta(days=1)
             dby_date = yesterday - timedelta(days=1)
-            date_range = [dby_date,today]            
-            ncns_count = EcplCalander.objects.filter(emp_id=emp_id,date__range=date_range,att_actual='NCNS').count()
+            date_range = [dby_date, today]
+            ncns_count = EcplCalander.objects.filter(emp_id=emp_id, date__range=date_range, att_actual='NCNS').count()
             if ncns_count >= 3:
                 usr = Profile.objects.get(emp_id=emp_id)
                 usr.agent_status = att_actual
@@ -958,8 +997,9 @@ def applyAttendace(request): # Test1
     else:
         return HttpResponse('<h1>*** Page not available ***</h1>')
 
+
 @login_required
-def newSingleAttandance(request): #Test1
+def newSingleAttandance(request):  # Test1
     if request.method == 'POST':
         ddate = request.POST['date']
         att_actual = request.POST['att_actual']
@@ -976,11 +1016,11 @@ def newSingleAttandance(request): #Test1
         team = prof.emp_process
         team_id = prof.emp_process_id
         try:
-            cal = EcplCalander.objects.get(Q(date=ddate),Q(emp_id=emp_id),~Q(att_actual='Unmarked'))
-            messages.info(request,'*** Already Marked in Calendar, Please Refresh the page and try again ***')
+            cal = EcplCalander.objects.get(Q(date=ddate), Q(emp_id=emp_id), ~Q(att_actual='Unmarked'))
+            messages.info(request, '*** Already Marked in Calendar, Please Refresh the page and try again ***')
             return redirect('/ams/ams-update-attendance')
         except EcplCalander.DoesNotExist:
-            cal = EcplCalander.objects.get(emp_id=emp_id,date=ddate)
+            cal = EcplCalander.objects.get(emp_id=emp_id, date=ddate)
             cal.att_actual = att_actual
             cal.approved_on = now
             cal.appoved_by = request.user.profile.emp_name
@@ -1002,8 +1042,8 @@ def newSingleAttandance(request): #Test1
             today = date.today()
             yesterday = today - timedelta(days=1)
             dby_date = yesterday - timedelta(days=1)
-            date_range = [dby_date,today]            
-            ncns_count = EcplCalander.objects.filter(emp_id=emp_id,date__range=date_range,att_actual='NCNS').count()
+            date_range = [dby_date, today]
+            ncns_count = EcplCalander.objects.filter(emp_id=emp_id, date__range=date_range, att_actual='NCNS').count()
             if ncns_count >= 3:
                 usr = Profile.objects.get(emp_id=emp_id)
                 usr.agent_status = att_actual
@@ -1015,35 +1055,39 @@ def newSingleAttandance(request): #Test1
         dby_date = yesterday - timedelta(days=1)
         emp_id = request.user.profile.emp_id
         # Today
-        todays_list_list = EcplCalander.objects.filter(Q(date=today), Q(emp_id=emp_id),Q(att_actual='Unmarked'))
+        todays_list_list = EcplCalander.objects.filter(Q(date=today), Q(emp_id=emp_id), Q(att_actual='Unmarked'))
         # Yesterday
-        ystday_list_list = EcplCalander.objects.filter(Q(date=yesterday), Q(emp_id=emp_id),Q(att_actual='Unmarked'))
+        ystday_list_list = EcplCalander.objects.filter(Q(date=yesterday), Q(emp_id=emp_id), Q(att_actual='Unmarked'))
         # Day before yesterday
-        dby_list_list = EcplCalander.objects.filter(Q(date=dby_date), Q(emp_id=emp_id),Q(att_actual='Unmarked'))
+        dby_list_list = EcplCalander.objects.filter(Q(date=dby_date), Q(emp_id=emp_id), Q(att_actual='Unmarked'))
         emp = Profile.objects.get(emp_id=emp_id)
-        data = {'todays_att': todays_list_list,'ystdays_att': ystday_list_list,'dbys_att': dby_list_list,'emp':emp}
+        data = {'todays_att': todays_list_list, 'ystdays_att': ystday_list_list, 'dbys_att': dby_list_list, 'emp': emp}
         return render(request, 'ams/attendance.html', data)
 
+
 @login_required
-def viewTeamAttendance(request): # Test1
+def viewTeamAttendance(request):  # Test1
     if request.method == 'POST':
         rm = request.user.profile.emp_id
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
         emp_id = request.POST['emp_id']
         if emp_id == 'All':
-            cal = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),date__range=[start_date,end_date])
+            cal = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),
+                                              date__range=[start_date, end_date])
         else:
-            cal = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm), date__range=[start_date, end_date],emp_id=emp_id)
+            cal = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),
+                                              date__range=[start_date, end_date], emp_id=emp_id)
         emp = Profile.objects.get(emp_id=rm)
         data = {'agt_cal_list': cal, 'emp': emp}
         return render(request, 'ams/agent-calander-status.html', data)
     else:
         return HttpResponse('<h2>*** GET not available ***</h2>')
 
+
 @login_required
-def weekAttendanceReport(request): # Test1
-    empobj = Profile.objects.get(emp_id = request.user.profile.emp_id)
+def weekAttendanceReport(request):  # Test1
+    empobj = Profile.objects.get(emp_id=request.user.profile.emp_id)
     day = date.today()
     start = day - timedelta(days=day.weekday())
     start = start + timedelta(days=-1)
@@ -1091,15 +1135,16 @@ def weekAttendanceReport(request): # Test1
             del samp[i]
             j += 1
         lst.append(samp)
-    data = {"cal": lst,'emp':empobj}
+    data = {"cal": lst, 'emp': empobj}
     return render(request, 'ams/week_attendace_report.html', data)
 
+
 @login_required
-def teamAttendanceReport(request): # Test 1
+def teamAttendanceReport(request):  # Test 1
     if request.method == 'POST':
         start_date = request.POST['start_date']
         end_date = request.POST['end_date']
-        team_name = request.POST['team_name']      
+        team_name = request.POST['team_name']
         start_date = start_date
         end_date = end_date
         emp_id = request.user.profile.emp_id
@@ -1114,15 +1159,15 @@ def teamAttendanceReport(request): # Test 1
             font_style = xlwt.XFStyle()
             font_style.font.bold = True
             columns = [
-                        'Date','Emp ID','Emp Name','Attendance','Designation','RM 1','RM 2','RM 3','Team'
-                    ]
+                'Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'
+            ]
             for col_num in range(len(columns)):
                 ws.write(row_num, col_num, columns[col_num], font_style)  # at 0 row 0 column
             # Sheet body, remaining rows
-            font_style = xlwt.XFStyle()       
-            rows = EcplCalander.objects.filter(date__range=[start_date,end_date]).values_list(
-                    'date','emp_id', 'emp_name','att_actual','emp_desi', 'rm1', 'rm2', 'rm3', 'team'
-                )     
+            font_style = xlwt.XFStyle()
+            rows = EcplCalander.objects.filter(date__range=[start_date, end_date]).values_list(
+                'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team'
+            )
             import datetime
             rows = [[x.strftime("%Y-%m-%d %H:%M") if isinstance(x, datetime.datetime) else x for x in row] for row in
                     rows]
@@ -1141,18 +1186,18 @@ def teamAttendanceReport(request): # Test 1
         font_style = xlwt.XFStyle()
         font_style.font.bold = True
         columns = [
-                        'Date','Emp ID','Emp Name','Attendance','Designation','RM 1','RM 2','RM 3','Team'
-                    ]
+            'Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'
+        ]
         for col_num in range(len(columns)):
             ws.write(row_num, col_num, columns[col_num], font_style)  # at 0 row 0 column
             # Sheet body, remaining rows
         font_style = xlwt.XFStyle()
-        rows = EcplCalander.objects.filter(date__range=[start_date,end_date],team=team_name).values_list(
-                    'date','emp_id', 'emp_name','att_actual','emp_desi', 'rm1', 'rm2', 'rm3', 'team'
-                )        
+        rows = EcplCalander.objects.filter(date__range=[start_date, end_date], team=team_name).values_list(
+            'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team'
+        )
         import datetime
         rows = [[x.strftime("%Y-%m-%d %H:%M") if isinstance(x, datetime.datetime) else x for x in row] for row in
-                    rows]
+                rows]
         for row in rows:
             row_num += 1
             for col_num in range(len(row)):
@@ -1164,24 +1209,26 @@ def teamAttendanceReport(request): # Test 1
 
 
 @login_required
-def agentSettings(request): # Test1
+def agentSettings(request):  # Test1
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     form = PasswordChangeForm(request.user)
-    data = {'emp':emp,'form':form}
-    return render(request,'ams/agent-settings.html',data)
+    data = {'emp': emp, 'form': form}
+    return render(request, 'ams/agent-settings.html', data)
+
 
 @login_required
-def rmSettings(request): # Test1
+def rmSettings(request):  # Test1
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     form = PasswordChangeForm(request.user)
-    data = {'emp':emp,'form':form}
-    return render(request,'ams/rm-settings.html',data)
+    data = {'emp': emp, 'form': form}
+    return render(request, 'ams/rm-settings.html', data)
+
 
 @login_required
-def uploadImageToDB(request): # Test1
-    if request.method=='POST':
+def uploadImageToDB(request):  # Test1
+    if request.method == 'POST':
         user_image = request.FILES['user-img']
         id = request.POST['id']
         prof = Profile.objects.get(id=id)
@@ -1192,24 +1239,26 @@ def uploadImageToDB(request): # Test1
         elif request.user.profile.emp_desi in hr_list:
             return redirect('/ams/hr-dashboard')
         elif request.profile.emp_desi in manager_list:
-            return redirect('/ams/manager-dashboard')    
+            return redirect('/ams/manager-dashboard')
         else:
             return redirect('/ams/agent-dashboard')
     else:
         pass
 
-@login_required
-def mappingHomePage(request): # Test1
-    emp_id = request.user.profile.emp_id
-    emp = Profile.objects.get(emp_id=emp_id)
-    employees = Profile.objects.filter(Q(emp_rm1_id=emp_id),Q(agent_status = 'Active'))
-    rms = Profile.objects.filter(emp_desi__in=rm_list).order_by('emp_name')
-    teams = Campaigns.objects.all().order_by('name')
-    data = {'emp': emp,'employees':employees,'rms':rms,'teams':teams}
-    return render(request,'ams/mapping_home.html',data)
 
 @login_required
-def createMappingTicket(request): # Test1
+def mappingHomePage(request):  # Test1
+    emp_id = request.user.profile.emp_id
+    emp = Profile.objects.get(emp_id=emp_id)
+    employees = Profile.objects.filter(Q(emp_rm1_id=emp_id), Q(agent_status='Active'))
+    rms = Profile.objects.filter(emp_desi__in=rm_list).order_by('emp_name')
+    teams = Campaigns.objects.all().order_by('name')
+    data = {'emp': emp, 'employees': employees, 'rms': rms, 'teams': teams}
+    return render(request, 'ams/mapping_home.html', data)
+
+
+@login_required
+def createMappingTicket(request):  # Test1
     if request.method == "POST":
         usr_name = request.user.profile.emp_name
         usr_id = request.user.profile.emp_id
@@ -1250,17 +1299,19 @@ def createMappingTicket(request): # Test1
     else:
         return redirect('/ams/rm-mapping-index')
 
-@login_required
-def viewMappingTicketsHr(request): # Test1
-    usr = request.user.profile.emp_id
-    tickets = MappingTickets.objects.filter(status=False,new_rm3_id=usr).order_by('created_date')
-    emp = Profile.objects.get(emp_id=usr)
-    data = {'tickets':tickets,'emp':emp}
-    return render(request,'ams/view_mapping_tickets.html',data)
 
 @login_required
-def approveMappingTicket(request): # Test1
-    if request.method=='POST':
+def viewMappingTicketsHr(request):  # Test1
+    usr = request.user.profile.emp_id
+    tickets = MappingTickets.objects.filter(status=False, new_rm3_id=usr).order_by('created_date')
+    emp = Profile.objects.get(emp_id=usr)
+    data = {'tickets': tickets, 'emp': emp}
+    return render(request, 'ams/view_mapping_tickets.html', data)
+
+
+@login_required
+def approveMappingTicket(request):  # Test1
+    if request.method == 'POST':
         usr_name = request.user.profile.emp_name
         id = request.POST['id']
         td = date.today()
@@ -1269,7 +1320,7 @@ def approveMappingTicket(request): # Test1
         ticket.approved_by = usr_name
         ticket.approved_date = td
         ticket.save()
-        emp_id = ticket.emp_id   
+        emp_id = ticket.emp_id
         prof = Profile.objects.get(emp_id=emp_id)
         prof.emp_rm1 = ticket.new_rm1
         prof.emp_rm2 = ticket.new_rm2
@@ -1283,45 +1334,49 @@ def approveMappingTicket(request): # Test1
     else:
         return redirect('/ams/logout')
 
+
 @login_required
-def viewMappingApplicationStatus(request): # Test1
+def viewMappingApplicationStatus(request):  # Test1
     usr = request.user.profile.emp_id
     tickets = MappingTickets.objects.filter(created_by_id=usr).order_by('created_date')
     emp = Profile.objects.get(emp_id=usr)
     data = {'tickets': tickets, 'emp': emp}
     return render(request, 'ams/view_mapping_status.html', data)
 
+
 @login_required
-def addNewTeam(request): # Test1
-    mgrs = Profile.objects.filter(emp_desi__in=manager_list,agent_status ='Active')
+def addNewTeam(request):  # Test1
+    mgrs = Profile.objects.filter(emp_desi__in=manager_list, agent_status='Active')
     if request.method == "POST":
         usr = request.user.profile.emp_name
         om = request.POST["om"]
         campaign = request.POST["campaign"]
-        cam = Campaigns.objects.create(name=campaign,om=om,created_by=usr)
+        cam = Campaigns.objects.create(name=campaign, om=om, created_by=usr)
         cam.save()
-        messages.info(request,'Team ' + campaign +' Created Successfully')
+        messages.info(request, 'Team ' + campaign + ' Created Successfully')
         return redirect('/ams/view-all-teams')
     else:
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
-        data = {'mgrs':mgrs,'emp':emp}
-        return render(request,"ams/add_team.html",data)
+        data = {'mgrs': mgrs, 'emp': emp}
+        return render(request, "ams/add_team.html", data)
+
 
 @login_required
-def viewTeam(request): # Test1
+def viewTeam(request):  # Test1
     if request.user.profile.emp_desi in hr_list:
         teams = Campaigns.objects.all()
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
-        data = {'teams':teams,'emp':emp}
-        return render(request,'ams/view_team.html',data)
+        data = {'teams': teams, 'emp': emp}
+        return render(request, 'ams/view_team.html', data)
     else:
-        messages.info(request,'*** You are not authorised to view this page ***')
+        messages.info(request, '*** You are not authorised to view this page ***')
         return redirect('ams/logout')
 
+
 @login_required
-def applyLeave(request): # Test1
+def applyLeave(request):  # Test1
     if request.method == 'POST':
         emp_name = request.POST["emp_name"]
         emp_id = request.POST["emp_id"]
@@ -1371,10 +1426,10 @@ def applyLeave(request): # Test1
         e.save()
         leave_balance = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
         if leave_type == 'PL':
-            leave_balance.pl_balance-=int(no_days)
+            leave_balance.pl_balance -= int(no_days)
             leave_balance.save()
         elif leave_type == 'SL':
-            leave_balance.sl_balance-=int(no_days)
+            leave_balance.sl_balance -= int(no_days)
             leave_balance.save()
         return redirect('/ams/ams-apply_leave')
     else:
@@ -1383,13 +1438,13 @@ def applyLeave(request): # Test1
         leave = LeaveTable.objects.filter(emp_id=emp_id)
 
         try:
-            Profile.objects.get(emp_id=emp_id,doj=None)
-            doj = date(2020,1,1)
+            Profile.objects.get(emp_id=emp_id, doj=None)
+            doj = date(2020, 1, 1)
             today = date.today()
             probation = (today - doj).days
         except Profile.DoesNotExist:
             if emp.doj == None:
-                doj = date(2020,1,1)
+                doj = date(2020, 1, 1)
             else:
                 doj = emp.doj
             today = date.today()
@@ -1397,22 +1452,26 @@ def applyLeave(request): # Test1
         try:
             leave_balance = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
         except EmployeeLeaveBalance.DoesNotExist:
-            leave_balance = {'sl_balance':0,'pl_balance':0}
-        leave_his = leaveHistory.objects.filter(emp_id=emp_id).values('date','transaction',
-                                                                  'leave_type','total').annotate(no_days=Sum('no_days'))
-        data = {'emp': emp,'leave':leave,'leave_balance':leave_balance,'probation':probation,'leave_his':leave_his}
-        return render(request,'ams/apply-leave.html',data)
+            leave_balance = {'sl_balance': 0, 'pl_balance': 0}
+        leave_his = leaveHistory.objects.filter(emp_id=emp_id).values('date', 'transaction',
+                                                                      'leave_type', 'total').annotate(
+            no_days=Sum('no_days'))
+        data = {'emp': emp, 'leave': leave, 'leave_balance': leave_balance, 'probation': probation,
+                'leave_his': leave_his}
+        return render(request, 'ams/apply-leave.html', data)
+
 
 @login_required
-def viewleaveListRM1(request): # Test1
+def viewleaveListRM1(request):  # Test1
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
-    leave_request = LeaveTable.objects.filter(emp_rm1_id=emp_id,tl_approval=False)
-    data = {'emp':emp,'leave_request':leave_request}
-    return render(request,'ams/leave_approval_rm1.html',data)
+    leave_request = LeaveTable.objects.filter(emp_rm1_id=emp_id, tl_approval=False)
+    data = {'emp': emp, 'leave_request': leave_request}
+    return render(request, 'ams/leave_approval_rm1.html', data)
+
 
 @login_required
-def approveLeaveRM1(request): # Test1
+def approveLeaveRM1(request):  # Test1
     if request.method == "POST":
         id = request.POST["id"]
         e = LeaveTable.objects.get(id=id)
@@ -1443,8 +1502,9 @@ def approveLeaveRM1(request): # Test1
         e.save()
         return redirect('/ams/view-leave-list')
 
+
 @login_required
-def applyEscalation(request): # Test1
+def applyEscalation(request):  # Test1
     if request.method == "POST":
         id = request.POST["id"]
         reason = request.POST['reason']
@@ -1457,7 +1517,7 @@ def applyEscalation(request): # Test1
         type = e.leave_type
         a = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
         if type == "PL":
-            a.pl_balance = a.pl_balance-no_days
+            a.pl_balance = a.pl_balance - no_days
         else:
             a.sl_balance = a.sl_balance - no_days
         a.save()
@@ -1465,21 +1525,25 @@ def applyEscalation(request): # Test1
     else:
         pass
 
+
 @login_required
-def viewEscalation(request): # Test1
-    leave_request = LeaveTable.objects.filter(emp_rm3_id=request.user.profile.emp_id, tl_approval=True,escalation=True,manager_approval=False)
+def viewEscalation(request):  # Test1
+    leave_request = LeaveTable.objects.filter(emp_rm3_id=request.user.profile.emp_id, tl_approval=True, escalation=True,
+                                              manager_approval=False)
     data = {'leave_request': leave_request}
     return render(request, 'ams/leave_escalation.html', data)
 
+
 @login_required
-def viewLeaveHistory(request): # Test1
+def viewLeaveHistory(request):  # Test1
     emp_id = request.user.profile.emp_id
-    leave = LeaveTable.objects.filter(Q(emp_rm1_id=emp_id)|Q(emp_rm2_id=emp_id)|Q(emp_rm3_id=emp_id))
+    leave = LeaveTable.objects.filter(Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id))
     data = {'leave': leave}
     return render(request, 'ams/view_employee_leave_history.html', data)
 
+
 @login_required
-def editAgentStatus(request): # Test1
+def editAgentStatus(request):  # Test1
     if request.method == 'POST':
         id = request.POST['id']
         agent_status = request.POST['new_status']
@@ -1488,31 +1552,36 @@ def editAgentStatus(request): # Test1
         current_status = profile.agent_status
         profile.agent_status = agent_status
         profile.save()
-        sh = AgentActiveStatusHist.objects.create(emp_id = profile.emp_id,emp_name=profile.emp_name ,current_status = current_status,
-                        new_status= agent_status,date=date.today() ,reason =reason ,changed_by =request.user.profile.emp_name)
+        sh = AgentActiveStatusHist.objects.create(emp_id=profile.emp_id, emp_name=profile.emp_name,
+                                                  current_status=current_status,
+                                                  new_status=agent_status, date=date.today(), reason=reason,
+                                                  changed_by=request.user.profile.emp_name)
         sh.save()
         return redirect('/ams/viewusers')
     else:
         return HttpResponse('<h1>Not Get Method</h1>')
 
+
 @login_required
-def attendanceCorrection(request): # Test1
+def attendanceCorrection(request):  # Test1
     emp_idd = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_idd)
     if request.method == 'POST':
         date = request.POST['date']
-        emp_id = request.POST['emp_id']        
-        cal = EcplCalander.objects.get(Q(date = date),Q(emp_id = emp_id))
-        data = {'cal':cal,'emp':emp}
-        return render(request,'ams/view_att_correction_apply.html',data)
+        emp_id = request.POST['emp_id']
+        cal = EcplCalander.objects.get(Q(date=date), Q(emp_id=emp_id))
+        data = {'cal': cal, 'emp': emp}
+        return render(request, 'ams/view_att_correction_apply.html', data)
     else:
-        all_emp = Profile.objects.filter(Q(agent_status='Active'),Q(emp_rm1_id=emp_idd) | Q(emp_rm2_id=emp_idd) | Q(emp_rm3_id=emp_idd))
+        all_emp = Profile.objects.filter(Q(agent_status='Active'),
+                                         Q(emp_rm1_id=emp_idd) | Q(emp_rm2_id=emp_idd) | Q(emp_rm3_id=emp_idd))
         atthist = AttendanceCorrectionHistory.objects.filter(applied_by_id=emp_idd)
-        data = {'all_emp':all_emp,'emp':emp,'atthist':atthist}
-        return render(request,'ams/view_att_correction.html',data)
+        data = {'all_emp': all_emp, 'emp': emp, 'atthist': atthist}
+        return render(request, 'ams/view_att_correction.html', data)
+
 
 @login_required
-def applyCorrection(request): # Test1
+def applyCorrection(request):  # Test1
     applied_by = request.user.profile.emp_name
     applied_by_id = request.user.profile.emp_id
     if request.method == 'POST':
@@ -1540,13 +1609,14 @@ def applyCorrection(request): # Test1
         atthist.cal_id = id
         atthist.reason = reason
         atthist.save()
-        messages.info(request,'Attendance Correction Request has been sent Successfully')
+        messages.info(request, 'Attendance Correction Request has been sent Successfully')
         return redirect('/ams/attendance-correction')
     else:
         pass
 
+
 @login_required
-def approveAttendanceRequest(request): # test1
+def approveAttendanceRequest(request):  # test1
     emp_idd = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_idd)
     if request.method == 'POST':
@@ -1557,7 +1627,7 @@ def approveAttendanceRequest(request): # test1
         hist = AttendanceCorrectionHistory.objects.get(id=id)
         cal = EcplCalander.objects.get(id=cal_id)
         if om_resp == 'Approved':
-            cal.att_actual = hist.att_new          
+            cal.att_actual = hist.att_new
             cal.save()
             att_actual = hist.att_new
             if att_actual == 'Attrition' or att_actual == 'Bench':
@@ -1570,93 +1640,83 @@ def approveAttendanceRequest(request): # test1
                 dby_date = yesterday - timedelta(days=1)
                 tmr = today + timedelta(days=1)
                 daftmr = tmr + timedelta(days=1)
-                date_range = [dby_date,today]            
-                ncns_count = EcplCalander.objects.filter(emp_id=cal.emp_id,date__range=date_range,att_actual='NCNS').count()
+                date_range = [dby_date, today]
+                ncns_count = EcplCalander.objects.filter(emp_id=cal.emp_id, date__range=date_range,
+                                                         att_actual='NCNS').count()
                 if ncns_count >= 3:
                     usr = Profile.objects.get(emp_id=cal.emp_id)
                     usr.agent_status = att_actual
                     usr.save()
 
         hist.status = True
-        hist.comments =comments
+        hist.comments = comments
         hist.approved_by = request.user.profile.emp_name
         hist.om_response = om_resp
         hist.save()
         return redirect('/ams/approve-att-correction-req')
     else:
-        att_hist = AttendanceCorrectionHistory.objects.filter(status = False, rm3_id=emp_idd)
-        data = {'att_hist':att_hist,'emp':emp}
-        return render(request,'ams/hr_attendance_correction.html',data)
+        att_hist = AttendanceCorrectionHistory.objects.filter(status=False, rm3_id=emp_idd)
+        data = {'att_hist': att_hist, 'emp': emp}
+        return render(request, 'ams/hr_attendance_correction.html', data)
+
 
 @login_required
 def addAttendance(request):
     if request.method == 'POST':
-        selected_date = request.POST['date']
+        id = request.POST['id']
         unique_id = request.POST['csrfmiddlewaretoken']
-
-
-        profile = Profile.objects.filter(agent_status='Active')
-        i = selected_date
-        for j in profile:
-            cal = EcplCalander.objects.filter(date=i,emp_id=j.emp_id).count()
-            if cal < 1:
-                EcplCalander.objects.create(date=i,emp_id=j.emp_id,att_actual='Unmarked',emp_name=j.emp_name,emp_desi=j.emp_desi,
-                    team=j.emp_process,team_id=j.emp_process_id,rm1=j.emp_rm1,rm2=j.emp_rm2,rm3=j.emp_rm3,rm1_id=j.emp_rm1_id,
-                    rm2_id=j.emp_rm2_id,rm3_id=j.emp_rm3_id)
-        days = DaysForAttendance.objects.get(date=i)
-        days.status = True
-        days.save()
-        # month = AddAttendanceMonths.objects.get(id=id).month_number
-        # year = AddAttendanceMonths.objects.get(id=id).year
-        # start_date = date(year,month,1)
-        # last = calendar.monthrange(year, month)[1]
-        # last_date = date(year,month,last)
-        # delta = last_date - start_date
-        # date_list = []
-        #
-        # for i in range(delta.days + 1):
-        #     day = start_date + timedelta(days=i)
-        #     date_list.append(day)
-        #     try:
-        #         DaysForAttendance.objects.get(date=day)
-        #     except DaysForAttendance.DoesNotExist:
-        #         DaysForAttendance.objects.create(date=day)
-        # days = DaysForAttendance.objects.filter(status=False,date__range=[start_date,last_date])
-        # for i in days:
-        #     date_list.append(i.date)
-        # profile = Profile.objects.filter(agent_status='Active')
-        # for i in date_list:
-        #     for j in profile:
-        #         EcplCalander.objects.create(date=i,emp_id=j.emp_id,att_actual='Unmarked',emp_name=j.emp_name,emp_desi=j.emp_desi,
-        #             team=j.emp_process,team_id=j.emp_process_id,rm1=j.emp_rm1,rm2=j.emp_rm2,rm3=j.emp_rm3,rm1_id=j.emp_rm1_id,
-        #             rm2_id=j.emp_rm2_id,rm3_id=j.emp_rm3_id)
-        #     days = DaysForAttendance.objects.get(date=i)
-        #     days.status = True
-        #     days.save()
-        # e = AddAttendanceMonths.objects.get(id=id)
-        # e.created = True
-        # e.save()
-        messages.info(request,"Success :)")
+        month = AddAttendanceMonths.objects.get(id=id).month_number
+        year = AddAttendanceMonths.objects.get(id=id).year
+        start_date = date(year, month, 1)
+        last = calendar.monthrange(year, month)[1]
+        last_date = date(year, month, last)
+        delta = last_date - start_date
+        date_list = []
+        for i in range(delta.days + 1):
+            day = start_date + timedelta(days=i)
+            try:
+                DaysForAttendance.objects.get(date=day)
+            except DaysForAttendance.DoesNotExist:
+                DaysForAttendance.objects.create(date=day)
+        days = DaysForAttendance.objects.filter(status=False, date__range=[start_date, last_date])
+        for i in days:
+            date_list.append(i.date)
+        for i in date_list:
+            profile = Profile.objects.exclude(emp_id__in=EcplCalander.objects.filter(date=i).values('emp_id'))
+            cal = []
+            for j in profile:
+                employees = EcplCalander()
+                employees.date = i
+                employees.emp_id = j.emp_id
+                employees.att_actual = 'Unmarked'
+                employees.emp_name = j.emp_name
+                employees.emp_desi = j.emp_desi
+                employees.team = j.emp_process
+                employees.team_id = j.emp_process_id
+                employees.rm1 = j.emp_rm1
+                employees.rm2 = j.emp_rm2
+                employees.rm3 = j.emp_rm3
+                employees.rm1_id = j.emp_rm1_id
+                employees.rm2_id = j.emp_rm2_id
+                employees.rm3_id = j.emp_rm3_id
+                cal.append(employees)
+            EcplCalander.objects.bulk_create(cal)
+            days = DaysForAttendance.objects.get(date=i)
+            days.status = True
+            days.save()
+        e = AddAttendanceMonths.objects.get(id=id)
+        e.created = True
+        e.save()
+        messages.info(request, "Attendance added Successfully!")
         return redirect('/ams/add-attendance')
     else:
-        today = date.today()
-        month = today.month
-        year = today.year
-        start_date = date(year,month,1)
-        last = calendar.monthrange(year, month)[1]
-        last_date = date(year,month,last)
-        dates = DaysForAttendance.objects.filter(status=False,date__range=[start_date,last_date])
-        date_list = []
-        for i in dates:
-            date_list.append(i.date)
-        new_date_list =[]
-        for i in date_list:
-            new_date_list.append(i.strftime("%Y-%m-%d"))
-        data = {'months':new_date_list}
-        return render(request, 'ams/admin/add_attendance.html',data)
+        months = AddAttendanceMonths.objects.filter(created=False)
+        data = {'months': months}
+        return render(request, 'ams/admin/add_attendance.html', data)
+
 
 @login_required
-def SLProofSubmit(request): # Test1
+def SLProofSubmit(request):  # Test1
     if request.method == 'POST':
         id = request.POST['id']
         proof = request.FILES['proof']
@@ -1670,6 +1730,7 @@ def SLProofSubmit(request): # Test1
         else:
             messages.info(request, "The time has exceeded cannot upload now :)")
             return redirect('/ams/ams-apply_leave')
+
 
 @login_required
 def addLeaveBalance(request):
@@ -1694,20 +1755,20 @@ def addLeaveBalance(request):
                     cal = EcplCalander.objects.filter(Q(emp_id=i.emp_id),
                                                       Q(att_actual='present') | Q(att_actual='Week OFF') |
                                                       Q(att_actual='Comp OFF') | Q(att_actual='Holiday'),
-                                                      date__range=[start_date,end_date]).count()
+                                                      date__range=[start_date, end_date]).count()
                     half = (EcplCalander.objects.filter(emp_id=i.emp_id, att_actual='Half Day',
-                                                        date__range=[start_date,end_date]).count()) / 2
+                                                        date__range=[start_date, end_date]).count()) / 2
                     cal += half
                     pl = round(cal / 20, 2)
                     i.pl_balance += pl
                     i.save()
                     if pl > 0:
-                        leaveHistory.objects.create(unique_id=unique_id,emp_id=i.emp_id, date=date.today(),
+                        leaveHistory.objects.create(unique_id=unique_id, emp_id=i.emp_id, date=date.today(),
                                                     leave_type="PL", transaction="Credit", no_days=pl,
                                                     total=i.pl_balance + i.sl_balance)
-                    leaveHistory.objects.create(unique_id=unique_id,emp_id=i.emp_id, date=date.today(),
-                                                    leave_type="SL", transaction="Credit", no_days=1,
-                                                    total=i.pl_balance + i.sl_balance)
+                    leaveHistory.objects.create(unique_id=unique_id, emp_id=i.emp_id, date=date.today(),
+                                                leave_type="SL", transaction="Credit", no_days=1,
+                                                total=i.pl_balance + i.sl_balance)
             id = request.POST['month']
             e = AddAttendanceMonths.objects.get(id=id)
             e.leave = True
@@ -1717,19 +1778,17 @@ def addLeaveBalance(request):
         else:
             month = datetime.now().month
             year = datetime.now().year
-            leave = AddAttendanceMonths.objects.filter(leave=False,month_number=month,year=year)
-            data = {'months':leave}
+            leave = AddAttendanceMonths.objects.filter(leave=False, month_number=month, year=year)
+            data = {'months': leave}
             return render(request, 'ams/add_leave_bal.html', data)
     else:
         messages.info(request, "Unauthorized access you have been Logged out :)")
         return redirect('/ams/')
 
 
-
 def exportMapping(request):
-
     if request.method == 'GET':
-       
+
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="mapping.xls"'
         wb = xlwt.Workbook(encoding='utf-8')
@@ -1739,8 +1798,8 @@ def exportMapping(request):
         font_style = xlwt.XFStyle()
         font_style.font.bold = True
         columns = [
-                    'Date','Emp ID','Emp Name','Attendance','Designation','RM 1','RM 2','RM 3','Team'
-                  ]
+            'Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'
+        ]
         for col_num in range(len(columns)):
             ws.write(row_num, col_num, columns[col_num], font_style)  # at 0 row 0 column
         # Sheet body, remaining rows
@@ -1748,10 +1807,10 @@ def exportMapping(request):
         start = '2022-03-01'
         end = '2022-03-31'
 
-        rows = EcplCalander.objects.filter(date__range=[start,end]).values_list(
-                'date','emp_id', 'emp_name','att_actual','emp_desi', 'rm1', 'rm2', 'rm3', 'team'
-            )
-      
+        rows = EcplCalander.objects.filter(date__range=[start, end]).values_list(
+            'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team'
+        )
+
         import datetime
         rows = [[x.strftime("%Y-%m-%d %H:%M") if isinstance(x, datetime.datetime) else x for x in row] for row in
                 rows]
@@ -1762,9 +1821,10 @@ def exportMapping(request):
         wb.save(response)
         return response
 
+
 def TestFun(request):
-    start_date = date(2022,1,1)
-    end_date = date(2025,12,31)
+    start_date = date(2022, 1, 1)
+    end_date = date(2025, 12, 31)
     while start_date <= end_date:
         try:
             DaysForAttendance.objects.get(date=start_date)

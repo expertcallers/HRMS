@@ -19,10 +19,10 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="month">Select Month</label>
-                          <select name="date" id="month" class="form-control select2" required>
+                          <select name="id" id="month" class="form-control select2" required>
                             <option value="" selected disabled>Please select</option>
                             {% for i in months %}
-                            <option value="{{i}}">{{i}}</option>
+                            <option value="{{i.id}}">{{i.month}} ({{i.year}})</option>
                             {% endfor %}
                           </select>
                         </div>
