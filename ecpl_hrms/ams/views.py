@@ -861,7 +861,8 @@ def addNewUserHR(request):  # Test1  # calander pending
             )
             # Creating Attendance
             start_date = date.today()
-            last_date = date(start_date.year, start_date.month + 2, 1) - timedelta(days=1)
+            last_date = start_date + monthdelta.monthdelta(2)
+            last_date = date(last_date.year, last_date.month, 1) - timedelta(days=1)
             delta = last_date - start_date
             date_list = []
             for i in range(delta.days + 1):
