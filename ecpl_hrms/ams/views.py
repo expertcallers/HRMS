@@ -29,11 +29,12 @@ tl_am_list = ['Team Leader', 'Assistant Manager', 'Subject Matter Expert', 'Trai
 manager_list = ['Quality Head', 'Operations Manager', 'Service Delivery Manager', 'Command Centre Head']
 # HR List
 hr_list = ['HR', 'HR Manager', 'Manager ER', 'HR Lead', 'Sr Recruiter', 'MIS Executive HR',
-           'Lead HRBP', 'Employee Relations Specialist', 'Payroll Specialist', 'Recruiter', 'HR Generalist']
+           'Lead HRBP', 'Employee Relations Specialist', 'Payroll Specialist', 'Recruiter', 'HR Generalist',
+           'Managing Director', 'Associate Director','Junior Recruiter']
 # Agent List
 agent_list = ['Client Relationship Officer', 'MIS Executive', 'Patrolling officer',
               'Data Analyst', 'Business Development Executive', 'Content Developer',
-              'Junior Developer', 'Web Developer', 'Trainee Developer', 'Jr Dev', 'CRO',
+              'Junior Developer', 'Web Developer', 'Trainee Developer', 'Jr Dev', 'CRO'
               ]
 rm_list = ['Team Leader', 'Assistant Manager', 'Subject Matter Expert', 'Trainer', 'Learning and Development Head',
            'Process Trainer', 'Sales Trainer',
@@ -44,6 +45,8 @@ rm_list = ['Team Leader', 'Assistant Manager', 'Subject Matter Expert', 'Trainer
            'Managing Director', 'Vice President', 'Board member',
            'IT Manager']
 
+hr_tl_am_list = ['HR Manager', 'Manager ER','Managing Director','Associate Director']
+hr_om_list = ['Managing Director','Associate Director']
 
 # Create your views here.
 def loginPage(request):  # Test1
@@ -461,7 +464,8 @@ def hrDashboard(request):  # Test1
         data = {'emp': emp, 'all_users_count': all_users_count, 'all_team_count': all_team_count,
                 'attrition_request_count': attrition_request_count, 'month_cal': month_cal, 'team': teams,
                 "leave_req_count": leave_req_count, "map_tickets_counts": map_tickets_counts,
-                "leave_esc_count": leave_esc_count, "att_requests_count": att_requests_count}
+                "leave_esc_count": leave_esc_count, "att_requests_count": att_requests_count,
+                "hr_tl_am_list": hr_tl_am_list, "hr_om_list":hr_om_list}
         return render(request, 'ams/hr_dashboard.html', data)
     else:
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
@@ -828,7 +832,8 @@ def addNewUserHR(request):  # Test1  # calander pending
         usr = User.objects.filter(username=emp_id)
         onb_obj = OnboardingnewHRC.objects.get(id=on_id)
         if usr.exists():
-            return HttpResponse('<h1>User Already Exists</h1>')
+            messages.info(request, "***User Already Exists***")
+            return redirect("/ams/add-new-user")
         else:
             # Creating User
             user = User.objects.create_user(username=emp_id, password=str(emp_id))
@@ -1522,7 +1527,7 @@ def applyEscalation(request):  # Test1
         else:
             a.sl_balance = a.sl_balance - no_days
         a.save()
-        return redirect('/ams/view-leave-list')
+        return redirect('/ams/ams-apply_leave')
     else:
         pass
 

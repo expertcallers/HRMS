@@ -185,7 +185,7 @@
                       <div class="col-md-8">
                         <div class="form-group">
                           <label for="pimg">Select the Profile Picture:</label>
-                          <input type="file" name="user-img" class="form-control" required>
+                          <input type="file" name="user-img" class="form-control uploadFile" required>
                           <input type="hidden" name="id" value="{{user.profile.id}}">
                         </div>
                       </div>
@@ -210,4 +210,22 @@
         <!-- /footer content -->
       </div>
     </div>
+
+
+<script type="text/javascript">
+  $(document).ready(function() {
+      $('.uploadFile').change(function() {
+          var fileInput = this;
+          var filePath = fileInput.value;
+          var allowedExtensions =  /(\.jpg|\.jpeg|\.png)$/i;
+          if (!allowedExtensions.exec(filePath)) {
+              fileInput.setCustomValidity("Only Images (.png, .jpg, .jpeg) are accepted");
+              fileInput.reportValidity();
+              return false;
+          } else {
+              fileInput.setCustomValidity("");
+          }
+      });
+  });
+</script>
 {% endblock %}

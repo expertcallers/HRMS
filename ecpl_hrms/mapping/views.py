@@ -89,7 +89,7 @@ def change_password(request): # Corrected
             user.save()
             user.profile.save()
             logout(request)
-            return redirect('/mapping/login')
+            return redirect('/ams/login')
         else:
             messages.error(request, 'Please correct the error below.')
     else:

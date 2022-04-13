@@ -46,7 +46,7 @@
                   </div>
                 </div>
 
-
+              {% if request.user.profile.emp_desi in hr_om_list %}
                 <div class="col-md-2">
                   <div class="card topcards">
                     <div class="card-header">
@@ -79,6 +79,30 @@
                     </div>
                   </div>
                 </div>
+              {% endif %}
+              {% if request.user.profile.emp_desi in hr_tl_am_list %}
+                <div class="col-md-2">
+                  <div class="card topcards">
+                    <div class="card-header">
+                      <h2>Mapping Tickets</h2>
+                    </div>
+                    <div class="card-body">
+                      <a href="/ams/view-mapping-tickets"><h1 style="margin: 0px !important;">{{map_tickets_counts}}</h1></a>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-2">
+                  <div class="card topcards">
+                    <div class="card-header">
+                      <h2>Leave Requests</h2>
+                    </div>
+                    <div class="card-body">
+                      <a href="/ams/view-leave-list"><h1 style="margin: 0px !important;">{{leave_req_count}}</h1></a>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
               </div>
             </div>
           </div>
@@ -212,7 +236,7 @@
                 <div class="col-md-12">
                   <div class="card">
                     <div class="card-header">
-                      <h2>Month Calender - {{emp.emp_name}}</h2>
+                      <h2>Month Calendar - {{emp.emp_name}}</h2>
                     </div>
                     <div class="card-body">
                       <div class="monthly" id="mycalendarid"></div>

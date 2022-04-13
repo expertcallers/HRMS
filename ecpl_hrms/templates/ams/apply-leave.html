@@ -154,12 +154,44 @@
                               <td>{{i.no_days}}</td>
                               <td>{{i.leave_type}}</td>
                               <td><p>{{i.agent_reason}}</p></td>
-                              <td>{{i.tl_approval}}</td>
-                              <td><p>{{i.tl_reason}}</p></td>
-                              <td>{{i.manager_approval}}</td>
-                              <td><p>{{i.manager_reason}}</p></td>
+                              <td>
+                                {% if i.tl_status %}
+                                {{i.tl_status}}
+                                {% else %}
+                                Pending
+                                {% endif %}
+                              </td>
+                              <td>
+                                <p>
+                                  {% if i.tl_reason %}
+                                  {{i.tl_reason}}
+                                  {% else %}
+                                  Pending
+                                  {% endif %}
+                                </p>
+                              </td>
+                              <td>
+                                {% if i.manager_status %}
+                                {{i.manager_status}}
+                                {% else %}
+                                Pending
+                                {% endif %}
+                              </td>
+                              <td>
+                                <p>
+                                  {% if i.manager_reason %}
+                                  {{i.manager_reason}}
+                                  {% else %}
+                                  Pending
+                                  {% endif %}
+                                </p>
+                              </td>
                               <td align="center">
-                                {{i.status}}
+                                {% if i.status %}
+                                  {{i.status}}
+                                {% else %}
+                                  Pending
+                                {% endif %}
                                 {% if i.tl_status == "Rejected" and i.manager_approval == False and i.escalation == False %}<br>
                                 <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#view_{{i.id}}">Escalate</button>
                                 {% endif %}
