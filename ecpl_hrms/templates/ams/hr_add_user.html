@@ -61,11 +61,11 @@
                             <select name="emp_desg" id="emp_desg" class="form-control select2" required>
                              <option value="" selected disabled>Please select</option>
                               {% for a in all_data %}
-                              <option value="{{a.emp_desi}}">{{a.emp_desi}}</option>
+                              <option value="{{a.name}}">{{a.name}}</option>
                               {% endfor %}
                             </select>
                             <center>
-                              <button type="button" class="btn btn-sm btn-primary mt-2" disabled data-toggle="modal" data-target="#add_desg">Add New designation</button>
+                              <button type="button" class="btn btn-sm btn-primary mt-2" data-toggle="modal" data-target="#add_desg">Add New Designation</button>
                             </center>
                           </div>
                         </div>
@@ -147,6 +147,7 @@
               </button>
             </div>
             <form method="POST" action="/ams/add-new-designation" enctype="multipart/form-data">
+              {% csrf_token %}
               <div class="modal-body">
                 <div class="row">
                   <div class="col-md-12">

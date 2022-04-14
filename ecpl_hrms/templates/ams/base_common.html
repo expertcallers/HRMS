@@ -48,7 +48,7 @@
         }
     </style>
   </head>
-  <body class="nav-md" oncontextmenu="alert('Right Click is Blocked'); return false">
+  <body class="nav-md" oncontextmenu="alert('Right Click is Blocked'); return false" >
   <div class="container body">
       <div class="main_container">
         <div class="col-md-3 left_col">
@@ -242,82 +242,7 @@
       }
     </script>
 
-  <script type="text/javascript">
-      var currentDate = new Date();
-      var day = currentDate.getDate();
-      var month = currentDate.getMonth() + 1;
-      var year = currentDate.getFullYear();
-      var total = $('#total_leave');
-      var myele = $('#mysubmit');
-      var ldays = $('#leave_days').val();
-      var number;
-      var type=0;
-      var type1 = $('#type').change(function() {
-        type=$(this).val();
-        $('#leave').val('');
-        $('#leave_days').val('');
-        if ($('#leave').val()=="") {
-          myele.attr("disabled","disabled");
-        }
-      });
-      var lbal = parseInt($('#leave_bal').html());
-      var sbal = parseInt($('#s_leave_bal').html());
-      $('#leave').daterangepicker({
-              autoUpdateInput: false,
-              minDate: (day+"/"+(month-1)+"/"+year),
-              autoApply: true,
-              drops: 'auto',
-              locale: {
-                  cancelLabel: 'Clear',
-                  format: 'DD/MM/YYYY'
-              }
-          }, function (start, end, label) {
-              const date1 = new Date(start),
-                    date2 = new Date(end),
-                    time_difference = difference(date1,date2)
-              number = difference(date1,date2)+1;
-      });
-      $('#leave').on('apply.daterangepicker', function(ev, picker) {
-          $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
-          $('#leave_days').val(number);
-          if ($(this).val()!="" && type=="") {
-            alert("Please choose leave type FIRST.");
-          }
-          if (($('#leave').val()!="") && ($('#leave_days').val()=="")) {
-            myele.removeAttr("disabled","disabled");
-          }
-          if ( type=="PL" && lbal < number ) {
-            myele.attr("disabled","disabled");
-            alert(type+" Balance is not sufficient. Please choose lesser days. :)");
-          } else if ( type=="SL" && sbal < number ) {
-            myele.attr("disabled","disabled");
-            alert(type+" Balance is not sufficient. Please choose lesser days. :)");
-          } else if ( type==0 ) {
-            myele.attr("disabled","disabled");
-          } else {
-            myele.removeAttr("disabled","disabled");
-          }
-          $('#startdate').val(picker.startDate.format('YYYY-MM-DD'));
-          $('#enddate').val(picker.endDate.format('YYYY-MM-DD'));
-      });
-      $('#leave').on('cancel.daterangepicker', function(ev, picker) {
-          $(this).val('');
-      });
-      myele.attr("disabled","disabled");
-      if (isNaN(lbal)){
-        lbal=0;
-      }
-      if (isNaN(sbal)){
-        sbal=0;
-      }
-      total.html(lbal+sbal);
-      function difference(date1, date2) {
-        const date1utc = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
-        const date2utc = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
-        day = 1000*60*60*24;
-        return(date2utc - date1utc)/day
-      }
-  </script>
+
           <script>
   function confirmm(){
       var c = confirm("Are you sure you want to proceed?");
@@ -356,8 +281,9 @@
               alert('{% for m in messages %}{{m}}{% endfor %}');
               {% endif %}
            </script>
-        {% block script %}
-        {% endblock %}
+{% block script %}
+
+{% endblock %}
 
   </body>
 </html>

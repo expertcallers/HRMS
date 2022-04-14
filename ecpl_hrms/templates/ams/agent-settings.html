@@ -36,10 +36,9 @@
               <div class="menu_section">
                 <ul class="nav side-menu">
                  <li><a href="/ams/agent-dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
-                  <li><a href="/ams/ams-agent-settings"><i class="fa fa-gear"></i> Settings</a></li>
+                  <li><a href="/ams/ams-agent-settings"><i class="fa fa-gears"></i> Settings</a></li>
                 </ul>
               </div>
-
             </div>
             <!-- /sidebar menu -->
 
@@ -185,7 +184,7 @@
                       <div class="col-md-8">
                         <div class="form-group">
                           <label for="pimg">Select the Profile Picture:</label>
-                          <input type="file" name="user-img" class="form-control uploadFile" required>
+                          <input type="file" name="user-img" id="pimg" class="form-control uploadFile" required>
                           <input type="hidden" name="id" value="{{user.profile.id}}">
                         </div>
                       </div>
@@ -213,6 +212,7 @@
 
 
 <script type="text/javascript">
+  var MAX_FILE_SIZE = 2048 * 1024; // 2 MB
   $(document).ready(function() {
       $('.uploadFile').change(function() {
           var fileInput = this;
@@ -224,6 +224,13 @@
               return false;
           } else {
               fileInput.setCustomValidity("");
+          }
+          fileSize = this.files[0].size;
+          if (fileSize > MAX_FILE_SIZE) {
+              this.setCustomValidity("File must not exceed 2 MB!");
+              this.reportValidity();
+          } else {
+              this.setCustomValidity("");
           }
       });
   });

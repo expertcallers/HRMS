@@ -21,7 +21,11 @@ manager_list = ['Team Leader','Assistant Manager','Subject Matter Expert', 'Trai
               'Managing Director','Vice President','Board member',
               'IT Manager',
               ]
-
+rm_list = ['HR', 'HR Manager', 'Manager ER', 'HR Lead', 'Sr Recruiter', 'MIS Executive HR',
+           'Lead HRBP', 'Employee Relations Specialist', 'Payroll Specialist', 'Recruiter', 'HR Generalist',
+           'Managing Director', 'Associate Director', 'Junior Recruiter','Quality Head', 'Operations Manager',
+           'Service Delivery Manager', 'Command Centre Head','Team Leader', 'Assistant Manager',
+           'Subject Matter Expert', 'Trainer', 'Learning and Development Head', 'Process Trainer', 'Trainer Sales']
 # Mapping Home Page
 @login_required
 def employeeMapping(request): 
@@ -94,7 +98,10 @@ def change_password(request): # Corrected
             messages.error(request, 'Please correct the error below.')
     else:
         form = PasswordChangeForm(request.user)
-    return render(request,'mapping/change-password.html', {'form': form})
+    if request.user.profile.emp_desi in rm_list:
+        return render(request,'ams/rm-settings.html', {'form': form})
+    else:
+        return render(request, 'ams/agent-settings.html', {'form': form})
 
 
 @login_required # Corrected

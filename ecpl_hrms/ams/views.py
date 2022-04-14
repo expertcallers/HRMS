@@ -5,6 +5,7 @@ import pytz
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.contrib.auth.hashers import make_password
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import *
@@ -30,7 +31,7 @@ manager_list = ['Quality Head', 'Operations Manager', 'Service Delivery Manager'
 # HR List
 hr_list = ['HR', 'HR Manager', 'Manager ER', 'HR Lead', 'Sr Recruiter', 'MIS Executive HR',
            'Lead HRBP', 'Employee Relations Specialist', 'Payroll Specialist', 'Recruiter', 'HR Generalist',
-           'Managing Director', 'Associate Director','Junior Recruiter']
+           'Managing Director', 'Associate Director', 'Junior Recruiter']
 # Agent List
 agent_list = ['Client Relationship Officer', 'MIS Executive', 'Patrolling officer',
               'Data Analyst', 'Business Development Executive', 'Content Developer',
@@ -45,8 +46,9 @@ rm_list = ['Team Leader', 'Assistant Manager', 'Subject Matter Expert', 'Trainer
            'Managing Director', 'Vice President', 'Board member',
            'IT Manager']
 
-hr_tl_am_list = ['HR Manager', 'Manager ER','Managing Director','Associate Director']
-hr_om_list = ['Managing Director','Associate Director']
+hr_tl_am_list = ['HR Manager', 'Manager ER', 'Managing Director', 'Associate Director']
+hr_om_list = ['Managing Director', 'Associate Director']
+
 
 # Create your views here.
 def loginPage(request):  # Test1
@@ -218,13 +220,21 @@ def tlDashboard(request):  # Test1
             dict['st'] = st
             month_cal.append(dict)
 
+        emps = Profile.objects.filter(Q(emp_rm3_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm1_id=emp_id))
+        rm3 = ""
+        for i in emps:
+            if i.emp_rm3_id == emp_id:
+                rm3 = "yes"
+                break
+
         data = {'emp_name': emp_name, 'emp': prof, 'att_details': att_details, 'emp_count': emp_count,
                 'present_count': present_count, 'absent_count': absent_count, 'week_off_count': week_off_count,
                 'comp_off_count': comp_off_count, 'half_day_count': half_day_count,
                 'client_off_count': client_off_count,
                 'unmarked_count': unmarked_count, 'map_tickets_counts': map_tickets_counts,
                 'all_emp': all_emp, 'sl_count': sl_count, 'pl_count': pl_count, 'attrition_count': attrition_count,
-                'training_count': training_count, 'leave_req_count': leave_req_count, 'month_cal': month_cal}
+                'training_count': training_count, 'leave_req_count': leave_req_count, 'month_cal': month_cal,
+                "rm3": rm3}
 
         return render(request, 'ams/rm-dashboard-new.html', data)
     elif usr_desi in manager_list:
@@ -234,7 +244,8 @@ def tlDashboard(request):  # Test1
     elif usr_desi in agent_list:
         return redirect('/ams/agent-dashboard')
     else:
-        return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
+        messages.error(request, "You are not Authorised to view this page! You have been Logged Out! ")
+        return redirect('/ams')
 
 
 @login_required
@@ -465,7 +476,7 @@ def hrDashboard(request):  # Test1
                 'attrition_request_count': attrition_request_count, 'month_cal': month_cal, 'team': teams,
                 "leave_req_count": leave_req_count, "map_tickets_counts": map_tickets_counts,
                 "leave_esc_count": leave_esc_count, "att_requests_count": att_requests_count,
-                "hr_tl_am_list": hr_tl_am_list, "hr_om_list":hr_om_list}
+                "hr_tl_am_list": hr_tl_am_list, "hr_om_list": hr_om_list}
         return render(request, 'ams/hr_dashboard.html', data)
     else:
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
@@ -895,7 +906,7 @@ def addNewUserHR(request):  # Test1  # calander pending
         for i in last_emp_id:
             lst_emp_id = i.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
-        all_desi = Profile.objects.all().values('emp_desi').distinct().order_by('emp_desi')
+        all_desi = Designation.objects.all()
         rms = Profile.objects.filter(emp_desi__in=rm_list).order_by('emp_name')
         all_team = Campaigns.objects.all()
 
@@ -904,7 +915,16 @@ def addNewUserHR(request):  # Test1  # calander pending
                 "last_emp_id": lst_emp_id}
         return render(request, 'ams/hr_add_user.html', data)
 
-
+@login_required
+def addNewDesi(request):
+    if request.method == 'POST':
+        name = request.POST['new_desg']
+        Designation.objects.create(name=name, created_by=request.user.profile.emp_name)
+        messages.error(request, "New Designation Added!")
+        return redirect('/ams/add-new-user')
+    else:
+        messages.error(request,"Invalid request! you have been logged out")
+        return redirect('/ams/')
 @login_required
 def viewUsersHR(request):  # Test1
     emp_id = request.user.profile.emp_id
@@ -1720,6 +1740,26 @@ def addAttendance(request):
         data = {'months': months}
         return render(request, 'ams/admin/add_attendance.html', data)
 
+@login_required
+def changeEmpPassword(request):
+    if request.method == "POST":
+        new_pass = request.POST["new_pass"]
+        con_pass = request.POST["con_pass"]
+        emp_id = request.POST["emp_id"]
+        user = User.objects.get(username=emp_id)
+        if new_pass == con_pass:
+            user.password = make_password(new_pass)
+            user.save()
+            messages.info(request, "Password Changed Successfully!!")
+            return redirect("/ams/rm-mapping-index")
+        else:
+            messages.error(request, "New Password and Confirm Password does not match! try again!!")
+            return redirect("/ams/rm-mapping-index")
+    else:
+        messages.error(request, "Unauthorized access you have been Logged Out :)")
+        return redirect("/ams/")
+
+
 
 @login_required
 def SLProofSubmit(request):  # Test1
@@ -1829,13 +1869,11 @@ def exportMapping(request):
 
 
 def TestFun(request):
-    start_date = date(2022, 1, 1)
-    end_date = date(2025, 12, 31)
-    while start_date <= end_date:
+    profile = Profile.objects.all().values('emp_desi').distinct()
+    for i in profile:
         try:
-            DaysForAttendance.objects.get(date=start_date)
-            start_date += timedelta(days=1)
-        except DaysForAttendance.DoesNotExist:
-            DaysForAttendance.objects.create(date=start_date)
-            start_date += timedelta(days=1)
-    return HttpResponse("Success")
+            Designation.objects.get(name=i.get('emp_desi'))
+        except:
+            Designation.objects.create(name=i.get('emp_desi'))
+    messages.info(request,"All Designations added Successfully")
+    return redirect("/ams/")

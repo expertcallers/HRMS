@@ -168,6 +168,7 @@
                           <td>{{e.emp_process}}</td>
                           <td>
                             <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#map_{{e.id}}">Change Mapping</button>
+                            <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#pass_{{e.id}}">Change Password</button>
                           </td>
                      </tr>
                     {% endfor %}
@@ -209,9 +210,8 @@
 
                     <label for="rm1_{{e.id}}">RM1</label>
                     <select class="form-control select2" name="new_rm1_id" id="rm1_{{e.id}}">
-                      <option value="{{e.emp_rm1_id}}">{{e.emp_rm1}}</option>
                       {% for r in rms %}
-                      <option value="{{r.emp_id}}">{{r.emp_name}} / {{r.emp_id}}</option>
+                      <option value="{{r.emp_id}}" {% if e.emp_rm1_id == r.emp_id %}selected{% endif %}>{{r.emp_name}} / {{r.emp_id}}</option>
                       {% endfor %}
                     </select>
                   </div>
@@ -220,9 +220,8 @@
                   <div class="form-group">
                     <label for="rm2_{{e.id}}">RM2</label>
                     <select class="form-control select2" name="new_rm2_id" id="rm2_{{e.id}}">
-                      <option value="{{e.emp_rm2_id}}">{{e.emp_rm2}}</option>
                       {% for r in rms %}
-                      <option value="{{r.emp_id}}">{{r.emp_name}} / {{r.emp_id}}</option>
+                      <option value="{{r.emp_id}}" {% if e.emp_rm2_id == r.emp_id %}selected{% endif %}>{{r.emp_name}} / {{r.emp_id}}</option>
                       {% endfor %}
                     </select>
                   </div>
@@ -231,9 +230,8 @@
                   <div class="form-group">
                     <label for="rm3_{{e.id}}">RM3</label>
                     <select class="form-control select2" name="new_rm3_id" id="rm3_{{e.id}}">
-                      <option value="{{e.emp_rm3_id}}">{{e.emp_rm3}}</option>
                       {% for r in rms %}
-                      <option value="{{r.emp_id}}">{{r.emp_name}} / {{r.emp_id}}</option>
+                      <option value="{{r.emp_id}}" {% if e.emp_rm3_id == r.emp_id %}selected{% endif %}>{{r.emp_name}} / {{r.emp_id}}</option>
                       {% endfor %}
                     </select>
                   </div>
@@ -248,9 +246,8 @@
                   <div class="form-group">
                     <label for="pro_{{e.id}}">Process</label>
                     <select class="form-control select2" name="new_process" id="pro_{{e.id}}">
-                      <option value="{{e.emp_process}}">{{e.emp_process}}</option>
                       {% for t in teams %}
-                      <option value="{{t.name}}">{{t.name}}</option>
+                      <option value="{{t.name}}" {% if e.emp_process == t.name %}selected{% endif %}>{{t.name}}</option>
                       {% endfor %}
                     </select>
                   </div>
@@ -265,21 +262,56 @@
         </div>
       </div>
     </div>
+
+      
+    <div class="modal fade" id="pass_{{e.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="change_pass">Change Password of {{e.emp_name}} ({{e.emp_id}})</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <form action="/ams/change-emp-password" method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="modal-body">
+                  <input type="hidden" value="{{e.emp_id}}" name="emp_id">
+                  <div class="row">
+                      <div class="col-md-12 form-group">
+                          <label for="new_pass">New Password</label>
+                          <input type="password" class="form-control" required name="new_pass" id="new_pass">
+                      </div>
+                      <div class="col-md-12 form-group">
+                          <label for="con_pass">Confirm Password</label>
+                          <input type="password" class="form-control" required name="con_pass" id="con_pass">
+                      </div>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+              </div>
+          </form>
+        </div>
+      </div>
+    </div>
   {% endfor %}
+{% endblock %}
 
-    <!-- Custom Theme Scripts -->
-    <script src="build/js/custom.min.js"></script>
+{% block script %}
+<script type="text/javascript">
+  function view_emp(e) {
+    var a = document.getElementById("all_emp");
+      a.classList.remove('d-none');
+    }
+</script>
 
-    <script type="text/javascript">
-      function view_emp(e) {
-        var a = document.getElementById("all_emp");
-        a.classList.remove('d-none');
-      }
-    </script>
-
-    <script src=https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js></script>
-    <script>
-      $('.select2').select2();
-    </script>
-
+{% for e in employees %}
+<script>
+  $today = new Date();
+  $today = moment($today).format('YYYY-MM-DD');
+  $("#eff_from_{{e.id}}").attr('min',$today)
+</script>
+{% endfor %}
 {% endblock %}

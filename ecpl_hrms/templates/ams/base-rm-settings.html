@@ -82,8 +82,7 @@
               <div class="menu_section">
                 <ul class="nav side-menu">
                   <li><a href="/ams/tl-dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
-
-                  <li><a href="/ams/rm-settings"><i class="fa fa-gear"></i> Settings</a></li>
+                  <li><a href="/ams/rm-settings"><i class="fa fa-gears"></i> Settings</a></li>
                 </ul>
               </div>
             </div>
@@ -397,7 +396,12 @@
       }
     }
 </script>
-
+ <script>
+      $('.select2').select2();
+      {% if messages %}
+      alert('{% for m in messages %}{{m}}{% endfor %}');
+      {% endif %}
+    </script>
 
   </body>
 </html>
