@@ -198,41 +198,49 @@ def updateToSystem(request):
         return redirect('/mapping/login')
 
 
-def createUserandProfile(request): # Need to work
+def createUserandProfile(request):  # Need to work
     emp = Data.objects.all()
     for i in emp:
         user = User.objects.filter(username=i.emp_id)
         if user.exists():
             usr = User.objects.get(username=i.emp_id)
-            prof = Profile.objects.filter(emp_id = i.emp_id)
+            prof = Profile.objects.filter(emp_id=i.emp_id)
             if prof.exists():
-                pass
+                doj = ""
+                for j in prof:
+                    myprof = Profile.objects.get(emp_id=j.emp_id)
+                    doj = i.emp_doj
+                    if doj != "":
+                        myprof.emp_doj = doj
+                        myprof.save()
+                        break
             else:
-                profile = Profile.objects.create(
+                Profile.objects.create(
                     emp_id=i.emp_id, emp_name=i.emp_name, emp_desi=i.emp_desi,
                     emp_rm1=i.emp_rm1, emp_rm2=i.emp_rm2, emp_rm3=i.emp_rm3,
-                    emp_process=i.emp_process, user=usr, 
-                    emp_rm1_id = i.emp_rm1_id,
-                    emp_rm2_id = i.emp_rm2_id,
-                    emp_rm3_id = i.emp_rm3_id,
-                    emp_process_id = int(i.emp_process_id),
+                    emp_process=i.emp_process, user=usr,
+                    emp_rm1_id=i.emp_rm1_id,
+                    emp_rm2_id=i.emp_rm2_id,
+                    emp_rm3_id=i.emp_rm3_id,
+                    emp_process_id=int(i.emp_process_id),
+                    emp_doj=i.emp_doj
                 )
-                profile.save()              
 
         else:
-            user = User.objects.create_user(username=i.emp_id, password=str(i.emp_id))
-            user.save()
+            User.objects.create_user(username=i.emp_id, password=str(i.emp_id))
             usr = User.objects.get(username=i.emp_id)
-            profile = Profile.objects.create(
-                emp_id = i.emp_id,emp_name = i.emp_name, emp_desi = i.emp_desi,
-                emp_rm1 = i.emp_rm1, emp_rm2 = i.emp_rm2, emp_rm3 = i.emp_rm3,
-                emp_process = i.emp_process, user = usr,
-                 emp_rm1_id = i.emp_rm1_id,
-                    emp_rm2_id = i.emp_rm2_id,
-                    emp_rm3_id = i.emp_rm3_id,
-                    emp_process_id = i.emp_process_id,
-                                          )
-            profile.save()
+            Profile.objects.create(
+                emp_id=i.emp_id, emp_name=i.emp_name, emp_desi=i.emp_desi,
+                emp_rm1=i.emp_rm1, emp_rm2=i.emp_rm2, emp_rm3=i.emp_rm3,
+                emp_process=i.emp_process, user=usr,
+                emp_rm1_id=i.emp_rm1_id,
+                emp_rm2_id=i.emp_rm2_id,
+                emp_rm3_id=i.emp_rm3_id,
+                emp_process_id=int(i.emp_process_id),
+                emp_doj=i.emp_doj
+            )
+    messages.info(request,"Users and Profiles added Successfully!")
+    return redirect("/ams/")
 
 @login_required
 def exportMapping(request):
