@@ -16,10 +16,10 @@
     <!-- Font Awesome -->
     <link href="{% static 'assets/vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
     <link rel="stylesheet" href=https://pro.fontawesome.com/releases/v5.10.0/css/all.css integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
-        <!-- NProgress -->
-    <link href="{% static 'assets/vendors/nprogress/nprogress.css' %}" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="{% static 'assets/vendors/nprogress/nprogress.css" rel="stylesheet' %}">
     <!-- iCheck -->
-    <link href="{% static 'assets/vendors/iCheck/skins/flat/green.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendors/iCheck/skins/flat/green.css" rel="stylesheet' %}">
     <!-- Datatables -->
     <link href="{% static 'assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'assets/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}" rel="stylesheet">
@@ -46,9 +46,12 @@
         .select2-container {
             width: 100% !important;
         }
+        .monthly-prev, .monthly-next{
+            display:none;
+          }
     </style>
   </head>
-  <body class="nav-md" oncontextmenu="alert('Right Click is Blocked'); return false" >
+  <body class="nav-md" oncontextmenu="alert('Right Click is Blocked'); return false">
   <div class="container body">
       <div class="main_container">
         <div class="col-md-3 left_col">
@@ -120,12 +123,10 @@
           </div>
         </div>
         <!-- /top navigation -->
-
 {% block main %}
 
 {% endblock %}
-
-    <!-- footer content -->
+        <!-- footer content -->
         <footer>
           <div class="text-center">
             ECPL CC Team
@@ -133,7 +134,8 @@
           <div class="clearfix"></div>
         </footer>
         <!-- /footer content -->
-
+      </div>
+    </div>
     <!-- Bootstrap -->
     <script src="{% static 'assets/vendors/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
     <!-- FastClick -->

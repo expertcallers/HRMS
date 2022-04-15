@@ -724,6 +724,14 @@ def on_boarding_update(request, id):  # Test1
         emp_upload_experience_two = request.FILES.get("emp_up_cer_2")
         emp_upload_experience_three = request.FILES.get("emp_up_cer_3")
         emp_upload_bank = request.FILES.get("emp_up_bank")
+        esic = request.POST["esic"]
+        pf = request.POST["pf"]
+        tds = request.POST["tds"]
+        pt = request.POST["pt"]
+        e.esic = esic
+        e.pf = pf
+        e.tds = tds
+        e.pt = pt
         e.emp_name = emp_name
         e.emp_dob = emp_dob
         e.emp_desig = emp_desig
@@ -919,9 +927,14 @@ def addNewUserHR(request):  # Test1  # calander pending
 def addNewDesi(request):
     if request.method == 'POST':
         name = request.POST['new_desg']
-        Designation.objects.create(name=name, created_by=request.user.profile.emp_name)
-        messages.error(request, "New Designation Added!")
-        return redirect('/ams/add-new-user')
+        try:
+            Designation.objects.get(name__iexact=name)
+            messages.success(request, "Designation with same name already present!")
+            return redirect('/ams/add-new-user')
+        except Designation.DoesNotExist:
+            Designation.objects.create(name=name, created_by=request.user.profile.emp_name)
+            messages.success(request, "New Designation Added!")
+            return redirect('/ams/add-new-user')
     else:
         messages.error(request,"Invalid request! you have been logged out")
         return redirect('/ams/')
@@ -1377,10 +1390,15 @@ def addNewTeam(request):  # Test1
         usr = request.user.profile.emp_name
         om = request.POST["om"]
         campaign = request.POST["campaign"]
-        cam = Campaigns.objects.create(name=campaign, om=om, created_by=usr)
-        cam.save()
-        messages.info(request, 'Team ' + campaign + ' Created Successfully')
-        return redirect('/ams/view-all-teams')
+        try:
+            Campaigns.objects.get(name__iexact=campaign)
+            messages.info(request, 'Team ' + campaign + 'Not added as Already Present')
+            return redirect('/ams/view-all-teams')
+        except Campaigns.DoesNotExist:
+            cam = Campaigns.objects.create(name=campaign, om=om, created_by=usr)
+            cam.save()
+            messages.info(request, 'Team ' + campaign + ' Created Successfully')
+            return redirect('/ams/view-all-teams')
     else:
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)

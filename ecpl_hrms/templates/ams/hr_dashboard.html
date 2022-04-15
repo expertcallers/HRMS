@@ -135,6 +135,8 @@
                 <div class="space"></div>
               </div>
             </div>
+
+            {% if request.user.profile.emp_desi in hr_om_list %}
             <div class="col-md-2">
               <div class="card-base">
                 <div class="card-icon">
@@ -152,6 +154,7 @@
                 <div class="space"></div>
               </div>
             </div>
+            {% endif %}
             <!--<div class="col-md-2">
               <div class="card-base">
                 <div class="card-icon">
