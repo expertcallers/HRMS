@@ -230,7 +230,7 @@
                   <div class="form-group">
                     <label for="rm3_{{e.id}}">RM3</label>
                     <select class="form-control select2" name="new_rm3_id" id="rm3_{{e.id}}">
-                      {% for r in rms %}
+                      {% for r in rm3 %}
                       <option value="{{r.emp_id}}" {% if e.emp_rm3_id == r.emp_id %}selected{% endif %}>{{r.emp_name}} / {{r.emp_id}}</option>
                       {% endfor %}
                     </select>

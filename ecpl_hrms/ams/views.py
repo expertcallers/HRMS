@@ -47,7 +47,7 @@ rm_list = ['Team Leader', 'Assistant Manager', 'Subject Matter Expert', 'Trainer
            'IT Manager']
 
 hr_tl_am_list = ['HR Manager', 'Manager ER', 'Managing Director', 'Associate Director']
-hr_om_list = ['Managing Director', 'Associate Director']
+hr_om_list = ['Managing Director']
 
 
 # Create your views here.
@@ -1279,7 +1279,7 @@ def uploadImageToDB(request):  # Test1
             return redirect('/ams/tl-dashboard')
         elif request.user.profile.emp_desi in hr_list:
             return redirect('/ams/hr-dashboard')
-        elif request.profile.emp_desi in manager_list:
+        elif request.user.profile.emp_desi in manager_list:
             return redirect('/ams/manager-dashboard')
         else:
             return redirect('/ams/agent-dashboard')
@@ -1293,8 +1293,9 @@ def mappingHomePage(request):  # Test1
     emp = Profile.objects.get(emp_id=emp_id)
     employees = Profile.objects.filter(Q(emp_rm1_id=emp_id), Q(agent_status='Active'))
     rms = Profile.objects.filter(emp_desi__in=rm_list).order_by('emp_name')
+    rm3 = Profile.objects.filter(emp_desi__in=manager_list).order_by('emp_name')
     teams = Campaigns.objects.all().order_by('name')
-    data = {'emp': emp, 'employees': employees, 'rms': rms, 'teams': teams}
+    data = {'emp': emp, 'employees': employees, 'rms': rms, 'teams': teams,"rm3":rm3}
     return render(request, 'ams/mapping_home.html', data)
 
 
@@ -1822,6 +1823,7 @@ def addLeaveBalance(request):
                     pass
                 except EmployeeLeaveBalance.DoesNotExist:
                     i.unique_id = unique_id
+                    total_bal = i.pl_balance + i.sl_balance
                     i.sl_balance += 1
                     cal = EcplCalander.objects.filter(Q(emp_id=i.emp_id),
                                                       Q(att_actual='present') | Q(att_actual='Week OFF') |
@@ -1836,10 +1838,10 @@ def addLeaveBalance(request):
                     if pl > 0:
                         leaveHistory.objects.create(unique_id=unique_id, emp_id=i.emp_id, date=date.today(),
                                                     leave_type="PL", transaction="Credit", no_days=pl,
-                                                    total=i.pl_balance + i.sl_balance)
+                                                    total=total_bal+pl)
                     leaveHistory.objects.create(unique_id=unique_id, emp_id=i.emp_id, date=date.today(),
                                                 leave_type="SL", transaction="Credit", no_days=1,
-                                                total=i.pl_balance + i.sl_balance)
+                                                total=total_bal+pl+1)
             id = request.POST['month']
             e = AddAttendanceMonths.objects.get(id=id)
             e.leave = True

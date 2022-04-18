@@ -24,8 +24,8 @@
                     {% csrf_token %}
                     <div class="row">
                       <div class="col-md-12 form-group">
-                        <label for="emp_name">Employee Name</label>
-                        <select id="emp_name" name="emp_id" class="form-control select2" required>
+                        <label for="empname">Employee Name</label>
+                        <select id="empname" name="emp_id" class="form-control select2" required>
                           <option value="" selected disabled >Please Select</option>
                           {% for i in all_emp %}
                           <option value="{{i.emp_id}}">{{i.emp_name}} - {{i.emp_id}}</option>
@@ -34,7 +34,7 @@
                       </div>
                       <div class="col-md-12 form-group">
                         <label for="start_date">Date</label>
-                        <input type="date" id="start_date" onchange="mydate(this);" name="date" required class="form-control" value="" />
+                        <input type="date" id="start_date" min="2022-04-01" onchange="mydate(this);" name="date" required class="form-control" value="" />
                       </div>
                       <div class="col-md-12 form-group">
                         <button class="form-control btn btn-primary">Submit</button>
@@ -44,8 +44,7 @@
                 </div>
               </div>
             </div>
-            </div>
-            <div class="col-md-12">
+            <div class="col-md-12 mt-3">
               <div class="card">
                 <div class="card-header">
                   <h4>Attendance Tickets Status</h4>
@@ -99,61 +98,7 @@
         </div>
         <!-- /page content -->
 
-    <!-- Pop Up -->
-      <div class="modal fade" id="edit_pop" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLongTitle">Employee Name | Emp ID</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <form action="" method="" enctype="">
-              <div class="modal-body">
-                <div class="row">
-                  <div class="col-md-4 form-group">
-                    <label for="date">Date</label>
-                    <input type="text" readonly value="Date" id="date" name="date" class="form-control">
-                  </div>
-                  <div class="col-md-4 form-group">
-                    <label for="emp_name">Name</label>
-                    <input type="text" readonly value="Name" id="emp_name" name="emp_name" class="form-control">
-                  </div>
-                  <div class="col-md-4 form-group">
-                    <label for="emp_id">Employee ID</label>
-                    <input type="text" readonly value="ID" id="emp_name" name="emp_name" class="form-control">
-                  </div>
-                  <div class="col-md-4 form-group">
-                    <label for="emp_pro">Process</label>
-                    <input type="text" readonly value="ID" id="emp_pro" name="emp_pro" class="form-control">
-                  </div>
-                  <div class="col-md-4 form-group">
-                    <label for="emp_desg">Designation</label>
-                    <input type="text" readonly value="Designation" id="emp_desg" name="emp_desg" class="form-control">
-                  </div>
-                  <div class="col-md-4 form-group">
-                    <label for="att_marked">Marked Status</label>
-                    <input type="text" readonly value="Marked" id="att_marked" name="att_marked" class="form-control">
-                  </div>
-                  <div class="col-md-5 form-group">
-                    <label for="att_actual">Actual Status</label>
-                    <select id="att_actual" name="att_actual" class="form-control" required>
-                      <option value="" selected disabled>Please Select</option>
-                      <option value="">Present</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="submit" onclick="return confirmm();" class="btn btn-primary">Save changes</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    <!-- Pop Up End -->
+
     <script type="text/javascript">
       $(document).ready(function() {
           $('#datatable2').DataTable();
