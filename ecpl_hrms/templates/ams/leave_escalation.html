@@ -12,7 +12,7 @@
             <div class="col-md-12">
               <div class="card">
                 <div class="card-header">
-                  <h4>Leave Requests</h4>
+                  <h4>Leave Escalation Requests</h4>
                 </div>
                 <div class="card-body">
                   <div class="row">
@@ -51,6 +51,13 @@
                               <td>{{i.leave_type}}</td>
                               <td>
                                   <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#view_{{i.id}}">View</button>
+                                  {% if i.proof and i.leave_type == "SL" and i.no_days > 1 and i.manager_approval == False %}
+                                    <a href="/media/{{i.proof}}" target="_blank">
+                                      <button class="btn btn-success btn-sm">View Proof</button>
+                                    </a>
+                                  {% elif i.leave_type == "SL" and i.no_days > 1 and i.manager_approval == False %}
+                                    <button class="btn btn-success btn-sm" onclick="alert('No Proof Submitted yet!');">View Proof</button>
+                                  {% endif %}
                               </td>
                           </tr>
                         {% endfor %}

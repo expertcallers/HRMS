@@ -237,18 +237,26 @@
                   "endtime": "",
                   {% if c.st == 'Unmarked' %}
                   "color": "grey",
-                  {% elif c.st == 'Client OFF' %}
-                  "color": "black",
                   {% elif c.st == 'Week OFF' %}
-                  "color": "blue",
+                  "color": "#000000",
                   {% elif c.st == 'Comp OFF' %}
-                  "color": "blue",
+                  "color": "#FF8FFF",
                   {% elif c.st == 'Absent' %}
-                  "color": "red",
+                  "color": "#FF0000",
                   {% elif c.st == 'present' %}
-                  "color": "green",
+                  "color": "#008C00",
+                  {% elif c.st == 'SL' %}
+                  "color": "#FFD3DF",
+                  {% elif c.st == 'PL' %}
+                  "color": "#FFFF00",
+                  {% elif c.st == 'Training' %}
+                  "color": "#6990CE",
+                  {% elif c.st == 'Half Day' %}
+                  "color": "#0000FF",
+                  {% elif c.st == 'Client OFF' %}
+                  "color": "#FF8FFF",
                   {% else %}
-                  "color": "grey",
+                  "color": "#B52E2E",
                   {% endif %}
 
                   "url": ""

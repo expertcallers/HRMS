@@ -560,7 +560,7 @@
                       </div>
                     </div>
                   </div>
-
+                {% if request.user.profile.emp_desi in hr_list %}
                   <div class="row mt-4">
                     <div class="col-md-12">
                       <h4>Status</h4>
@@ -603,7 +603,7 @@
                       </form>
                     </div>
                   </div>
-
+                {% endif %}
                 </div>
               </div>
             </div>

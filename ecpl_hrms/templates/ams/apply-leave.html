@@ -320,11 +320,11 @@
                   <div class="col-md-6 mt-2">
                     <label for="proof">Upload Proof</label>
                     {% if i.proof %}
-                    <a href="/{{i.proof}}" target="_blank" id="proof">
+                    <a href="/media/{{i.proof}}" target="_blank" id="proof">
                       <button type="button" class="btn btn-primary form-control">View</button>
                     </a>
                     {% else %}
-                    <input type="file" id="prooff_{{i.id}}" name="proof" class="form-control" required accept=".png, .jpg, .jpeg, .pdf">
+                    <input type="file" id="prooff_{{i.id}}" name="proof" class="form-control uploadFile" required accept=".png, .jpg, .jpeg, .pdf">
                     {% endif %}
                   </div>
                 </div>
@@ -405,25 +405,30 @@
 {% endblock %}
 
 {% block script %}
-{% for i in leave %}
-<script>
+<script type="text/javascript">
+  var MAX_FILE_SIZE = 2048 * 1024; // 2 MB
   $(document).ready(function() {
-      var upload=document.getElementById("prooff_{{i.id}}");
-      upload.addEventListener("change",()=>{
-          var fileInput = document.getElementById('proof');
+      $('.uploadFile').change(function() {
+          var fileInput = this;
           var filePath = fileInput.value;
-          var allowedExtensions =  /(\.jpg|\.jpeg|\.png|\.pdf)$/i;
+          var allowedExtensions =  /(\.jpg|\.jpeg|\.png)$/i;
           if (!allowedExtensions.exec(filePath)) {
-              fileInput.setCustomValidity("Only PDF files and Images (.png, .jpg, .jpeg) are accepted");
+              fileInput.setCustomValidity("Only Images (.png, .jpg, .jpeg) are accepted");
               fileInput.reportValidity();
               return false;
           } else {
               fileInput.setCustomValidity("");
           }
-      })
+          fileSize = this.files[0].size;
+          if (fileSize > MAX_FILE_SIZE) {
+              this.setCustomValidity("File must not exceed 2 MB!");
+              this.reportValidity();
+          } else {
+              this.setCustomValidity("");
+          }
+      });
   });
 </script>
-{% endfor %}
 <script type="text/javascript">
       var currentDate = new Date();
       var day = currentDate.getDate();

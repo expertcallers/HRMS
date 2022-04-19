@@ -81,10 +81,6 @@
 
         <!-- page content -->
         <div class="right_col" role="main">
-          <!-- top tiles -->
-          <div class="row" >
-        </div>
-          <!-- /top tiles -->
           <div class="row welcometop">
             <div class="col-md-6">
               <div class="welcome">
@@ -160,16 +156,24 @@
                           {% for c in leave_hist %}
                           <tr>
                             <td>{{c.start_date}} - {{c.end_date}}</td>
-                            <td>{{c.tl_status}}</td>
-                            <td>{{c.manager_status}}</td>
-                            <td>{% if c.status == 'None' %}
-                                <small>Pending</small>
-                                {% else %}
+                            <td>{% if c.tl_status %}{{c.tl_status}}{% else %}Pending{% endif %}</td>
+                            <td>
+                              {% if c.manager_status %}
+                                {{c.manager_status}}
+                              {% elif c.tl_status == "Rejected" %}
+                                Rejected by RM1
+                              {% else %}
+                                Pending
+                              {% endif %}
+                            </td>
+                            <td>
+                                {% if c.status %}
                                 <p>{{c.status}}</p>
+                                {% else %}
+                                <p>Pending</p>
                                 {% endif %}
                             </td>
                             <td>{{c.agent_reason}}</td>
-
                           </tr>
                           {% endfor %}
                         </tbody>
