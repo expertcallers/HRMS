@@ -406,14 +406,14 @@
 
 {% block script %}
 <script type="text/javascript">
-  var MAX_FILE_SIZE = 2048 * 1024; // 2 MB
+  var MAX_FILE_SIZE = 4096 * 1024; // 4 MB
   $(document).ready(function() {
       $('.uploadFile').change(function() {
           var fileInput = this;
           var filePath = fileInput.value;
-          var allowedExtensions =  /(\.jpg|\.jpeg|\.png)$/i;
+          var allowedExtensions =  /(\.jpg|\.jpeg|\.png|\.pdf)$/i;
           if (!allowedExtensions.exec(filePath)) {
-              fileInput.setCustomValidity("Only Images (.png, .jpg, .jpeg) are accepted");
+              fileInput.setCustomValidity("Only PDF and Images (.png, .jpg, .jpeg) are accepted");
               fileInput.reportValidity();
               return false;
           } else {
@@ -421,7 +421,7 @@
           }
           fileSize = this.files[0].size;
           if (fileSize > MAX_FILE_SIZE) {
-              this.setCustomValidity("File must not exceed 2 MB!");
+              this.setCustomValidity("File must not exceed 4 MB!");
               this.reportValidity();
           } else {
               this.setCustomValidity("");

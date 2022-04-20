@@ -27,7 +27,7 @@ Profile = apps.get_model('mapping', 'Profile')
 tl_am_list = ['Team Leader', 'Assistant Manager', 'Subject Matter Expert', 'Trainer', 'Learning and Development Head',
               'Process Trainer', 'Trainer Sales']
 # Manager List
-manager_list = ['Quality Head', 'Operations Manager', 'Service Delivery Manager', 'Command Centre Head']
+manager_list = ['Quality Head', 'Operations Manager', 'Service Delivery Manager', 'Command Centre Head',]
 # HR List
 hr_list = ['HR', 'HR Manager', 'Manager ER', 'HR Lead', 'Sr Recruiter', 'MIS Executive HR',
            'Lead HRBP', 'Employee Relations Specialist', 'Payroll Specialist', 'Recruiter', 'HR Generalist',
@@ -45,7 +45,7 @@ rm_list = ['Team Leader', 'Assistant Manager', 'Subject Matter Expert', 'Trainer
            'Associate Director', 'Chief Executive Officer', 'Chief Compliance Officer', 'Chief Technology Officer',
            'Managing Director', 'Vice President', 'Board member',
            'IT Manager']
-
+management_list = []
 hr_tl_am_list = ['HR Manager', 'Manager ER', 'Managing Director', 'Associate Director', 'HR Lead']
 hr_om_list = ['Managing Director', 'Associate Director']
 
@@ -393,8 +393,8 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
 
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
-        leave_request = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm1_id=emp_id),
-                                                  Q(tl_status='Approved'), Q(manager_approval=False))
+        leave_request = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id), Q(tl_status='Approved'),
+                                                  Q(manager_approval=False))
         data = {'emp': emp, 'leave_request': leave_request}
         return render(request, 'ams/leave_approval_rm3.html', data)
 
@@ -461,13 +461,15 @@ def hrDashboard(request):  # Test1
         # Leave Requests
         leave_req_count = LeaveTable.objects.filter(emp_rm1_id=emp_id, tl_approval=False).count()
 
+        leave_req_count_final = LeaveTable.objects.filter(emp_rm3_id=emp_id, tl_status='Approved',
+                                                    manager_approval=False).count()
         # Mapping Tickets
         map_tickets_counts = MappingTickets.objects.filter(
             Q(new_rm3_id=emp_id) | Q(new_rm2_id=emp_id) | Q(new_rm1_id=emp_id),
             Q(status=False)).count()
         # Leave Escalation Count
-        leave_esc_count = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm1_id=emp_id),
-                                                    Q(manager_approval=False), Q(escalation=True)).count()
+        leave_esc_count = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id), Q(manager_approval=False),
+                                                    Q(escalation=True)).count()
         # Attendance
         att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False, rm3_id=emp_id).count()
 
@@ -475,7 +477,7 @@ def hrDashboard(request):  # Test1
                 'attrition_request_count': attrition_request_count, 'month_cal': month_cal, 'team': teams,
                 "leave_req_count": leave_req_count, "map_tickets_counts": map_tickets_counts,
                 "leave_esc_count": leave_esc_count, "att_requests_count": att_requests_count,
-                "hr_tl_am_list": hr_tl_am_list, "hr_om_list": hr_om_list}
+                "hr_tl_am_list": hr_tl_am_list, "hr_om_list": hr_om_list,"leave_req_count_final": leave_req_count_final}
         return render(request, 'ams/hr_dashboard.html', data)
     else:
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
@@ -1438,8 +1440,6 @@ def applyLeave(request):  # Test1
         leave_type = request.POST["type"]
         start_date = request.POST["startdate"]
         end_date = request.POST["enddate"]
-        start_date = date.fromisoformat(start_date) # To Convert type of start_date from string to date
-        end_date = date.fromisoformat(end_date) # To Convert type of end_date from string to date
         no_days = request.POST["leave_days"]
         agent_reason = request.POST["reason"]
         unique_id = request.POST['csrfmiddlewaretoken']
@@ -1451,9 +1451,11 @@ def applyLeave(request):  # Test1
                 leave_dates_list.append(i.start_date)
                 i.start_date += timedelta(days=1)
         new_leave_dates = []
-        while start_date <= end_date:
-            new_leave_dates.append(start_date)
-            start_date += timedelta(days=1)
+        list_start_date = date.fromisoformat(start_date) # To Convert type of start_date from string to date
+        list_end_date = date.fromisoformat(end_date) # To Convert type of end_date from string to date
+        while list_start_date <= list_end_date:
+            new_leave_dates.append(list_start_date)
+            list_start_date += timedelta(days=1)
 
         common_dates = set(leave_dates_list) & set(new_leave_dates)
         if common_dates:
