@@ -45,7 +45,8 @@ rm_list = ['Team Leader', 'Assistant Manager', 'Subject Matter Expert', 'Trainer
            'Associate Director', 'Chief Executive Officer', 'Chief Compliance Officer', 'Chief Technology Officer',
            'Managing Director', 'Vice President', 'Board member',
            'IT Manager']
-management_list = []
+management_list = ['Managing Director', 'Associate Director','Chief Technology Officer','Chief Executive Officer',
+                   'Chief Compliance Officer','Vice President']
 hr_tl_am_list = ['HR Manager', 'Manager ER', 'Managing Director', 'Associate Director', 'HR Lead']
 hr_om_list = ['Managing Director', 'Associate Director']
 
@@ -388,7 +389,7 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
         e.manager_status = manager_status
         e.status = status
         e.save()
-        return redirect('/ams/view-leave-request-mgr')
+        return redirect('/ams/tl-dashboard')
     else:
 
         emp_id = request.user.profile.emp_id
@@ -640,9 +641,11 @@ def on_boarding(request):  # Test1
         e.save()
         return redirect("/ams/onboarding")
     else:
+        today_date = date.today()
+        minimum_dob = today_date - timedelta(days=6588)
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
-        data = {'emp': emp}
+        data = {'emp': emp,'minimum_dob':str(minimum_dob)}
         return render(request, 'ams/onboarding.html', data)
 
 
@@ -828,8 +831,10 @@ def on_boarding_update(request, id):  # Test1
         id = id
         onboard = OnboardingnewHRC.objects.get(id=id)
         emp_id = request.user.profile.emp_id
+        today_date = date.today()
+        minimum_dob = today_date - timedelta(days=6588)
         emp = Profile.objects.get(emp_id=emp_id)
-        data = {"onboard": onboard, 'emp': emp}
+        data = {"onboard": onboard, 'emp': emp,'minimum_dob':str(minimum_dob)}
         return render(request, "ams/edit_onboarding.html", data)
 
 
@@ -1294,7 +1299,7 @@ def mappingHomePage(request):  # Test1
     emp = Profile.objects.get(emp_id=emp_id)
     employees = Profile.objects.filter(Q(emp_rm1_id=emp_id), Q(agent_status='Active'))
     rms = Profile.objects.filter(emp_desi__in=rm_list).order_by('emp_name')
-    rm3 = Profile.objects.filter(emp_desi__in=manager_list).order_by('emp_name')
+    rm3 = Profile.objects.filter(Q(emp_desi__in=manager_list) | Q(emp_desi__in=management_list)).order_by('emp_name')
     teams = Campaigns.objects.all().order_by('name')
     data = {'emp': emp, 'employees': employees, 'rms': rms, 'teams': teams,"rm3":rm3}
     return render(request, 'ams/mapping_home.html', data)
@@ -1444,7 +1449,7 @@ def applyLeave(request):  # Test1
         agent_reason = request.POST["reason"]
         unique_id = request.POST['csrfmiddlewaretoken']
 
-        leaves = LeaveTable.objects.filter(emp_id=emp_id)
+        leaves = LeaveTable.objects.filter(emp_id=emp_id).exclude(status="Rejected")
         leave_dates_list = []
         for i in leaves:
             while i.start_date <= i.end_date:
