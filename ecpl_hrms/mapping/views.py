@@ -213,6 +213,7 @@ def createUserandProfile(request):  # Need to work
                     myprof.emp_desi = i.emp_desi
                 if myprof.emp_process != i.emp_process:
                     myprof.emp_process = i.emp_process
+                    myprof.emp_process_id = i.emp_process_id
                 if myprof.emp_rm1 != i.emp_rm1:
                     myprof.emp_rm1 = i.emp_rm1
                 if myprof.emp_rm1_id != i.emp_rm1_id:
@@ -227,8 +228,6 @@ def createUserandProfile(request):  # Need to work
                     myprof.emp_rm3_id = i.emp_rm3_id
                 if myprof.doj != i.emp_doj:
                     myprof.doj = i.emp_doj
-                if myprof.emp_process_id != i.emp_process_id:
-                    myprof.emp_process_id = i.emp_process_id
                 myprof.save()
             else:
                 Profile.objects.create(
