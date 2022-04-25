@@ -43,7 +43,7 @@ class MappingHistory(models.Model):
 
 
 class Data(models.Model):
-    emp_id = models.CharField(max_length=100,null=True)
+    emp_id = models.CharField(max_length=100, primary_key=True)
     emp_name = models.CharField(max_length=200)
     emp_desi = models.CharField(max_length=200)
     emp_rm1 = models.CharField(max_length=200)
@@ -53,8 +53,8 @@ class Data(models.Model):
     emp_rm3 = models.CharField(max_length=200)
     emp_rm3_id = models.CharField(max_length=10)
     emp_process = models.CharField(max_length=200)
-    emp_process_id = models.CharField(max_length=10)
-    emp_doj = models.DateField(null=True,blank=True)
+    emp_process_id = models.CharField(max_length=10, null=True, blank=True)
+    emp_doj = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return self.emp_name

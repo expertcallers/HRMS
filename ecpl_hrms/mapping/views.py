@@ -206,14 +206,30 @@ def createUserandProfile(request):  # Need to work
             usr = User.objects.get(username=i.emp_id)
             prof = Profile.objects.filter(emp_id=i.emp_id)
             if prof.exists():
-                doj = ""
-                for j in prof:
-                    myprof = Profile.objects.get(emp_id=j.emp_id)
-                    doj = i.emp_doj
-                    if doj != "":
-                        myprof.emp_doj = doj
-                        myprof.save()
-                        break
+                myprof = Profile.objects.get(emp_id=i.emp_id)
+                if myprof.emp_name != i.emp_name:
+                    myprof.emp_name = i.emp_name
+                if myprof.emp_desi != i.emp_desi:
+                    myprof.emp_desi = i.emp_desi
+                if myprof.emp_process != i.emp_process:
+                    myprof.emp_process = i.emp_process
+                if myprof.emp_rm1 != i.emp_rm1:
+                    myprof.emp_rm1 = i.emp_rm1
+                if myprof.emp_rm1_id != i.emp_rm1_id:
+                    myprof.emp_rm1_id = i.emp_rm1_id
+                if myprof.emp_rm2 != i.emp_rm2:
+                    myprof.emp_rm2 = i.emp_rm2
+                if myprof.emp_rm2_id != i.emp_rm2_id:
+                    myprof.emp_rm2_id = i.emp_rm2_id
+                if myprof.emp_rm3 != i.emp_rm3:
+                    myprof.emp_rm3 = i.emp_rm3
+                if myprof.emp_rm3_id != i.emp_rm3_id:
+                    myprof.emp_rm3_id = i.emp_rm3_id
+                if myprof.doj != i.emp_doj:
+                    myprof.doj = i.emp_doj
+                if myprof.emp_process_id != i.emp_process_id:
+                    myprof.emp_process_id = i.emp_process_id
+                myprof.save()
             else:
                 Profile.objects.create(
                     emp_id=i.emp_id, emp_name=i.emp_name, emp_desi=i.emp_desi,
@@ -223,7 +239,7 @@ def createUserandProfile(request):  # Need to work
                     emp_rm2_id=i.emp_rm2_id,
                     emp_rm3_id=i.emp_rm3_id,
                     emp_process_id=int(i.emp_process_id),
-                    emp_doj=i.emp_doj
+                    doj=i.emp_doj
                 )
 
         else:
@@ -237,7 +253,7 @@ def createUserandProfile(request):  # Need to work
                 emp_rm2_id=i.emp_rm2_id,
                 emp_rm3_id=i.emp_rm3_id,
                 emp_process_id=int(i.emp_process_id),
-                emp_doj=i.emp_doj
+                doj=i.emp_doj
             )
     messages.info(request,"Users and Profiles added Successfully!")
     return redirect("/ams/")
