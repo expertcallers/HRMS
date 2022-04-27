@@ -199,7 +199,7 @@ def updateToSystem(request):
 
 
 def createUserandProfile(request):  # Need to work
-    emp = Data.objects.all()
+    emp = NewData.objects.all()
     for i in emp:
         user = User.objects.filter(username=i.emp_id)
         if user.exists():
