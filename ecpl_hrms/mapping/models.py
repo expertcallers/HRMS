@@ -42,7 +42,7 @@ class MappingHistory(models.Model):
         return self.updated_by
 
 
-class Data(models.Model):
+class NewData(models.Model):
     emp_id = models.CharField(max_length=100, primary_key=True)
     emp_name = models.CharField(max_length=200)
     emp_desi = models.CharField(max_length=200)

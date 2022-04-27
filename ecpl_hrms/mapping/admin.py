@@ -14,7 +14,7 @@ class ProfileSearch(admin.ModelAdmin):
 
 class DataSearchResource(resources.ModelResource):
   class Meta:
-     model = Data
+     model = NewData
      fields = ['emp_id', 'emp_name', 'emp_desi', 'emp_rm1_id', 'emp_rm2_id', 'emp_rm3_id', 'emp_process',
                "emp_rm1", "emp_rm2", "emp_rm3", 'emp_doj', 'emp_process_id']
      import_id_fields = ('emp_id',)
@@ -27,4 +27,4 @@ class DataSearch(ImportExportModelAdmin):
 
 admin.site.register(Profile, ProfileSearch)
 admin.site.register(MappingHistory)
-admin.site.register(Data, DataSearch)
+admin.site.register(NewData, DataSearch)
