@@ -1196,7 +1196,7 @@ def teamAttendanceReport(request):  # Test 1
         emp = Profile.objects.get(emp_id=emp_id)
         if team_name == 'All Team':
             response = HttpResponse(content_type='application/ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="report.xls"'
+            response['Content-Disposition'] = 'attachment; filename="report.xlsx"'
             wb = xlwt.Workbook(encoding='utf-8')
             ws = wb.add_sheet('Users Data')  # this will make a sheet named Users Data
             # Sheet header, first row
@@ -1225,7 +1225,7 @@ def teamAttendanceReport(request):  # Test 1
         else:
             team_name = Campaigns.objects.get(id=team_name).name
             response = HttpResponse(content_type='application/ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="report.xls"'
+            response['Content-Disposition'] = 'attachment; filename="report.xlsx"'
             wb = xlwt.Workbook(encoding='utf-8')
             ws = wb.add_sheet('Users Data')  # this will make a sheet named Users Data
             # Sheet header, first row
