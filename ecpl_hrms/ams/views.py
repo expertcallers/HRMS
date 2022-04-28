@@ -1892,7 +1892,7 @@ def exportMapping(request):
     if request.method == 'GET':
 
         response = HttpResponse(content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="mapping.xls"'
+        response['Content-Disposition'] = 'attachment; filename="mapping.xlsx"'
         wb = xlwt.Workbook(encoding='utf-8')
         ws = wb.add_sheet('Users Data')  # this will make a sheet named Users Data
         # Sheet header, first row
