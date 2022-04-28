@@ -56,10 +56,10 @@
                         <td>{{t.created_by}}</td>
                         <td>{{t.effective_date}}</td>
                         <td>
-                          {% if t.status == False %}
-                          Pending by OM
+                          {% if t.action %}
+                          {{t.action}}
                           {% else %}
-                          Approved
+                          Pending by OM
                           {% endif %}
                         </td>
                         <td>
@@ -191,7 +191,7 @@
                   <div class="col-md-4">
                     <div class="form-group">
                       <label for="eff_date">Status</label>
-                      <input type="text" name="eff_date" id="status" value="{% if t.status == False %}Pending by OM{% else %}Approved{% endif %}" readonly class="form-control">
+                      <input type="text" name="eff_date" id="status" value="{% if t.action %}{{t.action}}{% else %}Pending by OM{% endif %}" readonly class="form-control">
                     </div>
                   </div>
 

@@ -1362,22 +1362,40 @@ def approveMappingTicket(request):  # Test1
     if request.method == 'POST':
         usr_name = request.user.profile.emp_name
         id = request.POST['id']
+        action = request.POST['action']
+        reason = request.POST.get('reason')
         td = date.today()
         ticket = MappingTickets.objects.get(id=id)
+        ticket.action = action
+        ticket.reason = reason
         ticket.status = True
         ticket.approved_by = usr_name
         ticket.approved_date = td
         ticket.save()
         emp_id = ticket.emp_id
-        prof = Profile.objects.get(emp_id=emp_id)
-        prof.emp_rm1 = ticket.new_rm1
-        prof.emp_rm2 = ticket.new_rm2
-        prof.emp_rm3 = ticket.new_rm3
-        prof.emp_rm1_id = ticket.new_rm1_id
-        prof.emp_rm2_id = ticket.new_rm2_id
-        prof.emp_rm3_id = ticket.new_rm3_id
-        prof.emp_process = ticket.new_process
-        prof.save()
+        if action == "Approve":
+            prof = Profile.objects.get(emp_id=emp_id)
+            prof.emp_rm1 = ticket.new_rm1
+            prof.emp_rm2 = ticket.new_rm2
+            prof.emp_rm3 = ticket.new_rm3
+            prof.emp_rm1_id = ticket.new_rm1_id
+            prof.emp_rm2_id = ticket.new_rm2_id
+            prof.emp_rm3_id = ticket.new_rm3_id
+            prof.emp_process = ticket.new_process
+            prof.emp_process_id = Campaigns.objects.get(name=ticket.new_process).id
+            prof.save()
+            cal = EcplCalander.objects.filter(emp_id=emp_id, date__gte=ticket.effective_date)
+            for i in cal:
+                i.rm1 = ticket.new_rm1
+                i.rm2 = ticket.new_rm2
+                i.rm3 = ticket.new_rm3
+                i.rm1_id = ticket.new_rm1_id
+                i.rm2_id = ticket.new_rm2_id
+                i.rm3_id = ticket.new_rm3_id
+                i.team = ticket.new_process
+                i.team_id = Campaigns.objects.get(name=ticket.new_process).id
+                i.save()
+
         return redirect('/ams/view-mapping-tickets')
     else:
         return redirect('/ams/logout')

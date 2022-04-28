@@ -179,10 +179,25 @@
                       <input type="text" name="eff_date" id="eff_date" value="{{t.effective_date}}" readonly class="form-control">
                     </div>
                   </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="eff_date">Action</label>
+                      <select class="form-control" name="action" required onchange="myAction(this)">
+                        <option value="Approve">Approve</option>
+                        <option value="Reject">Reject</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="reason">Reason</label>
+                      <textarea class="form-control" id="reason" name="reason"></textarea>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="modal-footer">
-                <button type="submit"  onclick="return confirmm();" class="btn btn-success">Approve</button>
+                <button type="submit"  onclick="return confirmm();" class="btn btn-success">Submit</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
               </div>
             </form>
@@ -194,7 +209,15 @@
       {% endfor %}
 
 
-
+<script>
+  function myAction(e) {
+    if (e.value == "Reject") {
+      $('#reason').attr("required",'');
+    } else {
+      $('#reason').removeAttr("required");
+    }
+  }
+</script>
 
 {% endblock %}
 

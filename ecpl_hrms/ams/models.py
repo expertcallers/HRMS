@@ -120,6 +120,8 @@ class MappingTickets(models.Model):
     approved_by=models.TextField(null=True,blank=True)
     approved_date=models.DateTimeField(null=True,blank=True)
     status=models.BooleanField(default=False)
+    action = models.CharField(max_length=50,null=True,blank=True)
+    reason = models.TextField(null=True,blank=True)
 
 # Campaigns - teams +
 class Campaigns(models.Model):

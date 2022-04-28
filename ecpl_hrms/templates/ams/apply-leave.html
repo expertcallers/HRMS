@@ -446,24 +446,43 @@
         if ($('#leave').val()=="") {
           myele.attr("disabled","disabled");
         }
+        if (type == "SL") {
+          $('#leave').daterangepicker({
+                  autoUpdateInput: false,
+                  maxDate: (day+"/"+(month)+"/"+year),
+                  minDate: (day+"/"+(month-1)+"/"+year),
+                  autoApply: true,
+                  drops: 'auto',
+                  locale: {
+                      cancelLabel: 'Clear',
+                      format: 'DD/MM/YYYY'
+                  }
+              }, function (start, end, label) {
+                  const date1 = new Date(start),
+                        date2 = new Date(end),
+                        time_difference = difference(date1,date2)
+                  number = difference(date1,date2)+1;
+          });
+        } else {
+          $('#leave').daterangepicker({
+                  autoUpdateInput: false,
+                  minDate: (day+"/"+(month-1)+"/"+year),
+                  autoApply: true,
+                  drops: 'auto',
+                  locale: {
+                      cancelLabel: 'Clear',
+                      format: 'DD/MM/YYYY'
+                  }
+              }, function (start, end, label) {
+                  const date1 = new Date(start),
+                        date2 = new Date(end),
+                        time_difference = difference(date1,date2)
+                  number = difference(date1,date2)+1;
+          });
+        }
       });
       var lbal = parseInt($('#leave_bal').html());
       var sbal = parseInt($('#s_leave_bal').html());
-      $('#leave').daterangepicker({
-              autoUpdateInput: false,
-              minDate: (day+"/"+(month-1)+"/"+year),
-              autoApply: true,
-              drops: 'auto',
-              locale: {
-                  cancelLabel: 'Clear',
-                  format: 'DD/MM/YYYY'
-              }
-          }, function (start, end, label) {
-              const date1 = new Date(start),
-                    date2 = new Date(end),
-                    time_difference = difference(date1,date2)
-              number = difference(date1,date2)+1;
-      });
       $('#leave').on('apply.daterangepicker', function(ev, picker) {
           $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
           $('#leave_days').val(number);
