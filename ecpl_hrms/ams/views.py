@@ -346,16 +346,6 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
             while start_date <= end_date:
                 month_days.append(start_date.strftime("%Y-%m-%d"))
                 start_date += delta
-            leave_history = leaveHistory()
-            leave_history.leave_type = leave_type
-            leave_history.transaction = 'Leaves Used'
-            leave_history.date = date.today()
-            leave_history.no_days = int(no_days)
-            leave_history.emp_id = emp_id
-            pl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).pl_balance
-            sl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).sl_balance
-            leave_history.total = pl + sl
-            leave_history.save()
             for i in month_days:
                 try:
                     cal = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id))
@@ -384,6 +374,18 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
             elif leave_type == 'SL':
                 leave_balance.sl_balance += int(no_days)
                 leave_balance.save()
+
+            leave_history = leaveHistory()
+            leave_history.leave_type = leave_type
+            leave_history.transaction = 'Leave Refund as RM3 Rejected, Leave applied on: '+str(e.applied_date)+' (ID: '+str(e.id)+')'
+            leave_history.date = date.today()
+            leave_history.no_days = int(no_days)
+            leave_history.emp_id = emp_id
+            pl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).pl_balance
+            sl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).sl_balance
+            leave_history.total = pl + sl
+            leave_history.save()
+
         e.manager_approval = manager_approval
         e.manager_reason = om_reason
         e.manager_status = manager_status
@@ -1521,6 +1523,17 @@ def applyLeave(request):  # Test1
             elif leave_type == 'SL':
                 leave_balance.sl_balance -= int(no_days)
                 leave_balance.save()
+
+            leave_history = leaveHistory()
+            leave_history.leave_type = leave_type
+            leave_history.transaction = 'Leave Applied (ID: '+str(e.id)+')'
+            leave_history.date = date.today()
+            leave_history.no_days = int(no_days)
+            leave_history.emp_id = emp_id
+            pl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).pl_balance
+            sl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).sl_balance
+            leave_history.total = pl + sl
+            leave_history.save()
             return redirect('/ams/ams-apply_leave')
     else:
         emp_id = request.user.profile.emp_id
@@ -1545,7 +1558,7 @@ def applyLeave(request):  # Test1
         except EmployeeLeaveBalance.DoesNotExist:
             leave_balance = {'sl_balance': 0, 'pl_balance': 0}
         leave_his = leaveHistory.objects.filter(emp_id=emp_id).values('date', 'transaction',
-                                                                      'leave_type', 'total').annotate(
+                                                                      'leave_type', 'total', 'id').annotate(
             no_days=Sum('no_days'))
         data = {'emp': emp, 'leave': leave, 'leave_balance': leave_balance, 'probation': probation,
                 'leave_his': leave_his}
@@ -1586,6 +1599,17 @@ def approveLeaveRM1(request):  # Test1
             elif leave_type == 'SL':
                 leave_balance.sl_balance += int(no_days)
                 leave_balance.save()
+            leave_history = leaveHistory()
+            leave_history.leave_type = leave_type
+            leave_history.transaction = 'Leave Refund as RM1 Rejected, Leave applied on: '+str(e.applied_date)+' (ID: '+str(e.id)+')'
+            leave_history.date = date.today()
+            leave_history.no_days = int(no_days)
+            leave_history.emp_id = emp_id
+            pl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).pl_balance
+            sl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).sl_balance
+            leave_history.total = pl + sl
+            leave_history.save()
+
         e.tl_approval = tl_approval
         e.tl_reason = tl_reason
         e.tl_status = tl_status
@@ -1612,6 +1636,18 @@ def applyEscalation(request):  # Test1
         else:
             a.sl_balance = a.sl_balance - no_days
         a.save()
+
+        leave_history = leaveHistory()
+        leave_history.leave_type = e.leave_type
+        leave_history.transaction = 'Applied for Escalation, Leave applied on: ' + str(e.applied_date)+' (ID: '+str(e.id)+')'
+        leave_history.date = date.today()
+        leave_history.no_days = int(no_days)
+        leave_history.emp_id = emp_id
+        pl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).pl_balance
+        sl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).sl_balance
+        leave_history.total = pl + sl
+        leave_history.save()
+
         return redirect('/ams/ams-apply_leave')
     else:
         pass

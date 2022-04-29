@@ -223,7 +223,7 @@ class leaveHistory(models.Model):
     emp_id = models.CharField(max_length=30)
     date = models.DateField()
     leave_type = models.CharField(max_length=30)
-    transaction = models.CharField(max_length=30)
+    transaction = models.CharField(max_length=300)
     no_days = models.FloatField()
     total = models.FloatField(null=True,blank=True)
 
