@@ -1755,6 +1755,8 @@ def approveAttendanceRequest(request):  # test1
         cal = EcplCalander.objects.get(id=cal_id)
         if om_resp == 'Approved':
             cal.att_actual = hist.att_new
+            cal.approved_on = datetime.now()
+            cal.appoved_by = emp.emp_name
             cal.save()
             att_actual = hist.att_new
             if att_actual == 'Attrition' or att_actual == 'Bench':
