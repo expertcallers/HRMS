@@ -1,5 +1,7 @@
 from django.contrib import admin
 from .models import *
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
 # Register your models here
 class AttendanceSearch(admin.ModelAdmin):
     search_fields = ('emp_name','emp_id',"att_actual")
@@ -27,10 +29,19 @@ class MappingSearch(admin.ModelAdmin):
     search_fields = ('emp_name','emp_id')
     list_display = ('emp_name','emp_id','emp_desi','emp_rm1','emp_rm2','emp_rm3','new_rm1','new_rm2','new_rm3','emp_process','new_process','status')
 
+class CampainSearchResource(resources.ModelResource):
+  class Meta:
+     model = Campaigns
+     fields = ['id', 'name', 'om']
+
+class CampaignSearch(ImportExportModelAdmin):
+    search_fields = ('id', 'name', 'om')
+    list_display = ('id', 'name', 'om')
+    resource_class = CampainSearchResource
 
 admin.site.register(EcplCalander, AttendanceSearch)
 admin.site.register(OnboardingnewHRC)
-admin.site.register(Campaigns)
+admin.site.register(Campaigns, CampaignSearch)
 admin.site.register(EmployeeLeaveBalance, LeaveSearch)
 admin.site.register(AgentActiveStatusHist)
 admin.site.register(LeaveTable)

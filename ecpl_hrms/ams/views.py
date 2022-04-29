@@ -1476,8 +1476,8 @@ def applyLeave(request):  # Test1
                 leave_dates_list.append(i.start_date)
                 i.start_date += timedelta(days=1)
         new_leave_dates = []
-        list_start_date = date.fromisoformat(start_date) # To Convert type of start_date from string to date
-        list_end_date = date.fromisoformat(end_date) # To Convert type of end_date from string to date
+        list_start_date = datetime.strptime(start_date,'%Y-%m-%d').date() # To Convert type of start_date from string to date
+        list_end_date = datetime.strptime(end_date,'%Y-%m-%d').date() # To Convert type of end_date from string to date
         while list_start_date <= list_end_date:
             new_leave_dates.append(list_start_date)
             list_start_date += timedelta(days=1)
@@ -1981,11 +1981,44 @@ def exportMapping(request):
 
 
 def TestFun(request):
-    profile = Profile.objects.all().values('emp_desi').distinct()
-    for i in profile:
+    start_date = date(2022, 4, 1)
+    last_date = date(2022, 4, 30)
+    delta = last_date - start_date
+    date_list = []
+    for i in range(delta.days + 1):
+        day = start_date + timedelta(days=i)
         try:
-            Designation.objects.get(name=i.get('emp_desi'))
-        except:
-            Designation.objects.create(name=i.get('emp_desi'))
-    messages.info(request,"All Designations added Successfully")
-    return redirect("/ams/")
+            DaysForAttendance.objects.get(date=day)
+        except DaysForAttendance.DoesNotExist:
+            DaysForAttendance.objects.create(date=day)
+    days = DaysForAttendance.objects.filter(status=False, date__range=[start_date, last_date])
+    for i in days:
+        date_list.append(i.date)
+    for i in date_list:
+        profile = Profile.objects.exclude(emp_id__in=EcplCalander.objects.filter(date=i).values('emp_id'))
+        cal = []
+        for j in profile:
+            employees = EcplCalander()
+            employees.date = i
+            employees.emp_id = j.emp_id
+            employees.att_actual = 'Unmarked'
+            employees.emp_name = j.emp_name
+            employees.emp_desi = j.emp_desi
+            employees.team = j.emp_process
+            employees.team_id = j.emp_process_id
+            employees.rm1 = j.emp_rm1
+            employees.rm2 = j.emp_rm2
+            employees.rm3 = j.emp_rm3
+            employees.rm1_id = j.emp_rm1_id
+            employees.rm2_id = j.emp_rm2_id
+            employees.rm3_id = j.emp_rm3_id
+            cal.append(employees)
+        EcplCalander.objects.bulk_create(cal)
+        days = DaysForAttendance.objects.get(date=i)
+        days.status = True
+        days.save()
+    e = AddAttendanceMonths.objects.get(id=id)
+    e.created = True
+    e.save()
+    messages.info(request, "Attendance added Successfully!")
+    return redirect('/ams/')
