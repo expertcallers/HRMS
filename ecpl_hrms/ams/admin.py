@@ -8,9 +8,16 @@ class AttendanceSearch(admin.ModelAdmin):
     list_display = ('emp_name','emp_id',"date","att_actual")
     filter = ('emp_id',"date","att_actual")
 
-class LeaveSearch(admin.ModelAdmin):
+class LeaveSearchResource(resources.ModelResource):
+  class Meta:
+      model = EmployeeLeaveBalance
+      fields = ['emp_id', 'emp_name', "team", "pl_balance", "sl_balance"]
+      import_id_fields = ('emp_id',)
+
+class LeaveSearch(ImportExportModelAdmin):
     search_fields = ('emp_name','emp_id')
-    list_display = ('emp_name','emp_id',"team","pl_balance","sl_balance","present_count")
+    list_display = ('emp_name','emp_id',"team","pl_balance","sl_balance")
+    resource_class = LeaveSearchResource
 
 class LeaveHistorySearch(admin.ModelAdmin):
     search_fields = ('emp_id','date')
