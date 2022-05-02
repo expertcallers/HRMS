@@ -48,7 +48,7 @@
                               <td>{{i.emp_id}}</td>
                               <td>{{i.start_date}} to {{i.end_date}}</td>
                               <td>{{i.no_days}}</td>
-                              <td>{{i.leave_type}}</td>
+                              <td>{% if i.leave_type == 'PL' %}EL{% else %}{{i.leave_type}}{% endif %}</td>
                               <td>
                                   <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#view_{{i.id}}">View</button>
                                   {% if i.proof and i.leave_type == "SL" and i.no_days > 1 and i.manager_approval == False %}
@@ -110,7 +110,7 @@
                   </div>
                   <div class="col-md-4 mt-2">
                     <label for="leave_type">Leave Type</label>
-                    <input type="text" readonly  value="{{i.leave_type}}" id="leave_type" class="form-control">
+                    <input type="text" readonly  value="{% if i.leave_type == 'PL' %}EL{% else %}{{i.leave_type}}{% endif %}" id="leave_type" class="form-control">
                   </div>
                   <div class="col-md-4 mt-2">
                     <label for="tl_app">TL Status</label>

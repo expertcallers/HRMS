@@ -1932,19 +1932,89 @@ def addLeaveBalance(request):
             end_date = end_date - timedelta(days=1)
             leavebal = []
             leavehist = []
-            ecpl_cal = EcplCalander.objects.filter(
-                date__range=[start_date, end_date]).values('emp_id', 'att_actual', 'date')
+            ecplcal = []
+            ecpl_cal = EcplCalander.objects.filter(date__range=[start_date, end_date]).exclude(att_actual='Unmarked')
             for i in emp:
                 cal = 0
                 i.unique_id = unique_id
                 total_bal = i.pl_balance + i.sl_balance
-                i.sl_balance += 1
                 for j in ecpl_cal:
-                    if j['emp_id'] == i.emp_id:
-                        if j['att_actual'] == "present" or j['att_actual'] == "Week OFF" or j['att_actual'] == "Comp OFF" or j['att_actual'] == "Holiday":
+                    week_off = []
+                    last = ""
+                    leave_bal = 0
+                    type = ""
+                    isdone = ''
+                    if j.emp_id == i.emp_id:
+                        if j.att_actual == "present" or j.att_actual == "Week OFF" or j.att_actual == "Comp OFF" or j.att_actual == "Holiday":
                             cal += 1
-                        elif j['att_actual'] == 'Half Day':
+                        elif j.att_actual == 'Half Day':
                             cal += 0.5
+                        elif j.att_actual == 'PL' or j.att_actual == "SL":
+                            start = j.date
+                            end = j.date - timedelta(days=3)
+                            while start >= end:
+                                week_off_dict = {}
+                                start -= timedelta(days=1)
+                                for k in ecpl_cal:
+                                    if k.att_actual == "Week OFF" or k.att_actual == "Comp OFF" or k.att_actual == "Client OFF" and k.emp_id == j.emp_id and k.date == start:
+                                        last = start - timedelta(days=1)
+                                        week_off_dict['emp_id'] = j.emp_id
+                                        week_off_dict['date'] = start
+                                        week_off.append(week_off_dict)
+                    if week_off:
+                        for w in week_off:
+                            for k in ecpl_cal:
+                                if w['emp_id'] == k.emp_id:
+                                    if k.date == last and k.att_actual == "PL" or k.att_actual == "SL":
+                                        if k.emp_id == i.emp_id:
+                                            if k.att_actual == "PL" and k.date == last:
+                                                leave_bal = i.pl_balance
+                                            elif k.att_actual == "SL" and k.date == last:
+                                                leave_bal = i.sl_balance
+                                            if leave_bal >= len(week_off) and k.emp_id == i.emp_id:
+                                                if k.att_actual == "PL":
+                                                    isdone = 'yes'
+                                                    type = "PL"
+                                                    i.pl_balance -= len(week_off)
+                                                    pl_hist = leaveHistory()
+                                                    pl_hist.unique_id = unique_id
+                                                    pl_hist.emp_id = i.emp_id
+                                                    pl_hist.date = date.today()
+                                                    pl_hist.leave_type = "PL"
+                                                    pl_hist.transaction = "Sandwich Leave Policy. Leave date before week off: "+str(last)
+                                                    pl_hist.no_days = len(week_off)
+                                                    total_bal -= len(week_off)
+                                                    pl_hist.total = total_bal
+                                                    leavehist.append(pl_hist)
+                                                elif k.att_actual == "SL":
+                                                    isdone = 'yes'
+                                                    type = "SL"
+                                                    i.sl_balance -= len(week_off)
+                                                    sl_hist = leaveHistory()
+                                                    sl_hist.unique_id = unique_id
+                                                    sl_hist.emp_id = i.emp_id
+                                                    sl_hist.date = date.today()
+                                                    sl_hist.leave_type = "SL"
+                                                    sl_hist.transaction = "Sandwich Leave Policy. Leave date before week off: "+str(last)
+                                                    sl_hist.no_days = len(week_off)
+                                                    total_bal -= len(week_off)
+                                                    sl_hist.total = total_bal
+                                                    leavehist.append(sl_hist)
+                                                leavebal.append(i)
+                                    if isdone == 'yes':
+                                        break
+                        for w in week_off:
+                            for k in ecpl_cal:
+                                if w['emp_id'] == k.emp_id and w['date'] == k.date:
+                                    if type == 'PL':
+                                        k.att_actual = 'PL'
+                                    elif type == 'SL':
+                                        k.att_actual = 'SL'
+                                    else:
+                                        k.att_actual = 'Absent'
+                                    ecplcal.append(k)
+
+                i.sl_balance += 1
                 pl = round(cal / 20, 2)
                 i.pl_balance += pl
                 leavebal.append(i)
@@ -1969,80 +2039,16 @@ def addLeaveBalance(request):
                 sl_hist.no_days = 1
                 sl_hist.total = total_bal+pl+1
                 leavehist.append(sl_hist)
+            if ecplcal:
+                EcplCalander.objects.bulk_update(ecplcal,['att_actual'])
             EmployeeLeaveBalance.objects.bulk_update(leavebal,['sl_balance', 'pl_balance'])
             leaveHistory.objects.bulk_create(leavehist)
             e.leave = True
             e.save()
             messages.info(request, "Leave Balance Added for the selected month")
+
             return redirect('/ams/add-leave-bal')
         else:
-            # ecpl_cal = EcplCalander.objects.filter(
-            #     date__range=[date(2022,3,1), date(2022,5,1)]).values('emp_id', 'att_actual', 'date')
-            # week_off = []
-            # last = ""
-            # for i in ecpl_cal:
-            #     if i['att_actual'] == "PL" or i['att_actual'] == "SL":
-            #         start = i['date']
-            #         end = i['date'] - timedelta(days=3)
-            #         while start >= end:
-            #             week_off_dict = {}
-            #             start -= timedelta(days=1)
-            #             for j in ecpl_cal:
-            #                 if j['att_actual'] == "Week OFF" and j['emp_id'] == i['emp_id'] and j['date'] == start:
-            #                     last = start - timedelta(days=1)
-            #                     week_off_dict['emp_id'] = j['emp_id']
-            #                     week_off_dict['date'] = start
-            #                     week_off.append(week_off_dict)
-            # emp_bal = EmployeeLeaveBalance.objects.all().values('emp_id','pl_balance','sl_balance')
-            # if len(week_off) > 0:
-            #     leave_bal = 0
-            #     for i in week_off:
-            #         week_off_list = []
-            #         for j in ecpl_cal:
-            #             if j['att_actual'] == "PL" or j['att_actual'] == "SL" and j['emp_id'] == i['emp_id'] and j['date'] == last:
-            #                 week_off_list.append(j['emp_id'])
-            #         for k in emp_bal:
-            #             if k['emp_id'] == i['emp_id']:
-            #                 if i['att_actual'] == "PL":
-            #                     leave_bal = k['pl_balance']
-            #                 else:
-            #                     leave_bal = k['sl_balance']
-            #                 print(week_off_list, i['date'], 'week_off_list')
-            #                 if leave_bal > len(week_off_list) and j['emp_id'] == i['emp_id']:
-            #                     print(leave_bal,'leave_bal')
-            #                     print(len(week_off_list), 'len(week_off_list)')
-                    # if len(week_off) > 0:
-                    #     last_week_off = EcplCalander.objects.get(date=start_date_off - timedelta(days=1), emp_id=emp_id).att_actual
-                    #     if last_week_off == "PL" or last_week_off == "SL":
-                    #         emp_bal = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
-                    #         if leave_type == "PL":
-                    #             leave_bal = emp_bal.pl_balance
-                    #         else:
-                    #             leave_bal = emp_bal.sl_balance
-                    #         if leave_bal >= len(week_off):
-                    #             if leave_type == "PL":
-                    #                 emp_bal.pl_balance -= len(week_off)
-                    #             else:
-                    #                 emp_bal.sl_balance -= len(week_off)
-                    #             emp_bal.save()
-                    #             leave_history = leaveHistory()
-                    #             leave_history.leave_type = leave_type
-                    #             leave_history.transaction = 'Sandwich Policy. Leave applied on: ' + str(
-                    #                 e.applied_date) + ' (ID: ' + str(e.id) + ')'
-                    #             leave_history.date = date.today()
-                    #             leave_history.no_days = len(week_off)
-                    #             leave_history.emp_id = emp_id
-                    #             pl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).pl_balance
-                    #             sl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).sl_balance
-                    #             leave_history.total = pl + sl
-                    #             leave_history.save()
-                    #         else:
-                    #             for i in week_off:
-                    #                 cal = EcplCalander.objects.get(date=i, emp_id=emp_id)
-                    #                 cal.att_actual = "Absent"
-                    #                 cal.save()
-
-
             month = datetime.now().month
             year = datetime.now().year
             leave = AddAttendanceMonths.objects.filter(leave=False, month_number=month, year=year)

@@ -18,7 +18,7 @@
             <div class="col-md-3">
               <div class="card">
                 <div class="card-header">
-                  <h4>Privilege Leave Balance</h4>
+                  <h4>Earned Leave Balance</h4>
                 </div>
                 <div class="card-body" align="center">
                   <h1 style="font-size: 64px;" id="leave_bal">
@@ -65,7 +65,7 @@
                         <label for="type">Select type of Leave</label>
                         <select name="type" class="form-control" id="type">
                           <option value="" selected disabled>Please Select</option>
-                          <option value="PL">Privilege Leave</option>
+                          <option value="PL">Earned Leave</option>
                           <option value="SL">Sick Leave</option>
                         </select>
                       </div>
@@ -155,7 +155,9 @@
                               <td>{{i.applied_date}}</td>
                               <td>{{i.start_date}} to {{i.end_date}}</td>
                               <td>{{i.no_days}}</td>
-                              <td>{{i.leave_type}}</td>
+                              <td>
+                                {% if i.leave_type == 'PL' %}EL{% else %}{{i.leave_type}}{% endif %}
+                              </td>
                               <td><p>{{i.agent_reason}}</p></td>
                               <td>
                                 {% if i.tl_status %}
@@ -196,7 +198,7 @@
                                   Pending
                                 {% endif %}
                                 {% if i.tl_status == "Rejected" and i.manager_approval == False and i.escalation == False %}<br>
-                                <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#view_{{i.id}}">Escalate</button>
+                                <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#view_{{i.id}}">Leave Appeal</button>
                                 {% endif %}
                                 {% if i.tl_status == "Rejected" and i.manager_approval == False and i.escalation == True %}
                                 <p>Applied for Escalation</p>
@@ -256,7 +258,7 @@
                   </div>
                   <div class="col-md-6 mt-2">
                     <label for="leave_type">Leave Type</label>
-                    <input type="text" disabled  value="{{i.leave_type}}" id="leave_type" class="form-control">
+                    <input type="text" disabled  value="{% if i.leave_type == 'PL' %}EL{% else %}{{i.leave_type}}{% endif %}" id="leave_type" class="form-control">
                   </div>
                   <div class="col-md-6 mt-2">
                     <label for="reason_esc">Reason / Comments</label>
@@ -318,7 +320,7 @@
                   </div>
                   <div class="col-md-6 mt-2">
                     <label for="proof_leave_type">Leave Type</label>
-                    <input type="text" disabled  value="{{i.leave_type}}" id="proof_leave_type" class="form-control">
+                    <input type="text" disabled  value="{% if i.leave_type == 'PL' %}EL{% else %}{{i.leave_type}}{% endif %}" id="proof_leave_type" class="form-control">
                   </div>
                   <div class="col-md-6 mt-2">
                     <label for="proof">Upload Proof</label>
@@ -390,7 +392,7 @@
                           <tr>
                             <td>{{i.id}}</td>
                             <td>{{i.date}}</td>
-                            <td>{{i.leave_type}}</td>
+                            <td>{% if i.leave_type == 'PL' %}EL{% else %}{{i.leave_type}}{% endif %}</td>
                             <td>{{i.transaction}}</td>
                             <td>{{i.no_days|floatformat:2}}</td>
                             <td>{{i.total|floatformat:2}}</td>
@@ -422,9 +424,14 @@
       var ldays = $('#leave_days').val();
       var number;
       var type=0;
+      var n = 0;
       var lbal = parseInt($('#leave_bal').html());
       var sbal = parseInt($('#s_leave_bal').html());
       var type1 = $('#type').change(function() {
+        n += 1
+        if ( n == 2 ) {
+          location.reload();
+        }
         type=$(this).val();
         $('#leave').val('');
         $('#leave_days').val('');

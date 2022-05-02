@@ -54,7 +54,7 @@
                             </div>
                             <div class="row">
                               <div class="col-md-9">
-                                <select name="att_actual" onchange="dbys_att{{i.id}}(this)" class="form-control">
+                                <select name="att_actual" onchange="dbys_att{{i.emp_id}}(this)" class="form-control">
                                   <option value="present">Present</option>
                                   <option value="Week OFF">Week OFF</option>
                                   <option value="Comp OFF">Comp OFF</option>
@@ -127,7 +127,7 @@
                             </div>
                             <div class="row">
                               <div class="col-md-9">
-                                <select name="att_actual" onchange="ystdays_att{{i.id}}(this)" class="form-control">
+                                <select name="att_actual" onchange="ystdays_att{{i.emp_id}}(this)" class="form-control">
                                   <option value="present">Present</option>
                                   <option value="Week OFF">Week OFF</option>
                                   <option value="Comp OFF">Comp OFF</option>
@@ -203,7 +203,7 @@
                             </div>
                             <div class="row">
                               <div class="col-md-9">
-                                <select name="att_actual" onchange="todays_att{{i.id}}(this)" id="today_att_actual_{{i.emp_id}}" class="form-control">
+                                <select name="att_actual" onchange="todays_att{{i.emp_id}}(this)" id="today_att_actual_{{i.emp_id}}" class="form-control">
                                   <option value="present">Present</option>
                                   <option value="Week OFF">Week OFF</option>
                                   <option value="Comp OFF">Comp OFF</option>
@@ -241,28 +241,37 @@
 {% endblock %}
 {% block script %}
 <script>
-  $( document ).ready(function() {
-    $today = new Date();
-    $yesterday = new Date($today);
-    $they = new Date($yesterday);
-    $yesterday.setDate($today.getDate() - 1);
-    $they.setDate($yesterday.getDate() - 1);
-    $("#todaydate").html(moment($today).format('YYYY-MM-DD'));
-    $("#yesdate").html(moment($yesterday).format('YYYY-MM-DD'));
-    $("#tyesdate").html(moment($they).format('YYYY-MM-DD'));
-    $("#ttodaydate").html(moment($today).format('DD-MMM-YYYY'));
-    $("#ttyesdate").html(moment($yesterday).format('DD-MMM-YYYY'));
-    $("#tttyesdate").html(moment($they).format('DD-MMM-YYYY'));
-  });
-</script>
-<script>
+
   {% for i in todays_att %}
     {% if i.status != 'Applied' %}
-      function todays_att{{i.id}}(e) {
+      function todays_att{{i.emp_id}}(e) {
         $button = $("#todays_button{{i.emp_id}}");
         if ((e.value == "NCNS") || (e.value == "Bench") || (e.value == "Attrition")) {
           $button.attr('disabled','');
           let emp_id = prompt("Please enter your Employee ID to confirm");
+          if (emp_id == {{request.user.profile.emp_id}} ) {
+            $button.removeAttr('disabled');
+          } else {
+            alert("Entered Employee ID is Wrong try Again :)");
+            $button.attr('disabled');
+          }
+        } else {
+          $button.removeAttr('disabled');
+        }
+      }
+    {% endif %}
+  {% endfor %}
+
+  {% for i in dbys_att %}
+    {% if i.status != 'Applied' %}
+      function dbys_att{{i.emp_id}}(e) {
+        $button = $("#dbys_button{{i.emp_id}}");
+        if ((e.value == "NCNS") || (e.value == "Bench") || (e.value == "Attrition")) {
+          $button.attr('disabled','');
+          let emp_id = prompt("Please enter your Employee ID to confirm");
+          if (emp_id === null){
+            return;
+          }
           if (emp_id == {{request.user.profile.emp_id}} ) {
             $button.removeAttr('disabled');
           } else {
@@ -300,7 +309,7 @@
 
   {% for i in ystdays_att %}
     {% if i.status != 'Applied' %}
-      function ystdays_att{{i.id}}(e) {
+      function ystdays_att{{i.emp_id}}(e) {
         $button = $("#ystdays_button{{i.emp_id}}");
         if ((e.value == "NCNS") || (e.value == "Bench") || (e.value == "Attrition")) {
           $button.attr('disabled','');
@@ -318,26 +327,23 @@
   {% endfor %}
 
 
-  {% for i in dbys_att %}
-    {% if i.status != 'Applied' %}
-      function dbys_att{{i.id}}(e) {
-        $button = $("#dbys_button{{i.emp_id}}");
-        if ((e.value == "NCNS") || (e.value == "Bench") || (e.value == "Attrition")) {
-          $button.attr('disabled','');
-          let emp_id = prompt("Please enter your Employee ID to confirm");
-          if (emp_id === null){
-            return;
-          }
-          if (emp_id == {{request.user.profile.emp_id}} ) {
-            $button.removeAttr('disabled');
-          } else {
-            alert("Entered Employee ID is Wrong try Again :)");
-          }
-        } else {
-          $button.removeAttr('disabled');
-        }
-      }
-    {% endif %}
-  {% endfor %}
+
+</script>
+
+
+<script>
+  $( document ).ready(function() {
+    $today = new Date();
+    $yesterday = new Date($today);
+    $they = new Date($yesterday);
+    $yesterday.setDate($today.getDate() - 1);
+    $they.setDate($yesterday.getDate() - 1);
+    $("#todaydate").html(moment($today).format('YYYY-MM-DD'));
+    $("#yesdate").html(moment($yesterday).format('YYYY-MM-DD'));
+    $("#tyesdate").html(moment($they).format('YYYY-MM-DD'));
+    $("#ttodaydate").html(moment($today).format('DD-MMM-YYYY'));
+    $("#ttyesdate").html(moment($yesterday).format('DD-MMM-YYYY'));
+    $("#tttyesdate").html(moment($they).format('DD-MMM-YYYY'));
+  });
 </script>
 {% endblock %}
