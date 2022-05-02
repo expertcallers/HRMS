@@ -1076,7 +1076,7 @@ def newSingleAttandance(request):  # Test1
         att_actual = request.POST['att_actual']
         emp_id = request.POST['emp_id']
         now = datetime.now()
-        prof = Profile.objects.get(emp_id=emp_id)
+        prof = Profile.objects.get(emp_id=emp_id,agent_status='Active')
         rm1 = prof.emp_rm1
         rm2 = prof.emp_rm2
         rm3 = prof.emp_rm3
