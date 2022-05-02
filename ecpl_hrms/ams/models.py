@@ -120,6 +120,8 @@ class MappingTickets(models.Model):
     approved_by=models.TextField(null=True,blank=True)
     approved_date=models.DateTimeField(null=True,blank=True)
     status=models.BooleanField(default=False)
+    action = models.CharField(max_length=50,null=True,blank=True)
+    reason = models.TextField(null=True,blank=True)
 
 # Campaigns - teams +
 class Campaigns(models.Model):
@@ -221,7 +223,7 @@ class leaveHistory(models.Model):
     emp_id = models.CharField(max_length=30)
     date = models.DateField()
     leave_type = models.CharField(max_length=30)
-    transaction = models.CharField(max_length=30)
+    transaction = models.CharField(max_length=300)
     no_days = models.FloatField()
     total = models.FloatField(null=True,blank=True)
 

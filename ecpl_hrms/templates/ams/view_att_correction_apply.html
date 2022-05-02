@@ -61,16 +61,15 @@
 
                             <div style="display: inline-flex;">
                               <select name="att_new" class="form-control" style="width: 175px; margin-right: 5px;">
-                                    <option value="present">Present</option>
-                                    <option value="Week OFF">Week OFF</option>
-                                    <option value="Comp OFF">Comp OFF</option>
-                                    <option value="Half Day">Half Day</option>
-                                    <option value="Client OFF">Client OFF</option>
-                                    <option value="Absent">Absent</option>
-                                    <option value="Training">Training</option>
-                                    <option value="Attrition">Attrition</option>
-                                    <option value="Bench">Bench</option>
-                                    <option value="NCNS">NCNS</option>
+                                    <option {% if cal.att_actual == "present" %}disabled{% endif %} value="present">Present</option>
+                                    <option {% if cal.att_actual == "Week OFF" %}disabled{% endif %} value="Week OFF">Week OFF</option>
+                                    <option {% if cal.att_actual == "Comp OFF" %}disabled{% endif %} value="Comp OFF">Comp OFF</option>
+                                    <option {% if cal.att_actual == "Half Day" %}disabled{% endif %} value="Half Day">Half Day</option>
+                                    <option {% if cal.att_actual == "Client OFF" %}disabled{% endif %} value="Client OFF">Client OFF</option>
+                                    <option {% if cal.att_actual == "Absent" %}disabled{% endif %} value="Absent">Absent</option>
+                                    <option {% if cal.att_actual == "Training" %}disabled{% endif %} value="Training">Training</option>
+                                    <option {% if cal.att_actual == "Attrition" %}disabled{% endif %} value="Attrition">Attrition</option>
+                                    <option {% if cal.att_actual == "Bench" %}disabled{% endif %} value="Bench">Bench</option>
                               </select>
                                 <input type="text" placeholder="Reason for Correction" name="reason" class="form-control" style="width:200px;margin-right:4px;" required>
                               <button class="btn btn-secondary">Apply</button>

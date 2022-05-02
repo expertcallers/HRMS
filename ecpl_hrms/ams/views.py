@@ -346,16 +346,6 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
             while start_date <= end_date:
                 month_days.append(start_date.strftime("%Y-%m-%d"))
                 start_date += delta
-            leave_history = leaveHistory()
-            leave_history.leave_type = leave_type
-            leave_history.transaction = 'Leaves Used'
-            leave_history.date = date.today()
-            leave_history.no_days = int(no_days)
-            leave_history.emp_id = emp_id
-            pl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).pl_balance
-            sl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).sl_balance
-            leave_history.total = pl + sl
-            leave_history.save()
             for i in month_days:
                 try:
                     cal = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id))
@@ -373,6 +363,8 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
                         emp_name=emp_name
                     )
                     cal.save()
+
+
         else:
             manager_approval = True
             manager_status = 'Rejected'
@@ -384,6 +376,18 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
             elif leave_type == 'SL':
                 leave_balance.sl_balance += int(no_days)
                 leave_balance.save()
+
+            leave_history = leaveHistory()
+            leave_history.leave_type = leave_type
+            leave_history.transaction = 'Leave Refund as RM3 Rejected, Leave applied on: '+str(e.applied_date)+' (ID: '+str(e.id)+')'
+            leave_history.date = date.today()
+            leave_history.no_days = int(no_days)
+            leave_history.emp_id = emp_id
+            pl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).pl_balance
+            sl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).sl_balance
+            leave_history.total = pl + sl
+            leave_history.save()
+
         e.manager_approval = manager_approval
         e.manager_reason = om_reason
         e.manager_status = manager_status
@@ -979,12 +983,34 @@ def teamAttendance(request):  # Team Attendance Page # Test1
         emp_list.append(i.emp_id)
     # Today 
     todays_list_list = EcplCalander.objects.filter(Q(date=today), Q(att_actual='Unmarked'), Q(emp_id__in=emp_list))
+    todays_dict_list = []
+    for i in todays_list_list:
+        todays_dict = {}
+        todays_dict['date'] = str(i.date)
+        todays_dict['emp_name'] = i.emp_name
+        todays_dict['emp_id'] = i.emp_id
+        todays_dict_list.append(todays_dict)
     # Yesterday
     ystday_list_list = EcplCalander.objects.filter(Q(date=yesterday), Q(att_actual='Unmarked'), Q(emp_id__in=emp_list))
+    ystday_dict_list = []
+    for i in ystday_list_list:
+        ystday_dict = {}
+        ystday_dict['date'] = str(i.date)
+        ystday_dict['emp_name'] = i.emp_name
+        ystday_dict['emp_id'] = i.emp_id
+        ystday_dict_list.append(ystday_dict)
     # Day Before Yesterday
     dby_list_list = EcplCalander.objects.filter(Q(date=dby_date), Q(att_actual='Unmarked'), Q(emp_id__in=emp_list))
+    dby_dict_list = []
+    for i in dby_list_list:
+        dby_dict = {}
+        dby_dict['date'] = str(i.date)
+        dby_dict['emp_name'] = i.emp_name
+        dby_dict['emp_id'] = i.emp_id
+        dby_dict_list.append(dby_dict)
+
     emp = Profile.objects.get(emp_id=user_empid)
-    data = {'todays_att': todays_list_list, 'ystdays_att': ystday_list_list, 'dbys_att': dby_list_list, 'emp': emp}
+    data = {'todays_att': todays_dict_list, 'ystdays_att': ystday_dict_list, 'dbys_att': dby_dict_list, 'emp': emp}
     return render(request, 'ams/team_attendance.html', data)
 
 
@@ -1362,22 +1388,40 @@ def approveMappingTicket(request):  # Test1
     if request.method == 'POST':
         usr_name = request.user.profile.emp_name
         id = request.POST['id']
+        action = request.POST['action']
+        reason = request.POST.get('reason')
         td = date.today()
         ticket = MappingTickets.objects.get(id=id)
+        ticket.action = action
+        ticket.reason = reason
         ticket.status = True
         ticket.approved_by = usr_name
         ticket.approved_date = td
         ticket.save()
         emp_id = ticket.emp_id
-        prof = Profile.objects.get(emp_id=emp_id)
-        prof.emp_rm1 = ticket.new_rm1
-        prof.emp_rm2 = ticket.new_rm2
-        prof.emp_rm3 = ticket.new_rm3
-        prof.emp_rm1_id = ticket.new_rm1_id
-        prof.emp_rm2_id = ticket.new_rm2_id
-        prof.emp_rm3_id = ticket.new_rm3_id
-        prof.emp_process = ticket.new_process
-        prof.save()
+        if action == "Approve":
+            prof = Profile.objects.get(emp_id=emp_id)
+            prof.emp_rm1 = ticket.new_rm1
+            prof.emp_rm2 = ticket.new_rm2
+            prof.emp_rm3 = ticket.new_rm3
+            prof.emp_rm1_id = ticket.new_rm1_id
+            prof.emp_rm2_id = ticket.new_rm2_id
+            prof.emp_rm3_id = ticket.new_rm3_id
+            prof.emp_process = ticket.new_process
+            prof.emp_process_id = Campaigns.objects.get(name=ticket.new_process).id
+            prof.save()
+            cal = EcplCalander.objects.filter(emp_id=emp_id, date__gte=ticket.effective_date)
+            for i in cal:
+                i.rm1 = ticket.new_rm1
+                i.rm2 = ticket.new_rm2
+                i.rm3 = ticket.new_rm3
+                i.rm1_id = ticket.new_rm1_id
+                i.rm2_id = ticket.new_rm2_id
+                i.rm3_id = ticket.new_rm3_id
+                i.team = ticket.new_process
+                i.team_id = Campaigns.objects.get(name=ticket.new_process).id
+                i.save()
+
         return redirect('/ams/view-mapping-tickets')
     else:
         return redirect('/ams/logout')
@@ -1456,8 +1500,8 @@ def applyLeave(request):  # Test1
                 leave_dates_list.append(i.start_date)
                 i.start_date += timedelta(days=1)
         new_leave_dates = []
-        list_start_date = date.fromisoformat(start_date) # To Convert type of start_date from string to date
-        list_end_date = date.fromisoformat(end_date) # To Convert type of end_date from string to date
+        list_start_date = datetime.strptime(start_date,'%Y-%m-%d').date() # To Convert type of start_date from string to date
+        list_end_date = datetime.strptime(end_date,'%Y-%m-%d').date() # To Convert type of end_date from string to date
         while list_start_date <= list_end_date:
             new_leave_dates.append(list_start_date)
             list_start_date += timedelta(days=1)
@@ -1503,6 +1547,17 @@ def applyLeave(request):  # Test1
             elif leave_type == 'SL':
                 leave_balance.sl_balance -= int(no_days)
                 leave_balance.save()
+
+            leave_history = leaveHistory()
+            leave_history.leave_type = leave_type
+            leave_history.transaction = 'Leave Applied (ID: '+str(e.id)+')'
+            leave_history.date = date.today()
+            leave_history.no_days = int(no_days)
+            leave_history.emp_id = emp_id
+            pl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).pl_balance
+            sl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).sl_balance
+            leave_history.total = pl + sl
+            leave_history.save()
             return redirect('/ams/ams-apply_leave')
     else:
         emp_id = request.user.profile.emp_id
@@ -1527,7 +1582,7 @@ def applyLeave(request):  # Test1
         except EmployeeLeaveBalance.DoesNotExist:
             leave_balance = {'sl_balance': 0, 'pl_balance': 0}
         leave_his = leaveHistory.objects.filter(emp_id=emp_id).values('date', 'transaction',
-                                                                      'leave_type', 'total').annotate(
+                                                                      'leave_type', 'total', 'id').annotate(
             no_days=Sum('no_days'))
         data = {'emp': emp, 'leave': leave, 'leave_balance': leave_balance, 'probation': probation,
                 'leave_his': leave_his}
@@ -1568,6 +1623,17 @@ def approveLeaveRM1(request):  # Test1
             elif leave_type == 'SL':
                 leave_balance.sl_balance += int(no_days)
                 leave_balance.save()
+            leave_history = leaveHistory()
+            leave_history.leave_type = leave_type
+            leave_history.transaction = 'Leave Refund as RM1 Rejected, Leave applied on: '+str(e.applied_date)+' (ID: '+str(e.id)+')'
+            leave_history.date = date.today()
+            leave_history.no_days = int(no_days)
+            leave_history.emp_id = emp_id
+            pl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).pl_balance
+            sl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).sl_balance
+            leave_history.total = pl + sl
+            leave_history.save()
+
         e.tl_approval = tl_approval
         e.tl_reason = tl_reason
         e.tl_status = tl_status
@@ -1594,6 +1660,18 @@ def applyEscalation(request):  # Test1
         else:
             a.sl_balance = a.sl_balance - no_days
         a.save()
+
+        leave_history = leaveHistory()
+        leave_history.leave_type = e.leave_type
+        leave_history.transaction = 'Applied for Escalation, Leave applied on: ' + str(e.applied_date)+' (ID: '+str(e.id)+')'
+        leave_history.date = date.today()
+        leave_history.no_days = int(no_days)
+        leave_history.emp_id = emp_id
+        pl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).pl_balance
+        sl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).sl_balance
+        leave_history.total = pl + sl
+        leave_history.save()
+
         return redirect('/ams/ams-apply_leave')
     else:
         pass
@@ -1701,6 +1779,8 @@ def approveAttendanceRequest(request):  # test1
         cal = EcplCalander.objects.get(id=cal_id)
         if om_resp == 'Approved':
             cal.att_actual = hist.att_new
+            cal.approved_on = datetime.now()
+            cal.appoved_by = emp.emp_name
             cal.save()
             att_actual = hist.att_new
             if att_actual == 'Attrition' or att_actual == 'Bench':
@@ -1839,45 +1919,130 @@ def addLeaveBalance(request):
     if emp_desi in hr_list:
         if request.method == 'POST':
             unique_id = request.POST['csrfmiddlewaretoken']
-            emp = EmployeeLeaveBalance.objects.all()
-            month = date.today().month
-            year = date.today().year
+            emp = EmployeeLeaveBalance.objects.exclude(
+                emp_id__in=EmployeeLeaveBalance.objects.filter(unique_id=unique_id).values('emp_id'))
+
+            id = request.POST['month']
+            e = AddAttendanceMonths.objects.get(id=id)
+            month = e.month_number
+            year = e.year
             start_date = date(year, month, 1)
             start_date = start_date - monthdelta.monthdelta(1)
             end_date = date(year, month, 1)
             end_date = end_date - timedelta(days=1)
+            leavebal = []
+            leavehist = []
+            ecpl_cal = EcplCalander.objects.filter(
+                date__range=[start_date, end_date]).values('emp_id', 'att_actual', 'date')
             for i in emp:
-                try:
-                    EmployeeLeaveBalance.objects.get(emp_id=i.emp_id, unique_id=unique_id)
-                    pass
-                except EmployeeLeaveBalance.DoesNotExist:
-                    i.unique_id = unique_id
-                    total_bal = i.pl_balance + i.sl_balance
-                    i.sl_balance += 1
-                    cal = EcplCalander.objects.filter(Q(emp_id=i.emp_id),
-                                                      Q(att_actual='present') | Q(att_actual='Week OFF') |
-                                                      Q(att_actual='Comp OFF') | Q(att_actual='Holiday'),
-                                                      date__range=[start_date, end_date]).count()
-                    half = (EcplCalander.objects.filter(emp_id=i.emp_id, att_actual='Half Day',
-                                                        date__range=[start_date, end_date]).count()) / 2
-                    cal += half
-                    pl = round(cal / 20, 2)
-                    i.pl_balance += pl
-                    i.save()
-                    if pl > 0:
-                        leaveHistory.objects.create(unique_id=unique_id, emp_id=i.emp_id, date=date.today(),
-                                                    leave_type="PL", transaction="Leaves Earned", no_days=pl,
-                                                    total=total_bal+pl)
-                    leaveHistory.objects.create(unique_id=unique_id, emp_id=i.emp_id, date=date.today(),
-                                                leave_type="SL", transaction="Leaves Earned", no_days=1,
-                                                total=total_bal+pl+1)
-            id = request.POST['month']
-            e = AddAttendanceMonths.objects.get(id=id)
+                cal = 0
+                i.unique_id = unique_id
+                total_bal = i.pl_balance + i.sl_balance
+                i.sl_balance += 1
+                for j in ecpl_cal:
+                    if j['emp_id'] == i.emp_id:
+                        if j['att_actual'] == "present" or j['att_actual'] == "Week OFF" or j['att_actual'] == "Comp OFF" or j['att_actual'] == "Holiday":
+                            cal += 1
+                        elif j['att_actual'] == 'Half Day':
+                            cal += 0.5
+                pl = round(cal / 20, 2)
+                i.pl_balance += pl
+                leavebal.append(i)
+
+                if pl > 0:
+                    pl_hist = leaveHistory()
+                    pl_hist.unique_id = unique_id
+                    pl_hist.emp_id = i.emp_id
+                    pl_hist.date = date.today()
+                    pl_hist.leave_type = "PL"
+                    pl_hist.transaction = "Leaves Earned"
+                    pl_hist.no_days = pl
+                    pl_hist.total = total_bal+pl
+                    leavehist.append(pl_hist)
+
+                sl_hist = leaveHistory()
+                sl_hist.unique_id = unique_id
+                sl_hist.emp_id = i.emp_id
+                sl_hist.date = date.today()
+                sl_hist.leave_type = "SL"
+                sl_hist.transaction = "Leaves Earned"
+                sl_hist.no_days = 1
+                sl_hist.total = total_bal+pl+1
+                leavehist.append(sl_hist)
+            EmployeeLeaveBalance.objects.bulk_update(leavebal,['sl_balance', 'pl_balance'])
+            leaveHistory.objects.bulk_create(leavehist)
             e.leave = True
             e.save()
             messages.info(request, "Leave Balance Added for the selected month")
             return redirect('/ams/add-leave-bal')
         else:
+            # ecpl_cal = EcplCalander.objects.filter(
+            #     date__range=[date(2022,3,1), date(2022,5,1)]).values('emp_id', 'att_actual', 'date')
+            # week_off = []
+            # last = ""
+            # for i in ecpl_cal:
+            #     if i['att_actual'] == "PL" or i['att_actual'] == "SL":
+            #         start = i['date']
+            #         end = i['date'] - timedelta(days=3)
+            #         while start >= end:
+            #             week_off_dict = {}
+            #             start -= timedelta(days=1)
+            #             for j in ecpl_cal:
+            #                 if j['att_actual'] == "Week OFF" and j['emp_id'] == i['emp_id'] and j['date'] == start:
+            #                     last = start - timedelta(days=1)
+            #                     week_off_dict['emp_id'] = j['emp_id']
+            #                     week_off_dict['date'] = start
+            #                     week_off.append(week_off_dict)
+            # emp_bal = EmployeeLeaveBalance.objects.all().values('emp_id','pl_balance','sl_balance')
+            # if len(week_off) > 0:
+            #     leave_bal = 0
+            #     for i in week_off:
+            #         week_off_list = []
+            #         for j in ecpl_cal:
+            #             if j['att_actual'] == "PL" or j['att_actual'] == "SL" and j['emp_id'] == i['emp_id'] and j['date'] == last:
+            #                 week_off_list.append(j['emp_id'])
+            #         for k in emp_bal:
+            #             if k['emp_id'] == i['emp_id']:
+            #                 if i['att_actual'] == "PL":
+            #                     leave_bal = k['pl_balance']
+            #                 else:
+            #                     leave_bal = k['sl_balance']
+            #                 print(week_off_list, i['date'], 'week_off_list')
+            #                 if leave_bal > len(week_off_list) and j['emp_id'] == i['emp_id']:
+            #                     print(leave_bal,'leave_bal')
+            #                     print(len(week_off_list), 'len(week_off_list)')
+                    # if len(week_off) > 0:
+                    #     last_week_off = EcplCalander.objects.get(date=start_date_off - timedelta(days=1), emp_id=emp_id).att_actual
+                    #     if last_week_off == "PL" or last_week_off == "SL":
+                    #         emp_bal = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
+                    #         if leave_type == "PL":
+                    #             leave_bal = emp_bal.pl_balance
+                    #         else:
+                    #             leave_bal = emp_bal.sl_balance
+                    #         if leave_bal >= len(week_off):
+                    #             if leave_type == "PL":
+                    #                 emp_bal.pl_balance -= len(week_off)
+                    #             else:
+                    #                 emp_bal.sl_balance -= len(week_off)
+                    #             emp_bal.save()
+                    #             leave_history = leaveHistory()
+                    #             leave_history.leave_type = leave_type
+                    #             leave_history.transaction = 'Sandwich Policy. Leave applied on: ' + str(
+                    #                 e.applied_date) + ' (ID: ' + str(e.id) + ')'
+                    #             leave_history.date = date.today()
+                    #             leave_history.no_days = len(week_off)
+                    #             leave_history.emp_id = emp_id
+                    #             pl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).pl_balance
+                    #             sl = EmployeeLeaveBalance.objects.get(emp_id=emp_id).sl_balance
+                    #             leave_history.total = pl + sl
+                    #             leave_history.save()
+                    #         else:
+                    #             for i in week_off:
+                    #                 cal = EcplCalander.objects.get(date=i, emp_id=emp_id)
+                    #                 cal.att_actual = "Absent"
+                    #                 cal.save()
+
+
             month = datetime.now().month
             year = datetime.now().year
             leave = AddAttendanceMonths.objects.filter(leave=False, month_number=month, year=year)
@@ -1925,11 +2090,54 @@ def exportMapping(request):
 
 
 def TestFun(request):
-    profile = Profile.objects.all().values('emp_desi').distinct()
-    for i in profile:
+    start_date = date(2022, 4, 1)
+    last_date = date(2022, 5, 31)
+    delta = last_date - start_date
+    date_list = []
+    for i in EmployeeLeaveBalance.objects.all():
+        i.delete()
+    for i in range(delta.days + 1):
+        day = start_date + timedelta(days=i)
         try:
-            Designation.objects.get(name=i.get('emp_desi'))
-        except:
-            Designation.objects.create(name=i.get('emp_desi'))
-    messages.info(request,"All Designations added Successfully")
-    return redirect("/ams/")
+            DaysForAttendance.objects.get(date=day)
+        except DaysForAttendance.DoesNotExist:
+            DaysForAttendance.objects.create(date=day)
+    days = DaysForAttendance.objects.filter(status=False, date__range=[start_date, last_date])
+    for i in days:
+        date_list.append(i.date)
+    for i in date_list:
+        profile = Profile.objects.exclude(emp_id__in=EcplCalander.objects.filter(date=i).values('emp_id'))
+        cal = []
+        for j in profile:
+            employees = EcplCalander()
+            employees.date = i
+            employees.emp_id = j.emp_id
+            employees.att_actual = 'Unmarked'
+            employees.emp_name = j.emp_name
+            employees.emp_desi = j.emp_desi
+            employees.team = j.emp_process
+            employees.team_id = j.emp_process_id
+            employees.rm1 = j.emp_rm1
+            employees.rm2 = j.emp_rm2
+            employees.rm3 = j.emp_rm3
+            employees.rm1_id = j.emp_rm1_id
+            employees.rm2_id = j.emp_rm2_id
+            employees.rm3_id = j.emp_rm3_id
+            cal.append(employees)
+        EcplCalander.objects.bulk_create(cal)
+        days = DaysForAttendance.objects.get(date=i)
+        days.status = True
+        days.save()
+    lea = []
+    profiles = Profile.objects.exclude(emp_id__in=EmployeeLeaveBalance.objects.all().values('emp_id'))
+    for j in profiles:
+        leave = EmployeeLeaveBalance()
+        leave.emp_id = j.emp_id
+        leave.emp_name = j.emp_name
+        leave.team = j.emp_process
+        leave.pl_balance = 0
+        leave.sl_balance = 0
+        lea.append(leave)
+    EmployeeLeaveBalance.objects.bulk_create(lea)
+    messages.info(request, "Attendance added Successfully!")
+    return redirect('/ams/')

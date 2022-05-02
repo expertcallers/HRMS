@@ -256,20 +256,6 @@
   });
 </script>
 <script>
-{% for i in todays_att %}
-  $today = $("#mydate_1_{{i.emp_id}}").val();
-  $("#mydate_1_{{i.emp_id}}").val(moment($today).format("YYYY-MM-DD"));
-{% endfor %}
-{% for i in ystdays_att %}
-  $yesterday = $("#mydate_2_{{i.emp_id}}").val();
-  $("#mydate_2_{{i.emp_id}}").val(moment($yesterday).format("YYYY-MM-DD"));
-{% endfor %}
-{% for i in dbys_att %}
-  $d_yes = $("#mydate_3_{{i.emp_id}}").val();
-  $("#mydate_3_{{i.emp_id}}").val(moment($d_yes).format("YYYY-MM-DD"));
-{% endfor %}
-</script>
-<script>
   {% for i in todays_att %}
     {% if i.status != 'Applied' %}
       function todays_att{{i.id}}(e) {
