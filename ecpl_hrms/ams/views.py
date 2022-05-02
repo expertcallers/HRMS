@@ -2091,7 +2091,7 @@ def exportMapping(request):
 
 def TestFun(request):
     start_date = date(2022, 4, 1)
-    last_date = date(2022, 4, 30)
+    last_date = date(2022, 5, 31)
     delta = last_date - start_date
     date_list = []
     for i in EmployeeLeaveBalance.objects.all():
