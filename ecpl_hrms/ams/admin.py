@@ -46,6 +46,16 @@ class CampaignSearch(ImportExportModelAdmin):
     list_display = ('id', 'name', 'om')
     resource_class = CampainSearchResource
 
+class DesignationSearchResource(resources.ModelResource):
+  class Meta:
+     model = Designation
+     fields = ['id', 'name', 'category','created_by']
+
+class DesignationSearch(ImportExportModelAdmin):
+    search_fields = ('id', 'name', 'category')
+    list_display = ('id', 'name', 'category','created_by')
+    resource_class = DesignationSearchResource
+
 admin.site.register(EcplCalander, AttendanceSearch)
 admin.site.register(OnboardingnewHRC)
 admin.site.register(Campaigns, CampaignSearch)
@@ -54,9 +64,9 @@ admin.site.register(AgentActiveStatusHist)
 admin.site.register(LeaveTable)
 admin.site.register(AddAttendanceMonths, AddAttendanceMonthsSearch)
 admin.site.register(leaveHistory, LeaveHistorySearch)
-admin.site.register(DaysForAttendance,DateStatus)
+admin.site.register(DaysForAttendance, DateStatus)
 admin.site.register(AttendanceCorrectionHistory)
 admin.site.register(MappingTickets, MappingSearch)
 admin.site.register(LastEmpId)
-admin.site.register(Designation)
+admin.site.register(Designation, DesignationSearch)
 

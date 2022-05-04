@@ -33,16 +33,20 @@
                         <li><a href="/ams/attendance-correction">Attendance Correction</a></li>
                         <li><a href="/ams/week-attendance">Week Report</a></li>
                         {% endif %}
+                        {% if request.user.profile.emp_desi in hr_om_list %}
                         <li><a href="/ams/add-leave-bal">Leave Balance</a></li>
                         <li><a href="/ams/add-attendance">Add Attendance</a></li>
+                        {% endif %}
                     </ul>
                   </li>
+                  {% if request.user.profile.emp_desi in hr_om_list or request.user.profile.emp_desi in hr_tl_am_list %}
                   <li><a><i class="fa fa-user"></i>Mapping <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/ams/rm-mapping-index"> Mapping</a></li>
                       <li><a href="/ams/mapping-application-status"> Mapping Change Status</a></li>
                     </ul>
                   </li>
+                  {% endif %}
                   <li><a href="/ams/ams-apply_leave"><i class="fa fa-check-square-o"></i> Leaves</a></li>
                   <li><a href="/ams/rm-settings"><i class="fa fa-gears"></i> Settings</a></li>
                 </ul>

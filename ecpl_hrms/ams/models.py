@@ -211,12 +211,14 @@ class AgentActiveStatusHist(models.Model):
     ticket_status = models.BooleanField(default=False)
 
 class AddAttendanceMonths(models.Model):
-    unique_id = models.CharField(max_length=150,null=True,blank=True)
+    unique_id = models.CharField(max_length=150, null=True, blank=True)
     month = models.CharField(max_length=30)
     month_number = models.IntegerField()
     year = models.IntegerField()
     created = models.BooleanField(default=False)
+    created_by = models.CharField(max_length=150, null=True, blank=True)
     leave = models.BooleanField(default=False)
+    leave_by = models.CharField(max_length=150, null=True, blank=True)
 
 class leaveHistory(models.Model):
     unique_id = models.CharField(max_length=150,null=True,blank=True)
@@ -238,4 +240,5 @@ class LastEmpId(models.Model):
 
 class Designation(models.Model):
     name = models.CharField(max_length=200)
+    category = models.CharField(max_length=200, null=True, blank=True)
     created_by = models.CharField(max_length=200, default="CC Team")
