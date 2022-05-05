@@ -27,7 +27,7 @@ Profile = apps.get_model('mapping', 'Profile')
 tl_am_list = ['Team Leader', 'Assistant Manager', 'Subject Matter Expert', 'Trainer', 'Learning and Development Head',
               'Process Trainer', 'Trainer Sales']
 # Manager List
-manager_list = ['Quality Head', 'Operations Manager', 'Service Delivery Manager', 'Command Centre Head',]
+manager_list = ['Quality Head', 'Operations Manager', 'Service Delivery Manager', 'Command Centre Head','IT Manager']
 # HR List
 hr_list = ['HR', 'HR Manager', 'Manager ER', 'HR Lead', 'Sr Recruiter', 'MIS Executive HR',
            'Lead HRBP', 'Employee Relations Specialist', 'Payroll Specialist', 'Recruiter', 'HR Generalist',
@@ -73,6 +73,8 @@ def loginAndRedirect(request):  # Test1
                 return redirect('/ams/manager-dashboard')
             elif request.user.profile.emp_desi in hr_list:
                 return redirect('/ams/hr-dashboard')
+            elif request.user.profile.emp_desi in management_list:
+                return redirect('/ams/manager-dashboard')
             else:
                 return redirect('/ams/agent-dashboard')
         else:
@@ -1209,7 +1211,7 @@ def weekAttendanceReport(request):  # Test1
     data = {"cal": lst, 'emp': empobj}
     return render(request, 'ams/week_attendace_report.html', data)
 
-
+import csv
 @login_required
 def teamAttendanceReport(request):  # Test 1
     if request.method == 'POST':
@@ -1221,61 +1223,25 @@ def teamAttendanceReport(request):  # Test 1
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
         if team_name == 'All Team':
-            response = HttpResponse(content_type='application/ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="report.xlsx"'
-            wb = xlwt.Workbook(encoding='utf-8')
-            ws = wb.add_sheet('Users Data')  # this will make a sheet named Users Data
-            # Sheet header, first row
-            row_num = 0
-            font_style = xlwt.XFStyle()
-            font_style.font.bold = True
-            columns = [
-                'Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'
-            ]
-            for col_num in range(len(columns)):
-                ws.write(row_num, col_num, columns[col_num], font_style)  # at 0 row 0 column
-            # Sheet body, remaining rows
-            font_style = xlwt.XFStyle()
-            rows = EcplCalander.objects.filter(date__range=[start_date, end_date]).values_list(
-                'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team'
-            )
-            import datetime
-            rows = [[x.strftime("%Y-%m-%d %H:%M") if isinstance(x, datetime.datetime) else x for x in row] for row in
-                    rows]
-            for row in rows:
-                row_num += 1
-                for col_num in range(len(row)):
-                    ws.write(row_num, col_num, row[col_num], font_style)
-            wb.save(response)
-            return response
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="attendance_report.csv"'
+            writer = csv.writer(response)
+            writer.writerow(['Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'])
+            calanders = EcplCalander.objects.filter(date__range=[start_date, end_date]).values_list(
+                'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team')
+            for c in calanders:
+                writer.writerow(c)
+            return response            
         else:
             team_name = Campaigns.objects.get(id=team_name).name
-            response = HttpResponse(content_type='application/ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="report.xlsx"'
-            wb = xlwt.Workbook(encoding='utf-8')
-            ws = wb.add_sheet('Users Data')  # this will make a sheet named Users Data
-            # Sheet header, first row
-            row_num = 0
-            font_style = xlwt.XFStyle()
-            font_style.font.bold = True
-            columns = [
-                'Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'
-            ]
-            for col_num in range(len(columns)):
-                ws.write(row_num, col_num, columns[col_num], font_style)  # at 0 row 0 column
-                # Sheet body, remaining rows
-            font_style = xlwt.XFStyle()
-            rows = EcplCalander.objects.filter(date__range=[start_date, end_date], team=team_name).values_list(
-                'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team'
-            )
-            import datetime
-            rows = [[x.strftime("%Y-%m-%d %H:%M") if isinstance(x, datetime.datetime) else x for x in row] for row in
-                    rows]
-            for row in rows:
-                row_num += 1
-                for col_num in range(len(row)):
-                    ws.write(row_num, col_num, row[col_num], font_style)
-            wb.save(response)
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="attendance_report.csv"'
+            writer = csv.writer(response)
+            writer.writerow(['Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'])
+            calanders = EcplCalander.objects.filter(team=team_name,date__range=[start_date, end_date]).values_list(
+                'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team')
+            for c in calanders:
+                writer.writerow(c)
             return response
     else:
         return HttpResponse('<h2>*** GET not available ***</h2>')
