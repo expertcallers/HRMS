@@ -241,6 +241,23 @@
 {% endblock %}
 {% block script %}
 <script>
+  {% for j in dbys_att %}
+    {% if j.att_actual == "Unmarked" %}
+      $("#ystdays_button{{j.emp_id}}").click(function(){
+          alert("Please mark previous day's attendance 1st for {{j.emp_name}} ({{j.emp_id}})");
+          return false;
+      })
+    {% endif %}
+  {% endfor %}
+
+  {% for j in ystdays_att %}
+    {% if j.att_actual == "Unmarked" %}
+      $("#todays_button{{j.emp_id}}").click(function(){
+          alert("Please mark previous day's attendance 1st for {{j.emp_name}} ({{j.emp_id}})");
+          return false;
+      })
+    {% endif %}
+  {% endfor %}
 
   {% for i in todays_att %}
     {% if i.status != 'Applied' %}
@@ -286,25 +303,7 @@
 
 
 
-  {% for j in dbys_att %}
-    {% if j.att_actual == "Unmarked" %}
-      $("#ystdays_button{{j.emp_id}}").click(function(){
-          alert("Please mark previous day's attendance 1st for {{j.emp_name}} ({{j.emp_id}})");
-          return false;
-      })
-    {% endif %}
-  {% endfor %}
 
-
-
-  {% for j in ystdays_att %}
-    {% if j.att_actual == "Unmarked" %}
-      $("#todays_button{{j.emp_id}}").click(function(){
-          alert("Please mark previous day's attendance 1st for {{j.emp_name}} ({{j.emp_id}})");
-          return false;
-      })
-    {% endif %}
-  {% endfor %}
 
 
   {% for i in ystdays_att %}

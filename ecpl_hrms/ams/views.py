@@ -24,31 +24,41 @@ from django.apps import apps
 Profile = apps.get_model('mapping', 'Profile')
 
 # TL and AM List
-tl_am_list = ['Team Leader', 'Assistant Manager', 'Subject Matter Expert', 'Trainer', 'Learning and Development Head',
-              'Process Trainer', 'Trainer Sales']
+tl_am_list = []
+for i in Designation.objects.filter(category='TL AM'):
+    tl_am_list.append(i.name)
+
 # Manager List
-manager_list = ['Quality Head', 'Operations Manager', 'Service Delivery Manager', 'Command Centre Head','IT Manager']
+manager_list = []
+for i in Designation.objects.filter(Q(category='Manager List') | Q(category='Management List')):
+    manager_list.append(i.name)
+
 # HR List
-hr_list = ['HR', 'HR Manager', 'Manager ER', 'HR Lead', 'Sr Recruiter', 'MIS Executive HR',
-           'Lead HRBP', 'Employee Relations Specialist', 'Payroll Specialist', 'Recruiter', 'HR Generalist',
-           'Managing Director', 'Associate Director', 'Junior Recruiter']
+hr_list = []
+for i in Designation.objects.filter(Q(category='HR') | Q(category='OM HR') | Q(category='Management List - HR') | Q(category='TL AM HR') | Q(category='TA') | Q(category='TA - TL - AM')):
+    hr_list.append(i.name)
+
 # Agent List
-agent_list = ['Client Relationship Officer', 'MIS Executive', 'Patrolling officer',
-              'Data Analyst', 'Business Development Executive', 'Content Developer',
-              'Junior Developer', 'Web Developer', 'Trainee Developer', 'Jr Dev', 'CRO'
-              ]
-rm_list = ['Team Leader', 'Assistant Manager', 'Subject Matter Expert', 'Trainer', 'Learning and Development Head',
-           'Process Trainer', 'Sales Trainer',
-           'Quality Head', 'Operations Manager', 'Service Delivery Manager', 'Command Centre Head',
-           'HR', 'HR Manager', 'Manager ER', 'HR Lead', 'Sr Recruiter', 'MIS Executive HR',
-           'Lead HRBP', 'Employee Relations Specialist', 'Payroll Specialist', 'Recruiter', 'HR Generalist',
-           'Associate Director', 'Chief Executive Officer', 'Chief Compliance Officer', 'Chief Technology Officer',
-           'Managing Director', 'Vice President', 'Board member',
-           'IT Manager']
-management_list = ['Managing Director', 'Associate Director','Chief Technology Officer','Chief Executive Officer',
-                   'Chief Compliance Officer','Vice President']
-hr_tl_am_list = ['HR Manager', 'Manager ER', 'Managing Director', 'Associate Director', 'HR Lead']
-hr_om_list = ['Managing Director', 'Associate Director']
+agent_list = []
+for i in Designation.objects.filter(category='Agent'):
+    agent_list.append(i.name)
+
+# Management List
+management_list = []
+for i in Designation.objects.filter(Q(category='Management List') | Q(category='Management List - HR')):
+    management_list.append(i.name)
+
+rm_list = []
+for i in Designation.objects.filter(Q(category='TL AM') | Q(category='Manager List') | Q(category='OM HR') | Q(category='TL AM HR') | Q(category='TA - TL - AM')):
+    rm_list.append(i.name)
+
+hr_tl_am_list = []
+for i in Designation.objects.filter(Q(category='TL AM HR') | Q(category='TA - TL - AM')):
+    hr_tl_am_list.append(i.name)
+
+hr_om_list = []
+for i in Designation.objects.filter(Q(category='OM HR') | Q(category='Management List - HR')):
+    hr_om_list.append(i.name)
 
 
 # Create your views here.
@@ -73,10 +83,11 @@ def loginAndRedirect(request):  # Test1
                 return redirect('/ams/manager-dashboard')
             elif request.user.profile.emp_desi in hr_list:
                 return redirect('/ams/hr-dashboard')
-            elif request.user.profile.emp_desi in management_list:
-                return redirect('/ams/manager-dashboard')
-            else:
+            elif request.user.profile.emp_desi in agent_list:
                 return redirect('/ams/agent-dashboard')
+            else:
+                messages.info(request, 'Something Went Wrong! Contact CC Team.')
+                return redirect('/ams/')
         else:
             form = AuthenticationForm()
             messages.info(request, 'Invalid Credentials')
@@ -253,68 +264,113 @@ def tlDashboard(request):  # Test1
 
 @login_required
 def managerDashboard(request):  # Test1
-    if request.user.profile.emp_desi in manager_list:
-        mgr_name = request.user.profile.emp_name
-        emp_id = request.user.profile.emp_id
+    mgr_name = request.user.profile.emp_name
+    emp_id = request.user.profile.emp_id
+
+    emp = Profile.objects.get(emp_id=emp_id)
+    # Mapping Tickets
+    map_tickets_counts = MappingTickets.objects.filter(new_rm3_id=emp_id, status=False).count()
+    # Leave Requests
+    leave_req_count = LeaveTable.objects.filter(emp_rm3_id=emp_id, tl_status='Approved',
+                                                manager_approval=False).count()
+    # Leave Escalation Count
+    leave_esc_count = LeaveTable.objects.filter(emp_rm3_id=emp_id, manager_approval=False, escalation=True).count()
+    # Attendance
+    att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False, rm3_id=emp_id).count()
+    # Month view
+    month_days = []
+    todays_date = date.today()
+    year = todays_date.year
+    month = todays_date.month
+    a, num_days = calendar.monthrange(year, month)
+    start_date = date(year, month, 1)
+    end_date = date(year, month, num_days)
+    delta = timedelta(days=1)
+    while start_date <= end_date:
+        month_days.append(start_date.strftime("%Y-%m-%d"))
+        start_date += delta
+    month_cal = []
+    for i in month_days:
+        dict = {}
+        try:
+            st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id)).att_actual
+        except EcplCalander.DoesNotExist:
+            st = 'Unmarked'
+        dict['dt'] = i
+        dict['st'] = st
+        month_cal.append(dict)
+
+    if request.user.profile.emp_desi in management_list and request.user.profile.emp_desi in manager_list:
+        # All Employees
+        all_emps = Profile.objects.filter(Q(agent_status='Active'),
+                                          Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id))
+        all_emps_under = []
+        for i in all_emps:
+            if i not in all_emps_under:
+                all_emps_under.append(i)
+                under = Profile.objects.filter(Q(agent_status='Active'),
+                                              Q(emp_rm1_id=i.emp_id) | Q(emp_rm2_id=i.emp_id) | Q(emp_rm3_id=i.emp_id))
+                for j in under:
+                    if j not in all_emps_under:
+                        all_emps_under.append(j)
+
+        # count of all employees
+        count_all_emps = len(all_emps_under)
+
+        # TLS
+        all_tls_under = []
+        for i in all_emps_under:
+            if i not in all_tls_under:
+                if i.emp_desi == 'Team Leader':
+                    all_tls_under.append(i)
+        # TLS Count
+        all_tls_count = len(all_tls_under)
+        # AMS
+        all_ams_under = []
+        for i in all_emps_under:
+            if i not in all_ams_under:
+                if i.emp_desi == 'Assistant Manager':
+                    all_ams_under.append(i)
+
+        # AMS Count
+        all_ams_count = len(all_ams_under)
+    elif request.user.profile.emp_desi in manager_list:
         # All Employees
         all_emps = Profile.objects.filter(Q(agent_status='Active'),
                                           Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
+        all_emps_under = []
+        for i in all_emps:
+            if i not in all_emps_under:
+                all_emps_under.append(i)
         # count of all employees
         count_all_emps = all_emps.count()
         # TLS
         all_tls = Profile.objects.filter(Q(agent_status='Active'),
                                          Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id),
                                          Q(emp_desi='Team Leader')).distinct()
+        all_tls_under = list(all_tls)
+
         # TLS Count
         all_tls_count = all_tls.count()
         # AMS
         all_ams = Profile.objects.filter(Q(agent_status='Active'),
                                          Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id),
                                          Q(emp_desi='Assistant Manager')).distinct()
+
+        all_ams_under = list(all_ams)
         # TLS Count
         all_ams_count = all_ams.count()
-        emp = Profile.objects.get(emp_id=emp_id)
-        # Mapping Tickets
-        map_tickets_counts = MappingTickets.objects.filter(new_rm3_id=emp_id, status=False).count()
-        # Leave Requests
-        leave_req_count = LeaveTable.objects.filter(emp_rm3_id=emp_id, tl_status='Approved',
-                                                    manager_approval=False).count()
-        # Leave Escalation Count
-        leave_esc_count = LeaveTable.objects.filter(emp_rm3_id=emp_id, manager_approval=False, escalation=True).count()
-        # Attendance 
-        att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False, rm3_id=emp_id).count()
-        # Month view
-        month_days = []
-        todays_date = date.today()
-        year = todays_date.year
-        month = todays_date.month
-        a, num_days = calendar.monthrange(year, month)
-        start_date = date(year, month, 1)
-        end_date = date(year, month, num_days)
-        delta = timedelta(days=1)
-        while start_date <= end_date:
-            month_days.append(start_date.strftime("%Y-%m-%d"))
-            start_date += delta
-        month_cal = []
-        for i in month_days:
-            dict = {}
-            try:
-                st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id)).att_actual
-            except EcplCalander.DoesNotExist:
-                st = 'Unmarked'
-            dict['dt'] = i
-            dict['st'] = st
-            month_cal.append(dict)
-
-        data = {'emp': emp, 'count_all_emps': count_all_emps, 'all_tls': all_tls, 'all_tls_count': all_tls_count,
-                'all_ams': all_ams, 'all_ams_count': all_ams_count,
-                'map_tickets_counts': map_tickets_counts, 'att_requests_count': att_requests_count,
-                'leave_req_count': leave_req_count, 'leave_esc_count': leave_esc_count, 'all_emp': all_emps,
-                'month_cal': month_cal,
-                }
-        return render(request, 'ams/manager-dashboard.html', data)
     else:
-        return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
+        messages.error(request, "You are not Authorised to view this page! You have been Logged Out! ")
+        return redirect('/ams')
+    data = {'emp': emp, 'count_all_emps': count_all_emps, 'all_tls': all_tls_under, 'all_tls_count': all_tls_count,
+            'all_ams': all_ams_under, 'all_ams_count': all_ams_count,
+            'map_tickets_counts': map_tickets_counts, 'att_requests_count': att_requests_count,
+            'leave_req_count': leave_req_count, 'leave_esc_count': leave_esc_count, 'all_emp': all_emps_under,
+            'month_cal': month_cal,
+            }
+    return render(request, 'ams/manager-dashboard.html', data)
+
 
 
 @login_required
@@ -410,22 +466,36 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
 def viewallOMS(request, name):  # Test1
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
+    all_emp = Profile.objects.filter(Q(agent_status='Active'),
+                                     Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id))
+    all_emps_under = []
+    for i in all_emp:
+        if i not in all_emps_under:
+            all_emps_under.append(i)
+            under = Profile.objects.filter(Q(agent_status='Active'),
+                                           Q(emp_rm1_id=i.emp_id) | Q(emp_rm2_id=i.emp_id) | Q(emp_rm3_id=i.emp_id))
+            for j in under:
+                if j not in all_emps_under:
+                    all_emps_under.append(j)
     if name == 'Agent':
-        all_emp = Profile.objects.filter(Q(agent_status='Active'),
-                                         Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
-        data = {'emp': emp, 'all_emp': all_emp}
+        all_emps_under = all_emps_under
+        data = {'emp': emp, 'all_emp': all_emps_under}
         return render(request, 'ams/view_all_emp_om.html', data)
     elif name == 'TL':
-        all_emp = Profile.objects.filter(Q(agent_status='Active'),
-                                         Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id),
-                                         Q(emp_desi='Team Leader')).distinct()
-        data = {'emp': emp, 'all_emp': all_emp}
+        all_tls_under = []
+        for i in all_emps_under:
+            if i not in all_tls_under:
+                if i.emp_desi == 'Team Leader':
+                    all_tls_under.append(i)
+        data = {'emp': emp, 'all_emp': all_tls_under}
         return render(request, 'ams/view_all_emp_om.html', data)
     elif name == 'AM':
-        all_emp = Profile.objects.filter(Q(agent_status='Active'),
-                                         Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id),
-                                         Q(emp_desi='Assistant Manager')).distinct()
-        data = {'emp': emp, 'all_emp': all_emp}
+        all_ams_under = []
+        for i in all_emps_under:
+            if i not in all_ams_under:
+                if i.emp_desi == 'Assistant Manager':
+                    all_ams_under.append(i)
+        data = {'emp': emp, 'all_emp': all_ams_under}
         return render(request, 'ams/view_all_emp_om.html', data)
     else:
         messages.info(request, 'Bad Request')
@@ -991,6 +1061,7 @@ def teamAttendance(request):  # Team Attendance Page # Test1
         todays_dict['date'] = str(i.date)
         todays_dict['emp_name'] = i.emp_name
         todays_dict['emp_id'] = i.emp_id
+        todays_dict['att_actual'] = i.att_actual
         todays_dict_list.append(todays_dict)
     # Yesterday
     ystday_list_list = EcplCalander.objects.filter(Q(date=yesterday), Q(att_actual='Unmarked'), Q(emp_id__in=emp_list))
@@ -1000,6 +1071,7 @@ def teamAttendance(request):  # Team Attendance Page # Test1
         ystday_dict['date'] = str(i.date)
         ystday_dict['emp_name'] = i.emp_name
         ystday_dict['emp_id'] = i.emp_id
+        ystday_dict['att_actual'] = i.att_actual
         ystday_dict_list.append(ystday_dict)
     # Day Before Yesterday
     dby_list_list = EcplCalander.objects.filter(Q(date=dby_date), Q(att_actual='Unmarked'), Q(emp_id__in=emp_list))
@@ -1009,6 +1081,7 @@ def teamAttendance(request):  # Team Attendance Page # Test1
         dby_dict['date'] = str(i.date)
         dby_dict['emp_name'] = i.emp_name
         dby_dict['emp_id'] = i.emp_id
+        dby_dict['att_actual'] = i.att_actual
         dby_dict_list.append(dby_dict)
 
     emp = Profile.objects.get(emp_id=user_empid)
@@ -1146,21 +1219,38 @@ def viewTeamAttendance(request):  # Test1
         end_date = request.POST['end_date']
         emp_id = request.POST['emp_id']
         if emp_id == 'All':
-            cal = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),
+            if request.user.profile.emp_desi in management_list:
+                all_emp = Profile.objects.filter(Q(emp_rm1_id=rm) | Q(emp_rm2_id=rm) | Q(emp_rm3_id=rm))
+                emp_id_lst = []
+                for i in all_emp:
+                    if i.emp_id not in emp_id_lst:
+                        emp_id_lst.append(i.emp_id)
+                        under = Profile.objects.filter(Q(emp_rm1_id=i.emp_id) | Q(emp_rm2_id=i.emp_id) | Q(emp_rm3_id=i.emp_id))
+                        for j in under:
+                            if j.emp_id not in emp_id_lst:
+                                emp_id_lst.append(j.emp_id)
+                cal = EcplCalander.objects.filter(emp_id__in=emp_id_lst,
+                        date__range=[start_date, end_date])
+            else:
+                cal = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),
                                               date__range=[start_date, end_date])
         else:
-            cal = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),
-                                              date__range=[start_date, end_date], emp_id=emp_id)
+            cal = EcplCalander.objects.filter(date__range=[start_date, end_date], emp_id=emp_id)
+        if emp_id == 'self':
+            cal = EcplCalander.objects.filter(emp_id=rm,
+                                              date__range=[start_date, end_date])
         emp = Profile.objects.get(emp_id=rm)
         data = {'agt_cal_list': cal, 'emp': emp}
         return render(request, 'ams/agent-calander-status.html', data)
     else:
-        return HttpResponse('<h2>*** GET not available ***</h2>')
+        messages.info(request, "Invalid Request!")
+        return redirect('/ams/tl-dashboard')
 
 
 @login_required
 def weekAttendanceReport(request):  # Test1
     empobj = Profile.objects.get(emp_id=request.user.profile.emp_id)
+    emp_id = request.user.profile.emp_id
     day = date.today()
     start = day - timedelta(days=day.weekday())
     start = start + timedelta(days=-1)
@@ -1175,7 +1265,7 @@ def weekAttendanceReport(request):  # Test1
     end = date(end_year, end_month, end_day)
     weeks = ['sund', 'mon', 'tue', 'wed', 'thur', 'fri', 'sat']
     emp_id_list = []
-    ems = Profile.objects.filter(emp_rm1_id=request.user.profile.emp_id)
+    ems = Profile.objects.filter(Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id))
     for i in ems:
         emp_id_list.append(i.emp_id)
     weekdays = []
@@ -1501,7 +1591,7 @@ def applyLeave(request):  # Test1
                 e.tl_status = 'Approved'
                 e.tl_approval = True
                 e.tl_reason = 'OM as TL'
-            if emp_desi in manager_list or emp_desi in tl_am_list:
+            if emp_desi in manager_list or emp_desi in tl_am_list or emp_desi in hr_tl_am_list or emp_desi in hr_om_list:
                 e.tl_status = 'Approved'
                 e.tl_approval = True
                 e.tl_reason = 'Self Approved'
@@ -1654,8 +1744,18 @@ def viewEscalation(request):  # Test1
 @login_required
 def viewLeaveHistory(request):  # Test1
     emp_id = request.user.profile.emp_id
-    leave = LeaveTable.objects.filter(Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id))
-    data = {'leave': leave}
+    leave = Profile.objects.filter(Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id))
+    direct = LeaveTable.objects.filter(Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id))
+    leave_lst = []
+    for i in leave:
+        under = LeaveTable.objects.filter(Q(emp_rm1_id=i.emp_id) | Q(emp_rm2_id=i.emp_id) | Q(emp_rm3_id=i.emp_id))
+        for j in under:
+            if j not in leave_lst:
+                leave_lst.append(j)
+    for i in direct:
+        if i not in leave_lst:
+            leave_lst.append(i)
+    data = {'leave': leave_lst}
     return render(request, 'ams/view_employee_leave_history.html', data)
 
 
@@ -1825,6 +1925,7 @@ def addAttendance(request):
             days.save()
         e = AddAttendanceMonths.objects.get(id=id)
         e.created = True
+        e.created_by = request.user.profile.emp_name + "(" + request.user + ")"
         e.save()
         messages.info(request, "Attendance added Successfully!")
         return redirect('/ams/add-attendance')
@@ -1907,9 +2008,6 @@ def addLeaveBalance(request):
                 for j in ecpl_cal:
                     week_off = []
                     last = ""
-                    leave_bal = 0
-                    type = ""
-                    isdone = ''
                     if j.emp_id == i.emp_id:
                         if j.att_actual == "present" or j.att_actual == "Week OFF" or j.att_actual == "Comp OFF" or j.att_actual == "Holiday":
                             cal += 1
@@ -1922,63 +2020,21 @@ def addLeaveBalance(request):
                                 week_off_dict = {}
                                 start -= timedelta(days=1)
                                 for k in ecpl_cal:
-                                    if k.att_actual == "Week OFF" or k.att_actual == "Comp OFF" or k.att_actual == "Client OFF" and k.emp_id == j.emp_id and k.date == start:
+                                    if k.att_actual != "Week OFF" and k.emp_id == j.emp_id and k.date == start:
+                                        end = start+timedelta(days=1)
+                                    if k.att_actual == "Week OFF" and k.emp_id == j.emp_id and k.date == start:
                                         last = start - timedelta(days=1)
                                         week_off_dict['emp_id'] = j.emp_id
                                         week_off_dict['date'] = start
                                         week_off.append(week_off_dict)
                     if week_off:
-                        for w in week_off:
-                            for k in ecpl_cal:
-                                if w['emp_id'] == k.emp_id:
-                                    if k.date == last and k.att_actual == "PL" or k.att_actual == "SL":
-                                        if k.emp_id == i.emp_id:
-                                            if k.att_actual == "PL" and k.date == last:
-                                                leave_bal = i.pl_balance
-                                            elif k.att_actual == "SL" and k.date == last:
-                                                leave_bal = i.sl_balance
-                                            if leave_bal >= len(week_off) and k.emp_id == i.emp_id:
-                                                if k.att_actual == "PL":
-                                                    isdone = 'yes'
-                                                    type = "PL"
-                                                    i.pl_balance -= len(week_off)
-                                                    pl_hist = leaveHistory()
-                                                    pl_hist.unique_id = unique_id
-                                                    pl_hist.emp_id = i.emp_id
-                                                    pl_hist.date = date.today()
-                                                    pl_hist.leave_type = "PL"
-                                                    pl_hist.transaction = "Sandwich Leave Policy. Leave date before week off: "+str(last)
-                                                    pl_hist.no_days = len(week_off)
-                                                    total_bal -= len(week_off)
-                                                    pl_hist.total = total_bal
-                                                    leavehist.append(pl_hist)
-                                                elif k.att_actual == "SL":
-                                                    isdone = 'yes'
-                                                    type = "SL"
-                                                    i.sl_balance -= len(week_off)
-                                                    sl_hist = leaveHistory()
-                                                    sl_hist.unique_id = unique_id
-                                                    sl_hist.emp_id = i.emp_id
-                                                    sl_hist.date = date.today()
-                                                    sl_hist.leave_type = "SL"
-                                                    sl_hist.transaction = "Sandwich Leave Policy. Leave date before week off: "+str(last)
-                                                    sl_hist.no_days = len(week_off)
-                                                    total_bal -= len(week_off)
-                                                    sl_hist.total = total_bal
-                                                    leavehist.append(sl_hist)
-                                                leavebal.append(i)
-                                    if isdone == 'yes':
-                                        break
-                        for w in week_off:
-                            for k in ecpl_cal:
-                                if w['emp_id'] == k.emp_id and w['date'] == k.date:
-                                    if type == 'PL':
-                                        k.att_actual = 'PL'
-                                    elif type == 'SL':
-                                        k.att_actual = 'SL'
-                                    else:
+                        las_att_actual = EcplCalander.objects.get(date=last, emp_id=i.emp_id).att_actual
+                        if las_att_actual == "PL" or las_att_actual == "SL":
+                            for w in week_off:
+                                for k in ecpl_cal:
+                                    if w['emp_id'] == k.emp_id and w['date'] == k.date:
                                         k.att_actual = 'Absent'
-                                    ecplcal.append(k)
+                                        ecplcal.append(k)
 
                 i.sl_balance += 1
                 pl = round(cal / 20, 2)
@@ -2010,6 +2066,7 @@ def addLeaveBalance(request):
             EmployeeLeaveBalance.objects.bulk_update(leavebal,['sl_balance', 'pl_balance'])
             leaveHistory.objects.bulk_create(leavehist)
             e.leave = True
+            e.leave_by = request.user.profile.emp_name + "(" + request.user + ")"
             e.save()
             messages.info(request, "Leave Balance Added for the selected month")
 
