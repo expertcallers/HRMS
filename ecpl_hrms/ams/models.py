@@ -238,7 +238,3 @@ class LastEmpId(models.Model):
     def __str__(self):
         return self.emp_id
 
-class Designation(models.Model):
-    name = models.CharField(max_length=200)
-    category = models.CharField(max_length=200, null=True, blank=True)
-    created_by = models.CharField(max_length=200, default="CC Team")
