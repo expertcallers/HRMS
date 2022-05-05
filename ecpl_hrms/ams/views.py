@@ -22,7 +22,7 @@ c = Calendar()
 from django.apps import apps
 Profile = apps.get_model('mapping', 'Profile')
 
-'''# TL and AM List
+# TL and AM List
 tl_am_list = []
 for i in Designation.objects.filter(category='TL AM'):
     tl_am_list.append(i.name)
@@ -57,7 +57,7 @@ for i in Designation.objects.filter(Q(category='TL AM HR') | Q(category='TA - TL
 
 hr_om_list = []
 for i in Designation.objects.filter(Q(category='OM HR') | Q(category='Management List - HR')):
-    hr_om_list.append(i.name)'''
+    hr_om_list.append(i.name)
 
 # Create your views here.
 def loginPage(request):  # Test1
