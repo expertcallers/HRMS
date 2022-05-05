@@ -18,7 +18,7 @@ from django.db.models import Q, Sum, Max
 import xlwt
 c = Calendar()
 
-# Getting Model from other Apps
+'''# Getting Model from other Apps
 from django.apps import apps
 Profile = apps.get_model('mapping', 'Profile')
 
@@ -58,7 +58,7 @@ for i in Designation.objects.filter(Q(category='TL AM HR') | Q(category='TA - TL
 hr_om_list = []
 for i in Designation.objects.filter(Q(category='OM HR') | Q(category='Management List - HR')):
     hr_om_list.append(i.name)
-
+'''
 # Create your views here.
 def loginPage(request):  # Test1
     logout(request)
