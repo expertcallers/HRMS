@@ -16,11 +16,10 @@ import calendar
 from datetime import date
 from django.db.models import Q, Sum, Max
 import xlwt
-
 c = Calendar()
+
 # Getting Model from other Apps
 from django.apps import apps
-
 Profile = apps.get_model('mapping', 'Profile')
 
 # TL and AM List
@@ -60,14 +59,12 @@ hr_om_list = []
 for i in Designation.objects.filter(Q(category='OM HR') | Q(category='Management List - HR')):
     hr_om_list.append(i.name)
 
-
 # Create your views here.
 def loginPage(request):  # Test1
     logout(request)
     form = AuthenticationForm()
     data = {'form': form}
     return render(request, 'ams/login.html', data)
-
 
 def loginAndRedirect(request):  # Test1
     if request.method == 'POST':
@@ -108,6 +105,8 @@ def redirectTOAllDashBoards(request, id):  # Test1
         return redirect('/ams/hr-dashboard')
     elif request.user.profile.emp_desi in manager_list:
         return redirect('/ams/manager-dashboard')
+    elif request.user.profile.emp_desi in agent_list:
+        return redirect('/ams/agent-dashboard')    
     else:
         return HttpResponse('<h1>Not Authorised to view this page</h1>')
 
@@ -1229,11 +1228,32 @@ def viewTeamAttendance(request):  # Test1
                         for j in under:
                             if j.emp_id not in emp_id_lst:
                                 emp_id_lst.append(j.emp_id)
-                cal = EcplCalander.objects.filter(emp_id__in=emp_id_lst,
-                        date__range=[start_date, end_date])
+                # cal = EcplCalander.objects.filter(emp_id__in=emp_id_lst,
+                #        date__range=[start_date, end_date])
+                # Export
+                response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = 'attachment; filename="attendance_report.csv"'
+                writer = csv.writer(response)
+                writer.writerow(['Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'])
+                calanders = EcplCalander.objects.filter(emp_id__in=emp_id_lst,date__range=[start_date, end_date]).values_list(
+                    'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team')
+                for c in calanders:
+                    writer.writerow(c)
+                return response  
             else:
-                cal = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),
-                                              date__range=[start_date, end_date])
+                # cal = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),
+                #                              date__range=[start_date, end_date])
+                # Export
+                response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = 'attachment; filename="attendance_report.csv"'
+                writer = csv.writer(response)
+                writer.writerow(['Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'])
+                calanders = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),date__range=[start_date, end_date]).values_list(
+                    'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team')
+                for c in calanders:
+                    writer.writerow(c)
+                return response  
+
         else:
             cal = EcplCalander.objects.filter(date__range=[start_date, end_date], emp_id=emp_id)
         if emp_id == 'self':
@@ -1345,7 +1365,6 @@ def agentSettings(request):  # Test1
     data = {'emp': emp, 'form': form}
     return render(request, 'ams/agent-settings.html', data)
 
-
 @login_required
 def rmSettings(request):  # Test1
     emp_id = request.user.profile.emp_id
@@ -1353,7 +1372,6 @@ def rmSettings(request):  # Test1
     form = PasswordChangeForm(request.user)
     data = {'emp': emp, 'form': form}
     return render(request, 'ams/rm-settings.html', data)
-
 
 @login_required
 def uploadImageToDB(request):  # Test1
