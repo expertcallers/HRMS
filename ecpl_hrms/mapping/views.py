@@ -29,27 +29,23 @@ rm_list = ['HR', 'HR Manager', 'Manager ER', 'HR Lead', 'Sr Recruiter', 'MIS Exe
 # Mapping Home Page
 @login_required
 def employeeMapping(request): 
-    if request.user.profile.emp_desi in manager_list:
-        if request.method == 'POST':
-            emp_name = request.POST['emp_name']
-            employees = Profile.objects.filter(agent_status = 'Active',emp_name__icontains=emp_name)
-            if employees:
-                messages.info(request,'Search Result')
-            else:
-                messages.info(request,'The requested employee not found')
-            teams = Campaigns.objects.all().order_by('name')
-            data = {'employees': employees,'teams':teams,'emp_name':emp_name,}
-            return render(request, 'mapping/index.html', data)
+
+    if request.method == 'POST':
+        emp_name = request.POST['emp_name']
+        employees = Profile.objects.filter(agent_status = 'Active',emp_name__icontains=emp_name)
+        if employees:
+            messages.info(request,'Search Result')
         else:
-            employees = Profile.objects.all()
-            teams = Campaigns.objects.all().order_by('name')
-            data = {'employees':employees,'teams':teams,}
-            return render(request,'mapping/index.html',data)
+            messages.info(request,'The requested employee not found')
+        teams = Campaigns.objects.all().order_by('name')
+        data = {'employees': employees,'teams':teams,'emp_name':emp_name,}
+        return render(request, 'mapping/index.html', data)
     else:
-        logout(request)
-        form = AuthenticationForm()
-        m='Not Authorised to view this page !'
-        return render(request,'mapping/login.html',{'form':form,'m':m})
+        employees = Profile.objects.all()
+        teams = Campaigns.objects.all().order_by('name')
+        data = {'employees':employees,'teams':teams,}
+        return render(request,'mapping/index.html',data)
+
 
 # Login Page 
 def mappingLogin(request):
@@ -59,14 +55,13 @@ def mappingLogin(request):
             # login the user
             user = form.get_user()
             login(request, user)
-            if request.user.profile.emp_desi in manager_list:
-                if request.user.profile.pc == False:
-                    return redirect('/mapping/change-password')
-                return redirect('/mapping/home')
-            else:
+         
+            if request.user.profile.pc == False:
                 form = AuthenticationForm()
-                m='Not Authorised to view this page !'
+                m='User not activated !'
                 return render(request,'mapping/login.html',{'form':form,'m':m})
+            return redirect('/mapping/home')
+
         else:
             form = AuthenticationForm()
             m='Invalid Credentials !'
@@ -270,7 +265,7 @@ def exportMapping(request):
         font_style = xlwt.XFStyle()
         font_style.font.bold = True
         columns = [
-                    'Emp ID','Emp Name','Designation','RM 1','RM 2','RM 3','Team'
+                    'Emp ID','Emp Name','Designation','RM 1','RM 2','RM 3','Team','status'
                   ]
         for col_num in range(len(columns)):
             ws.write(row_num, col_num, columns[col_num], font_style)  # at 0 row 0 column
@@ -278,7 +273,7 @@ def exportMapping(request):
         font_style = xlwt.XFStyle()
         if team_id =='all':
             rows = Profile.objects.all().values_list(
-            'emp_id', 'emp_name', 'emp_desi', 'emp_rm1', 'emp_rm2', 'emp_rm3', 'emp_process'
+            'emp_id', 'emp_name', 'emp_desi', 'emp_rm1', 'emp_rm2', 'emp_rm3', 'emp_process','agent_status'
             )
         else:
             rows = Profile.objects.filter(emp_process_id = team_id).values_list(

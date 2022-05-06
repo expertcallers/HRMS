@@ -16,11 +16,10 @@ import calendar
 from datetime import date
 from django.db.models import Q, Sum, Max
 import xlwt
-
 c = Calendar()
+
 # Getting Model from other Apps
 from django.apps import apps
-
 Profile = apps.get_model('mapping', 'Profile')
 
 # TL and AM List
@@ -60,14 +59,12 @@ hr_om_list = []
 for i in Designation.objects.filter(Q(category='OM HR') | Q(category='Management List - HR')):
     hr_om_list.append(i.name)
 
-
 # Create your views here.
 def loginPage(request):  # Test1
     logout(request)
     form = AuthenticationForm()
     data = {'form': form}
     return render(request, 'ams/login.html', data)
-
 
 def loginAndRedirect(request):  # Test1
     if request.method == 'POST':
@@ -108,6 +105,8 @@ def redirectTOAllDashBoards(request, id):  # Test1
         return redirect('/ams/hr-dashboard')
     elif request.user.profile.emp_desi in manager_list:
         return redirect('/ams/manager-dashboard')
+    elif request.user.profile.emp_desi in agent_list:
+        return redirect('/ams/agent-dashboard')    
     else:
         return HttpResponse('<h1>Not Authorised to view this page</h1>')
 
@@ -1229,11 +1228,32 @@ def viewTeamAttendance(request):  # Test1
                         for j in under:
                             if j.emp_id not in emp_id_lst:
                                 emp_id_lst.append(j.emp_id)
-                cal = EcplCalander.objects.filter(emp_id__in=emp_id_lst,
-                        date__range=[start_date, end_date])
+                # cal = EcplCalander.objects.filter(emp_id__in=emp_id_lst,
+                #        date__range=[start_date, end_date])
+                # Export
+                response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = 'attachment; filename="attendance_report.csv"'
+                writer = csv.writer(response)
+                writer.writerow(['Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'])
+                calanders = EcplCalander.objects.filter(emp_id__in=emp_id_lst,date__range=[start_date, end_date]).values_list(
+                    'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team')
+                for c in calanders:
+                    writer.writerow(c)
+                return response  
             else:
-                cal = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),
-                                              date__range=[start_date, end_date])
+                # cal = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),
+                #                              date__range=[start_date, end_date])
+                # Export
+                response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = 'attachment; filename="attendance_report.csv"'
+                writer = csv.writer(response)
+                writer.writerow(['Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'])
+                calanders = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),date__range=[start_date, end_date]).values_list(
+                    'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team')
+                for c in calanders:
+                    writer.writerow(c)
+                return response  
+
         else:
             cal = EcplCalander.objects.filter(date__range=[start_date, end_date], emp_id=emp_id)
         if emp_id == 'self':
@@ -1302,7 +1322,7 @@ def weekAttendanceReport(request):  # Test1
     data = {"cal": new_lst, 'emp': empobj}
     return render(request, 'ams/week_attendace_report.html', data)
 
-
+import csv
 @login_required
 def teamAttendanceReport(request):  # Test 1
     if request.method == 'POST':
@@ -1314,61 +1334,25 @@ def teamAttendanceReport(request):  # Test 1
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
         if team_name == 'All Team':
-            response = HttpResponse(content_type='application/ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="report.xlsx"'
-            wb = xlwt.Workbook(encoding='utf-8')
-            ws = wb.add_sheet('Users Data')  # this will make a sheet named Users Data
-            # Sheet header, first row
-            row_num = 0
-            font_style = xlwt.XFStyle()
-            font_style.font.bold = True
-            columns = [
-                'Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'
-            ]
-            for col_num in range(len(columns)):
-                ws.write(row_num, col_num, columns[col_num], font_style)  # at 0 row 0 column
-            # Sheet body, remaining rows
-            font_style = xlwt.XFStyle()
-            rows = EcplCalander.objects.filter(date__range=[start_date, end_date]).values_list(
-                'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team'
-            )
-            import datetime
-            rows = [[x.strftime("%Y-%m-%d %H:%M") if isinstance(x, datetime.datetime) else x for x in row] for row in
-                    rows]
-            for row in rows:
-                row_num += 1
-                for col_num in range(len(row)):
-                    ws.write(row_num, col_num, row[col_num], font_style)
-            wb.save(response)
-            return response
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="attendance_report.csv"'
+            writer = csv.writer(response)
+            writer.writerow(['Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'])
+            calanders = EcplCalander.objects.filter(date__range=[start_date, end_date]).values_list(
+                'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team')
+            for c in calanders:
+                writer.writerow(c)
+            return response            
         else:
             team_name = Campaigns.objects.get(id=team_name).name
-            response = HttpResponse(content_type='application/ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="report.xlsx"'
-            wb = xlwt.Workbook(encoding='utf-8')
-            ws = wb.add_sheet('Users Data')  # this will make a sheet named Users Data
-            # Sheet header, first row
-            row_num = 0
-            font_style = xlwt.XFStyle()
-            font_style.font.bold = True
-            columns = [
-                'Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'
-            ]
-            for col_num in range(len(columns)):
-                ws.write(row_num, col_num, columns[col_num], font_style)  # at 0 row 0 column
-                # Sheet body, remaining rows
-            font_style = xlwt.XFStyle()
-            rows = EcplCalander.objects.filter(date__range=[start_date, end_date], team=team_name).values_list(
-                'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team'
-            )
-            import datetime
-            rows = [[x.strftime("%Y-%m-%d %H:%M") if isinstance(x, datetime.datetime) else x for x in row] for row in
-                    rows]
-            for row in rows:
-                row_num += 1
-                for col_num in range(len(row)):
-                    ws.write(row_num, col_num, row[col_num], font_style)
-            wb.save(response)
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="attendance_report.csv"'
+            writer = csv.writer(response)
+            writer.writerow(['Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'])
+            calanders = EcplCalander.objects.filter(team=team_name,date__range=[start_date, end_date]).values_list(
+                'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team')
+            for c in calanders:
+                writer.writerow(c)
             return response
     else:
         return HttpResponse('<h2>*** GET not available ***</h2>')
@@ -1382,7 +1366,6 @@ def agentSettings(request):  # Test1
     data = {'emp': emp, 'form': form}
     return render(request, 'ams/agent-settings.html', data)
 
-
 @login_required
 def rmSettings(request):  # Test1
     emp_id = request.user.profile.emp_id
@@ -1390,7 +1373,6 @@ def rmSettings(request):  # Test1
     form = PasswordChangeForm(request.user)
     data = {'emp': emp, 'form': form}
     return render(request, 'ams/rm-settings.html', data)
-
 
 @login_required
 def uploadImageToDB(request):  # Test1
@@ -2016,7 +1998,6 @@ def SLProofSubmit(request):  # Test1
             messages.info(request, "The time has exceeded cannot upload now :)")
             return redirect('/ams/ams-apply_leave')
 
-
 @login_required
 def addLeaveBalance(request):
     emp_desi = request.user.profile.emp_desi
@@ -2117,42 +2098,6 @@ def addLeaveBalance(request):
     else:
         messages.info(request, "Unauthorized access you have been Logged out :)")
         return redirect('/ams/')
-
-
-def exportMapping(request):
-    if request.method == 'GET':
-
-        response = HttpResponse(content_type='application/ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="mapping.xlsx"'
-        wb = xlwt.Workbook(encoding='utf-8')
-        ws = wb.add_sheet('Users Data')  # this will make a sheet named Users Data
-        # Sheet header, first row
-        row_num = 0
-        font_style = xlwt.XFStyle()
-        font_style.font.bold = True
-        columns = [
-            'Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'
-        ]
-        for col_num in range(len(columns)):
-            ws.write(row_num, col_num, columns[col_num], font_style)  # at 0 row 0 column
-        # Sheet body, remaining rows
-        font_style = xlwt.XFStyle()
-        start = '2022-03-01'
-        end = '2022-03-31'
-
-        rows = EcplCalander.objects.filter(date__range=[start, end]).values_list(
-            'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team'
-        )
-
-        import datetime
-        rows = [[x.strftime("%Y-%m-%d %H:%M") if isinstance(x, datetime.datetime) else x for x in row] for row in
-                rows]
-        for row in rows:
-            row_num += 1
-            for col_num in range(len(row)):
-                ws.write(row_num, col_num, row[col_num], font_style)
-        wb.save(response)
-        return response
 
 
 def TestFun(request):
