@@ -1981,7 +1981,6 @@ def changeEmpPassword(request):
         return redirect("/ams/")
 
 
-
 @login_required
 def SLProofSubmit(request):  # Test1
     if request.method == 'POST':
@@ -2105,8 +2104,7 @@ def TestFun(request):
     last_date = date(2022, 5, 31)
     delta = last_date - start_date
     date_list = []
-    for i in EmployeeLeaveBalance.objects.all():
-        i.delete()
+
     for i in range(delta.days + 1):
         day = start_date + timedelta(days=i)
         try:
