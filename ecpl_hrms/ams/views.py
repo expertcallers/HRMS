@@ -1269,6 +1269,9 @@ def viewTeamAttendance(request):  # Test1
 
 @login_required
 def weekAttendanceReport(request):  # Test1
+    def Merge(a, b, c, d, e, f, g):
+        res = a | b | c | d | e | f | g
+        return res
     empobj = Profile.objects.get(emp_id=request.user.profile.emp_id)
     emp_id = request.user.profile.emp_id
     day = date.today()
@@ -1287,38 +1290,36 @@ def weekAttendanceReport(request):  # Test1
     emp_id_list = []
     ems = Profile.objects.filter(Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id))
     for i in ems:
-        emp_id_list.append(i.emp_id)
+        if i.emp_id not in emp_id_list:
+            emp_id_list.append(i.emp_id)
     weekdays = []
     delta = timedelta(days=1)
     while start <= end:
-        weekdays.append(start.strftime("%Y-%m-%d"))
+        weekdays.append(start)
         start += delta
     lst = []  # main data
-    for j in emp_id_list:
-        if len(emp_id_list) > 0:
-            emp = Profile.objects.get(emp_id=j)
-        else:
-            break
+    calobj = EcplCalander.objects.filter(emp_id__in=emp_id_list, date__in=weekdays)
+    for i in calobj:
         samp = {}
-        samp['name'] = emp.emp_name
-        samp["emp_id"] = emp.emp_id
-        for i in weekdays:
-            try:
-                calobj = EcplCalander.objects.get(date=i, emp_id=j)
-                att = calobj.att_actual
-                samp[i] = att
-            except EcplCalander.DoesNotExist:
-                att = 'Unmarked'
-                samp[i] = att
-        # making key static
-        j = 0
-        for i in weekdays:
-            a = weeks[j]
-            samp[a] = samp[i]
-            del samp[i]
-            j += 1
+        samp['name'] = i.emp_name
+        samp["emp_id"] = i.emp_id
+        samp[i.date] = i.att_actual
         lst.append(samp)
-    data = {"cal": lst, 'emp': empobj}
+    n = 0
+    new_lst = []
+    sort = sorted(lst, key=lambda x: x['emp_id'])
+    for i in range(0,len(emp_id_list)):
+        individual = Merge(sort[n], sort[n + 1], sort[n + 2], sort[n + 3], sort[n + 4], sort[n + 5], sort[n + 6])
+        j = 0
+        for w in weekdays:
+            a = weeks[j]
+            individual[a] = individual[w]
+            del individual[w]
+            j += 1
+        new_lst.append(individual)
+        n+=7
+
+    data = {"cal": new_lst, 'emp': empobj}
     return render(request, 'ams/week_attendace_report.html', data)
 
 import csv
