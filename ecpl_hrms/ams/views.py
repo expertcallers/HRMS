@@ -2151,3 +2151,8 @@ def TestFun(request):
     EmployeeLeaveBalance.objects.bulk_create(lea)
     messages.info(request, "Attendance added Successfully!")
     return redirect('/ams/')
+
+
+
+            
+            
