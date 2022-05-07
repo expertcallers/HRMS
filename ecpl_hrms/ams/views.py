@@ -1270,7 +1270,7 @@ def viewTeamAttendance(request):  # Test1
 @login_required
 def weekAttendanceReport(request):  # Test1
     def Merge(a, b, c, d, e, f, g):
-        res = a | b | c | d | e | f | g
+        res = {**a,**b,**c,**d,**e,**f,**g}
         return res
     empobj = Profile.objects.get(emp_id=request.user.profile.emp_id)
     emp_id = request.user.profile.emp_id
