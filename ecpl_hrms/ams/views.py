@@ -24,40 +24,18 @@ Profile = apps.get_model('mapping', 'Profile')
 
 # TL and AM List
 tl_am_list = []
-for i in Designation.objects.filter(category='TL AM'):
-    tl_am_list.append(i.name)
-
 # Manager List
 manager_list = []
-for i in Designation.objects.filter(Q(category='Manager List') | Q(category='Management List')):
-    manager_list.append(i.name)
-
 # HR List
 hr_list = []
-for i in Designation.objects.filter(Q(category='HR') | Q(category='OM HR') | Q(category='Management List - HR') | Q(category='TL AM HR') | Q(category='TA') | Q(category='TA - TL - AM')):
-    hr_list.append(i.name)
-
 # Agent List
 agent_list = []
-for i in Designation.objects.filter(category='Agent'):
-    agent_list.append(i.name)
-
 # Management List
 management_list = []
-for i in Designation.objects.filter(Q(category='Management List') | Q(category='Management List - HR')):
-    management_list.append(i.name)
 
 rm_list = []
-for i in Designation.objects.filter(Q(category='TL AM') | Q(category='Manager List') | Q(category='OM HR') | Q(category='TL AM HR') | Q(category='TA - TL - AM')):
-    rm_list.append(i.name)
-
 hr_tl_am_list = []
-for i in Designation.objects.filter(Q(category='TL AM HR') | Q(category='TA - TL - AM')):
-    hr_tl_am_list.append(i.name)
-
 hr_om_list = []
-for i in Designation.objects.filter(Q(category='OM HR') | Q(category='Management List - HR')):
-    hr_om_list.append(i.name)
 
 # Create your views here.
 def loginPage(request):  # Test1
@@ -67,6 +45,31 @@ def loginPage(request):  # Test1
     return render(request, 'ams/login.html', data)
 
 def loginAndRedirect(request):  # Test1
+
+    for i in Designation.objects.filter(category='TL AM'):
+        tl_am_list.append(i.name)
+
+    for i in Designation.objects.filter(Q(category='Manager List') | Q(category='Management List')):
+        manager_list.append(i.name)
+
+    for i in Designation.objects.filter(Q(category='HR') | Q(category='OM HR') | Q(category='Management List - HR') | Q(category='TL AM HR') | Q(category='TA') | Q(category='TA - TL - AM')):
+        hr_list.append(i.name)
+
+    for i in Designation.objects.filter(category='Agent'):
+        agent_list.append(i.name)
+
+    for i in Designation.objects.filter(Q(category='Management List') | Q(category='Management List - HR')):
+        management_list.append(i.name)
+
+    for i in Designation.objects.filter(Q(category='TL AM') | Q(category='Manager List') | Q(category='OM HR') | Q(category='TL AM HR') | Q(category='TA - TL - AM')):
+        rm_list.append(i.name)
+
+    for i in Designation.objects.filter(Q(category='TL AM HR') | Q(category='TA - TL - AM')):
+        hr_tl_am_list.append(i.name)
+
+    for i in Designation.objects.filter(Q(category='OM HR') | Q(category='Management List - HR')):
+        hr_om_list.append(i.name)
+
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
@@ -96,7 +99,6 @@ def loginAndRedirect(request):  # Test1
         data = {'form': form}
         return render(request, 'ams/login.html', data)
 
-
 @login_required
 def redirectTOAllDashBoards(request, id):  # Test1
     if request.user.profile.emp_desi in tl_am_list:
@@ -110,11 +112,9 @@ def redirectTOAllDashBoards(request, id):  # Test1
     else:
         return HttpResponse('<h1>Not Authorised to view this page</h1>')
 
-
 def logoutView(request):  # Test1
     logout(request)
     return redirect('/ams/')
-
 
 @login_required
 def change_password(request):  # Test1
@@ -135,7 +135,6 @@ def change_password(request):  # Test1
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'ams/change-password.html', {'form': form})
-
 
 @login_required
 def agentDashBoard(request):  # Test1
@@ -171,7 +170,6 @@ def agentDashBoard(request):  # Test1
         return render(request, 'ams/agent-dashboard-new.html', data)
     else:
         return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
-
 
 @login_required
 def tlDashboard(request):  # Test1
