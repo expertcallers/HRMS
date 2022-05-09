@@ -418,8 +418,57 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
                         emp_name=emp_name
                     )
                     cal.save()
+            week_off = []
+            last = ''
+            if leave_type == 'SL':
+                start_date = e.start_date
+                sand_start_date = start_date - timedelta(days=1)
+                cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
+                if cal == "Week OFF":
+                    week_off.append(sand_start_date)
+                    sand_start_date -= timedelta(days=1)
+                    sand_end_date = start_date - timedelta(days=7)
+                    while sand_start_date > sand_end_date:
+                        cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
+                        if cal == "Week OFF":
+                            week_off.append(sand_start_date)
+                        elif cal == 'SL' or cal == 'PL':
+                            last = sand_start_date
+                            break
+                        else:
+                            break
+                        sand_start_date -= timedelta(days=1)
 
-
+            elif leave_type == 'PL':
+                start_date = e.start_date
+                sand_start_date = start_date - timedelta(days=1)
+                try:
+                    cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
+                    if cal == "Week OFF":
+                        week_off.append(sand_start_date)
+                        sand_start_date -= timedelta(days=1)
+                        sand_end_date = start_date - timedelta(days=7)
+                        while sand_start_date > sand_end_date:
+                            cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
+                            if cal == "Week OFF":
+                                week_off.append(sand_start_date)
+                            elif cal == 'SL' or cal == 'PL':
+                                last = sand_start_date
+                                break
+                            else:
+                                break
+                            sand_start_date -= timedelta(days=1)
+                except:
+                    pass
+            if last != '':
+                cal_list = []
+                last += timedelta(days=1)
+                while start_date > last:
+                    start_date -= timedelta(days=1)
+                    cal = EcplCalander.objects.get(Q(date=start_date), Q(emp_id=emp_id))
+                    cal.att_actual = "Absent (Sandwich)"
+                    cal_list.append(cal)
+                EcplCalander.objects.bulk_update(cal_list,['att_actual'])
         else:
             manager_approval = True
             manager_status = 'Rejected'
@@ -1136,6 +1185,38 @@ def applyAttendace(request):  # Test1
                 usr = Profile.objects.get(emp_id=emp_id)
                 usr.agent_status = att_actual
                 usr.save()
+        ddate = datetime.strptime(ddate,'%Y-%m-%d').date()
+        pre_day = ddate - timedelta(days=1)
+        cal = EcplCalander.objects.get(emp_id=emp_id, date=pre_day).att_actual
+        week_off = []
+        last = ''
+        start_date = pre_day
+        if cal == 'PL':
+            sand_start_date = start_date - timedelta(days=1)
+            cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
+            if cal == "Week OFF" or cal == "PL":
+                week_off.append(sand_start_date)
+                sand_start_date -= timedelta(days=1)
+                sand_end_date = start_date - timedelta(days=7)
+                while sand_start_date > sand_end_date:
+                    cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
+                    if cal == "Week OFF":
+                        week_off.append(sand_start_date)
+                    elif cal == 'SL' or cal == 'PL':
+                        last = sand_start_date
+                        break
+                    else:
+                        break
+                    sand_start_date -= timedelta(days=1)
+        if last != '':
+            cal_list = []
+            last += timedelta(days=1)
+            while start_date > last:
+                start_date -= timedelta(days=1)
+                cal = EcplCalander.objects.get(Q(date=start_date), Q(emp_id=emp_id))
+                cal.att_actual = "Absent (Sandwich)"
+                cal_list.append(cal)
+            EcplCalander.objects.bulk_update(cal_list,['att_actual'])
         return redirect('/ams/team-attendance')
     else:
         return HttpResponse('<h1>*** Page not available ***</h1>')
@@ -1268,7 +1349,7 @@ def viewTeamAttendance(request):  # Test1
 @login_required
 def weekAttendanceReport(request):  # Test1
     def Merge(a, b, c, d, e, f, g):
-        res = {**a,**b,**c,**d,**e,**f,**g}
+        res = a | b | c | d | e | f | g
         return res
     empobj = Profile.objects.get(emp_id=request.user.profile.emp_id)
     emp_id = request.user.profile.emp_id
@@ -1979,6 +2060,7 @@ def changeEmpPassword(request):
         return redirect("/ams/")
 
 
+
 @login_required
 def SLProofSubmit(request):  # Test1
     if request.method == 'POST':
@@ -2014,42 +2096,17 @@ def addLeaveBalance(request):
             end_date = end_date - timedelta(days=1)
             leavebal = []
             leavehist = []
-            ecplcal = []
             ecpl_cal = EcplCalander.objects.filter(date__range=[start_date, end_date]).exclude(att_actual='Unmarked')
             for i in emp:
                 cal = 0
                 i.unique_id = unique_id
                 total_bal = i.pl_balance + i.sl_balance
                 for j in ecpl_cal:
-                    week_off = []
-                    last = ""
                     if j.emp_id == i.emp_id:
                         if j.att_actual == "present" or j.att_actual == "Week OFF" or j.att_actual == "Comp OFF" or j.att_actual == "Holiday":
                             cal += 1
                         elif j.att_actual == 'Half Day':
                             cal += 0.5
-                        elif j.att_actual == 'PL' or j.att_actual == "SL":
-                            start = j.date
-                            end = j.date - timedelta(days=3)
-                            while start >= end:
-                                week_off_dict = {}
-                                start -= timedelta(days=1)
-                                for k in ecpl_cal:
-                                    if k.att_actual != "Week OFF" and k.emp_id == j.emp_id and k.date == start:
-                                        end = start+timedelta(days=1)
-                                    if k.att_actual == "Week OFF" and k.emp_id == j.emp_id and k.date == start:
-                                        last = start - timedelta(days=1)
-                                        week_off_dict['emp_id'] = j.emp_id
-                                        week_off_dict['date'] = start
-                                        week_off.append(week_off_dict)
-                    if week_off:
-                        las_att_actual = EcplCalander.objects.get(date=last, emp_id=i.emp_id).att_actual
-                        if las_att_actual == "PL" or las_att_actual == "SL":
-                            for w in week_off:
-                                for k in ecpl_cal:
-                                    if w['emp_id'] == k.emp_id and w['date'] == k.date:
-                                        k.att_actual = 'Absent'
-                                        ecplcal.append(k)
 
                 i.sl_balance += 1
                 pl = round(cal / 20, 2)
@@ -2076,8 +2133,6 @@ def addLeaveBalance(request):
                 sl_hist.no_days = 1
                 sl_hist.total = total_bal+pl+1
                 leavehist.append(sl_hist)
-            if ecplcal:
-                EcplCalander.objects.bulk_update(ecplcal,['att_actual'])
             EmployeeLeaveBalance.objects.bulk_update(leavebal,['sl_balance', 'pl_balance'])
             leaveHistory.objects.bulk_create(leavehist)
             e.leave = True
@@ -2102,7 +2157,6 @@ def TestFun(request):
     last_date = date(2022, 5, 31)
     delta = last_date - start_date
     date_list = []
-
     for i in range(delta.days + 1):
         day = start_date + timedelta(days=i)
         try:
@@ -2148,8 +2202,3 @@ def TestFun(request):
     EmployeeLeaveBalance.objects.bulk_create(lea)
     messages.info(request, "Attendance added Successfully!")
     return redirect('/ams/')
-
-
-
-            
-            
