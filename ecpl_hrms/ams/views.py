@@ -136,6 +136,21 @@ def change_password(request):  # Test1
         form = PasswordChangeForm(request.user)
     return render(request, 'ams/change-password.html', {'form': form})
 
+def autoApproveLeave():
+    leaves = LeaveTable.objects.filter(tl_approval=False)
+    leave_list = []
+    for i in leaves:
+        applied_time = i.applied_date.timestamp()
+        timee = datetime.now(pytz.timezone('Asia/Kolkata')).timestamp() - applied_time
+        if timee >= 48*60*60:
+            i.tl_approval = True
+            i.tl_status = "Auto Approved"
+            i.tl_reason = "Auto Approved"
+            leave_list.append(i)
+    LeaveTable.objects.bulk_update(leave_list,['tl_approval','tl_status','tl_reason'])
+
+
+
 @login_required
 def agentDashBoard(request):  # Test1
     if request.user.profile.emp_desi in agent_list:
