@@ -624,7 +624,9 @@
         <!-- /page content -->
 
 
+{% endblock %}
 
+{% block script %}
 <script>
 function testing(e) {
   var regexp = /^[2-9]{1}[0-9]{11}$/;
@@ -670,4 +672,40 @@ if (hiq=="Others"){
   });
 </script>
 
+    <script>
+        var dob = document.getElementById('emp_dob_1');
+        document.getElementById('emp_dob_v').value = moment(dob.value).format('YYYY-MM-DD');
+
+        var from1 = document.getElementById("emp_pre_empl_from");
+        var to1 = document.getElementById("emp_pre_empl_to");
+        var from2 = document.getElementById("emp_pre_empl_from_2");
+        var to2 = document.getElementById("emp_pre_empl_to_2");
+        var from3 = document.getElementById("emp_pre_empl_from_3");
+        var to3 = document.getElementById("emp_pre_empl_to_3");
+
+        {% if onboard.emp_pre_period_of_employment_frm %}
+        document.getElementById("va_emp_pre_empl_from").value = moment(from1).format("YYYY-MM-DD");
+        {% endif %}
+
+        {% if onboard.emp_pre_period_of_employment_to %}
+        document.getElementById("va_emp_pre_empl_to").value = moment(to1).format("YYYY-MM-DD");
+        {% endif %}
+
+        {% if onboard.emp_pre_period_of_employment_frm_two %}
+        document.getElementById("va_emp_pre_empl_from_2").value = moment(from2).format("YYYY-MM-DD");
+        {% endif %}
+
+        {% if onboard.emp_pre_period_of_employment_to_two %}
+        document.getElementById("va_emp_pre_empl_to_2").value = moment(to2).format("YYYY-MM-DD");
+        {% endif %}
+
+        {% if onboard.emp_pre_period_of_employment_frm_three %}
+        document.getElementById("va_emp_pre_empl_from_3").value = moment(from3).format("YYYY-MM-DD");
+        {% endif %}
+
+        {% if onboard.emp_pre_period_of_employment_to_three %}
+        document.getElementById("va_emp_pre_empl_to_3").value = moment(to3).format("YYYY-MM-DD");
+        {% endif %}
+
+    </script>
 {% endblock %}

@@ -24,6 +24,17 @@
                   <form method="post" action="/ams/onboarding" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="row">
+                      <div class="col-md-6 form-group">
+                        <label for="profiles">Select Profile</label>
+                        <select id="profiles" required class="form-control select2" name="profile">
+                          <option value="" selected disabled>Please Select Profile</option>
+                          {% for i in profiles %}
+                          <option value="{{i.emp_id}}">{{i.emp_name}} ({{i.emp_id}})</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="row">
                       <div class="col-md-12">
                         <h4>Personal Details</h4>
                         <hr>

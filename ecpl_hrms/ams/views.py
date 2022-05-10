@@ -627,6 +627,7 @@ def hrDashboard(request):  # Test1
 def on_boarding(request):  # Test1
     if request.method == "POST":
         hrname = request.user
+        emp_id = request.POST["profile"]
         emp_name = request.POST["emp_name"]
         emp_dob = request.POST["emp_dob"]
         emp_desig = request.POST["emp_desg"]
@@ -778,22 +779,29 @@ def on_boarding(request):  # Test1
         e.emp_upload_bank = emp_upload_bank
         e.hr_name = hrname
         e.save()
+        profile = Profile.objects.get(emp_id=emp_id)
+        profile.on_id = e.id
+        profile.save()
         return redirect("/ams/onboarding")
     else:
+        profiles = Profile.objects.filter(Q(on_id=None)).order_by('-id')
         today_date = date.today()
         minimum_dob = today_date - timedelta(days=6588)
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
-        data = {'emp': emp,'minimum_dob':str(minimum_dob)}
+        data = {'emp': emp,'minimum_dob':str(minimum_dob),'profiles':profiles,'hr_om_list':hr_om_list, 'hr_tl_am_list':hr_tl_am_list}
         return render(request, 'ams/onboarding.html', data)
 
 
 @login_required
 def viewOnBoarding(request):  # Test1
-    onboard = OnboardingnewHRC.objects.all()
+    profiles = Profile.objects.filter(~Q(on_id=None))
+    onboard = []
+    for i in profiles:
+        onboard.append({"onboard":OnboardingnewHRC.objects.get(id=i.on_id),'profile':i})
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
-    data = {'onboard': onboard, 'emp': emp}
+    data = {'onboard': onboard, 'emp': emp,'hr_om_list':hr_om_list, 'hr_tl_am_list':hr_tl_am_list}
     return render(request, "ams/view_onboarding.html", data)
 
 
@@ -980,7 +988,6 @@ def on_boarding_update(request, id):  # Test1
 @login_required
 def addNewUserHR(request):  # Test1  # calander pending
     if request.method == 'POST':
-        on_id = request.POST['id']
         emp_name = request.POST["emp_name"]
         emp_id = request.POST["emp_id"]
         emp_doj = request.POST["emp_doj"]
@@ -994,7 +1001,6 @@ def addNewUserHR(request):  # Test1  # calander pending
         emp_process_id = request.POST["emp_pro"]
         emp_process = Campaigns.objects.get(id=emp_process_id).name
         usr = User.objects.filter(username=emp_id)
-        onb_obj = OnboardingnewHRC.objects.get(id=on_id)
         if usr.exists():
             messages.info(request, "***User Already Exists***")
             return redirect("/ams/add-new-user")
@@ -1005,22 +1011,22 @@ def addNewUserHR(request):  # Test1  # calander pending
             Profile.objects.create(
                 user=user, emp_id=emp_id, emp_name=emp_name, emp_desi=emp_desi,
                 emp_rm1=emp_rm1, emp_rm2=emp_rm2, emp_rm3=emp_rm3, emp_rm1_id=emp_rm1_id, emp_rm2_id=emp_rm2_id,
-                emp_rm3_id=emp_rm3_id, emp_process=emp_process, emp_process_id=emp_process_id, doj=emp_doj, on_id=on_id,
+                emp_rm3_id=emp_rm3_id, emp_process=emp_process, emp_process_id=emp_process_id, doj=emp_doj,
             )
             # Updating Last Emp ID
-            try:
-                new_emp_id = int(emp_id) + 1
-            except:
-                profiles = Profile.objects.all().order_by('-id')
-                int_emp_id_lst = []
-                for i in profiles:
-                    try:
-                        j = int(i.emp_id)
-                        int_emp_id_lst.append(j)
-                    except:
-                        pass
-                new_emp_id = max(int_emp_id_lst) + 1
-            last = LastEmpId.objects.get(emp_id=emp_id)
+            profiles = Profile.objects.all().order_by('-id')
+            int_emp_id_lst = []
+            for i in profiles:
+                try:
+                    j = int(i.emp_id)
+                    int_emp_id_lst.append(j)
+                except:
+                    pass
+            new_emp_id = max(int_emp_id_lst) + 1
+            lastModel = LastEmpId.objects.all()
+            last = ''
+            for i in lastModel:
+                last = LastEmpId.objects.get(id=i.id)
             last.emp_id = new_emp_id
             last.save()
             # Creating Leave Balance
@@ -1048,8 +1054,6 @@ def addNewUserHR(request):  # Test1  # calander pending
                                                 rm2=j.emp_rm2, rm3=j.emp_rm3, rm1_id=j.emp_rm1_id,
                                                 rm2_id=j.emp_rm2_id, rm3_id=j.emp_rm3_id)
 
-            onb_obj.user_created = True
-            onb_obj.save()
         messages.info(request, 'User and Profile Successfully Created')
         return redirect('/ams/add-new-user')
     else:
@@ -1065,7 +1069,7 @@ def addNewUserHR(request):  # Test1  # calander pending
 
         onboarding = OnboardingnewHRC.objects.filter(user_created=False)
         data = {'emp': emp, 'all_data': all_desi, 'rms': rms, 'all_team': all_team, 'onboarding': onboarding,
-                "last_emp_id": lst_emp_id}
+                "last_emp_id": lst_emp_id,'hr_om_list':hr_om_list, 'hr_tl_am_list':hr_tl_am_list}
         return render(request, 'ams/hr_add_user.html', data)
 
 @login_required
@@ -1101,9 +1105,8 @@ def viewEmployeeProfile(request, id, on_id):  # Test 1
         onboarding = ""
     else:
         onboarding = OnboardingnewHRC.objects.get(id=int(on_id))
-    data = {'profile': profile, 'onboard': onboarding, 'emp': emp, "on": on_id, "hr_list":hr_list}
+    data = {'profile': profile, 'onboard': onboarding, 'emp': emp, "on": on_id, "hr_list":hr_list,'hr_om_list':hr_om_list, 'hr_tl_am_list':hr_tl_am_list}
     return render(request, 'ams/emp_profile_view.html', data)
-
 
 @login_required
 def teamAttendance(request):  # Team Attendance Page # Test1
@@ -1630,7 +1633,7 @@ def addNewTeam(request):  # Test1
     else:
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
-        data = {'mgrs': mgrs, 'emp': emp}
+        data = {'mgrs': mgrs, 'emp': emp,'hr_om_list':hr_om_list, 'hr_tl_am_list':hr_tl_am_list}
         return render(request, "ams/add_team.html", data)
 
 
@@ -1640,7 +1643,7 @@ def viewTeam(request):  # Test1
         teams = Campaigns.objects.all()
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
-        data = {'teams': teams, 'emp': emp}
+        data = {'teams': teams, 'emp': emp,'hr_om_list':hr_om_list, 'hr_tl_am_list':hr_tl_am_list}
         return render(request, 'ams/view_team.html', data)
     else:
         messages.info(request, '*** You are not authorised to view this page ***')
