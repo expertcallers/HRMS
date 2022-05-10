@@ -38,13 +38,13 @@ hr_tl_am_list = []
 hr_om_list = []
 
 # Create your views here.
-def loginPage(request):  # Test1
+def loginPage(request):  # Test1 Test2
     logout(request)
     form = AuthenticationForm()
     data = {'form': form}
     return render(request, 'ams/login.html', data)
 
-def loginAndRedirect(request):  # Test1
+def loginAndRedirect(request):  # Test1 Test2
 
     for i in Designation.objects.filter(category='TL AM'):
         tl_am_list.append(i.name)
@@ -100,7 +100,7 @@ def loginAndRedirect(request):  # Test1
         return render(request, 'ams/login.html', data)
 
 @login_required
-def redirectTOAllDashBoards(request, id):  # Test1
+def redirectTOAllDashBoards(request, id):  # Test1 Test2
     if request.user.profile.emp_desi in tl_am_list:
         return redirect('/ams/tl-dashboard')
     elif request.user.profile.emp_desi in hr_list:
@@ -112,12 +112,12 @@ def redirectTOAllDashBoards(request, id):  # Test1
     else:
         return HttpResponse('<h1>Not Authorised to view this page</h1>')
 
-def logoutView(request):  # Test1
+def logoutView(request):  # Test1 Test2
     logout(request)
     return redirect('/ams/')
 
 @login_required
-def change_password(request):  # Test1
+def change_password(request):  # Test1 Test2
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
         if form.is_valid():
@@ -137,7 +137,7 @@ def change_password(request):  # Test1
     return render(request, 'ams/change-password.html', {'form': form})
 
 @login_required
-def agentDashBoard(request):  # Test1
+def agentDashBoard(request):  # Test1 Test2
     if request.user.profile.emp_desi in agent_list:
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
@@ -172,7 +172,7 @@ def agentDashBoard(request):  # Test1
         return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
 
 @login_required
-def tlDashboard(request):  # Test1
+def tlDashboard(request):  # Test1 Test2
     usr_desi = request.user.profile.emp_desi
     if usr_desi in tl_am_list:
         emp_name = request.user.profile.emp_name
@@ -231,6 +231,7 @@ def tlDashboard(request):  # Test1
             dict['st'] = st
             month_cal.append(dict)
 
+        # Add Comment
         emps = Profile.objects.filter(Q(emp_rm3_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm1_id=emp_id))
         rm3 = ""
         for i in emps:
@@ -248,6 +249,7 @@ def tlDashboard(request):  # Test1
                 "rm3": rm3}
 
         return render(request, 'ams/rm-dashboard-new.html', data)
+
     elif usr_desi in manager_list:
         return redirect('/ams/manager-dashboard')
     elif usr_desi in hr_list:
@@ -260,7 +262,7 @@ def tlDashboard(request):  # Test1
 
 
 @login_required
-def managerDashboard(request):  # Test1
+def managerDashboard(request):  # Test1 Test2
     mgr_name = request.user.profile.emp_name
     emp_id = request.user.profile.emp_id
 
@@ -268,8 +270,7 @@ def managerDashboard(request):  # Test1
     # Mapping Tickets
     map_tickets_counts = MappingTickets.objects.filter(new_rm3_id=emp_id, status=False).count()
     # Leave Requests
-    leave_req_count = LeaveTable.objects.filter(emp_rm3_id=emp_id, tl_status='Approved',
-                                                manager_approval=False).count()
+    leave_req_count = LeaveTable.objects.filter(emp_rm3_id=emp_id, tl_status='Approved',manager_approval=False).count()
     # Leave Escalation Count
     leave_esc_count = LeaveTable.objects.filter(emp_rm3_id=emp_id, manager_approval=False, escalation=True).count()
     # Attendance
@@ -299,14 +300,12 @@ def managerDashboard(request):  # Test1
 
     if request.user.profile.emp_desi in management_list and request.user.profile.emp_desi in manager_list:
         # All Employees
-        all_emps = Profile.objects.filter(Q(agent_status='Active'),
-                                          Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id))
+        all_emps = Profile.objects.filter(Q(agent_status='Active'),Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id))
         all_emps_under = []
         for i in all_emps:
             if i not in all_emps_under:
                 all_emps_under.append(i)
-                under = Profile.objects.filter(Q(agent_status='Active'),
-                                              Q(emp_rm1_id=i.emp_id) | Q(emp_rm2_id=i.emp_id) | Q(emp_rm3_id=i.emp_id))
+                under = Profile.objects.filter(Q(agent_status='Active'),Q(emp_rm1_id=i.emp_id) | Q(emp_rm2_id=i.emp_id) | Q(emp_rm3_id=i.emp_id))
                 for j in under:
                     if j not in all_emps_under:
                         all_emps_under.append(j)
@@ -418,57 +417,61 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
                         emp_name=emp_name
                     )
                     cal.save()
-            week_off = []
-            last = ''
-            if leave_type == 'SL':
-                start_date = e.start_date
-                sand_start_date = start_date - timedelta(days=1)
-                cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-                if cal == "Week OFF":
-                    week_off.append(sand_start_date)
-                    sand_start_date -= timedelta(days=1)
-                    sand_end_date = start_date - timedelta(days=7)
-                    while sand_start_date > sand_end_date:
-                        cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-                        if cal == "Week OFF":
-                            week_off.append(sand_start_date)
-                        elif cal == 'SL' or cal == 'PL':
-                            last = sand_start_date
-                            break
-                        else:
-                            break
-                        sand_start_date -= timedelta(days=1)
+                    
+            # sandwich policy calculation    
 
-            elif leave_type == 'PL':
-                start_date = e.start_date
-                sand_start_date = start_date - timedelta(days=1)
-                try:
-                    cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-                    if cal == "Week OFF":
-                        week_off.append(sand_start_date)
-                        sand_start_date -= timedelta(days=1)
-                        sand_end_date = start_date - timedelta(days=7)
-                        while sand_start_date > sand_end_date:
-                            cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-                            if cal == "Week OFF":
-                                week_off.append(sand_start_date)
-                            elif cal == 'SL' or cal == 'PL':
-                                last = sand_start_date
-                                break
-                            else:
-                                break
-                            sand_start_date -= timedelta(days=1)
-                except:
-                    pass
-            if last != '':
-                cal_list = []
-                last += timedelta(days=1)
-                while start_date > last:
-                    start_date -= timedelta(days=1)
-                    cal = EcplCalander.objects.get(Q(date=start_date), Q(emp_id=emp_id))
-                    cal.att_actual = "Absent (Sandwich)"
-                    cal_list.append(cal)
-                EcplCalander.objects.bulk_update(cal_list,['att_actual'])
+            # week_off = []
+            # last = ''
+            # if leave_type == 'SL':
+            #     start_date = e.start_date
+            #     sand_start_date = start_date - timedelta(days=1)
+            #     cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
+            #     if cal == "Week OFF":
+            #         week_off.append(sand_start_date)
+            #         sand_start_date -= timedelta(days=1)
+            #         sand_end_date = start_date - timedelta(days=7)
+            #         while sand_start_date > sand_end_date:
+            #             cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
+            #             if cal == "Week OFF":
+            #                 week_off.append(sand_start_date)
+            #             elif cal == 'SL' or cal == 'PL':
+            #                 last = sand_start_date
+            #                 break
+            #             else:
+            #                 break
+            #             sand_start_date -= timedelta(days=1)
+
+            # elif leave_type == 'PL':
+            #     start_date = e.start_date
+            #     sand_start_date = start_date - timedelta(days=1)
+            #     try:
+            #         cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
+            #         if cal == "Week OFF":
+            #             week_off.append(sand_start_date)
+            #             sand_start_date -= timedelta(days=1)
+            #             sand_end_date = start_date - timedelta(days=7)
+            #             while sand_start_date > sand_end_date:
+            #                 cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
+            #                 if cal == "Week OFF":
+            #                     week_off.append(sand_start_date)
+            #                 elif cal == 'SL' or cal == 'PL':
+            #                     last = sand_start_date
+            #                     break
+            #                 else:
+            #                     break
+            #                 sand_start_date -= timedelta(days=1)
+            #     except:
+            #         pass
+            # if last != '':
+            #     cal_list = []
+            #     last += timedelta(days=1)
+            #     while start_date > last:
+            #         start_date -= timedelta(days=1)
+            #         cal = EcplCalander.objects.get(Q(date=start_date), Q(emp_id=emp_id))
+            #         cal.att_actual = "Absent (Sandwich)"
+            #         cal_list.append(cal)
+            #     EcplCalander.objects.bulk_update(cal_list,['att_actual'])
+            
         else:
             manager_approval = True
             manager_status = 'Rejected'
@@ -502,8 +505,7 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
 
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
-        leave_request = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id), Q(tl_status='Approved'),
-                                                  Q(manager_approval=False))
+        leave_request = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id), Q(tl_status='Approved'),Q(manager_approval=False))
         data = {'emp': emp, 'leave_request': leave_request}
         return render(request, 'ams/leave_approval_rm3.html', data)
 
@@ -1185,38 +1187,42 @@ def applyAttendace(request):  # Test1
                 usr = Profile.objects.get(emp_id=emp_id)
                 usr.agent_status = att_actual
                 usr.save()
-        ddate = datetime.strptime(ddate,'%Y-%m-%d').date()
-        pre_day = ddate - timedelta(days=1)
-        cal = EcplCalander.objects.get(emp_id=emp_id, date=pre_day).att_actual
-        week_off = []
-        last = ''
-        start_date = pre_day
-        if cal == 'PL':
-            sand_start_date = start_date - timedelta(days=1)
-            cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-            if cal == "Week OFF" or cal == "PL":
-                week_off.append(sand_start_date)
-                sand_start_date -= timedelta(days=1)
-                sand_end_date = start_date - timedelta(days=7)
-                while sand_start_date > sand_end_date:
-                    cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-                    if cal == "Week OFF":
-                        week_off.append(sand_start_date)
-                    elif cal == 'SL' or cal == 'PL':
-                        last = sand_start_date
-                        break
-                    else:
-                        break
-                    sand_start_date -= timedelta(days=1)
-        if last != '':
-            cal_list = []
-            last += timedelta(days=1)
-            while start_date > last:
-                start_date -= timedelta(days=1)
-                cal = EcplCalander.objects.get(Q(date=start_date), Q(emp_id=emp_id))
-                cal.att_actual = "Absent (Sandwich)"
-                cal_list.append(cal)
-            EcplCalander.objects.bulk_update(cal_list,['att_actual'])
+
+        # Sandwich policy Calculation 
+          
+        # ddate = datetime.strptime(ddate,'%Y-%m-%d').date()
+        # pre_day = ddate - timedelta(days=1)
+        # cal = EcplCalander.objects.get(emp_id=emp_id, date=pre_day).att_actual
+        # week_off = []
+        # last = ''
+        # start_date = pre_day
+        # if cal == 'PL':
+        #     sand_start_date = start_date - timedelta(days=1)
+        #     cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
+        #     if cal == "Week OFF" or cal == "PL":
+        #         week_off.append(sand_start_date)
+        #         sand_start_date -= timedelta(days=1)
+        #         sand_end_date = start_date - timedelta(days=7)
+        #         while sand_start_date > sand_end_date:
+        #             cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
+        #             if cal == "Week OFF":
+        #                 week_off.append(sand_start_date)
+        #             elif cal == 'SL' or cal == 'PL':
+        #                 last = sand_start_date
+        #                 break
+        #             else:
+        #                 break
+        #             sand_start_date -= timedelta(days=1)
+        # if last != '':
+        #     cal_list = []
+        #     last += timedelta(days=1)
+        #     while start_date > last:
+        #         start_date -= timedelta(days=1)
+        #         cal = EcplCalander.objects.get(Q(date=start_date), Q(emp_id=emp_id))
+        #         cal.att_actual = "Absent (Sandwich)"
+        #         cal_list.append(cal)
+        #     EcplCalander.objects.bulk_update(cal_list,['att_actual'])
+
         return redirect('/ams/team-attendance')
     else:
         return HttpResponse('<h1>*** Page not available ***</h1>')
