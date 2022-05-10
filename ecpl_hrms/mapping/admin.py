@@ -12,6 +12,11 @@ class ProfileSearch(admin.ModelAdmin):
     list_display = ('emp_name', 'emp_id', 'emp_desi', 'emp_process', "emp_rm1", "emp_rm2", "emp_rm3")
 
 
+class MappingSearch(admin.ModelAdmin):
+    search_fields = ('emp_name', 'emp_id', "emp_desi")
+    list_display = ('date','emp_name', 'emp_id', 'team', "rm1", "rm2", "rm3",'history')
+
+
 class DataSearchResource(resources.ModelResource):
   class Meta:
      model = NewData
@@ -26,5 +31,5 @@ class DataSearch(ImportExportModelAdmin):
 
 
 admin.site.register(Profile, ProfileSearch)
-admin.site.register(MappingHistory)
+admin.site.register(MappingHistory, MappingSearch)
 admin.site.register(NewData, DataSearch)
