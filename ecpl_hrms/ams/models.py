@@ -151,7 +151,7 @@ class LeaveTable(models.Model):
     emp_desi = models.CharField(max_length=50, null=True)
     emp_process = models.CharField(max_length=50, null=True)
     leave_type = models.CharField(max_length=50,null=True)
-    applied_date = models.DateField(null=True,blank=True)
+    applied_date = models.DateTimeField(null=True,blank=True)
     start_date=models.DateField()
     end_date=models.DateField()
     no_days = models.IntegerField()
