@@ -56,6 +56,7 @@ urlpatterns = [
     path('onboarding', on_boarding),
     path('view-onboarding', viewOnBoarding),
     path('edit-onboarding/<int:id>', on_boarding_update),
+    path('bulk-onboarding', onboardingBulkUpload),
     path('view-all-employees-oms/<str:name>', viewallOMS),
 
     # Team Management

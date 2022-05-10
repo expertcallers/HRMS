@@ -1,4 +1,6 @@
+from datetime import datetime
 from statistics import mode
+
 from django.contrib.auth.models import User
 from django.db import models
 # Attendance - Master ++
@@ -24,8 +26,9 @@ class EcplCalander(models.Model):
 # Onboarding - Master +
 class OnboardingnewHRC(models.Model):
     unique_id = models.CharField(max_length=150,null=True,blank=True)
-    hr_name = models.ForeignKey(User,on_delete=models.CASCADE,related_name='hrname',null=True)
-    submit_date=models.DateTimeField(default="2000-01-01 01:01")
+    hr_name = models.ForeignKey(User, on_delete=models.CASCADE,related_name='hrname', null=True, blank=True)
+    submit_date=models.DateTimeField(default=datetime.now())
+    emp_id = models.CharField(max_length=20,null=True,blank=True)
     emp_name=models.CharField(max_length=50)
     emp_dob=models.DateField(max_length=50)
     emp_desig=models.CharField(max_length=50)
@@ -75,7 +78,7 @@ class OnboardingnewHRC(models.Model):
     have_system = models.CharField(null=True, max_length=10)
     require_system = models.CharField(null=True, max_length=10)
     wifi_broadband = models.CharField(null=True, max_length=10)
-    emp_upload_aadhar=models.ImageField(upload_to='Aadhar/')
+    emp_upload_aadhar=models.ImageField(upload_to='Aadhar/', null=True)
     emp_upload_aadhar_back=models.ImageField(upload_to='Aadhar/',null=True)
     emp_upload_pan=models.ImageField(upload_to='Pan/',null=True)
     emp_upload_id=models.ImageField(upload_to='Id/',null=True,)

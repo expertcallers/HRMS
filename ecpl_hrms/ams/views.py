@@ -16,6 +16,9 @@ import calendar
 from datetime import date
 from django.db.models import Q, Sum, Max
 import xlwt
+from .admin import *
+from tablib import Dataset
+
 c = Calendar()
 
 # Getting Model from other Apps
@@ -778,6 +781,7 @@ def on_boarding(request):  # Test1
         e.emp_upload_experience_three = emp_upload_experience_three
         e.emp_upload_bank = emp_upload_bank
         e.hr_name = hrname
+        e.emp_id = emp_id
         e.save()
         profile = Profile.objects.get(emp_id=emp_id)
         profile.on_id = e.id
@@ -1971,6 +1975,7 @@ def approveAttendanceRequest(request):  # test1
             cal.appoved_by = emp.emp_name
             cal.save()
             att_actual = hist.att_new
+            old_att = hist.att_old
             if att_actual == 'Attrition' or att_actual == 'Bench':
                 usr = Profile.objects.get(emp_id=cal.emp_id)
                 usr.agent_status = att_actual
@@ -1988,6 +1993,15 @@ def approveAttendanceRequest(request):  # test1
                     usr = Profile.objects.get(emp_id=cal.emp_id)
                     usr.agent_status = att_actual
                     usr.save()
+            if old_att == 'PL':
+                leave = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
+                leave.pl_balance += 1
+                leave.save()
+                leaveHistory.objects.create(
+                    emp_id=cal.emp_id, date = date.today(), leave_type = 'PL',
+                    transaction = 'Attendance Correction, Leave Refund which was applied on '+str(cal.date), no_days = 1,
+                    total = leave.pl_balance + leave.sl_balance
+                )
 
         hist.status = True
         hist.comments = comments
@@ -2174,6 +2188,37 @@ def addLeaveBalance(request):
     else:
         messages.info(request, "Unauthorized access you have been Logged out :)")
         return redirect('/ams/')
+
+
+@login_required
+def onboardingBulkUpload(request):
+    if request.method == 'POST':
+        dataset = Dataset()
+        person_resource = OnboardingnewHRCResourse()
+        new_persons = request.FILES['myfile']
+        imported_data = dataset.load(new_persons.read().decode('utf-8'), format='csv', headers=True)
+        result = person_resource.import_data(imported_data, dry_run=True)  # Test the data import
+        if not result.has_errors():
+            person_resource.import_data(imported_data, dry_run=False)
+            messages.success(request, "Successfully Uploaded :)")
+        else:
+            messages.success(request,
+                             "Something went wrong. Please Correct the Data and make sure all fields are filled.")
+        profile_list = []
+        onboarding = []
+        for i in OnboardingnewHRC.objects.filter(user_created=False):
+            profile = Profile.objects.get(emp_id=i.emp_id)
+            profile.on_id = i.id
+            profile_list.append(profile)
+            i.user_created = True
+            onboarding.append(i)
+
+        Profile.objects.bulk_update(profile_list,['on_id'])
+        OnboardingnewHRC.objects.bulk_update(onboarding,['user_created'])
+
+        return redirect('/ams/bulk-onboarding')
+    else:
+        return render(request,'ams/bulk_onboarding.html')
 
 
 def TestFun(request):

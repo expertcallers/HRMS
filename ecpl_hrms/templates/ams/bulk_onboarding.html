@@ -1,0 +1,70 @@
+{% extends 'ams/base_hr_new.html' %}
+
+{% load static %}
+{% block main %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <!-- top tiles -->
+          <div class="row" >
+        </div>
+          <!-- /top tiles -->
+
+        <div class="page-title">
+          <div class="title_left">
+            <h3>Bulk upload Onboardings</h3>
+          </div>
+        </div>
+        <div class="row">
+          <div class="card">
+            <div class="card-body">
+              <div class="col-md-12">
+                <h3>The file should be in <b>CSV</b> extension and should be in below format</h3>
+                <p>['emp_id', 'emp_name', 'emp_dob', 'emp_desig', 'emp_process', 'emp_pan', 'emp_aadhar', 'emp_father_name', 'emp_marital_status', 'emp_email', 'emp_phone', 'emp_alt_phone', 'emp_present_address', 'emp_permanent_address', 'emp_blood', 'emp_emergency_person', 'emp_emergency_number', 'emp_emergency_address', 'emp_emergency_person_two', 'emp_emergency_number_two', 'emp_emergency_address_two', 'emp_edu_qualification', 'emp_quali_other', 'emp_edu_course', 'emp_edu_institute', 'emp_pre_exp', 'emp_pre_industry', 'emp_pre_org_name', 'emp_pre_desg', 'emp_pre_period_of_employment_frm', 'emp_pre_period_of_employment_to', 'emp_pre_exp_two', 'emp_pre_industry_two', 'emp_pre_org_name_two', 'emp_pre_desg_two', 'emp_pre_period_of_employment_frm_two', 'emp_pre_period_of_employment_to_two', 'emp_pre_exp_three', 'emp_pre_industry_three', 'emp_pre_org_name_three', 'emp_pre_desg_three', 'emp_pre_period_of_employment_frm_three', 'emp_pre_period_of_employment_to_three', 'emp_bank_holder_name', 'emp_bank_name', 'emp_bank_acco_no', 'emp_bank_ifsc', 'have_system', 'require_system', 'wifi_broadband', 'esic', 'pf', 'tds', 'pt']</p>
+              </div>
+              <div class="col-md-12">
+                <form action="" method="POST" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="row">
+                    <div class="col-md-6 form-group">
+                      <label for="upload" style="font-size: 18px;">Please Select <b>CSV</b> file</label>
+                      <input type="file" id="upload" required class="form-control uploadFile" name="myfile">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 form-group">
+                      <input type="submit" class="form-control btn btn-success" name="myfile">
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        </div>
+        <!-- /page content -->
+
+
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+  var MAX_FILE_SIZE = 500 * 1024; // 500KB
+  $(document).ready(function() {
+      $('.uploadFile').change(function() {
+          var fileInput = this;
+          var filePath = fileInput.value;
+          var allowedExtensions =  /(\.csv)$/i;
+          if (!allowedExtensions.exec(filePath)) {
+              fileInput.setCustomValidity("Only CSV files accepted");
+              fileInput.reportValidity();
+              return false;
+          } else {
+              fileInput.setCustomValidity("");
+          }
+      });
+  });
+</script>
+{% endblock %}
