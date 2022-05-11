@@ -8,8 +8,8 @@ from import_export.admin import ImportExportModelAdmin
 class ProfileResource(resources.ModelResource):
   class Meta:
      model = Profile
-     fields = ['id', 'user', 'emp_id', 'emp_name', 'emp_desi', "emp_rm1", 'emp_rm1_id', "emp_rm2", 'emp_rm2_id',
-               "emp_rm3", 'emp_rm3_id', 'emp_process', 'emp_process_id', 'doj']
+     # fields = ['id', 'user', 'emp_id', 'emp_name', 'emp_desi', "emp_rm1", 'emp_rm1_id', "emp_rm2", 'emp_rm2_id',
+     #           "emp_rm3", 'emp_rm3_id', 'emp_process', 'emp_process_id', 'doj']
 
 class ProfileSearch(ImportExportModelAdmin):
     search_fields = ('emp_name', 'emp_id', "emp_desi", 'emp_process')
