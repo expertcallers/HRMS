@@ -150,7 +150,6 @@ def autoApproveLeave():
     LeaveTable.objects.bulk_update(leave_list,['tl_approval','tl_status','tl_reason'])
 
 
-
 @login_required
 def agentDashBoard(request):  # Test1 Test2
     if request.user.profile.emp_desi in agent_list:
