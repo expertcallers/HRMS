@@ -219,9 +219,9 @@ class AddAttendanceMonths(models.Model):
     month_number = models.IntegerField()
     year = models.IntegerField()
     created = models.BooleanField(default=False)
-  
+    created_by = models.CharField(max_length=150, null=True, blank=True)
     leave = models.BooleanField(default=False)
- 
+    leave_by = models.CharField(max_length=150, null=True, blank=True)
 
 class leaveHistory(models.Model):
     unique_id = models.CharField(max_length=150,null=True,blank=True)
