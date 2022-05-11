@@ -50,28 +50,36 @@ def loginPage(request):  # Test1 Test2
 def loginAndRedirect(request):  # Test1 Test2
 
     for i in Designation.objects.filter(category='TL AM'):
-        tl_am_list.append(i.name)
+        if i.name not in tl_am_list:
+            tl_am_list.append(i.name)
 
     for i in Designation.objects.filter(Q(category='Manager List') | Q(category='Management List')):
-        manager_list.append(i.name)
+        if i.name not in manager_list:
+            manager_list.append(i.name)
 
     for i in Designation.objects.filter(Q(category='HR') | Q(category='OM HR') | Q(category='Management List - HR') | Q(category='TL AM HR') | Q(category='TA') | Q(category='TA - TL - AM')):
-        hr_list.append(i.name)
+        if i.name not in hr_list:
+            hr_list.append(i.name)
 
     for i in Designation.objects.filter(category='Agent'):
-        agent_list.append(i.name)
+        if i.name not in agent_list:
+            agent_list.append(i.name)
 
     for i in Designation.objects.filter(Q(category='Management List') | Q(category='Management List - HR')):
-        management_list.append(i.name)
+        if i.name not in management_list:
+            management_list.append(i.name)
 
     for i in Designation.objects.filter(Q(category='TL AM') | Q(category='Manager List') | Q(category='OM HR') | Q(category='TL AM HR') | Q(category='TA - TL - AM')):
-        rm_list.append(i.name)
+        if i.name not in rm_list:
+            rm_list.append(i.name)
 
     for i in Designation.objects.filter(Q(category='TL AM HR') | Q(category='TA - TL - AM')):
-        hr_tl_am_list.append(i.name)
+        if i.name not in hr_tl_am_list:
+            hr_tl_am_list.append(i.name)
 
     for i in Designation.objects.filter(Q(category='OM HR') | Q(category='Management List - HR')):
-        hr_om_list.append(i.name)
+        if i.name not in hr_om_list:
+            hr_om_list.append(i.name)
 
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
@@ -443,7 +451,7 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
             #     start_date = e.start_date
             #     sand_start_date = start_date - timedelta(days=1)
             #     cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-            #     if cal == "Week OFF":
+            #     if cal == "Week OFF" or cal == "SL" or cal == "PL":
             #         week_off.append(sand_start_date)
             #         sand_start_date -= timedelta(days=1)
             #         sand_end_date = start_date - timedelta(days=7)
@@ -463,7 +471,7 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
             #     sand_start_date = start_date - timedelta(days=1)
             #     try:
             #         cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-            #         if cal == "Week OFF":
+            #         if cal == "Week OFF" or cal == "PL" or cal == "SL":
             #             week_off.append(sand_start_date)
             #             sand_start_date -= timedelta(days=1)
             #             sand_end_date = start_date - timedelta(days=7)
@@ -1065,11 +1073,14 @@ def addNewUserHR(request):  # Test1  # calander pending
             lst_emp_id = i.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
         all_desi = Designation.objects.all()
-        rms = Profile.objects.filter(emp_desi__in=rm_list).order_by('emp_name')
+
+        rms = Profile.objects.filter(Q(emp_desi__in=rm_list) | Q(emp_desi__in=management_list)).order_by('emp_name')
+        rm3 = Profile.objects.filter(Q(emp_desi__in=manager_list) | Q(emp_desi__in=management_list)).order_by(
+            'emp_name')
         all_team = Campaigns.objects.all()
 
         onboarding = OnboardingnewHRC.objects.filter(user_created=False)
-        data = {'emp': emp, 'all_data': all_desi, 'rms': rms, 'all_team': all_team, 'onboarding': onboarding,
+        data = {'emp': emp, 'all_data': all_desi, 'rms': rms, 'rm3':rm3, 'all_team': all_team, 'onboarding': onboarding,
                 "last_emp_id": lst_emp_id,'hr_om_list':hr_om_list, 'hr_tl_am_list':hr_tl_am_list}
         return render(request, 'ams/hr_add_user.html', data)
 
@@ -1503,7 +1514,7 @@ def mappingHomePage(request):  # Test1
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     employees = Profile.objects.filter(Q(emp_rm1_id=emp_id), Q(agent_status='Active'))
-    rms = Profile.objects.filter(emp_desi__in=rm_list).order_by('emp_name')
+    rms = Profile.objects.filter(Q(emp_desi__in=rm_list) | Q(emp_desi__in=management_list)).order_by('emp_name')
     rm3 = Profile.objects.filter(Q(emp_desi__in=manager_list) | Q(emp_desi__in=management_list)).order_by('emp_name')
     teams = Campaigns.objects.all().order_by('name')
     data = {'emp': emp, 'employees': employees, 'rms': rms, 'teams': teams,"rm3":rm3}

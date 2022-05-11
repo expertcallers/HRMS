@@ -87,7 +87,7 @@
                         <label for="emp_rm3">RM3</label>
                         <select name="emp_rm3_id" id="emp_rm3" class="form-control select2" required>
                           <option value="" selected disabled>Please select</option>
-                          {% for r in rms %}
+                          {% for r in rm3 %}
                           <option value="{{r.emp_id}}">{{r.emp_name}} / {{r.emp_id}}</option>
                           {% endfor %}
                         </select>
