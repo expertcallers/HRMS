@@ -606,9 +606,7 @@ def hrDashboard(request):  # Test1
         leave_req_count_final = LeaveTable.objects.filter(emp_rm3_id=emp_id, tl_status='Approved',
                                                     manager_approval=False).count()
         # Mapping Tickets
-        map_tickets_counts = MappingTickets.objects.filter(
-            Q(new_rm3_id=emp_id) | Q(new_rm2_id=emp_id) | Q(new_rm1_id=emp_id),
-            Q(status=False)).count()
+        map_tickets_counts = MappingTickets.objects.filter(Q(new_rm3_id=emp_id), Q(status=False)).count()
         # Leave Escalation Count
         leave_esc_count = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id), Q(manager_approval=False),
                                                     Q(escalation=True)).count()
