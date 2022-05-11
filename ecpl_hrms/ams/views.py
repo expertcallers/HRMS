@@ -1694,7 +1694,7 @@ def applyLeave(request):  # Test1
         else:
             e = LeaveTable()
             e.unique_id = unique_id
-            e.applied_date = date.today()
+            e.applied_date = datetime.now()
             e.leave_type = leave_type
             e.start_date = start_date
             e.end_date = end_date
