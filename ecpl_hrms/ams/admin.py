@@ -8,16 +8,7 @@ class AttendanceSearch(admin.ModelAdmin):
     list_display = ('emp_name','emp_id',"date","att_actual")
     filter = ('emp_id',"date","att_actual")
 
-class LeaveSearchResource(resources.ModelResource):
-  class Meta:
-      model = EmployeeLeaveBalance
-      fields = ['emp_id', 'emp_name', "team", "pl_balance", "sl_balance"]
-      import_id_fields = ('emp_id',)
 
-class LeaveSearch(ImportExportModelAdmin):
-    search_fields = ('emp_name','emp_id')
-    list_display = ('emp_name','emp_id',"team","pl_balance","sl_balance")
-    resource_class = LeaveSearchResource
 
 class LeaveHistorySearch(admin.ModelAdmin):
     search_fields = ('emp_id','date')
@@ -48,9 +39,39 @@ class LeaveTableSearch(admin.ModelAdmin):
     search_fields = ('emp_name','emp_id')
     list_display = ('emp_name','emp_id','applied_date','leave_type','start_date','end_date','no_days','tl_approval','manager_approval', 'escalation', 'status')
 
-class OnboardingnewHRCSearch(admin.ModelAdmin):
-    search_fields = ('emp_name','emp_aadhar','emp_phone')
-    list_display = ('submit_date','emp_name','emp_desig','emp_aadhar','emp_phone','hr_name','user_created')
+class OnboardingnewHRCResourse(resources.ModelResource):
+  class Meta:
+      model = OnboardingnewHRC
+      fields =['emp_id', 'emp_name', 'emp_dob', 'emp_desig', 'emp_process', 'emp_pan', 'emp_aadhar', 'emp_father_name',
+               'emp_marital_status', 'emp_email', 'emp_phone', 'emp_alt_phone', 'emp_present_address',
+               'emp_permanent_address', 'emp_blood', 'emp_emergency_person', 'emp_emergency_number',
+               'emp_emergency_address', 'emp_emergency_person_two', 'emp_emergency_number_two',
+               'emp_emergency_address_two', 'emp_edu_qualification', 'emp_quali_other', 'emp_edu_course',
+               'emp_edu_institute', 'emp_pre_exp', 'emp_pre_industry', 'emp_pre_org_name', 'emp_pre_desg',
+               'emp_pre_period_of_employment_frm', 'emp_pre_period_of_employment_to', 'emp_pre_exp_two',
+               'emp_pre_industry_two', 'emp_pre_org_name_two', 'emp_pre_desg_two',
+               'emp_pre_period_of_employment_frm_two', 'emp_pre_period_of_employment_to_two', 'emp_pre_exp_three',
+               'emp_pre_industry_three', 'emp_pre_org_name_three', 'emp_pre_desg_three',
+               'emp_pre_period_of_employment_frm_three', 'emp_pre_period_of_employment_to_three',
+               'emp_bank_holder_name', 'emp_bank_name', 'emp_bank_acco_no', 'emp_bank_ifsc', 'have_system',
+               'require_system', 'wifi_broadband', 'esic', 'pf', 'tds', 'pt']
+      import_id_fields = ('emp_id',)
+
+class OnboardingnewHRCSearch(ImportExportModelAdmin):
+    search_fields = ('emp_name','emp_id','emp_aadhar','emp_phone')
+    list_display = ('emp_name','emp_id','emp_desig','emp_aadhar','emp_phone','hr_name')
+    resource_class = OnboardingnewHRCResourse
+
+class LeaveSearchResource(resources.ModelResource):
+  class Meta:
+      model = EmployeeLeaveBalance
+      fields = ['emp_id', 'emp_name', "team", "pl_balance", "sl_balance"]
+      import_id_fields = ('emp_id',)
+
+class LeaveSearch(ImportExportModelAdmin):
+    search_fields = ('emp_name','emp_id')
+    list_display = ('emp_name','emp_id',"team","pl_balance","sl_balance")
+    resource_class = LeaveSearchResource
 
 class CampainSearchResource(resources.ModelResource):
   class Meta:

@@ -22,19 +22,6 @@
                 <form method="POST" action="/ams/add-new-user" enctype="multipart/form-data">
                   {% csrf_token %}
                   <div class="row">
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="">Onboarding Details</label>
-                        <select name="id" class="form-control select2" required>
-                          <option value="" selected disabled>Please select</option>
-                          {% for o in onboarding %}
-                          <option value="{{o.id}}" class="form-control">{{o.emp_name}}</option>
-                          {% endfor %}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row">
                     <div class="col-md-3">
                       <div class="form-group">
                         <label for="emp_name">Employee Name</label>
@@ -44,7 +31,7 @@
                     <div class="col-md-3">
                       <div class="form-group">
                         <label for="emp_id">Employee ID</label>
-                        <input type="text" name="emp_id" value="{{last_emp_id}}" id="emp_id" class="form-control"  readonly>
+                        <input type="text" name="emp_id" value="{{last_emp_id}}" id="emp_id" class="form-control">
                       </div>
                     </div>
                     <div class="col-md-3">
