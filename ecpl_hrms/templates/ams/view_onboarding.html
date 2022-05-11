@@ -80,7 +80,7 @@
         <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLongTitle">View Onboarding of {{i.onboard.emp_name}}</h5>
+              <h5 class="modal-title" id="exampleModalLongTitle">View Onboarding of {{i.onboard.emp_name}} ({{i.profile.emp_id}})</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -589,10 +589,7 @@
                   <div class="form-group">
                     <label for="ESIC" style="font-size: 18px; font-weight: 600;">ESIC</label>
                     <div style="display: inline-flex; width: 100%" id="ESIC">
-                      <input type="radio" disabled name="esic" {% if i.onboard.esic == "Yes" %}checked{% endif %} id="ESIC_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
-                      <label for="ESIC_1">Yes</label>
-                      <input type="radio" disabled name="esic" {% if i.onboard.esic == "No" %}checked{% endif %} id="ESIC_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
-                      <label for="ESIC_0">No</label>
+                      <input type="text" disabled value="{{i.onboard.esic}}" class="form-control">
                     </div>
                   </div>
                 </div>
@@ -600,10 +597,7 @@
                   <div class="form-group">
                     <label for="PF" style="font-size: 18px; font-weight: 600;">PF</label>
                     <div style="display: inline-flex; width: 100%" id="PF">
-                      <input type="radio" disabled name="pf" {% if i.onboard.pf == "Yes" %}checked{% endif %} id="PF_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
-                      <label for="PF_1">Yes</label>
-                      <input type="radio" disabled name="pf" {% if i.onboard.pf == "No" %}checked{% endif %} id="PF_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
-                      <label for="PF_0">No</label>
+                      <input type="text" disabled value="{{i.onboard.pf}}" class="form-control">
                     </div>
                   </div>
                 </div>
@@ -611,10 +605,7 @@
                   <div class="form-group">
                     <label for="TDS" style="font-size: 18px; font-weight: 600;">TDS</label>
                     <div style="display: inline-flex; width: 100%" id="TDS">
-                      <input type="radio" disabled name="tds" {% if i.onboard.tds == "Yes" %}checked{% endif %} id="TDS_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
-                      <label for="TDS_1">Yes</label>
-                      <input type="radio" disabled name="tds" {% if i.onboard.tds == "No" %}checked{% endif %} id="TDS_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
-                      <label for="TDS_0">No</label>
+                      <input type="text" disabled value="{{i.onboard.tds}}" class="form-control">
                     </div>
                   </div>
                 </div>
@@ -622,10 +613,7 @@
                   <div class="form-group">
                     <label for="PT" style="font-size: 18px; font-weight: 600;">PT</label>
                     <div style="display: inline-flex; width: 100%" id="PT">
-                      <input type="radio" disabled name="pt" id="PT_1" {% if i.onboard.pt == "Yes" %}checked{% endif %} value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
-                      <label for="PT_1">Yes</label>
-                      <input type="radio" disabled name="pt" id="PT_0" {% if i.onboard.pt == "No" %}checked{% endif %} value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
-                      <label for="PT_0">No</label>
+                      <input type="text" disabled value="{{i.onboard.pt}}" class="form-control">
                     </div>
                   </div>
                 </div>

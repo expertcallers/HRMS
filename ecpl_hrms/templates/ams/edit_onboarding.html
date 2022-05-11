@@ -385,9 +385,9 @@
                         <div class="form-group">
                           <label for="have_system">Do you have your own system/laptop?</label>
                           <div style="display: inline-flex; width: 100%" id="have_system">
-                            <input type="radio" required {% if 'Yes' in onboard.have_system %} checked {% endif %}  name="have_system" id="have_system_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                            <input type="radio" required name="have_system" id="have_system_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
                             <label for="have_system_1">Yes</label>
-                            <input type="radio" required {% if 'No' in onboard.have_system %} checked {% endif %} name="have_system" id="have_system_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                            <input type="radio" required name="have_system" id="have_system_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
                             <label for="have_system_0">No</label>
                           </div>
                         </div>
@@ -396,9 +396,9 @@
                         <div class="form-group">
                           <label for="require_system">Do you require a system to be provided from the company?</label>
                           <div style="display: inline-flex; width: 100%" id="require_system">
-                            <input type="radio" required {% if 'Yes' in onboard.require_system %} checked {% endif %} name="require_system" value="Yes" id="require_system_1" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                            <input type="radio" required name="require_system" value="Yes" id="require_system_1" style="transform: scale(1.5); margin: 3px 8px 0 0;">
                             <label for="require_system_1">Yes</label>
-                            <input type="radio" required {% if 'No' in onboard.require_system %} checked {% endif %} name="require_system" value="No" id="require_system_0" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                            <input type="radio" required name="require_system" value="No" id="require_system_0" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
                             <label for="require_system_0">No</label>
                           </div>
                         </div>
@@ -407,9 +407,9 @@
                         <div class="form-group">
                           <label for="wifi">Do you have Wifi/Broadbrand services at home? if yes the amount can be claimed will be reimbursed by submitting the broadbrand bill every month</label>
                           <div style="display: inline-flex; width: 100%" id="wifi">
-                            <input type="radio" required {% if 'Yes' in onboard.wifi_broadband %} checked {% endif %} name="wifi" id="wifi_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                            <input type="radio" required name="wifi" id="wifi_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
                             <label for="wifi_1">Yes</label>
-                            <input type="radio" required {% if 'No' in onboard.wifi_broadband %} checked {% endif %} name="wifi" id="wifi_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                            <input type="radio" required name="wifi" id="wifi_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
                             <label for="wifi_0">No</label>
                           </div>
                         </div>
@@ -566,9 +566,9 @@
                         <div class="form-group">
                           <label for="ESIC" style="font-size: 18px; font-weight: 600;">ESIC</label>
                           <div style="display: inline-flex; width: 100%" id="ESIC">
-                            <input type="radio" required name="esic" {% if onboard.esic == "Yes" %}checked{% endif %} id="ESIC_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                            <input type="radio" required name="esic" id="ESIC_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
                             <label for="ESIC_1">Yes</label>
-                            <input type="radio" required name="esic" {% if onboard.esic == "No" %}checked{% endif %} id="ESIC_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                            <input type="radio" required name="esic" id="ESIC_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
                             <label for="ESIC_0">No</label>
                           </div>
                         </div>
@@ -577,9 +577,9 @@
                         <div class="form-group">
                           <label for="PF" style="font-size: 18px; font-weight: 600;">PF</label>
                           <div style="display: inline-flex; width: 100%" id="PF">
-                            <input type="radio" required name="pf" {% if onboard.pf == "Yes" %}checked{% endif %} id="PF_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                            <input type="radio" required name="pf" id="PF_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
                             <label for="PF_1">Yes</label>
-                            <input type="radio" required name="pf" {% if onboard.pf == "No" %}checked{% endif %} id="PF_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                            <input type="radio" required name="pf" id="PF_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
                             <label for="PF_0">No</label>
                           </div>
                         </div>
@@ -588,9 +588,9 @@
                         <div class="form-group">
                           <label for="TDS" style="font-size: 18px; font-weight: 600;">TDS</label>
                           <div style="display: inline-flex; width: 100%" id="TDS">
-                            <input type="radio" required name="tds" {% if onboard.tds == "Yes" %}checked{% endif %} id="TDS_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                            <input type="radio" required name="tds" id="TDS_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
                             <label for="TDS_1">Yes</label>
-                            <input type="radio" required name="tds" {% if onboard.tds == "No" %}checked{% endif %} id="TDS_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                            <input type="radio" required name="tds" id="TDS_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
                             <label for="TDS_0">No</label>
                           </div>
                         </div>
@@ -599,9 +599,9 @@
                         <div class="form-group">
                           <label for="PT" style="font-size: 18px; font-weight: 600;">PT</label>
                           <div style="display: inline-flex; width: 100%" id="PT">
-                            <input type="radio" required name="pt" {% if onboard.pt == "Yes" %}checked{% endif %} id="PT_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
+                            <input type="radio" required name="pt" id="PT_1" value="Yes" style="transform: scale(1.5); margin: 3px 8px 0 0;">
                             <label for="PT_1">Yes</label>
-                            <input type="radio" required name="pt" {% if onboard.pt == "No" %}checked{% endif %} id="PT_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
+                            <input type="radio" required name="pt" id="PT_0" value="No" style="transform: scale(1.5); margin: 3px 8px 0 10px;">
                             <label for="PT_0">No</label>
                           </div>
                         </div>
@@ -627,6 +627,54 @@
 {% endblock %}
 
 {% block script %}
+<script>
+  $yes_str = 'YES'
+  $no_str = 'NO'
+  $pt = '{{onboard.pt}}'
+  $tds = '{{onboard.tds}}'
+  $pf = '{{onboard.pf}}'
+  $esic = '{{onboard.esic}}'
+  if ($pt.toUpperCase() === $yes_str ) {
+    $('#PT_1').attr('checked','')
+  } else {
+    $('#PT_0').attr('checked','')
+  }
+  if ($tds.toUpperCase() === $yes_str ) {
+    $('#TDS_1').attr('checked','')
+  } else {
+    $('#TDS_0').attr('checked','')
+  }
+  if ($pf.toUpperCase() === $yes_str ) {
+    $('#PF_1').attr('checked','')
+  } else {
+    $('#PF_0').attr('checked','')
+  }
+  if ($esic.toUpperCase() === $yes_str ) {
+    $('#ESIC_1').attr('checked','')
+  } else {
+    $('#ESIC_0').attr('checked','')
+  }
+
+
+  $wifi = '{{onboard.wifi_broadband}}'
+  $require_system = '{{onboard.require_system}}'
+  $have_system = '{{onboard.have_system}}'
+  if ($wifi.toUpperCase() === $yes_str ) {
+    $('#wifi_1').attr('checked','')
+  } else {
+    $('#wifi_0').attr('checked','')
+  }
+  if ($require_system.toUpperCase() === $yes_str ) {
+    $('#require_system_1').attr('checked','')
+  } else {
+    $('#require_system_0').attr('checked','')
+  }
+  if ($have_system.toUpperCase() === $yes_str ) {
+    $('#have_system_1').attr('checked','')
+  } else {
+    $('#have_system_0').attr('checked','')
+  }
+</script>
 <script>
 function testing(e) {
   var regexp = /^[2-9]{1}[0-9]{11}$/;
