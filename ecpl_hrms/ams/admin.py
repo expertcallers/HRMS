@@ -6,14 +6,13 @@ from import_export.admin import ImportExportModelAdmin
 class AttendanceSearch(admin.ModelAdmin):
     search_fields = ('emp_name','emp_id',"att_actual")
     list_display = ('emp_name','emp_id',"date","att_actual")
-    filter = ('emp_id',"date","att_actual")
+    list_filter = ("date","att_actual")
 
 
 
 class LeaveHistorySearch(admin.ModelAdmin):
     search_fields = ('emp_id','date')
     list_display = ('date','emp_id',"leave_type","transaction","no_days",'total')
-    filter = ('emp_id',"date")
 
 class AddAttendanceMonthsSearch(admin.ModelAdmin):
     search_fields = ('month','year')
@@ -38,6 +37,7 @@ class AttendanceCorrectionHistorySearch(admin.ModelAdmin):
 class LeaveTableSearch(admin.ModelAdmin):
     search_fields = ('emp_name','emp_id')
     list_display = ('emp_name','emp_id','applied_date','leave_type','start_date','end_date','no_days','tl_approval','manager_approval', 'escalation', 'status')
+    list_filter = ('tl_approval','manager_approval', 'escalation', 'status')
 
 class OnboardingnewHRCResourse(resources.ModelResource):
   class Meta:

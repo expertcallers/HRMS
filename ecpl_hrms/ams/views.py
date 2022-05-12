@@ -213,7 +213,9 @@ def tlDashboard(request):  # Test1 Test2
                                          Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
         # All Active Today
         today = date.today()
-        att_details = EcplCalander.objects.filter(Q(date=today), Q(rm1_id=emp_id))
+
+        emps = Profile.objects.filter(Q(emp_rm1_id=emp_id), Q(agent_status='Active')).values('emp_id')
+        att_details = EcplCalander.objects.filter(Q(date=today), Q(emp_id__in=emps))
         # counts
         emp_count = Profile.objects.filter(Q(agent_status='Active'), Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(
             emp_rm3_id=emp_id)).distinct().count()
@@ -238,6 +240,7 @@ def tlDashboard(request):  # Test1 Test2
         map_tickets_counts = MappingTickets.objects.filter(new_rm3_id=emp_id, status=False).count()
         # Leaves
         leave_req_count = LeaveTable.objects.filter(emp_rm1_id=emp_id, tl_approval=False).count()
+
         # Month view
         month_days = []
         todays_date = date.today()
@@ -288,7 +291,7 @@ def tlDashboard(request):  # Test1 Test2
         return redirect('/ams/agent-dashboard')
     else:
         messages.error(request, "You are not Authorised to view this page! You have been Logged Out! ")
-        return redirect('/ams')
+        return redirect('/ams/')
 
 
 @login_required

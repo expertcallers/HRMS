@@ -14,6 +14,7 @@ class ProfileResource(resources.ModelResource):
 class ProfileSearch(ImportExportModelAdmin):
     search_fields = ('emp_name', 'emp_id', "emp_desi", 'emp_process')
     list_display = ('emp_name', 'emp_id', 'emp_desi', 'emp_process', "emp_rm1", "emp_rm2", "emp_rm3")
+    list_filter = ("agent_status",)
     resource_class = ProfileResource
 
 
