@@ -148,15 +148,20 @@ def change_password(request):  # Test1 Test2
     return render(request, 'ams/change-password.html', {'form': form})
 
 def autoApproveLeave():
-    leaves = LeaveTable.objects.filter(tl_approval=False)
+    leaves = LeaveTable.objects.filter(Q(tl_approval=False)|Q(manager_approval=False))
     leave_list = []
     for i in leaves:
         applied_time = i.applied_date.timestamp()
         timee = datetime.now(pytz.timezone('Asia/Kolkata')).timestamp() - applied_time
         if timee >= 48*60*60:
-            i.tl_approval = True
-            i.tl_status = "Auto Approved"
-            i.tl_reason = "Auto Approved"
+            if i.tl_approval == False:
+                i.tl_approval = True
+                i.tl_status = "Auto Approved"
+                i.tl_reason = "Auto Approved"
+            i.manager_approval = True
+            i.manager_status = "Auto Approved"
+            i.manager_reason = "Auto Approved"
+            i.status = "Auto Approved"
             leave_list.append(i)
     LeaveTable.objects.bulk_update(leave_list,['tl_approval','tl_status','tl_reason'])
 
@@ -454,7 +459,7 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
             #     if cal == "Week OFF" or cal == "SL" or cal == "PL":
             #         week_off.append(sand_start_date)
             #         sand_start_date -= timedelta(days=1)
-            #         sand_end_date = start_date - timedelta(days=7)
+            #         sand_end_date = start_date - timedelta(days=15)
             #         while sand_start_date > sand_end_date:
             #             cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
             #             if cal == "Week OFF":
@@ -474,7 +479,7 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
             #         if cal == "Week OFF" or cal == "PL" or cal == "SL":
             #             week_off.append(sand_start_date)
             #             sand_start_date -= timedelta(days=1)
-            #             sand_end_date = start_date - timedelta(days=7)
+            #             sand_end_date = start_date - timedelta(days=15)
             #             while sand_start_date > sand_end_date:
             #                 cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
             #                 if cal == "Week OFF":
@@ -1229,10 +1234,10 @@ def applyAttendace(request):  # Test1
         # if cal == 'PL':
         #     sand_start_date = start_date - timedelta(days=1)
         #     cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-        #     if cal == "Week OFF" or cal == "PL":
+        #     if cal == "Week OFF" or cal == "PL" or cal == "SL":
         #         week_off.append(sand_start_date)
         #         sand_start_date -= timedelta(days=1)
-        #         sand_end_date = start_date - timedelta(days=7)
+        #         sand_end_date = start_date - timedelta(days=15)
         #         while sand_start_date > sand_end_date:
         #             cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
         #             if cal == "Week OFF":
