@@ -3,12 +3,16 @@ from .models import *
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 # Register your models here
-class AttendanceSearch(admin.ModelAdmin):
+class AttendanceResourse(resources.ModelResource):
+  class Meta:
+      model = EcplCalander
+
+
+class AttendanceSearch(ImportExportModelAdmin):
     search_fields = ('emp_name','emp_id',"att_actual")
     list_display = ('emp_name','emp_id',"date","att_actual")
     list_filter = ("date","att_actual")
-
-
+    resource_class = AttendanceResourse
 
 class LeaveHistorySearch(admin.ModelAdmin):
     search_fields = ('emp_id','date')
