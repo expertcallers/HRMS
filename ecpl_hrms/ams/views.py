@@ -2145,7 +2145,7 @@ def addAttendance(request):
         current_date = date(year,month,1)
         next_month = (current_date + monthdelta.monthdelta(1)).month
         months = AddAttendanceMonths.objects.filter(created=False,month_number=next_month)
-        data = {'months': months}
+        data = {'months': months, "hr_tl_am_list": hr_tl_am_list, "hr_om_list": hr_om_list}
         return render(request, 'ams/admin/add_attendance.html', data)
 
 @login_required
@@ -2256,7 +2256,7 @@ def addLeaveBalance(request):
             month = datetime.now().month
             year = datetime.now().year
             leave = AddAttendanceMonths.objects.filter(leave=False, month_number=month, year=year)
-            data = {'months': leave}
+            data = {'months': leave, "hr_tl_am_list": hr_tl_am_list, "hr_om_list": hr_om_list}
             return render(request, 'ams/add_leave_bal.html', data)
     else:
         messages.info(request, "Unauthorized access you have been Logged out :)")
