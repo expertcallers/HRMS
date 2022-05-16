@@ -30,7 +30,7 @@ tl_am_list = []
 # Manager List
 manager_list = []
 # HR List
-hr_list = []
+hr_list = ['HR Lead']
 # Agent List
 agent_list = []
 # Management List
@@ -1118,6 +1118,35 @@ def viewUsersHR(request):  # Test1
 
 @login_required
 def viewEmployeeProfile(request, id, on_id):  # Test 1
+
+    if request.method == 'POST':
+        changed_name = request.POST.get('emp_name')
+        changed_desi = request.POST.get('emp_desi')
+        type = request.POST['from']
+        if type == 'name':
+            n = Profile.objects.get(id=id)
+            n.emp_name = changed_name
+            n.save()
+            x = Profile.objects.filter(Q(emp_rm1_id=n.emp_id) | Q(emp_rm2_id=n.emp_id) | Q(emp_rm3_id=n.emp_id))
+            change = []
+            for i in x:
+                if i.emp_rm1_id == n.emp_id:
+                    i.emp_rm1 = changed_name
+                if i.emp_rm2_id == n.emp_id:
+                    i.emp_rm2 = changed_name
+                if i.emp_rm3_id == n.emp_id:
+                    i.emp_rm3 = changed_name
+                change.append(i)
+            Profile.objects.bulk_update(change,['emp_rm1','emp_rm2','emp_rm3'])
+            messages.success(request, 'Employee Name Changed Successfully!')
+            return redirect('/ams/view-employee-profile/'+str(id)+'/'+str(on_id))
+        elif type == 'desi':
+            n = Profile.objects.get(id=id)
+            n.emp_desi = changed_desi
+            n.save()
+            messages.success(request, 'Employee Designation Changed Successfully!')
+            return redirect('/ams/view-employee-profile/'+str(id)+'/'+str(on_id))
+
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     profile = Profile.objects.get(id=id)
@@ -1125,7 +1154,9 @@ def viewEmployeeProfile(request, id, on_id):  # Test 1
         onboarding = ""
     else:
         onboarding = OnboardingnewHRC.objects.get(id=int(on_id))
-    data = {'profile': profile, 'onboard': onboarding, 'emp': emp, "on": on_id, "hr_list":hr_list,'hr_om_list':hr_om_list, 'hr_tl_am_list':hr_tl_am_list}
+    designations = Designation.objects.all()
+    data = {'profile': profile, 'onboard': onboarding, 'emp': emp, "on": on_id, "hr_list":hr_list,
+            'hr_om_list':hr_om_list, 'hr_tl_am_list':hr_tl_am_list, 'designations':designations}
     return render(request, 'ams/emp_profile_view.html', data)
 
 @login_required

@@ -594,6 +594,19 @@
                 {% if request.user.profile.emp_desi in hr_list %}
                   <div class="row mt-4">
                     <div class="col-md-12">
+                      <h4>Change Name or Designation</h4>
+                      <!-- <p>Person to be contacted in case of emergency.</p> -->
+                      <hr>
+                    </div>
+                    <div class="col-md-6">
+                      <button class="btn btn-success" data-toggle="modal" data-target="#change_name">Change Name</button>
+                    </div>
+                    <div class="col-md-6">
+                      <button class="btn btn-success" data-toggle="modal" data-target="#change_desi">Change Designation</button>
+                    </div>
+                  </div>
+                  <div class="row mt-4">
+                    <div class="col-md-12">
                       <h4>Status</h4>
                       <!-- <p>Person to be contacted in case of emergency.</p> -->
                       <hr>
@@ -643,4 +656,63 @@
 
         </div>
         <!-- /page content -->
+
+
+
+    <!-- View Pop-Up -->
+      <div class="modal fade" id="change_name" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="change_name_pop">Change Name of {{profile.emp_name}} ({{profile.emp_id}})</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form action="" method="POST" enctype="multipart/form-data">
+              <div class="modal-body">
+                  {% csrf_token %}
+                  <input type="hidden" value="name" name="from">
+                  <input type="text" value="{{profile.emp_name}}" class="form-control" name="emp_name" required>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-success">Save Changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    <!-- End Change Name Pop-Up -->
+
+    <!-- View Pop-Up -->
+      <div class="modal fade" id="change_desi" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="change_desi_pop">Change Designation of {{profile.emp_name}} ({{profile.emp_id}})</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form action="" method="POST" enctype="multipart/form-data">
+              <div class="modal-body">
+                  {% csrf_token %}
+                  <input type="hidden" value="desi" name="from">
+                  <select class="form-control select2" required name="emp_desi">
+                    {% for i in designations %}
+                    <option value="{{i.name}}" {% if profile.emp_desi == i.name %}selected{% endif %}>{{i.name}}</option>
+                    {% endfor %}
+                  </select>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-success">Save Changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    <!-- End Change Name Pop-Up -->
+
 {% endblock %}
