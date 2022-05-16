@@ -30,7 +30,7 @@ tl_am_list = []
 # Manager List
 manager_list = []
 # HR List
-hr_list = ['HR Lead']
+hr_list = []
 # Agent List
 agent_list = []
 # Management List
@@ -40,15 +40,61 @@ rm_list = []
 hr_tl_am_list = []
 hr_om_list = []
 
+def autoApproveLeave():
+    leaves = LeaveTable.objects.filter(Q(tl_approval=False) | Q(manager_approval=False))
+    leave_list = []
+    ecpl_cal = []
+    for i in leaves:
+        start_date = i.start_date
+        end_date = i.end_date
+        applied_time = i.applied_date.timestamp()
+        timee = datetime.now(pytz.timezone('Asia/Kolkata')).timestamp() - applied_time
+        if timee >= 48 * 60 * 60:
+            if i.tl_approval == False:
+                i.tl_approval = True
+                i.tl_status = "Auto Approved"
+                i.tl_reason = "Auto Approved"
+            i.manager_approval = True
+            i.manager_status = "Auto Approved"
+            i.manager_reason = "Auto Approved"
+            i.status = "Auto Approved"
+            leave_list.append(i)
+            while start_date <= end_date:
+                try:
+                    j = EcplCalander.objects.get(emp_id=i.emp_id, date=start_date)
+                    j.att_actual = i.leave_type
+                    j.approved_on = datetime.now()
+                    j.appoved_by = "Auto Approved"
+                    j.rm1 = i.emp_rm1
+                    j.rm1_id = i.emp_rm1_id
+                    j.rm2 = i.emp_rm2
+                    j.rm2_id = i.emp_rm2_id
+                    j.rm3 = i.emp_rm3
+                    j.rm3_id = i.emp_rm3_id
+                    ecpl_cal.append(j)
+                    start_date += timedelta(days=1)
+                except EcplCalander.DoesNotExist:
+                    profile = Profile.objects.get(emp_id=i.emp_id)
+                    EcplCalander.objects.create(
+                        emp_id=i.emp_id, date=start_date, att_actual=i.leave_type, approved_on = datetime.now(),
+                        appoved_by="Auto Approved", rm1 = i.emp_rm1, rm1_id = i.emp_rm1_id, rm2 = i.emp_rm2,
+                        rm2_id=i.emp_rm2_id, rm3 = i.emp_rm3, rm3_id = i.emp_rm3_id, emp_desi = i.emp_desi,
+                        team= profile.emp_process, team_id = profile.emp_process_id, emp_name = i.emp_name
+                    )
+    LeaveTable.objects.bulk_update(leave_list, ['tl_approval', 'tl_status', 'tl_reason','manager_approval',
+                                                'manager_status', 'manager_reason', 'status'])
+    EcplCalander.objects.bulk_update(ecpl_cal, ['att_actual', 'approved_on', 'appoved_by', 'rm1', 'rm1_id', 'rm2',
+                                                'rm2_id', 'rm3', 'rm3_id'])
+
 # Create your views here.
 def loginPage(request):  # Test1 Test2
     logout(request)
     form = AuthenticationForm()
+    autoApproveLeave()
     data = {'form': form}
     return render(request, 'ams/login.html', data)
 
 def loginAndRedirect(request):  # Test1 Test2
-
     for i in Designation.objects.filter(category='TL AM'):
         if i.name not in tl_am_list:
             tl_am_list.append(i.name)
@@ -100,15 +146,13 @@ def loginAndRedirect(request):  # Test1 Test2
                 messages.info(request, 'Something Went Wrong! Contact CC Team.')
                 return redirect('/ams/')
         else:
-            form = AuthenticationForm()
             messages.info(request, 'Invalid Credentials')
-            data = {'form': form}
-            return render(request, 'ams/login.html', data)
+            return redirect("/ams/")
+            # form = AuthenticationForm()
+            # data = {'form': form}
+            # return render(request, 'ams/login.html', data)
     else:
-        logout(request)
-        form = AuthenticationForm()
-        data = {'form': form}
-        return render(request, 'ams/login.html', data)
+        return redirect("/ams/")
 
 @login_required
 def redirectTOAllDashBoards(request, id):  # Test1 Test2
@@ -146,24 +190,6 @@ def change_password(request):  # Test1 Test2
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'ams/change-password.html', {'form': form})
-
-def autoApproveLeave():
-    leaves = LeaveTable.objects.filter(Q(tl_approval=False)|Q(manager_approval=False))
-    leave_list = []
-    for i in leaves:
-        applied_time = i.applied_date.timestamp()
-        timee = datetime.now(pytz.timezone('Asia/Kolkata')).timestamp() - applied_time
-        if timee >= 48*60*60:
-            if i.tl_approval == False:
-                i.tl_approval = True
-                i.tl_status = "Auto Approved"
-                i.tl_reason = "Auto Approved"
-            i.manager_approval = True
-            i.manager_status = "Auto Approved"
-            i.manager_reason = "Auto Approved"
-            i.status = "Auto Approved"
-            leave_list.append(i)
-    LeaveTable.objects.bulk_update(leave_list,['tl_approval','tl_status','tl_reason'])
 
 
 @login_required
@@ -2089,7 +2115,7 @@ def addAttendance(request):
             for j in profile:
                 employees = EcplCalander()
                 employees.date = i
-                employees.emp_id = j.emp_id
+                employees.emp = j.emp_id
                 employees.att_actual = 'Unmarked'
                 employees.emp_name = j.emp_name
                 employees.emp_desi = j.emp_desi
