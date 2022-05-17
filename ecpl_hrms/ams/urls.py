@@ -41,7 +41,6 @@ urlpatterns = [
     path('team-attendance', teamAttendance),
     path('view-emp-attendance', viewTeamAttendance),
     path('team-attendance-report', teamAttendanceReport),
-    path('add-leave-bal', addLeaveBalance),
 
     # Attendance Correction
     path('attendance-correction', attendanceCorrection),
@@ -80,7 +79,6 @@ urlpatterns = [
     path('approve-mapping-ticket', approveMappingTicket),
     path('mapping-application-status', viewMappingApplicationStatus),
 
-    path('add-attendance', addAttendance),
     path('change-emp-password', changeEmpPassword),
     path('add-new-designation', addNewDesi),
     path('test', TestFun),
