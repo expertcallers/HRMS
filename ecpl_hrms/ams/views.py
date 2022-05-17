@@ -40,57 +40,10 @@ rm_list = []
 hr_tl_am_list = []
 hr_om_list = []
 
-def autoApproveLeave():
-    leaves = LeaveTable.objects.filter(Q(tl_approval=False) | Q(manager_approval=False))
-    leave_list = []
-    ecpl_cal = []
-    for i in leaves:
-        start_date = i.start_date
-        end_date = i.end_date
-        applied_time = i.applied_date.timestamp()
-        timee = datetime.now(pytz.timezone('Asia/Kolkata')).timestamp() - applied_time
-        if timee >= 48 * 60 * 60:
-            if i.tl_approval == False:
-                i.tl_approval = True
-                i.tl_status = "Auto Approved"
-                i.tl_reason = "Auto Approved"
-            i.manager_approval = True
-            i.manager_status = "Auto Approved"
-            i.manager_reason = "Auto Approved"
-            i.status = "Auto Approved"
-            leave_list.append(i)
-            while start_date <= end_date:
-                try:
-                    j = EcplCalander.objects.get(emp_id=i.emp_id, date=start_date)
-                    j.att_actual = i.leave_type
-                    j.approved_on = datetime.now()
-                    j.appoved_by = "Auto Approved"
-                    j.rm1 = i.emp_rm1
-                    j.rm1_id = i.emp_rm1_id
-                    j.rm2 = i.emp_rm2
-                    j.rm2_id = i.emp_rm2_id
-                    j.rm3 = i.emp_rm3
-                    j.rm3_id = i.emp_rm3_id
-                    ecpl_cal.append(j)
-                    start_date += timedelta(days=1)
-                except EcplCalander.DoesNotExist:
-                    profile = Profile.objects.get(emp_id=i.emp_id)
-                    EcplCalander.objects.create(
-                        emp_id=i.emp_id, date=start_date, att_actual=i.leave_type, approved_on = datetime.now(),
-                        appoved_by="Auto Approved", rm1 = i.emp_rm1, rm1_id = i.emp_rm1_id, rm2 = i.emp_rm2,
-                        rm2_id=i.emp_rm2_id, rm3 = i.emp_rm3, rm3_id = i.emp_rm3_id, emp_desi = i.emp_desi,
-                        team= profile.emp_process, team_id = profile.emp_process_id, emp_name = i.emp_name
-                    )
-    LeaveTable.objects.bulk_update(leave_list, ['tl_approval', 'tl_status', 'tl_reason','manager_approval',
-                                                'manager_status', 'manager_reason', 'status'])
-    EcplCalander.objects.bulk_update(ecpl_cal, ['att_actual', 'approved_on', 'appoved_by', 'rm1', 'rm1_id', 'rm2',
-                                                'rm2_id', 'rm3', 'rm3_id'])
-
 # Create your views here.
 def loginPage(request):  # Test1 Test2
     logout(request)
     form = AuthenticationForm()
-    autoApproveLeave()
     data = {'form': form}
     return render(request, 'ams/login.html', data)
 
@@ -132,25 +85,26 @@ def loginAndRedirect(request):  # Test1 Test2
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            if request.user.profile.pc == False:
-                return redirect('/ams/change-password')
-            if request.user.profile.emp_desi in tl_am_list:
-                return redirect('/ams/tl-dashboard')
-            elif request.user.profile.emp_desi in manager_list:
-                return redirect('/ams/manager-dashboard')
-            elif request.user.profile.emp_desi in hr_list:
-                return redirect('/ams/hr-dashboard')
-            elif request.user.profile.emp_desi in agent_list:
-                return redirect('/ams/agent-dashboard')
+            if request.user.profile.agent_status == "Active":
+                if request.user.profile.pc == False:
+                    return redirect('/ams/change-password')
+                if request.user.profile.emp_desi in tl_am_list:
+                    return redirect('/ams/tl-dashboard')
+                elif request.user.profile.emp_desi in manager_list:
+                    return redirect('/ams/manager-dashboard')
+                elif request.user.profile.emp_desi in hr_list:
+                    return redirect('/ams/hr-dashboard')
+                elif request.user.profile.emp_desi in agent_list:
+                    return redirect('/ams/agent-dashboard')
+                else:
+                    messages.info(request, 'Something Went Wrong! Contact CC Team.')
+                    return redirect('/ams/')
             else:
-                messages.info(request, 'Something Went Wrong! Contact CC Team.')
-                return redirect('/ams/')
+                messages.info(request, 'You are Inactive. Please contact HR.')
+                return redirect("/ams/")
         else:
             messages.info(request, 'Invalid Credentials')
             return redirect("/ams/")
-            # form = AuthenticationForm()
-            # data = {'form': form}
-            # return render(request, 'ams/login.html', data)
     else:
         return redirect("/ams/")
 
@@ -2089,66 +2043,6 @@ def approveAttendanceRequest(request):  # test1
 
 
 @login_required
-def addAttendance(request):
-    if request.method == 'POST':
-        id = request.POST['id']
-        unique_id = request.POST['csrfmiddlewaretoken']
-        month = AddAttendanceMonths.objects.get(id=id).month_number
-        year = AddAttendanceMonths.objects.get(id=id).year
-        start_date = date(year, month, 1)
-        last = calendar.monthrange(year, month)[1]
-        last_date = date(year, month, last)
-        delta = last_date - start_date
-        date_list = []
-        for i in range(delta.days + 1):
-            day = start_date + timedelta(days=i)
-            try:
-                DaysForAttendance.objects.get(date=day)
-            except DaysForAttendance.DoesNotExist:
-                DaysForAttendance.objects.create(date=day)
-        days = DaysForAttendance.objects.filter(status=False, date__range=[start_date, last_date])
-        for i in days:
-            date_list.append(i.date)
-        for i in date_list:
-            profile = Profile.objects.exclude(emp_id__in=EcplCalander.objects.filter(date=i).values('emp_id'))
-            cal = []
-            for j in profile:
-                employees = EcplCalander()
-                employees.date = i
-                employees.emp = j.emp_id
-                employees.att_actual = 'Unmarked'
-                employees.emp_name = j.emp_name
-                employees.emp_desi = j.emp_desi
-                employees.team = j.emp_process
-                employees.team_id = j.emp_process_id
-                employees.rm1 = j.emp_rm1
-                employees.rm2 = j.emp_rm2
-                employees.rm3 = j.emp_rm3
-                employees.rm1_id = j.emp_rm1_id
-                employees.rm2_id = j.emp_rm2_id
-                employees.rm3_id = j.emp_rm3_id
-                cal.append(employees)
-            EcplCalander.objects.bulk_create(cal)
-            days = DaysForAttendance.objects.get(date=i)
-            days.status = True
-            days.save()
-        e = AddAttendanceMonths.objects.get(id=id)
-        e.created = True
-        e.created_by = request.user.profile.emp_name + "(" + request.user + ")"
-        e.save()
-        messages.info(request, "Attendance added Successfully!")
-        return redirect('/ams/add-attendance')
-    else:
-        todayy = date.today()
-        month = todayy.month
-        year = todayy.year
-        current_date = date(year,month,1)
-        next_month = (current_date + monthdelta.monthdelta(1)).month
-        months = AddAttendanceMonths.objects.filter(created=False,month_number=next_month)
-        data = {'months': months, "hr_tl_am_list": hr_tl_am_list, "hr_om_list": hr_om_list}
-        return render(request, 'ams/admin/add_attendance.html', data)
-
-@login_required
 def changeEmpPassword(request):
     if request.method == "POST":
         new_pass = request.POST["new_pass"]
@@ -2188,79 +2082,6 @@ def SLProofSubmit(request):  # Test1
             messages.info(request, "The time has exceeded cannot upload now :)")
             return redirect('/ams/ams-apply_leave')
 
-@login_required
-def addLeaveBalance(request):
-    emp_desi = request.user.profile.emp_desi
-    if emp_desi in hr_list:
-        if request.method == 'POST':
-            unique_id = request.POST['csrfmiddlewaretoken']
-            emp = EmployeeLeaveBalance.objects.exclude(
-                emp_id__in=EmployeeLeaveBalance.objects.filter(unique_id=unique_id).values('emp_id'))
-
-            id = request.POST['month']
-            e = AddAttendanceMonths.objects.get(id=id)
-            month = e.month_number
-            year = e.year
-            start_date = date(year, month, 1)
-            start_date = start_date - monthdelta.monthdelta(1)
-            end_date = date(year, month, 1)
-            end_date = end_date - timedelta(days=1)
-            leavebal = []
-            leavehist = []
-            ecpl_cal = EcplCalander.objects.filter(date__range=[start_date, end_date]).exclude(att_actual='Unmarked')
-            for i in emp:
-                cal = 0
-                i.unique_id = unique_id
-                total_bal = i.pl_balance + i.sl_balance
-                for j in ecpl_cal:
-                    if j.emp_id == i.emp_id:
-                        if j.att_actual == "present" or j.att_actual == "Week OFF" or j.att_actual == "Comp OFF" or j.att_actual == "Holiday":
-                            cal += 1
-                        elif j.att_actual == 'Half Day':
-                            cal += 0.5
-
-                i.sl_balance += 1
-                pl = round(cal / 20, 2)
-                i.pl_balance += pl
-                leavebal.append(i)
-
-                if pl > 0:
-                    pl_hist = leaveHistory()
-                    pl_hist.unique_id = unique_id
-                    pl_hist.emp_id = i.emp_id
-                    pl_hist.date = date.today()
-                    pl_hist.leave_type = "PL"
-                    pl_hist.transaction = "Leaves Earned"
-                    pl_hist.no_days = pl
-                    pl_hist.total = total_bal+pl
-                    leavehist.append(pl_hist)
-
-                sl_hist = leaveHistory()
-                sl_hist.unique_id = unique_id
-                sl_hist.emp_id = i.emp_id
-                sl_hist.date = date.today()
-                sl_hist.leave_type = "SL"
-                sl_hist.transaction = "Leaves Earned"
-                sl_hist.no_days = 1
-                sl_hist.total = total_bal+pl+1
-                leavehist.append(sl_hist)
-            EmployeeLeaveBalance.objects.bulk_update(leavebal,['sl_balance', 'pl_balance'])
-            leaveHistory.objects.bulk_create(leavehist)
-            e.leave = True
-            e.leave_by = request.user.profile.emp_name + "(" + request.user + ")"
-            e.save()
-            messages.info(request, "Leave Balance Added for the selected month")
-
-            return redirect('/ams/add-leave-bal')
-        else:
-            month = datetime.now().month
-            year = datetime.now().year
-            leave = AddAttendanceMonths.objects.filter(leave=False, month_number=month, year=year)
-            data = {'months': leave, "hr_tl_am_list": hr_tl_am_list, "hr_om_list": hr_om_list}
-            return render(request, 'ams/add_leave_bal.html', data)
-    else:
-        messages.info(request, "Unauthorized access you have been Logged out :)")
-        return redirect('/ams/')
 
 
 @login_required
@@ -2294,27 +2115,25 @@ def onboardingBulkUpload(request):
         return render(request,'ams/bulk_onboarding.html')
 
 
-def TestFun(request):
-    start_date = date(2022, 4, 1)
-    last_date = date(2022, 5, 31)
+def addAttendance():
+    mydate = date.today()
+    month = mydate.month
+    year = mydate.year
+    start_date = date(year, month, 1)
+    last = calendar.monthrange(year, month)[1]
+    last_date = date(year, month, last)
     delta = last_date - start_date
     date_list = []
     for i in range(delta.days + 1):
         day = start_date + timedelta(days=i)
-        try:
-            DaysForAttendance.objects.get(date=day)
-        except DaysForAttendance.DoesNotExist:
-            DaysForAttendance.objects.create(date=day)
-    days = DaysForAttendance.objects.filter(status=False, date__range=[start_date, last_date])
-    for i in days:
-        date_list.append(i.date)
+        date_list.append(day)
     for i in date_list:
         profile = Profile.objects.exclude(emp_id__in=EcplCalander.objects.filter(date=i).values('emp_id'))
         cal = []
         for j in profile:
             employees = EcplCalander()
             employees.date = i
-            employees.emp_id = j.emp_id
+            employees.emp = j.emp_id
             employees.att_actual = 'Unmarked'
             employees.emp_name = j.emp_name
             employees.emp_desi = j.emp_desi
@@ -2328,21 +2147,105 @@ def TestFun(request):
             employees.rm3_id = j.emp_rm3_id
             cal.append(employees)
         EcplCalander.objects.bulk_create(cal)
-        days = DaysForAttendance.objects.get(date=i)
-        days.status = True
-        days.save()
-    lea = []
-    profiles = Profile.objects.exclude(emp_id__in=EmployeeLeaveBalance.objects.all().values('emp_id'))
-    for j in profiles:
-        leave = EmployeeLeaveBalance()
-        leave.emp_id = j.emp_id
-        leave.emp_name = j.emp_name
-        leave.team = j.emp_process
-        leave.pl_balance = 0
-        leave.sl_balance = 0
-        lea.append(leave)
-    EmployeeLeaveBalance.objects.bulk_create(lea)
-    messages.info(request, "Attendance added Successfully!")
+
+def autoApproveLeave():
+    leaves = LeaveTable.objects.filter(Q(tl_approval=False) | Q(manager_approval=False))
+    leave_list = []
+    ecpl_cal = []
+    for i in leaves:
+        start_date = i.start_date
+        end_date = i.end_date
+        applied_time = i.applied_date.timestamp()
+        timee = datetime.now(pytz.timezone('Asia/Kolkata')).timestamp() - applied_time
+        if timee >= 48 * 60 * 60:
+            if i.tl_approval == False:
+                i.tl_approval = True
+                i.tl_status = "Auto Approved"
+                i.tl_reason = "Auto Approved"
+            i.manager_approval = True
+            i.manager_status = "Auto Approved"
+            i.manager_reason = "Auto Approved"
+            i.status = "Auto Approved"
+            leave_list.append(i)
+            while start_date <= end_date:
+                try:
+                    j = EcplCalander.objects.get(emp_id=i.emp_id, date=start_date)
+                    j.att_actual = i.leave_type
+                    j.approved_on = datetime.now()
+                    j.appoved_by = "Auto Approved"
+                    j.rm1 = i.emp_rm1
+                    j.rm1_id = i.emp_rm1_id
+                    j.rm2 = i.emp_rm2
+                    j.rm2_id = i.emp_rm2_id
+                    j.rm3 = i.emp_rm3
+                    j.rm3_id = i.emp_rm3_id
+                    ecpl_cal.append(j)
+                except EcplCalander.DoesNotExist:
+                    profile = Profile.objects.get(emp_id=i.emp_id)
+                    EcplCalander.objects.create(
+                        emp_id=i.emp_id, date=start_date, att_actual=i.leave_type, approved_on = datetime.now(),
+                        appoved_by="Auto Approved", rm1 = i.emp_rm1, rm1_id = i.emp_rm1_id, rm2 = i.emp_rm2,
+                        rm2_id=i.emp_rm2_id, rm3 = i.emp_rm3, rm3_id = i.emp_rm3_id, emp_desi = i.emp_desi,
+                        team= profile.emp_process, team_id = profile.emp_process_id, emp_name = i.emp_name
+                    )
+                start_date += timedelta(days=1)
+    LeaveTable.objects.bulk_update(leave_list, ['tl_approval', 'tl_status', 'tl_reason','manager_approval',
+                                                'manager_status', 'manager_reason', 'status'])
+    EcplCalander.objects.bulk_update(ecpl_cal, ['att_actual', 'approved_on', 'appoved_by', 'rm1', 'rm1_id', 'rm2',
+                                                'rm2_id', 'rm3', 'rm3_id'])
+
+def addLeaveBalance():
+    emp = EmployeeLeaveBalance.objects.all()
+    e = date.today()
+    month = e.month
+    year = e.year
+    start_date = date(year, month, 1)
+    start_date = start_date - monthdelta.monthdelta(1)
+    end_date = date(year, month, 1)
+    end_date = end_date - timedelta(days=1)
+    leavebal = []
+    leavehist = []
+    ecpl_cal = EcplCalander.objects.filter(date__range=[start_date, end_date]).exclude(att_actual='Unmarked')
+    for i in emp:
+        cal = 0
+        i.unique_id = e
+        total_bal = i.pl_balance + i.sl_balance
+        for j in ecpl_cal:
+            if j.emp_id == i.emp_id:
+                if j.att_actual == "present" or j.att_actual == "Week OFF" or j.att_actual == "Comp OFF" or j.att_actual == "Holiday":
+                    cal += 1
+                elif j.att_actual == 'Half Day':
+                    cal += 0.5
+
+        i.sl_balance += 1
+        pl = round(cal / 20, 2)
+        i.pl_balance += pl
+        leavebal.append(i)
+
+        if pl > 0:
+            pl_hist = leaveHistory()
+            pl_hist.unique_id = e
+            pl_hist.emp_id = i.emp_id
+            pl_hist.date = date.today()
+            pl_hist.leave_type = "PL"
+            pl_hist.transaction = "Leaves Earned"
+            pl_hist.no_days = pl
+            pl_hist.total = total_bal+pl
+            leavehist.append(pl_hist)
+
+        sl_hist = leaveHistory()
+        sl_hist.unique_id = e
+        sl_hist.emp_id = i.emp_id
+        sl_hist.date = date.today()
+        sl_hist.leave_type = "SL"
+        sl_hist.transaction = "Leaves Earned"
+        sl_hist.no_days = 1
+        sl_hist.total = total_bal+pl+1
+        leavehist.append(sl_hist)
+    EmployeeLeaveBalance.objects.bulk_update(leavebal,['sl_balance', 'pl_balance'])
+    leaveHistory.objects.bulk_create(leavehist)
+
+def TestFun(request):
     return redirect('/ams/')
 
 
