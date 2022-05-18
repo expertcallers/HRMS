@@ -2250,8 +2250,5 @@ def TestFun(request):
 
 
 def schedule_print():
-    
-    emp = Profile.objects.get(emp_id=1732)
-    emp.emp_name+='a'  
-    emp.save()
-    print(Profile.objects.get(emp_id=1732).emp_name)
+
+    print(datetime.now())
