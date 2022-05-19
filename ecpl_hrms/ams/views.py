@@ -1740,7 +1740,7 @@ def applyLeave(request):  # Test1
             e.emp_rm3_id = emp_rm3_id
             rm1_desi = Profile.objects.get(emp_id=emp_rm1_id).emp_desi
 
-            if rm1_desi in manager_list:
+            if rm1_desi in manager_list or rm1_desi in hr_om_list:
                 e.tl_status = 'Approved'
                 e.tl_approval = True
                 e.tl_reason = 'OM as TL'
