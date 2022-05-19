@@ -2115,7 +2115,7 @@ def onboardingBulkUpload(request):
         return render(request,'ams/bulk_onboarding.html')
 
 
-def addAttendance():
+def addAttendance(request):
     mydate = date.today()
     month = mydate.month
     year = mydate.year
@@ -2150,8 +2150,9 @@ def addAttendance():
             employees.rm3_id = j.emp_rm3_id
             cal.append(employees)
         EcplCalander.objects.bulk_create(cal)
+    return redirect('/ams/')
 
-def autoApproveLeave():
+def autoApproveLeave(request):
     leaves = LeaveTable.objects.filter(Q(tl_approval=False) | Q(manager_approval=False))
     leave_list = []
     ecpl_cal = []
@@ -2196,62 +2197,64 @@ def autoApproveLeave():
                                                 'manager_status', 'manager_reason', 'status'])
     EcplCalander.objects.bulk_update(ecpl_cal, ['att_actual', 'approved_on', 'appoved_by', 'rm1', 'rm1_id', 'rm2',
                                                 'rm2_id', 'rm3', 'rm3_id'])
+    return redirect('/ams/')
 
-def addLeaveBalance():
-    emp = EmployeeLeaveBalance.objects.all()
-    e = date.today()
-    month = e.month
-    year = e.year
-    start_date = date(year, month, 1)
-    start_date = start_date - monthdelta.monthdelta(1)
-    end_date = date(year, month, 1)
-    end_date = end_date - timedelta(days=1)
-    leavebal = []
-    leavehist = []
-    ecpl_cal = EcplCalander.objects.filter(date__range=[start_date, end_date]).exclude(att_actual='Unmarked')
-    for i in emp:
-        cal = 0
-        i.unique_id = e
-        total_bal = i.pl_balance + i.sl_balance
-        for j in ecpl_cal:
-            if j.emp_id == i.emp_id:
-                if j.att_actual == "present" or j.att_actual == "Week OFF" or j.att_actual == "Comp OFF" or j.att_actual == "Holiday":
-                    cal += 1
-                elif j.att_actual == 'Half Day':
-                    cal += 0.5
+def addLeaveBalance(request,a):
+    if a == "yes":
+        emp = EmployeeLeaveBalance.objects.all()
+        e = date.today()
+        month = e.month
+        year = e.year
+        start_date = date(year, month, 1)
+        start_date = start_date - monthdelta.monthdelta(1)
+        end_date = date(year, month, 1)
+        end_date = end_date - timedelta(days=1)
+        leavebal = []
+        leavehist = []
+        ecpl_cal = EcplCalander.objects.filter(date__range=[start_date, end_date]).exclude(att_actual='Unmarked')
+        for i in emp:
+            cal = 0
+            i.unique_id = e
+            total_bal = i.pl_balance + i.sl_balance
+            for j in ecpl_cal:
+                if j.emp_id == i.emp_id:
+                    if j.att_actual == "present" or j.att_actual == "Week OFF" or j.att_actual == "Comp OFF" or j.att_actual == "Holiday":
+                        cal += 1
+                    elif j.att_actual == 'Half Day':
+                        cal += 0.5
 
-        i.sl_balance += 1
-        pl = round(cal / 20, 2)
-        i.pl_balance += pl
-        leavebal.append(i)
+            i.sl_balance += 1
+            pl = round(cal / 20, 2)
+            i.pl_balance += pl
+            leavebal.append(i)
 
-        if pl > 0:
-            pl_hist = leaveHistory()
-            pl_hist.unique_id = e
-            pl_hist.emp_id = i.emp_id
-            pl_hist.date = date.today()
-            pl_hist.leave_type = "PL"
-            pl_hist.transaction = "Leaves Earned"
-            pl_hist.no_days = pl
-            pl_hist.total = total_bal+pl
-            leavehist.append(pl_hist)
+            if pl > 0:
+                pl_hist = leaveHistory()
+                pl_hist.unique_id = e
+                pl_hist.emp_id = i.emp_id
+                pl_hist.date = date.today()
+                pl_hist.leave_type = "PL"
+                pl_hist.transaction = "Leaves Earned"
+                pl_hist.no_days = pl
+                pl_hist.total = total_bal+pl
+                leavehist.append(pl_hist)
 
-        sl_hist = leaveHistory()
-        sl_hist.unique_id = e
-        sl_hist.emp_id = i.emp_id
-        sl_hist.date = date.today()
-        sl_hist.leave_type = "SL"
-        sl_hist.transaction = "Leaves Earned"
-        sl_hist.no_days = 1
-        sl_hist.total = total_bal+pl+1
-        leavehist.append(sl_hist)
-    EmployeeLeaveBalance.objects.bulk_update(leavebal,['sl_balance', 'pl_balance'])
-    leaveHistory.objects.bulk_create(leavehist)
+            sl_hist = leaveHistory()
+            sl_hist.unique_id = e
+            sl_hist.emp_id = i.emp_id
+            sl_hist.date = date.today()
+            sl_hist.leave_type = "SL"
+            sl_hist.transaction = "Leaves Earned"
+            sl_hist.no_days = 1
+            sl_hist.total = total_bal+pl+1
+            leavehist.append(sl_hist)
+        EmployeeLeaveBalance.objects.bulk_update(leavebal,['sl_balance', 'pl_balance'])
+        leaveHistory.objects.bulk_create(leavehist)
+        return redirect('/ams/')
+    else:
+        messages.success(request, "Unauthorized Access")
+        return redirect('/ams/')
+
 
 def TestFun(request):
-
-    print('Its Working')
-
-
-def schedule_print():
-    print(datetime.now())
+    return redirect('/ams/')
