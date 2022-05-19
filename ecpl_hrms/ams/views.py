@@ -2249,7 +2249,8 @@ def addLeaveBalance():
     leaveHistory.objects.bulk_create(leavehist)
 
 def TestFun(request):
-    return redirect('/ams/')
+
+    print('Its Working')
 
 
 def schedule_print():
