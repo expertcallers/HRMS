@@ -2120,20 +2120,23 @@ def addAttendance():
     month = mydate.month
     year = mydate.year
     start_date = date(year, month, 1)
+    start_date += monthdelta.monthdelta(1)
     last = calendar.monthrange(year, month)[1]
     last_date = date(year, month, last)
+    last_date += monthdelta.monthdelta(1)
     delta = last_date - start_date
     date_list = []
     for i in range(delta.days + 1):
         day = start_date + timedelta(days=i)
         date_list.append(day)
     for i in date_list:
-        profile = Profile.objects.exclude(emp_id__in=EcplCalander.objects.filter(date=i).values('emp_id'))
+        profile = Profile.objects.all().exclude(
+            emp_id__in=EcplCalander.objects.filter(date=i).values('emp_id'), agent_status='Attrition')
         cal = []
         for j in profile:
             employees = EcplCalander()
             employees.date = i
-            employees.emp = j.emp_id
+            employees.emp_id = j.emp_id
             employees.att_actual = 'Unmarked'
             employees.emp_name = j.emp_name
             employees.emp_desi = j.emp_desi
@@ -2250,5 +2253,4 @@ def TestFun(request):
 
 
 def schedule_print():
-
     print(datetime.now())
