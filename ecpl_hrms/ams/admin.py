@@ -60,6 +60,7 @@ class OnboardingnewHRCResourse(resources.ModelResource):
                'emp_bank_holder_name', 'emp_bank_name', 'emp_bank_acco_no', 'emp_bank_ifsc', 'have_system',
                'require_system', 'wifi_broadband', 'esic', 'pf', 'tds', 'pt']
       import_id_fields = ('emp_id',)
+      clean_model_instances = True
 
 class OnboardingnewHRCSearch(ImportExportModelAdmin):
     search_fields = ('emp_name','emp_id','emp_aadhar','emp_phone')
