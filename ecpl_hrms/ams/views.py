@@ -2248,10 +2248,3 @@ def addLeaveBalance():
     EmployeeLeaveBalance.objects.bulk_update(leavebal,['sl_balance', 'pl_balance'])
     leaveHistory.objects.bulk_create(leavehist)
 
-def TestFun(request):
-
-    print('Its Working')
-
-
-def schedule_print():
-    print(datetime.now())
