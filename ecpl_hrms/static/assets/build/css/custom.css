@@ -802,6 +802,7 @@
   content: "\e260"; }
 
 .left_col {
+  width: 99%;
   background: #2A3F54; }
 
 .container {
@@ -937,6 +938,7 @@
 
 
 .profile_info h2 {
+  word-wrap: break-word;
   font-size: 16px;
   color: #ECF0F1;
   padding: 0 0 0 15px;

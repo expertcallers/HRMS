@@ -86,5 +86,6 @@ urlpatterns = [
     path('add-leave-balance/<str:a>', addLeaveBalance),
     path('auto-approve-leave', autoApproveLeave),
     path('add-attendance', addAttendance),
+    path('sandwich', sandwichPolicy),
 
 ]
