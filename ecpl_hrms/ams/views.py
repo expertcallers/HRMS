@@ -18,7 +18,6 @@ from django.db.models import Q, Sum, Max
 import xlwt
 from .admin import *
 from tablib import Dataset
-
 c = Calendar()
 
 # Getting Model from other Apps
@@ -2358,8 +2357,5 @@ def sandwichPolicy(request):
 #     EcplCalander.objects.bulk_update(cal_list,['att_actual'])
 #     return redirect('/ams/')
 
-<<<<<<< HEAD
-=======
 def TestFun(request):
     return redirect('/ams/')
->>>>>>> 2a85ee234f7bfb3abef8ca2e38c0396da4b3d8ce
