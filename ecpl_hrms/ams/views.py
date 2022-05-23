@@ -1057,7 +1057,7 @@ def addNewUserHR(request):  # Test1  # calander pending
                 try:
                     EcplCalander.objects.get(emp_id=j.emp_id, date=i)
                 except EcplCalander.DoesNotExist:
-                    EcplCalander.objects.create(date=i, emp_id=j.emp_id, att_actual='NA',
+                    EcplCalander.objects.create(date=i, emp_id=j.emp_id, att_actual='',
                                                 emp_name=j.emp_name, emp_desi=j.emp_desi,
                                                 team=j.emp_process, team_id=j.emp_process_id, rm1=j.emp_rm1,
                                                 rm2=j.emp_rm2, rm3=j.emp_rm3, rm1_id=j.emp_rm1_id,
@@ -1784,8 +1784,6 @@ def applyLeave(request):  # Test1
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
         leave = LeaveTable.objects.filter(emp_id=emp_id)
-
-
         try:
             Profile.objects.get(emp_id=emp_id, doj=None)
             doj = date(2020, 1, 1)
