@@ -2191,6 +2191,10 @@ def autoApproveLeave(request):
         applied_date = datetime.date(applied_date)
         current_date = datetime.date(current_date)
         days = (current_date-applied_date).days
+        print(applied_date,'applied date')
+        print(current_date,'current date')
+        print(days)
+        
      
         if days >= 2:
             if i.tl_approval == False:
