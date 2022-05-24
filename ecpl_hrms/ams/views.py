@@ -1951,7 +1951,7 @@ def attendanceCorrection(request):  # Test1
         emp_id = request.POST['emp_id']
         profile = Profile.objects.get(emp_id=emp_id)
         if profile.doj:
-            if datetime.strptime(date, "%Y-%m-%d").date() <= profile.doj:
+            if datetime.strptime(date, "%Y-%m-%d").date() >= profile.doj:
                 cal = EcplCalander.objects.get(Q(date=date), Q(emp_id=emp_id))
                 data = {'cal': cal, 'emp': emp}
                 return render(request, 'ams/view_att_correction_apply.html', data)
