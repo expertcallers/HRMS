@@ -2176,6 +2176,7 @@ def autoApproveLeave(request):
     leaves = LeaveTable.objects.filter(Q(tl_approval=False) | Q(manager_approval=False))
     leave_list = []
     ecpl_cal = []
+
     for i in leaves:
         start_date = i.start_date
         end_date = i.end_date
@@ -2213,6 +2214,8 @@ def autoApproveLeave(request):
                         team= profile.emp_process, team_id = profile.emp_process_id, emp_name = i.emp_name
                     )
                 start_date += timedelta(days=1)
+    print(leave_list,'Leave list')
+    print(ecpl_cal,'ecpl calander')            
     LeaveTable.objects.bulk_update(leave_list, ['tl_approval', 'tl_status', 'tl_reason','manager_approval',
                                                 'manager_status', 'manager_reason', 'status'])
     EcplCalander.objects.bulk_update(ecpl_cal, ['att_actual', 'approved_on', 'appoved_by', 'rm1', 'rm1_id', 'rm2',
