@@ -2177,28 +2177,14 @@ def autoApproveLeave(request):
     leave_list = []
     ecpl_cal = []   
     for i in leaves:
-        print(i.applied_date)
-        
         start_date = i.start_date
-        end_date = i.end_date
-
-        #applied_time = i.applied_date.timestamp()
-        #print(applied_time,'applied_time')
-        #timee = datetime.now(pytz.timezone('Asia/Kolkata')).timestamp() - applied_time
-        #print(timee,'time')
-
-      
+        end_date = i.end_date      
         current_date = datetime.now(pytz.timezone('Asia/Kolkata'))
         # converting into requiered format
         applied_date = datetime.date(i.applied_date)
         current_date = datetime.date(current_date)
-        days = (current_date-applied_date).days
-        print(applied_date,'applied date')
-        print(current_date,'current date')
-        print(days)
-
-     
-        if days >= 2:
+        days = (current_date-applied_date).days        
+        if days > 2:
             if i.tl_approval == False:
                 i.tl_approval = True
                 i.tl_status = "Auto Approved"
