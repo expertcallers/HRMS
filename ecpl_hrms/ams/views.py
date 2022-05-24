@@ -2175,17 +2175,24 @@ def addAttendance(request):
 def autoApproveLeave(request):
     leaves = LeaveTable.objects.filter(Q(tl_approval=False) | Q(manager_approval=False))
     leave_list = []
-    ecpl_cal = []
-    print(leaves,'leaves')
+    ecpl_cal = []   
     for i in leaves:
         start_date = i.start_date
         end_date = i.end_date
-        applied_time = i.applied_date.timestamp()
-        print(applied_time,'applied_time')
-        timee = datetime.now(pytz.timezone('Asia/Kolkata')).timestamp() - applied_time
-        print(timee,'time')
 
-        if timee >= 48 * 60 * 60:
+        #applied_time = i.applied_date.timestamp()
+        #print(applied_time,'applied_time')
+        #timee = datetime.now(pytz.timezone('Asia/Kolkata')).timestamp() - applied_time
+        #print(timee,'time')
+
+        applied_date = i.applied_date        
+        current_date = datetime.now(pytz.timezone('Asia/Kolkata'))
+        # converting into requiered format
+        applied_date = datetime.date(applied_date)
+        current_date = datetime.date(current_date)
+        days = (current_date-applied_date).days
+     
+        if days >= 2:
             if i.tl_approval == False:
                 i.tl_approval = True
                 i.tl_status = "Auto Approved"
@@ -2217,8 +2224,7 @@ def autoApproveLeave(request):
                         team= profile.emp_process, team_id = profile.emp_process_id, emp_name = i.emp_name
                     )
                 start_date += timedelta(days=1)
-    print(leave_list,'Leave list')
-    print(ecpl_cal,'ecpl calander')            
+           
     LeaveTable.objects.bulk_update(leave_list, ['tl_approval', 'tl_status', 'tl_reason','manager_approval',
                                                 'manager_status', 'manager_reason', 'status'])
     EcplCalander.objects.bulk_update(ecpl_cal, ['att_actual', 'approved_on', 'appoved_by', 'rm1', 'rm1_id', 'rm2',
