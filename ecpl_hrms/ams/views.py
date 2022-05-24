@@ -2220,7 +2220,7 @@ def autoApproveLeave(request):
     return redirect('/ams/')
 
 def addLeaveBalance(request,a):
-    if a == "yes":
+    if a == "3cpl@2022#":
         emp = EmployeeLeaveBalance.objects.all()
         e = date.today()
         month = e.month
@@ -2356,4 +2356,11 @@ def sandwichPolicy(request):
 #     return redirect('/ams/')
 
 def TestFun(request):
+    emps = Profile.objects.filter(doj__gte='2022-05-01')
+    for i in emps:
+        doj = i.doj
+        cal = EcplCalander.objects.filter(date__lt=doj,date__gte='2022-05-01',emp_id=i.emp_id)
+        for j in cal:
+            j.att_actual = ''
+            j.save()    
     return redirect('/ams/')
