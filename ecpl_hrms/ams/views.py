@@ -2176,12 +2176,15 @@ def autoApproveLeave(request):
     leaves = LeaveTable.objects.filter(Q(tl_approval=False) | Q(manager_approval=False))
     leave_list = []
     ecpl_cal = []
-
+    print(leaves,'leaves')
     for i in leaves:
         start_date = i.start_date
         end_date = i.end_date
         applied_time = i.applied_date.timestamp()
+        print(applied_time,'applied_time')
         timee = datetime.now(pytz.timezone('Asia/Kolkata')).timestamp() - applied_time
+        print(timee,'time')
+
         if timee >= 48 * 60 * 60:
             if i.tl_approval == False:
                 i.tl_approval = True
