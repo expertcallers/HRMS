@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-<link rel="icon" href="favicon.ico" type="image/x-icon"/>
+<link rel="icon" href="{% static 'assets/images/expertcallers-icon.png' %}" type="image/x-icon"/>
 
 <title>ECPL AMS</title>
 
@@ -26,6 +26,14 @@
         }
         body{
             overflow-x: hidden;
+        }
+        .flash {
+          animation: mymove 1s;
+          animation-iteration-count: infinite ;
+        }
+        @keyframes mymove {
+          from {transform : scale(1);}
+          to {transform : scale(1.2);}
         }
     </style>
 
@@ -61,7 +69,15 @@
             </div>
         </div>        
     </div>
-    <div class="auth_right full_img"></div>
+    <div class="auth_right full_img" style="padding-left: 280px; padding-top: 50px; padding-right: 120px;">
+        <div class="row">
+            <div class="col-md-12">
+                <h2 style="color: red;" class="flash">** Important Notice **</h2>
+                <h5 align="left">1. Please approve all pending attendance correction requests before end of the month, or database will lock preventing changes.</h5>
+                <h5 align="left">2. Please approve/reject all pending leave requests - All request older than 48Hours will auto approve.</h5>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="{% static 'old/bundles/lib.vendor.bundle.js' %}"></script>

@@ -1214,19 +1214,19 @@ def applyAttendace(request):  # Test1
         desi = prof.emp_desi
         team = prof.emp_process
         team_id = prof.emp_process_id
-        if att_actual == 'Half Day':
-            leave_bal = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
-            if leave_bal.pl_balance >= 0.5:
-                leave_bal.pl_balance -= 0.5
-                leave_bal.save()
-                leaveHistory.objects.create(
-                    emp_id=emp_id, date=date.today(), leave_type='PL',
-                    transaction='Half day deduction', no_days=0.5,
-                    total=leave_bal.pl_balance+leave_bal.sl_balance
-                )
-            else:
-                messages.info(request, "Not enough leave balance to mark half day. kindly mark as absent!")
-                return redirect(request.META.get('HTTP_REFERER'))
+        # if att_actual == 'Half Day':
+        #     leave_bal = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
+        #     if leave_bal.pl_balance >= 0.5:
+        #         leave_bal.pl_balance -= 0.5
+        #         leave_bal.save()
+        #         leaveHistory.objects.create(
+        #             emp_id=emp_id, date=date.today(), leave_type='PL',
+        #             transaction='Half day deduction', no_days=0.5,
+        #             total=leave_bal.pl_balance+leave_bal.sl_balance
+        #         )
+        #     else:
+        #         messages.info(request, "Not enough leave balance to mark half day. kindly mark as absent!")
+        #         return redirect(request.META.get('HTTP_REFERER'))
         try:
             cal = EcplCalander.objects.get(Q(date=ddate), Q(emp_id=emp_id), ~Q(att_actual='Unmarked'))
             messages.info(request, '*** Already Marked in Calendar, Please Refresh the page and try again ***')
@@ -1446,7 +1446,9 @@ def weekAttendanceReport(request):  # Test1
     end = date(end_year, end_month, end_day)
     weeks = ['sund', 'mon', 'tue', 'wed', 'thur', 'fri', 'sat']
     emp_id_list = []
-    ems = Profile.objects.filter(Q(emp_rm1_id=emp_id))
+    ems = Profile.objects.filter(
+        Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id), Q(agent_status='Active')
+    )
     for i in ems:
         if i.emp_id not in emp_id_list:
             emp_id_list.append(i.emp_id)
@@ -1994,20 +1996,20 @@ def applyCorrection(request):  # Test1
         date = request.POST['date']
         reason = request.POST['reason']
         emp_id = request.POST['emp_id']
-        if att_new == 'Half Day':
-            leave_bal = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
-            if leave_bal.pl_balance >= 0.5:
-                leave_bal.pl_balance -= 0.5
-                leave_bal.save()
-                today = datetime.now().date()
-                leaveHistory.objects.create(
-                    emp_id=emp_id, date=today, leave_type='PL',
-                    transaction='Half day deduction', no_days=0.5,
-                    total=leave_bal.pl_balance+leave_bal.sl_balance
-                )
-            else:
-                messages.info(request, "Not enough leave balance to mark half day. kindly mark as absent!")
-                return redirect(request.META.get('HTTP_REFERER'))
+        # if att_new == 'Half Day':
+        #     leave_bal = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
+        #     if leave_bal.pl_balance >= 0.5:
+        #         leave_bal.pl_balance -= 0.5
+        #         leave_bal.save()
+        #         today = datetime.now().date()
+        #         leaveHistory.objects.create(
+        #             emp_id=emp_id, date=today, leave_type='PL',
+        #             transaction='Half day deduction', no_days=0.5,
+        #             total=leave_bal.pl_balance+leave_bal.sl_balance
+        #         )
+        #     else:
+        #         messages.info(request, "Not enough leave balance to mark half day. kindly mark as absent!")
+        #         return redirect(request.META.get('HTTP_REFERER'))
         emp_obj = Profile.objects.get(emp_id=emp_id)
         cal = EcplCalander.objects.get(id=id)
         emp_name = cal.emp_name
@@ -2077,16 +2079,16 @@ def approveAttendanceRequest(request):  # test1
                     transaction = 'Attendance Correction, Leave Refund which was applied on '+str(cal.date), no_days = 1,
                     total = leave.pl_balance + leave.sl_balance
                 )
-        if om_resp == 'Rejected':
-            if hist.att_new == 'Half Day':
-                leave_bal = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
-                leave_bal.pl_balance += 0.5
-                leave_bal.save()
-                leaveHistory.objects.create(
-                    emp_id=cal.emp_id, date=date.today(), leave_type='PL',
-                    transaction='Half day got rejected', no_days=0.5,
-                    total=leave_bal.pl_balance + leave_bal.sl_balance
-                )
+        # if om_resp == 'Rejected':
+        #     if hist.att_new == 'Half Day':
+        #         leave_bal = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
+        #         leave_bal.pl_balance += 0.5
+        #         leave_bal.save()
+        #         leaveHistory.objects.create(
+        #             emp_id=cal.emp_id, date=date.today(), leave_type='PL',
+        #             transaction='Half day got rejected', no_days=0.5,
+        #             total=leave_bal.pl_balance + leave_bal.sl_balance
+        #         )
 
         hist.status = True
         hist.comments = comments
