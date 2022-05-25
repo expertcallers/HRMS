@@ -2023,6 +2023,7 @@ def applyCorrection(request):  # Test1
         atthist.emp_id = emp_id
         atthist.rm3_id = emp_obj.emp_rm3_id
         atthist.rm3_name = emp_obj.emp_rm3
+        atthist.om_response = 'Pending by '+str(emp_obj.emp_rm3)+" ("+str(emp_obj.emp_rm3_id)+")"
         atthist.cal_id = id
         atthist.reason = reason
         atthist.save()
