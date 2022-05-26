@@ -193,7 +193,7 @@ class AttendanceCorrectionHistory(models.Model):
     approved_by = models.CharField(max_length=30,null=True,blank=True)
     status = models.BooleanField(default=False)
     cal_id = models.IntegerField()
-    om_response = models.CharField(max_length=30,default='Pending by OM')
+    om_response = models.CharField(max_length=150,default='Pending by OM')
     comments = models.TextField(null=True,blank=True)
     reason = models.TextField(null=True,blank=True)
 
