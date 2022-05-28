@@ -2179,19 +2179,21 @@ def addAttendance(request):
     mydate = date.today()
     month = mydate.month
     year = mydate.year
-    start_date = date(2022, 4, 1)
+
+    start_date = date(year, month, 1)
     start_date += monthdelta.monthdelta(1)
-    last = calendar.monthrange(year, month)[1]
-    last_date = date(2022, 5, last)
-    last_date += monthdelta.monthdelta(1)
+    last = start_date + monthdelta.monthdelta(1)
+    last_date = last - timedelta(days=1)
     delta = last_date - start_date
-    date_list = []
+    date_list = []    
+
     for i in range(delta.days + 1):
         day = start_date + timedelta(days=i)
         date_list.append(day)
     for i in date_list:
         profile = Profile.objects.all().exclude(
             emp_id__in=EcplCalander.objects.filter(date=i).values('emp_id'), agent_status='Attrition')
+
         cal = []
         for j in profile:
             employees = EcplCalander()
@@ -2210,6 +2212,7 @@ def addAttendance(request):
             employees.rm3_id = j.emp_rm3_id
             cal.append(employees)
         EcplCalander.objects.bulk_create(cal)
+
     return redirect('/ams/')
 
 def autoApproveLeave(request):
