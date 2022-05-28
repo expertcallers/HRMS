@@ -2190,10 +2190,16 @@ def addAttendance(request):
     for i in range(delta.days + 1):
         day = start_date + timedelta(days=i)
         date_list.append(day)
-    for i in date_list:
-        profile = Profile.objects.all().exclude(
-            emp_id__in=EcplCalander.objects.filter(date=i).values('emp_id'), agent_status='Attrition')
 
+    for i in date_list:
+        
+        cal_obj = EcplCalander.objects.filter(date=i)
+        emp_ids = []
+        for k in cal_obj:
+            emp_ids.append(k.emp_id)
+
+        profile = Profile.objects.exclude(Q(emp_id__in= emp_ids) | Q(agent_status='Attrition'))
+        
         cal = []
         for j in profile:
             employees = EcplCalander()
