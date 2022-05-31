@@ -87,5 +87,6 @@ urlpatterns = [
     path('auto-approve-leave', autoApproveLeave),
     path('add-attendance', addAttendance),
     path('sandwich', sandwichPolicy),
+    path('maternity-leave', maternityLeave),
 
 ]
