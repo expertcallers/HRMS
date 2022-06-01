@@ -2131,6 +2131,15 @@ def approveAttendanceRequest(request):  # test1
                     transaction='Attendance Correction, Leave Refund which was applied on ' + str(cal.date), no_days=1,
                     total=leave.pl_balance + leave.sl_balance
                 )
+            if old_att == 'SL':
+                leave = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
+                leave.sl_balance += 1
+                leave.save()
+                leaveHistory.objects.create(
+                    emp_id=cal.emp_id, date=date.today(), leave_type='PL',
+                    transaction='Attendance Correction, Leave Refund which was applied on ' + str(cal.date), no_days=1,
+                    total=leave.pl_balance + leave.sl_balance
+                )
         # if om_resp == 'Rejected':
         #     if hist.att_new == 'Half Day':
         #         leave_bal = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
