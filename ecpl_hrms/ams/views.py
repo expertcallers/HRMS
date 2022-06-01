@@ -20,9 +20,12 @@ from django.db.models import Q, Sum, Max
 import xlwt
 from .admin import *
 from tablib import Dataset
+
 c = Calendar()
 
 # Getting Model from other Apps
+from django.apps import apps
+
 Profile = apps.get_model('mapping', 'Profile')
 
 # TL and AM List
@@ -39,6 +42,7 @@ management_list = []
 rm_list = []
 hr_tl_am_list = []
 hr_om_list = []
+
 
 # Create your views here.
 
@@ -59,7 +63,9 @@ def loginAndRedirect(request):  # Test1 Test2
         if i.name not in manager_list:
             manager_list.append(i.name)
 
-    for i in Designation.objects.filter(Q(category='HR') | Q(category='OM HR') | Q(category='Management List - HR') | Q(category='TL AM HR') | Q(category='TA') | Q(category='TA - TL - AM')):
+    for i in Designation.objects.filter(
+            Q(category='HR') | Q(category='OM HR') | Q(category='Management List - HR') | Q(category='TL AM HR') | Q(
+                category='TA') | Q(category='TA - TL - AM')):
         if i.name not in hr_list:
             hr_list.append(i.name)
 
@@ -71,7 +77,9 @@ def loginAndRedirect(request):  # Test1 Test2
         if i.name not in management_list:
             management_list.append(i.name)
 
-    for i in Designation.objects.filter(Q(category='TL AM') | Q(category='Manager List') | Q(category='OM HR') | Q(category='TL AM HR') | Q(category='TA - TL - AM')):
+    for i in Designation.objects.filter(
+            Q(category='TL AM') | Q(category='Manager List') | Q(category='OM HR') | Q(category='TL AM HR') | Q(
+                category='TA - TL - AM')):
         if i.name not in rm_list:
             rm_list.append(i.name)
 
@@ -301,8 +309,7 @@ def managerDashboard(request):  # Test1 Test2
     map_tickets_counts = MappingTickets.objects.filter(
         new_rm3_id=emp_id, status=False).count()
     # Leave Requests
-    leave_req_count = LeaveTable.objects.filter(
-        emp_rm3_id=emp_id, tl_status='Approved', manager_approval=False).count()
+    leave_req_count = LeaveTable.objects.filter(emp_rm3_id=emp_id, tl_status='Approved', manager_approval=False).count()
     # Leave Escalation Count
     leave_esc_count = LeaveTable.objects.filter(
         emp_rm3_id=emp_id, manager_approval=False, escalation=True).count()
@@ -457,7 +464,11 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
                     )
                     cal.save()
 
+<<<<<<< HEAD
             # sandwich policy calculation
+=======
+            # sandwich policy calculation    
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
 
             # week_off = []
             # last = ''
@@ -525,8 +536,13 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
 
             leave_history = leaveHistory()
             leave_history.leave_type = leave_type
+<<<<<<< HEAD
             leave_history.transaction = 'Leave Refund as RM3 Rejected, Leave applied on: ' + \
                 str(e.applied_date)+' (ID: '+str(e.id)+')'
+=======
+            leave_history.transaction = 'Leave Refund as RM3 Rejected, Leave applied on: ' + str(
+                e.applied_date) + ' (ID: ' + str(e.id) + ')'
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
             leave_history.date = date.today()
             leave_history.no_days = int(no_days)
             leave_history.emp_id = emp_id
@@ -545,8 +561,13 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
 
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
+<<<<<<< HEAD
         leave_request = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id), Q(
             tl_status='Approved'), Q(manager_approval=False))
+=======
+        leave_request = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id), Q(tl_status='Approved'),
+                                                  Q(manager_approval=False))
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
         data = {'emp': emp, 'leave_request': leave_request}
         return render(request, 'ams/leave_approval_rm3.html', data)
 
@@ -645,7 +666,12 @@ def hrDashboard(request):  # Test1
                 'attrition_request_count': attrition_request_count, 'month_cal': month_cal, 'team': teams,
                 "leave_req_count": leave_req_count, "map_tickets_counts": map_tickets_counts,
                 "leave_esc_count": leave_esc_count, "att_requests_count": att_requests_count,
+<<<<<<< HEAD
                 "hr_tl_am_list": hr_tl_am_list, "hr_om_list": hr_om_list, "leave_req_count_final": leave_req_count_final}
+=======
+                "hr_tl_am_list": hr_tl_am_list, "hr_om_list": hr_om_list,
+                "leave_req_count_final": leave_req_count_final}
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
         return render(request, 'ams/hr_dashboard.html', data)
     else:
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
@@ -822,8 +848,13 @@ def on_boarding(request):  # Test1
         minimum_dob = today_date - timedelta(days=6588)
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
+<<<<<<< HEAD
         data = {'emp': emp, 'minimum_dob': str(
             minimum_dob), 'profiles': profiles, 'hr_om_list': hr_om_list, 'hr_tl_am_list': hr_tl_am_list}
+=======
+        data = {'emp': emp, 'minimum_dob': str(minimum_dob), 'profiles': profiles, 'hr_om_list': hr_om_list,
+                'hr_tl_am_list': hr_tl_am_list}
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
         return render(request, 'ams/onboarding.html', data)
 
 
@@ -832,12 +863,19 @@ def viewOnBoarding(request):  # Test1
     profiles = Profile.objects.filter(~Q(on_id=None))
     onboard = []
     for i in profiles:
+<<<<<<< HEAD
         onboard.append(
             {"onboard": OnboardingnewHRC.objects.get(id=i.on_id), 'profile': i})
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     data = {'onboard': onboard, 'emp': emp,
         'hr_om_list': hr_om_list, 'hr_tl_am_list': hr_tl_am_list}
+=======
+        onboard.append({"onboard": OnboardingnewHRC.objects.get(id=i.on_id), 'profile': i})
+    emp_id = request.user.profile.emp_id
+    emp = Profile.objects.get(emp_id=emp_id)
+    data = {'onboard': onboard, 'emp': emp, 'hr_om_list': hr_om_list, 'hr_tl_am_list': hr_tl_am_list}
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
     return render(request, "ams/view_onboarding.html", data)
 
 
@@ -1022,8 +1060,12 @@ def on_boarding_update(request, id):  # Test1
         today_date = date.today()
         minimum_dob = today_date - timedelta(days=6588)
         emp = Profile.objects.get(emp_id=emp_id)
+<<<<<<< HEAD
         data = {"onboard": onboard, 'emp': emp,
             'minimum_dob': str(minimum_dob)}
+=======
+        data = {"onboard": onboard, 'emp': emp, 'minimum_dob': str(minimum_dob)}
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
         return render(request, "ams/edit_onboarding.html", data)
 
 
@@ -1128,7 +1170,12 @@ def addNewUserHR(request):  # Test1  # calander pending
         all_team = Campaigns.objects.all()
 
         onboarding = OnboardingnewHRC.objects.filter(user_created=False)
+<<<<<<< HEAD
         data = {'emp': emp, 'all_data': all_desi, 'rms': rms, 'rm3': rm3, 'all_team': all_team, 'onboarding': onboarding,
+=======
+        data = {'emp': emp, 'all_data': all_desi, 'rms': rms, 'rm3': rm3, 'all_team': all_team,
+                'onboarding': onboarding,
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
                 "last_emp_id": lst_emp_id, 'hr_om_list': hr_om_list, 'hr_tl_am_list': hr_tl_am_list}
         return render(request, 'ams/hr_add_user.html', data)
 
@@ -1183,17 +1230,26 @@ def viewEmployeeProfile(request, id, on_id):  # Test 1
                 if i.emp_rm3_id == n.emp_id:
                     i.emp_rm3 = changed_name
                 change.append(i)
+<<<<<<< HEAD
             Profile.objects.bulk_update(
                 change, ['emp_rm1', 'emp_rm2', 'emp_rm3'])
+=======
+            Profile.objects.bulk_update(change, ['emp_rm1', 'emp_rm2', 'emp_rm3'])
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
             messages.success(request, 'Employee Name Changed Successfully!')
-            return redirect('/ams/view-employee-profile/'+str(id)+'/'+str(on_id))
+            return redirect('/ams/view-employee-profile/' + str(id) + '/' + str(on_id))
         elif type == 'desi':
             n = Profile.objects.get(id=id)
             n.emp_desi = changed_desi
             n.save()
+<<<<<<< HEAD
             messages.success(
                 request, 'Employee Designation Changed Successfully!')
             return redirect('/ams/view-employee-profile/'+str(id)+'/'+str(on_id))
+=======
+            messages.success(request, 'Employee Designation Changed Successfully!')
+            return redirect('/ams/view-employee-profile/' + str(id) + '/' + str(on_id))
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
 
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
@@ -1314,6 +1370,12 @@ def applyAttendace(request):  # Test1
             usr = Profile.objects.get(emp_id=emp_id)
             usr.agent_status = att_actual
             usr.save()
+            cal = []
+            for i in EcplCalander.objects.filter(emp_id=emp_id, date__gt=date.today()):
+                if i.att_actual == 'Unmarked':
+                    i.att_actual = ''
+                    cal.append(i)
+            EcplCalander.objects.bulk_update(cal, ['att_actual'])
         if att_actual == 'NCNS':
             today = date.today()
             yesterday = today - timedelta(days=1)
@@ -1455,8 +1517,13 @@ def viewTeamAttendance(request):  # Test1
                 for i in all_emp:
                     if i.emp_id not in emp_id_lst:
                         emp_id_lst.append(i.emp_id)
+<<<<<<< HEAD
                         under = Profile.objects.filter(Q(emp_rm1_id=i.emp_id) | Q(
                             emp_rm2_id=i.emp_id) | Q(emp_rm3_id=i.emp_id))
+=======
+                        under = Profile.objects.filter(
+                            Q(emp_rm1_id=i.emp_id) | Q(emp_rm2_id=i.emp_id) | Q(emp_rm3_id=i.emp_id))
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
                         for j in under:
                             if j.emp_id not in emp_id_lst:
                                 emp_id_lst.append(j.emp_id)
@@ -1466,9 +1533,16 @@ def viewTeamAttendance(request):  # Test1
                 response = HttpResponse(content_type='text/csv')
                 response['Content-Disposition'] = 'attachment; filename="attendance_report.csv"'
                 writer = csv.writer(response)
+<<<<<<< HEAD
                 writer.writerow(['Date', 'Emp ID', 'Emp Name', 'Attendance',
                                 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'])
                 calanders = EcplCalander.objects.filter(emp_id__in=emp_id_lst, date__range=[start_date, end_date]).values_list(
+=======
+                writer.writerow(
+                    ['Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'])
+                calanders = EcplCalander.objects.filter(emp_id__in=emp_id_lst,
+                                                        date__range=[start_date, end_date]).values_list(
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
                     'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team')
                 for c in calanders:
                     writer.writerow(c)
@@ -1480,9 +1554,16 @@ def viewTeamAttendance(request):  # Test1
                 response = HttpResponse(content_type='text/csv')
                 response['Content-Disposition'] = 'attachment; filename="attendance_report.csv"'
                 writer = csv.writer(response)
+<<<<<<< HEAD
                 writer.writerow(['Date', 'Emp ID', 'Emp Name', 'Attendance',
                                 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'])
                 calanders = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm), date__range=[start_date, end_date]).values_list(
+=======
+                writer.writerow(
+                    ['Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'])
+                calanders = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),
+                                                        date__range=[start_date, end_date]).values_list(
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
                     'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team')
                 for c in calanders:
                     writer.writerow(c)
@@ -1507,6 +1588,7 @@ def weekAttendanceReport(request):  # Test1
     def Merge(a, b, c, d, e, f, g):
         res = {**a, **b, **c, **d, **e, **f, **g}
         return res
+
     empobj = Profile.objects.get(emp_id=request.user.profile.emp_id)
     emp_id = request.user.profile.emp_id
     day = date.today()
@@ -1549,8 +1631,12 @@ def weekAttendanceReport(request):  # Test1
     sort = sorted(lst, key=lambda x: x['emp_id'])
 
     for i in range(0, len(emp_id_list)):
+<<<<<<< HEAD
         individual = Merge(sort[n], sort[n + 1], sort[n + 2],
                            sort[n + 3], sort[n + 4], sort[n + 5], sort[n + 6])
+=======
+        individual = Merge(sort[n], sort[n + 1], sort[n + 2], sort[n + 3], sort[n + 4], sort[n + 5], sort[n + 6])
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
         j = 0
         for w in weekdays:
             a = weeks[j]
@@ -1564,6 +1650,12 @@ def weekAttendanceReport(request):  # Test1
     return render(request, 'ams/week_attendace_report.html', data)
 
 
+<<<<<<< HEAD
+=======
+import csv
+
+
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
 @login_required
 def teamAttendanceReport(request):  # Test 1
     if request.method == 'POST':
@@ -1590,8 +1682,12 @@ def teamAttendanceReport(request):  # Test 1
             response = HttpResponse(content_type='text/csv')
             response['Content-Disposition'] = 'attachment; filename="attendance_report.csv"'
             writer = csv.writer(response)
+<<<<<<< HEAD
             writer.writerow(['Date', 'Emp ID', 'Emp Name', 'Attendance',
                             'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'])
+=======
+            writer.writerow(['Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'])
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
             calanders = EcplCalander.objects.filter(team=team_name, date__range=[start_date, end_date]).values_list(
                 'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team')
             for c in calanders:
@@ -1650,8 +1746,12 @@ def mappingHomePage(request):  # Test1
     rm3 = Profile.objects.filter(Q(emp_desi__in=manager_list) | Q(
         emp_desi__in=management_list)).order_by('emp_name')
     teams = Campaigns.objects.all().order_by('name')
+<<<<<<< HEAD
     data = {'emp': emp, 'employees': employees,
         'rms': rms, 'teams': teams, "rm3": rm3}
+=======
+    data = {'emp': emp, 'employees': employees, 'rms': rms, 'teams': teams, "rm3": rm3}
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
     return render(request, 'ams/mapping_home.html', data)
 
 
@@ -1787,8 +1887,12 @@ def addNewTeam(request):  # Test1
     else:
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
+<<<<<<< HEAD
         data = {'mgrs': mgrs, 'emp': emp, 'hr_om_list': hr_om_list,
             'hr_tl_am_list': hr_tl_am_list}
+=======
+        data = {'mgrs': mgrs, 'emp': emp, 'hr_om_list': hr_om_list, 'hr_tl_am_list': hr_tl_am_list}
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
         return render(request, "ams/add_team.html", data)
 
 
@@ -1798,8 +1902,12 @@ def viewTeam(request):  # Test1
         teams = Campaigns.objects.all()
         emp_id = request.user.profile.emp_id
         emp = Profile.objects.get(emp_id=emp_id)
+<<<<<<< HEAD
         data = {'teams': teams, 'emp': emp,
             'hr_om_list': hr_om_list, 'hr_tl_am_list': hr_tl_am_list}
+=======
+        data = {'teams': teams, 'emp': emp, 'hr_om_list': hr_om_list, 'hr_tl_am_list': hr_tl_am_list}
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
         return render(request, 'ams/view_team.html', data)
     else:
         messages.info(
@@ -1828,18 +1936,29 @@ def applyLeave(request):  # Test1
         agent_reason = request.POST["reason"]
         unique_id = request.POST['csrfmiddlewaretoken']
 
+<<<<<<< HEAD
         leaves = LeaveTable.objects.filter(
             emp_id=emp_id).exclude(status="Rejected")
+=======
+        leaves = LeaveTable.objects.filter(emp_id=emp_id).exclude(Q(status="Rejected") | Q(status="Auto Rejected"))
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
         leave_dates_list = []
         for i in leaves:
             while i.start_date <= i.end_date:
                 leave_dates_list.append(i.start_date)
                 i.start_date += timedelta(days=1)
         new_leave_dates = []
+<<<<<<< HEAD
         # To Convert type of start_date from string to date
         list_start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
         # To Convert type of end_date from string to date
         list_end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+=======
+        list_start_date = datetime.strptime(start_date,
+                                            '%Y-%m-%d').date()  # To Convert type of start_date from string to date
+        list_end_date = datetime.strptime(end_date,
+                                          '%Y-%m-%d').date()  # To Convert type of end_date from string to date
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
         while list_start_date <= list_end_date:
             new_leave_dates.append(list_start_date)
             list_start_date += timedelta(days=1)
@@ -1889,7 +2008,7 @@ def applyLeave(request):  # Test1
 
             leave_history = leaveHistory()
             leave_history.leave_type = leave_type
-            leave_history.transaction = 'Leave Applied (ID: '+str(e.id)+')'
+            leave_history.transaction = 'Leave Applied (ID: ' + str(e.id) + ')'
             leave_history.date = date.today()
             leave_history.no_days = int(no_days)
             leave_history.emp_id = emp_id
@@ -1963,8 +2082,13 @@ def approveLeaveRM1(request):  # Test1
                 leave_balance.save()
             leave_history = leaveHistory()
             leave_history.leave_type = leave_type
+<<<<<<< HEAD
             leave_history.transaction = 'Leave Refund as RM1 Rejected, Leave applied on: ' + \
                 str(e.applied_date)+' (ID: '+str(e.id)+')'
+=======
+            leave_history.transaction = 'Leave Refund as RM1 Rejected, Leave applied on: ' + str(
+                e.applied_date) + ' (ID: ' + str(e.id) + ')'
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
             leave_history.date = date.today()
             leave_history.no_days = int(no_days)
             leave_history.emp_id = emp_id
@@ -2002,8 +2126,13 @@ def applyEscalation(request):  # Test1
 
         leave_history = leaveHistory()
         leave_history.leave_type = e.leave_type
+<<<<<<< HEAD
         leave_history.transaction = 'Applied for Escalation, Leave applied on: ' + \
             str(e.applied_date)+' (ID: '+str(e.id)+')'
+=======
+        leave_history.transaction = 'Applied for Escalation, Leave applied on: ' + str(e.applied_date) + ' (ID: ' + str(
+            e.id) + ')'
+>>>>>>> 95b8f43aa3766fe10651367f9a489a819a4db6a9
         leave_history.date = date.today()
         leave_history.no_days = int(no_days)
         leave_history.emp_id = emp_id
@@ -2051,6 +2180,7 @@ def editAgentStatus(request):  # Test1
     if request.method == 'POST':
         id = request.POST['id']
         agent_status = request.POST['new_status']
+        effective = request.POST['effective']
         reason = request.POST['reason']
         profile = Profile.objects.get(id=id)
         current_status = profile.agent_status
@@ -2061,6 +2191,14 @@ def editAgentStatus(request):  # Test1
                                                   new_status=agent_status, date=date.today(), reason=reason,
                                                   changed_by=request.user.profile.emp_name)
         sh.save()
+        if agent_status == 'Active':
+            cal_list = []
+            cal = EcplCalander.objects.filter(emp_id=profile.emp_id, date__gte=effective)
+            for i in cal:
+                if i.att_actual != "PL" or i.att_actual != "SL":
+                    i.att_actual = 'Unmarked'
+                    cal_list.append(i)
+            EcplCalander.objects.bulk_update(cal_list, ['att_actual'])
         return redirect('/ams/viewusers')
     else:
         return HttpResponse('<h1>Not Get Method</h1>')
@@ -2137,8 +2275,7 @@ def applyCorrection(request):  # Test1
         atthist.emp_id = emp_id
         atthist.rm3_id = emp_obj.emp_rm3_id
         atthist.rm3_name = emp_obj.emp_rm3
-        atthist.om_response = 'Pending by ' + \
-            str(emp_obj.emp_rm3)+" ("+str(emp_obj.emp_rm3_id)+")"
+        atthist.om_response = 'Pending by ' + str(emp_obj.emp_rm3) + " (" + str(emp_obj.emp_rm3_id) + ")"
         atthist.cal_id = id
         atthist.reason = reason
         atthist.save()
@@ -2190,7 +2327,16 @@ def approveAttendanceRequest(request):  # test1
                 leave.save()
                 leaveHistory.objects.create(
                     emp_id=cal.emp_id, date=date.today(), leave_type='PL',
-                    transaction='Attendance Correction, Leave Refund which was applied on '+str(cal.date), no_days=1,
+                    transaction='Attendance Correction, Leave Refund which was applied on ' + str(cal.date), no_days=1,
+                    total=leave.pl_balance + leave.sl_balance
+                )
+            if old_att == 'SL':
+                leave = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
+                leave.sl_balance += 1
+                leave.save()
+                leaveHistory.objects.create(
+                    emp_id=cal.emp_id, date=date.today(), leave_type='PL',
+                    transaction='Attendance Correction, Leave Refund which was applied on ' + str(cal.date), no_days=1,
                     total=leave.pl_balance + leave.sl_balance
                 )
             
@@ -2263,6 +2409,60 @@ def SLProofSubmit(request):  # Test1
 
 
 @login_required
+def maternityLeave(request):
+    emp_desi = request.user.profile.emp_desi
+    if emp_desi in hr_tl_am_list or hr_om_list:
+        if request.method == 'POST':
+            emp_id = request.POST['emp_id']
+            startdate = request.POST['startdate']
+            startdate = datetime.strptime(startdate, '%Y-%m-%d').date()
+            enddate = startdate + monthdelta.monthdelta(6)
+            datelist = []
+            ecplcalupdate = []
+            ecplcalcreate = []
+            emp = Profile.objects.get(emp_id=emp_id)
+            while startdate < enddate:
+                datelist.append(startdate)
+                startdate += timedelta(days=1)
+            for i in datelist:
+                try:
+                    cal = EcplCalander.objects.get(emp_id=emp_id, date=i)
+                    cal.att_actual = 'ML'
+                    cal.appoved_by = request.user.profile.emp_name
+                    cal.approved_on = datetime.now()
+                    ecplcalupdate.append(cal)
+                except:
+                    employees = EcplCalander()
+                    employees.date = i
+                    employees.emp_id = emp.emp_id
+                    employees.att_actual = 'ML'
+                    employees.emp_name = emp.emp_name
+                    employees.emp_desi = emp.emp_desi
+                    employees.team = emp.emp_process
+                    employees.team_id = emp.emp_process_id
+                    employees.rm1 = emp.emp_rm1
+                    employees.rm2 = emp.emp_rm2
+                    employees.rm3 = emp.emp_rm3
+                    employees.rm1_id = emp.emp_rm1_id
+                    employees.rm2_id = emp.emp_rm2_id
+                    employees.rm3_id = emp.emp_rm3_id
+                    ecplcalcreate.append(employees)
+            EcplCalander.objects.bulk_update(ecplcalupdate, ['att_actual', 'appoved_by', 'approved_on'])
+            EcplCalander.objects.bulk_create(ecplcalcreate)
+            messages.success(
+                request, 'ML has been marked successfully for ' + str(emp.emp_name) +
+                         ' (' + str(emp.emp_id) + '). And the next reporting date will be ' + str(enddate))
+            return redirect('/ams/maternity-leave')
+        else:
+            profiles = Profile.objects.all()
+            data = {'profiles': profiles}
+            return render(request, 'ams/maternity-leave.html', data)
+    else:
+        messages.error(request, 'Invalid Request you have been logged out!')
+        return redirect('/ams/')
+
+
+@login_required
 def onboardingBulkUpload(request):
     if request.method == 'POST':
         dataset = Dataset()
@@ -2326,7 +2526,12 @@ def addAttendance(request):
             employees = EcplCalander()
             employees.date = i
             employees.emp_id = j.emp_id
-            employees.att_actual = 'Unmarked'
+            if j.agent_status == 'Bench':
+                employees.att_actual = 'Bench'
+            elif j.agent_status == 'NCNS':
+                employees.att_actual = 'NCNS'
+            else:
+                employees.att_actual = 'Unmarked'
             employees.emp_name = j.emp_name
             employees.emp_desi = j.emp_desi
             employees.team = j.emp_process
@@ -2349,46 +2554,55 @@ def autoApproveLeave(request):
     leave_list = []
     ecpl_cal = []
     for i in leaves:
+        profile = Profile.objects.get(emp_id=i.emp_id)
         start_date = i.start_date
         end_date = i.end_date
         current_date = datetime.now(pytz.timezone('Asia/Kolkata'))
-        # converting into requiered format
+        # converting into required format
         applied_date = datetime.date(i.applied_date)
         current_date = datetime.date(current_date)
-        days = (current_date-applied_date).days
+        days = (current_date - applied_date).days
         if days > 2:
+            if i.escalation == True:
+                continue
             if i.tl_approval == False:
                 i.tl_approval = True
                 i.tl_status = "Auto Approved"
                 i.tl_reason = "Auto Approved"
-            i.manager_approval = True
-            i.manager_status = "Auto Approved"
-            i.manager_reason = "Auto Approved"
-            i.status = "Auto Approved"
-            leave_list.append(i)
-            while start_date <= end_date:
-                try:
-                    j = EcplCalander.objects.get(
-                        emp_id=i.emp_id, date=start_date)
-                    j.att_actual = i.leave_type
-                    j.approved_on = datetime.now()
-                    j.appoved_by = "Auto Approved"
-                    j.rm1 = i.emp_rm1
-                    j.rm1_id = i.emp_rm1_id
-                    j.rm2 = i.emp_rm2
-                    j.rm2_id = i.emp_rm2_id
-                    j.rm3 = i.emp_rm3
-                    j.rm3_id = i.emp_rm3_id
-                    ecpl_cal.append(j)
-                except EcplCalander.DoesNotExist:
-                    profile = Profile.objects.get(emp_id=i.emp_id)
-                    EcplCalander.objects.create(
-                        emp_id=i.emp_id, date=start_date, att_actual=i.leave_type, approved_on=datetime.now(),
-                        appoved_by="Auto Approved", rm1=i.emp_rm1, rm1_id=i.emp_rm1_id, rm2=i.emp_rm2,
-                        rm2_id=i.emp_rm2_id, rm3=i.emp_rm3, rm3_id=i.emp_rm3_id, emp_desi=i.emp_desi,
-                        team=profile.emp_process, team_id=profile.emp_process_id, emp_name=i.emp_name
-                    )
-                start_date += timedelta(days=1)
+            if i.tl_status == "Rejected":
+                i.manager_status = "Auto Rejected"
+                i.manager_reason = "Auto Rejected"
+                i.status = "Auto Rejected"
+                i.manager_approval = True
+                leave_list.append(i)
+            else:
+                i.manager_status = "Auto Approved"
+                i.manager_reason = "Auto Approved"
+                i.status = "Auto Approved"
+                i.manager_approval = True
+                leave_list.append(i)
+                while start_date <= end_date:
+                    try:
+                        j = EcplCalander.objects.get(emp_id=i.emp_id, date=start_date)
+                        j.att_actual = i.leave_type
+                        j.approved_on = datetime.now()
+                        j.appoved_by = "Auto Approved"
+                        j.rm1 = profile.emp_rm1
+                        j.rm1_id = profile.emp_rm1_id
+                        j.rm2 = profile.emp_rm2
+                        j.rm2_id = profile.emp_rm2_id
+                        j.rm3 = profile.emp_rm3
+                        j.rm3_id = profile.emp_rm3_id
+                        ecpl_cal.append(j)
+                    except EcplCalander.DoesNotExist:
+                        EcplCalander.objects.create(
+                            emp_id=profile.emp_id, date=start_date, att_actual=i.leave_type,
+                            approved_on=datetime.now(), appoved_by="Auto Approved", rm1=profile.emp_rm1,
+                            rm1_id=profile.emp_rm1_id, rm2=profile.emp_rm2, rm2_id=profile.emp_rm2_id,
+                            rm3=profile.emp_rm3, rm3_id=profile.emp_rm3_id, emp_desi=profile.emp_desi,
+                            team=profile.emp_process, team_id=profile.emp_process_id, emp_name=profile.emp_name
+                        )
+                    start_date += timedelta(days=1)
 
     LeaveTable.objects.bulk_update(leave_list, ['tl_approval', 'tl_status', 'tl_reason', 'manager_approval',
                                                 'manager_status', 'manager_reason', 'status'])
@@ -2435,7 +2649,7 @@ def addLeaveBalance(request, a):
                 pl_hist.leave_type = "PL"
                 pl_hist.transaction = "Leaves Earned"
                 pl_hist.no_days = pl
-                pl_hist.total = total_bal+pl
+                pl_hist.total = total_bal + pl
                 leavehist.append(pl_hist)
 
             sl_hist = leaveHistory()
@@ -2445,15 +2659,15 @@ def addLeaveBalance(request, a):
             sl_hist.leave_type = "SL"
             sl_hist.transaction = "Leaves Earned"
             sl_hist.no_days = 1
-            sl_hist.total = total_bal+pl+1
+            sl_hist.total = total_bal + pl + 1
             leavehist.append(sl_hist)
-        EmployeeLeaveBalance.objects.bulk_update(
-            leavebal, ['sl_balance', 'pl_balance'])
+        EmployeeLeaveBalance.objects.bulk_update(leavebal, ['sl_balance', 'pl_balance'])
         leaveHistory.objects.bulk_create(leavehist)
         return redirect('/ams/')
     else:
         messages.success(request, "Unauthorized Access")
         return redirect('/ams/')
+
 
 # def calculatea(start, emp_id):
 #     cal = EcplCalander.objects.get(Q(date=start), Q(emp_id=emp_id)).att_actual
@@ -2462,6 +2676,7 @@ def addLeaveBalance(request, a):
 
 def sandwichPolicy(request):
     return redirect('/ams/')
+
 
 #     # Sandwich policy Calculation
 #     ddate = date.today()
@@ -2537,14 +2752,27 @@ def sandwichPolicy(request):
 
 
 def TestFun(request):
-    emps = Profile.objects.filter(doj__gte='2022-05-01')
-    for i in emps:
-        doj = i.doj
-        cal = EcplCalander.objects.filter(
-            date__lt=doj, date__gte='2022-05-01', emp_id=i.emp_id)
-        for j in cal:
-            j.att_actual = ''
-            j.save()
+    cal = EcplCalander.objects.filter(Q(att_actual='Bench') | Q(att_actual='Attrition') | Q(att_actual='NCNS'))
+    ecplcalendar = []
+    for j in cal:
+        startdate = j.date
+        try:
+            enddate = ''
+            cal = EcplCalander.objects.filter(Q(emp_id=j.emp_id), Q(date__gt=startdate),
+                                              ~Q(att_actual='Unmarked')).order_by('date')[:1]
+            for i in cal:
+                enddate = i.date
+            blank_cal = EcplCalander.objects.filter(Q(emp_id=j.emp_id), Q(date__gt=startdate), Q(date__lte=enddate),
+                                                    Q(att_actual='Unmarked'))
+            for i in blank_cal:
+                i.att_actual = j.att_actual
+                ecplcalendar.append(i)
+        except:
+            cal = EcplCalander.objects.filter(Q(emp_id=j.emp_id), Q(date__gt=startdate), Q(att_actual='Unmarked'))
+            for i in cal:
+                i.att_actual = j.att_actual
+                ecplcalendar.append(i)
+    EcplCalander.objects.bulk_update(ecplcalendar, ['att_actual'])
     return redirect('/ams/')
 
 

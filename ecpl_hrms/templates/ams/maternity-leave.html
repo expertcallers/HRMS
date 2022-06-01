@@ -1,0 +1,56 @@
+{% extends 'ams/base_hr_new.html' %}
+{% block main %}
+  {% load static %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+          <div class="page-title">
+            <div class="title_left">
+              <h3>Maternity Leave</h3>
+            </div>
+          </div>
+          <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-body">
+                <form method="POST" action="/ams/maternity-leave" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="emp">Employee</label>
+                        <select name="emp_id" id="emp" class="form-control select2" required>
+                          <option value="" selected disabled>Please select</option>
+                          {% for i in profiles %}
+                          <option value="{{i.emp_id}}">{{i.emp_name}} ({{i.emp_id}})</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="date">Effective from</label>
+                        <input type="date" class="form-control" id="date" name="startdate">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <div class="col-md-12" align="center">
+                        <button type="submit" class="form-control mt-4 btn btn-success btn-lg" onclick="return confirmm();">Submit</button>
+                      </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        </div>
+        <!-- /page content -->
+
+
+  {% endblock %}

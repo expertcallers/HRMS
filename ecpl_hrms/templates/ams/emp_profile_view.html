@@ -625,11 +625,17 @@
                             <label for="new_status">New Status</label>
                             <select class="form-control select2" name="new_status" id="new_status" required>
                               <option value="" selected disabled>Please Select</option>
-                              <option value="Attrition">Attrition</option>
-                              <option value="Active">Active</option>
-                              <option value="Bench">Bench</option>
+                              <option value="Attrition" {% if profile.agent_status == "Attrition" %}disabled{% endif %}>Attrition</option>
+                              <option value="Active" {% if profile.agent_status == "Active" %}disabled{% endif %}>Active</option>
+                              <option value="Bench" {% if profile.agent_status == "Bench" %}disabled{% endif %}>Bench</option>
                             </select>
                             <input type="hidden" value="{{profile.id}}" name="id" id="">
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="form-group">
+                            <label for="effective">Effective From</label>
+                            <input type="date" id="effective" name="effective" class="form-control" required>
                           </div>
                         </div>
                         <div class="col-md-4">
