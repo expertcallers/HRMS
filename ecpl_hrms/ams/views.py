@@ -2562,4 +2562,4 @@ def TestFun(request):
                 i.att_actual = j.att_actual
                 ecplcalendar.append(i)
     EcplCalander.objects.bulk_update(ecplcalendar, ['att_actual'])
-    return redirect('/ams/')
+    return redirect("/ams/")
