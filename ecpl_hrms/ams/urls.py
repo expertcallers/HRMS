@@ -89,6 +89,6 @@ urlpatterns = [
     path('sandwich', sandwichPolicy),
     path('maternity-leave', maternityLeave),
 
-    path('ML',maternityleave),
+    path('maternity-leave',maternityLeave),
 
 ]
