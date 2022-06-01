@@ -88,4 +88,6 @@ urlpatterns = [
     path('add-attendance', addAttendance),
     path('sandwich', sandwichPolicy),
 
+    path('ML',maternityleave),
+
 ]
