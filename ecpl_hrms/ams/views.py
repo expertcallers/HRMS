@@ -1,3 +1,4 @@
+import ast
 import json
 from datetime import datetime, date
 import monthdelta
@@ -2354,22 +2355,33 @@ def AttendanceCorrectionAdmin(request):
 @login_required
 def AttendanceCorrectionSubmitAdmin(request):
     emp_id = request.user.profile.emp_id
+    emp_name = request.user.profile.emp_name
     if emp_id in admin_list:
         if request.method == 'POST':
             type = request.POST['type']
+            cal_update =[]
+            cal_create =[]
+            att_create =[]
             if type == 'single':
                 id = request.POST['id']
                 new_att = request.POST['new_att']
                 cal = EcplCalander.objects.get(id=id)
+                old_att = cal.att_actual
                 cal.att_actual = new_att
                 cal.approved_on = datetime.now()
                 cal.appoved_by = "CC Team"
-                cal.save()
+                cal_update.append(cal)
+                att_his = AttendanceCorrectionHistory(
+                    applied_by=emp_name, applied_by_id=emp_id, applied_date=date.today(),
+                    date_for=cal.date, att_old=old_att, att_new=new_att,
+                    emp_name=cal.emp_name, emp_id=cal.emp_id, rm3_name=cal.emp_rm3,
+                    rm3_id=cal.emp_rm3_id, approved_by='CC TEAM', status=True, cal_id=cal.id,
+                    om_response="Approved", comments="Approved by CCTeam", reason="Approved by CCTeam"
+                )
+                att_create.append(att_his)
             elif type == 'bulk':
                 emp_id = request.POST.get('emp_id')
-                emp_id = emp_id.strip('][').split("', '")
-                emp_id[0] = emp_id[0][1:len(emp_id[0])]
-                emp_id[-1] = emp_id[-1][0:len(emp_id[-1])-1]
+                emp_id = ast.literal_eval(emp_id)
                 start = request.POST['start']
                 start = datetime.strptime(start, '%Y-%m-%d').date()
                 end = request.POST['end']
@@ -2381,8 +2393,10 @@ def AttendanceCorrectionSubmitAdmin(request):
                     start += timedelta(days=1)
                 for i in date_list:
                     for j in emp_id:
+                        emp = Profile.objects.get(emp_id=j)
                         try:
                             cal = EcplCalander.objects.get(emp_id=j, date=i)
+                            old_att = cal.att_actual
                             cal.att_actual = new_att
                             if new_att == 'Unmarked':
                                 cal.approved_on = None
@@ -2390,11 +2404,18 @@ def AttendanceCorrectionSubmitAdmin(request):
                             else:
                                 cal.approved_on = datetime.now()
                                 cal.appoved_by = "CC Team"
-                            cal.save()
+                            cal_update.append(cal)
+                            att_his = AttendanceCorrectionHistory(
+                                applied_by=emp_name, applied_by_id=emp_id, applied_date=date.today(),
+                                date_for=cal.date, att_old=old_att, att_new=new_att,
+                                emp_name=emp.emp_name, emp_id=emp.emp_id, rm3_name=emp.emp_rm3,
+                                rm3_id=emp.emp_rm3_id, approved_by='CC TEAM', status=True, cal_id=cal.id,
+                                om_response="Approved", comments="Approved by CCTeam", reason="Approved by CCTeam"
+                            )
+                            att_create.append(att_his)
                         except EcplCalander.DoesNotExist:
-                            emp = Profile.objects.get(emp_id=j)
                             if new_att == 'Unmarked':
-                                EcplCalander.objects.create(
+                                cal = EcplCalander(
                                     emp_id=j, date=i, team=emp.emp_process, emp_name=emp.emp_name,
                                     emp_desi=emp.emp_desi, att_actual=new_att,
                                     rm1=emp.emp_rm1, rm2=emp.emp_rm2, rm3=emp.emp_rm3,
@@ -2402,13 +2423,26 @@ def AttendanceCorrectionSubmitAdmin(request):
                                     team_id=emp.emp_process_id
                                 )
                             else:
-                                EcplCalander.objects.create(
+                                cal = EcplCalander(
                                     emp_id=j, date=i, team=emp.emp_process, emp_name=emp.emp_name,
                                     emp_desi=emp.emp_desi, att_actual=new_att, approved_on=datetime.now(),
                                     appoved_by='CC Team', rm1=emp.emp_rm1, rm2=emp.emp_rm2, rm3=emp.emp_rm3,
                                     rm1_id=emp.emp_rm1_id, rm2_id=emp.emp_rm2_id, rm3_id=emp.emp_rm3_id,
                                     team_id=emp.emp_process_id
                                 )
+
+                            att_his = AttendanceCorrectionHistory(
+                                applied_by=emp_name, applied_by_id=emp_id, applied_date=date.today(),
+                                date_for=cal.date, att_old=None, att_new=new_att,
+                                emp_name=emp.emp_name, emp_id=emp.emp_id, rm3_name=emp.emp_rm3,
+                                rm3_id=emp.emp_rm3_id, approved_by='CC TEAM', status=True, cal_id=cal.id,
+                                om_response="Approved", comments="Approved by CCTeam", reason="Approved by CCTeam"
+                            )
+                            att_create.append(att_his)
+                            cal_create.append(cal)
+            EcplCalander.objects.bulk_create(cal_create)
+            EcplCalander.objects.bulk_update(cal_update, ['att_actual', 'approved_on', 'appoved_by'])
+            AttendanceCorrectionHistory.objects.bulk_create(att_create)
             messages.info(request, 'Successfully Changed!')
             return redirect('/ams/admin-attendance-correction')
         else:
@@ -2459,6 +2493,16 @@ def changeMapping(request):
         desig_id = request.POST["emp_desi"]
         desi = Designation.objects.get(id=desig_id)
         e = Profile.objects.get(id=id)
+        if e.emp_rm1_id != rm1.emp_id or e.emp_rm2_id != rm2.emp_id or e.emp_rm3_id != rm3.emp_id:
+            MappingTickets.objects.create(
+                emp_name=e.emp_name, emp_id=e.emp_id, emp_desi=e.emp_desi, emp_rm1=e.emp_rm1, emp_rm2=e.emp_rm2,
+                emp_rm3=e.emp_rm3, emp_rm1_id=e.emp_rm1_id, emp_rm2_id=e.emp_rm2_id, emp_rm3_id=e.emp_rm3_id,
+                new_rm1=rm1.emp_name, new_rm1_id=rm1.emp_id, new_rm2=rm2.emp_name, new_rm2_id=rm2.emp_id,
+                new_rm3=rm3.emp_name, new_rm3_id=rm3.emp_id, emp_process=e.emp_process, new_process=cam.name,
+                created_by=request.user.profile.emp_name, created_by_id=request.user.profile.emp_id,
+                created_date=datetime.now(), effective_date=date.today(), approved_by='CC TEAM',
+                approved_date=datetime.now(), status=True, action='Approved', reason='Approved by CC TEAM',
+            )
         e.emp_rm1 = rm1.emp_name
         e.emp_rm1_id = rm1.emp_id
         e.emp_rm2 = rm2.emp_name
