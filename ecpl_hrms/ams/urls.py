@@ -29,7 +29,7 @@ urlpatterns = [
     path('edit-employee-profile-status', editAgentStatus),
 
     # Dashboard Redirect
-    path('dashboard-redirect/<int:id>', redirectTOAllDashBoards),
+    path('dashboard-redirect', redirectTOAllDashBoards),
     path('agent-dashboard', agentDashBoard),
     path('tl-dashboard', tlDashboard),
     path('manager-dashboard', managerDashboard),
@@ -88,5 +88,13 @@ urlpatterns = [
     path('add-attendance', addAttendance),
     path('sandwich', sandwichPolicy),
     path('maternity-leave', maternityLeave),
+
+
+    # ADMIN URLS
+    path('attendance', AttendanceReportAdmin),
+    path('admin-attendance-correction', AttendanceCorrectionAdmin),
+    path('admin-attendance-correction-submit', AttendanceCorrectionSubmitAdmin),
+    path('mapping-correction', getMapping),
+    path('mapping-correction-submit', changeMapping),
 
 ]

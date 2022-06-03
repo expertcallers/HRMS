@@ -84,32 +84,8 @@
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
               <div class="menu_section">
                 <ul class="nav side-menu">
-                  <li><a href="/ams/tl-dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
-                  <li><a href="/ams/viewusers"><i class="fa fa-user"></i> View Users</a></li>
-                  <li><a><i class="fa fa-clock-o"></i>Attendance <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="/ams/ams-update-attendance">Mark Attendance</a></li>
-                        <li><a href="/ams/team-attendance">Team Attendance</a></li>
-                        <li><a href="/ams/week-attendance">Week Report</a></li>
-                        <li><a href="/ams/attendance-correction">Attendance Correction</a></li>
-                      <!--<li><a href="all_emp.html">Active Employees</a></li>-->
-                    </ul>
-                  </li>
-                  <li><a href="/ams/rm-settings"><i class="fa fa-gear"></i> Settings</a></li>
-
-                  <li><a><i class="fa fa-user"></i>Mapping <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="/ams/rm-mapping-index"> Mapping</a></li>
-                      <li><a href="/ams/mapping-application-status"> Mapping Change Status</a></li>
-                    </ul>
-                  </li>
-                  <!--<li><a><i class="fa fa-briefcase"></i> Job Requisition <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="/ams/add-new-job">Add New</a></li>
-                      <li><a href="/ams/view-job-table-rm">View Submissions</a></li>
-                    </ul>
-                  </li>-->
-                  <li><a href="/ams/ams-apply_leave"><i class="fa fa-check-square-o"></i> Leaves</a></li>
+                  <li><a href="/ams/dashboard-redirect"><i class="fa fa-home"></i> Dashboard</a></li>
+                  <li><a href="" onclick="history.back();"><i class="fa fa-arrow-left"></i> Back</a></li>
                 </ul>
               </div>
             </div>
@@ -215,7 +191,6 @@
           <script type="text/javascript">
       $(document).ready(function() {
           $('#datatablex').DataTable({
-              dom: 'lBfrtip',
               buttons: [
                     {
                         extend: "copy",
@@ -230,7 +205,8 @@
                         className: "btn btn-success btn-sm ml-1"
                     },
                 ],
-                responsive: true
+              dom: '<"row"<"col-md-2"l><"col-md-6"B><"col-md-4"fr>>tip',
+              responsive: true
           } );
       } );
       $('#datatable').DataTable( {

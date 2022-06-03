@@ -1,0 +1,112 @@
+{% extends 'ams/admin_main/base.html' %}
+{% block main %}
+  {% load static %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>Attendance report</h3>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <form method="POST" action="" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="month">Select Employee</label>
+                          <select name="emp_id" id="month" class="form-control select2" required>
+                            <option value="" selected disabled>Please select</option>
+                            {% for i in profiles %}
+                            <option value="{{i.emp_id}}">{{i.emp_name}} ({{i.emp_id}})</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="start">Select Start Date</label>
+                          <input type="date" name="start" id="start" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="end">Select End Date</label>
+                          <input type="date" name="end" id="end" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="col-md-12" align="center">
+                        <button type="submit" class="form-control mt-4 btn btn-success btn-lg" onclick="return confirmm();">Submit</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <table  id="datatablex" class="table table-striped" style="width: 100% !important;">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Emp Name</th>
+                        <th>Emp ID</th>
+                        <th>Attendance</th>
+                        <th>Team</th>
+                        <th>Marked by</th>
+                        <th>Applied On</th>
+                        <th>RM1</th>
+                        <th>RM2</th>
+                        <th>RM3</th>
+                      </tr>
+                    </thead>
+                    <tfoot>
+                      <tr>
+                        <th>Date</th>
+                        <th>Emp Name</th>
+                        <th>Emp ID</th>
+                        <th>Attendance</th>
+                        <th>Team</th>
+                        <th>Marked by</th>
+                        <th>Applied On</th>
+                        <th>RM1</th>
+                        <th>RM2</th>
+                        <th>RM3</th>
+
+                      </tr>
+                    </tfoot>
+                    <tbody>
+                      {% for i in calendar %}
+                      <tr>
+                          <td>{{i.date}}</td>
+                          <td>{{i.emp_name}}</td>
+                          <td>{{i.emp_id}}</td>
+                          <td style="text-transform: capitalize;">{{i.att_actual}}</td>
+                          <td>{{i.team}}</td>
+                          <td>{{i.appoved_by}}</td>
+                          <td>{{i.approved_on}}</td>
+                          <td>{{i.rm1}}</td>
+                          <td>{{i.rm2}}</td>
+                          <td>{{i.rm3}}</td>
+                      </tr>
+                      {% endfor %}
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- /page content -->
+
+
+  {% endblock %}

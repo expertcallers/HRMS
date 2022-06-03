@@ -1,0 +1,142 @@
+{% extends 'ams/admin_main/base.html' %}
+{% block main %}
+  {% load static %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>Mapping Correction</h3>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-body">
+                  <form method="POST" action="" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <label for="month">Select Employee</label>
+                          <select name="id" id="month" class="form-control select2" required>
+                            <option value="" selected disabled>Please select</option>
+                            {% for i in profiles %}
+                            <option value="{{i.id}}">{{i.emp_name}} ({{i.emp_id}})</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-12" align="center">
+                        <button type="submit" class="form-control mt-4 btn btn-success btn-lg">Submit</button>
+                      </div>
+                    </div>
+                    <input type="hidden" value="single" name="type">
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% if profile %}
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <form action="/ams/mapping-correction-submit" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{profile.id}}">
+                    <div class="row mt-4">
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="hr_emp_name">Employee Name</label>
+                          <input type="text" value="{{profile.emp_name}}" disabled name="emp_name" id="hr_emp_name" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="hr_emp_id">Employee ID</label>
+                          <input type="text" value="{{profile.emp_id}}" disabled name="emp_id" id="hr_emp_id" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="hr_emp_desg">Employee Designation</label>
+                          <select name="emp_desi" id="hr_emp_desg" class="form-control select2" required>
+                            {% for i in desi %}
+                            <option value="{{i.id}}" {% if profile.emp_desi == i.name %}selected{% endif %}>{{i.name}}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="hr_emp_pro">Employee Process</label>
+                          <select name="emp_department" id="hr_emp_pro" class="form-control select2" required>
+                            {% for i in departments %}
+                            <option value="{{i.id}}" {% if profile.emp_process == i.name %}selected{% endif %}>{{i.name}}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="hr_emp_rm1">RM1</label>
+                          <select name="rm1" id="hr_emp_rm1" class="form-control select2" required>
+                            {% for i in rms %}
+                            <option value="{{i.id}}" {% if profile.emp_rm1_id == i.emp_id %}selected{% endif %}>{{i.emp_name}} ({{i.emp_id}})</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="hr_emp_rm2">RM2</label>
+                          <select name="rm2" id="hr_emp_rm2" class="form-control select2" required>
+                            {% for i in rms %}
+                            <option value="{{i.id}}" {% if profile.emp_rm2_id == i.emp_id %}selected{% endif %}>{{i.emp_name}} ({{i.emp_id}})</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="hr_emp_rm3">RM3</label>
+                          <select name="rm3" id="hr_emp_rm3" class="form-control select2" required>
+                            {% for i in rms %}
+                            <option value="{{i.id}}" {% if profile.emp_rm3_id == i.emp_id %}selected{% endif %}>{{i.emp_name}} ({{i.emp_id}})</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-group">
+                          <label for="status">Agent Status</label>
+                          <input type="text" disabled value="{{profile.agent_status}}" class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-12" align="center">
+                        <button class="btn btn-success form-control" onclick="return confirmm();">Make Changes</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+        </div>
+        <!-- /page content -->
+
+  {% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+      $today = new Date();
+      $today = moment($today).format('YYYY-MM-DD');
+      function mydate(e) {
+        $start = $('#start').val();
+        $end = $('#end');
+        $end.attr("min", $start);
+      }
+</script>
+{% endblock %}

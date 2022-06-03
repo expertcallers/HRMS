@@ -100,6 +100,9 @@
                       <li><a href="/ams/ams-apply_leave">Your Leaves</a></li>
                     </ul>
                   </li>
+                  {% if request.user.profile.emp_id in admin_list %}
+                  {% include 'ams/admin_urls.html' %}
+                  {% endif %}
                     <li><a href="/ams/rm-mapping-index"><i class="fa fa-user"></i> Mapping</a></li>
                   <li><a href="/ams/rm-settings"><i class="fa fa-gears"></i> Settings</a></li>
                     <!--<li><a href="/ams/add-new-job"><i class="fa fa-check-square-o"></i> Job Requisition Form</a></li>-->

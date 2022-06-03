@@ -5078,4 +5078,7 @@ ul.notifications {
   font-size: 50px;
   line-height: 115px;
 }
+div.dataTables_wrapper div.dataTables_filter input{
+    width: 90% !important;
+}
 

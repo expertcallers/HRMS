@@ -108,6 +108,9 @@
                       <li><a href="/ams/ams-apply_leave">Your Leaves</a></li>
                     </ul>
                   </li>
+                  {% if request.user.profile.emp_id in admin_list %}
+                  {% include 'ams/admin_urls.html' %}
+                  {% endif %}
                   <li><a href="/ams/rm-settings"><i class="fa fa-gears"></i> Settings</a></li>
                   <!--<li><a><i class="fa fa-briefcase"></i> Job Requisition <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">

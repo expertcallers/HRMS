@@ -39,6 +39,9 @@
               <div class="menu_section">
                 <ul class="nav side-menu">
                   <li><a href="/ams/agent-dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
+                  {% if request.user.profile.emp_id in admin_list %}
+                  {% include 'ams/admin_urls.html' %}
+                  {% endif %}
                   <li><a href="/ams/ams-apply_leave"><i class="fa fa-calendar-times"></i> Leaves</a></li>
                   <li><a href="/ams/ams-agent-settings"><i class="fa fa-gears"></i> Settings</a></li>
                 </ul>

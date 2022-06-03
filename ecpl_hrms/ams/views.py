@@ -40,6 +40,7 @@ management_list = []
 rm_list = []
 hr_tl_am_list = []
 hr_om_list = []
+admin_list = ['7875', '8082', '1732', '249', '7297', '5638']
 
 
 # Create your views here.
@@ -49,6 +50,8 @@ def loginPage(request):  # Test1 Test2
     data = {'form': form}
     return render(request, 'ams/login.html', data)
 
+def view_403(request, exception=None):
+    return redirect('/ams/')
 
 def loginAndRedirect(request):  # Test1 Test2
     for i in Designation.objects.filter(category='TL AM'):
@@ -117,7 +120,7 @@ def loginAndRedirect(request):  # Test1 Test2
 
 
 @login_required
-def redirectTOAllDashBoards(request, id):  # Test1 Test2
+def redirectTOAllDashBoards(request):  # Test1 Test2
     if request.user.profile.emp_desi in tl_am_list:
         return redirect('/ams/tl-dashboard')
     elif request.user.profile.emp_desi in hr_list:
@@ -186,7 +189,7 @@ def agentDashBoard(request):  # Test1 Test2
             dict['dt'] = i
             dict['st'] = st
             month_cal.append(dict)
-        data = {'emp': emp, 'leave_hist': leave_hist, 'month_cal': month_cal}
+        data = {'emp': emp, 'leave_hist': leave_hist, 'month_cal': month_cal, 'admin_list': admin_list}
         return render(request, 'ams/agent-dashboard-new.html', data)
     else:
         return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
@@ -270,7 +273,7 @@ def tlDashboard(request):  # Test1 Test2
                 'unmarked_count': unmarked_count, 'map_tickets_counts': map_tickets_counts,
                 'all_emp': all_emp, 'sl_count': sl_count, 'pl_count': pl_count, 'attrition_count': attrition_count,
                 'training_count': training_count, 'leave_req_count': leave_req_count, 'month_cal': month_cal,
-                "rm3": rm3}
+                "rm3": rm3, 'admin_list': admin_list}
 
         return render(request, 'ams/rm-dashboard-new.html', data)
 
@@ -389,7 +392,7 @@ def managerDashboard(request):  # Test1 Test2
             'all_ams': all_ams_under, 'all_ams_count': all_ams_count,
             'map_tickets_counts': map_tickets_counts, 'att_requests_count': att_requests_count,
             'leave_req_count': leave_req_count, 'leave_esc_count': leave_esc_count, 'all_emp': all_emps_under,
-            'month_cal': month_cal,
+            'month_cal': month_cal, 'admin_list': admin_list,
             }
     return render(request, 'ams/manager-dashboard.html', data)
 
@@ -628,7 +631,7 @@ def hrDashboard(request):  # Test1
                 "leave_req_count": leave_req_count, "map_tickets_counts": map_tickets_counts,
                 "leave_esc_count": leave_esc_count, "att_requests_count": att_requests_count,
                 "hr_tl_am_list": hr_tl_am_list, "hr_om_list": hr_om_list,
-                "leave_req_count_final": leave_req_count_final}
+                "leave_req_count_final": leave_req_count_final, 'admin_list': admin_list}
         return render(request, 'ams/hr_dashboard.html', data)
     else:
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
@@ -2286,6 +2289,191 @@ def onboardingBulkUpload(request):
         return redirect('/ams/bulk-onboarding')
     else:
         return render(request, 'ams/bulk_onboarding.html')
+
+
+@login_required
+def AttendanceReportAdmin(request):
+    emp_id = request.user.profile.emp_id
+    if emp_id in admin_list:
+        if request.method == 'POST':
+            emp_id = request.POST['emp_id']
+            start = request.POST['start']
+            end = request.POST['end']
+            calendar = EcplCalander.objects.filter(emp_id=emp_id, date__range=[start, end])
+
+            profiles = Profile.objects.all()
+            data = {'profiles': profiles, 'calendar': calendar}
+            return render(request, 'ams/admin_main/attendance-report.html', data)
+        else:
+            profiles = Profile.objects.all()
+            data = {'profiles': profiles}
+            return render(request, 'ams/admin_main/attendance-report.html', data)
+    else:
+        messages.info(request, 'Unauthorized Access')
+        return redirect('/ams/')
+
+
+@login_required
+def AttendanceCorrectionAdmin(request):
+    emp_id = request.user.profile.emp_id
+    if emp_id in admin_list:
+        if request.method == 'POST':
+            type = request.POST['type']
+            if type == 'single':
+                emp_id = request.POST['emp_id']
+                start = request.POST['start']
+                try:
+                    calendar = EcplCalander.objects.get(emp_id=emp_id, date=start)
+                    profiles = Profile.objects.all()
+                    data = {'profiles': profiles, 'cal': calendar}
+                    return render(request, 'ams/admin_main/attendance-correction.html', data)
+                except:
+                    messages.error(request, 'No attendance for selected employee on selected date')
+                    return redirect('/ams/admin-attendance-correction')
+            if type == 'bulk':
+                emp_id = request.POST.getlist('emp_id')
+                start = request.POST['start']
+                end = request.POST['end']
+                calendar = EcplCalander.objects.filter(emp_id__in=emp_id, date__range=[start, end])
+                if calendar.exists():
+                    calendar = calendar
+                else:
+                    calendar = {'val': True}
+                profiles = Profile.objects.all()
+                data = {'profiles': profiles, 'bulk_cal': calendar, 'emp_id': emp_id, 'start': start, 'end': end}
+                return render(request, 'ams/admin_main/attendance-correction.html', data)
+        else:
+            profiles = Profile.objects.all()
+            data = {'profiles': profiles}
+            return render(request, 'ams/admin_main/attendance-correction.html', data)
+    else:
+        messages.info(request, 'Unauthorized Access')
+        return redirect('/ams/')
+
+
+@login_required
+def AttendanceCorrectionSubmitAdmin(request):
+    emp_id = request.user.profile.emp_id
+    if emp_id in admin_list:
+        if request.method == 'POST':
+            type = request.POST['type']
+            if type == 'single':
+                id = request.POST['id']
+                new_att = request.POST['new_att']
+                cal = EcplCalander.objects.get(id=id)
+                cal.att_actual = new_att
+                cal.approved_on = datetime.now()
+                cal.appoved_by = "CC Team"
+                cal.save()
+            elif type == 'bulk':
+                emp_id = request.POST.get('emp_id')
+                emp_id = emp_id.strip('][').split("', '")
+                emp_id[0] = emp_id[0][1:len(emp_id[0])]
+                emp_id[-1] = emp_id[-1][0:len(emp_id[-1])-1]
+                start = request.POST['start']
+                start = datetime.strptime(start, '%Y-%m-%d').date()
+                end = request.POST['end']
+                end = datetime.strptime(end, '%Y-%m-%d').date()
+                new_att = request.POST['new_att']
+                date_list = []
+                while start <= end:
+                    date_list.append(start)
+                    start += timedelta(days=1)
+                for i in date_list:
+                    for j in emp_id:
+                        try:
+                            cal = EcplCalander.objects.get(emp_id=j, date=i)
+                            cal.att_actual = new_att
+                            if new_att == 'Unmarked':
+                                cal.approved_on = None
+                                cal.appoved_by = None
+                            else:
+                                cal.approved_on = datetime.now()
+                                cal.appoved_by = "CC Team"
+                            cal.save()
+                        except EcplCalander.DoesNotExist:
+                            emp = Profile.objects.get(emp_id=j)
+                            if new_att == 'Unmarked':
+                                EcplCalander.objects.create(
+                                    emp_id=j, date=i, team=emp.emp_process, emp_name=emp.emp_name,
+                                    emp_desi=emp.emp_desi, att_actual=new_att,
+                                    rm1=emp.emp_rm1, rm2=emp.emp_rm2, rm3=emp.emp_rm3,
+                                    rm1_id=emp.emp_rm1_id, rm2_id=emp.emp_rm2_id, rm3_id=emp.emp_rm3_id,
+                                    team_id=emp.emp_process_id
+                                )
+                            else:
+                                EcplCalander.objects.create(
+                                    emp_id=j, date=i, team=emp.emp_process, emp_name=emp.emp_name,
+                                    emp_desi=emp.emp_desi, att_actual=new_att, approved_on=datetime.now(),
+                                    appoved_by='CC Team', rm1=emp.emp_rm1, rm2=emp.emp_rm2, rm3=emp.emp_rm3,
+                                    rm1_id=emp.emp_rm1_id, rm2_id=emp.emp_rm2_id, rm3_id=emp.emp_rm3_id,
+                                    team_id=emp.emp_process_id
+                                )
+            messages.info(request, 'Successfully Changed!')
+            return redirect('/ams/admin-attendance-correction')
+        else:
+            messages.info(request, 'Unauthorized Access')
+            return redirect('/ams/')
+    else:
+        messages.info(request, 'Unauthorized Access')
+        return redirect('/ams/')
+
+
+@login_required
+def getMapping(request):
+    emp_id = request.user.profile.emp_id
+    if emp_id in admin_list:
+        if request.method == "POST":
+            id = request.POST["id"]
+            profiles = Profile.objects.all()
+            profile = Profile.objects.get(id=id)
+            departments = Campaigns.objects.all()
+            desi = Designation.objects.all()
+            rms = Profile.objects.filter(
+                Q(emp_desi__in=hr_list) | Q(emp_desi__in=management_list) | Q(emp_desi__in=manager_list) | Q(
+                    emp_desi__in=tl_am_list), Q(agent_status='Active')
+            )
+            data = {'profile': profile, 'profiles': profiles, 'departments': departments, 'desi': desi, 'rms':rms}
+            return render(request, 'ams/admin_main/mapping-correction.html', data)
+        else:
+            profiles = Profile.objects.all()
+            data = {'profiles': profiles}
+            return render(request, 'ams/admin_main/mapping-correction.html', data)
+    else:
+        messages.info(request, 'Unauthorized Access')
+        return redirect('/ams/')
+
+
+@login_required
+def changeMapping(request):
+    if request.method == "POST":
+        id = request.POST["id"]
+        rm1 = request.POST["rm1"]
+        rm1 = Profile.objects.get(id=rm1)
+        rm2 = request.POST["rm2"]
+        rm2 = Profile.objects.get(id=rm2)
+        rm3 = request.POST["rm3"]
+        rm3 = Profile.objects.get(id=rm3)
+        campaign_id = request.POST["emp_department"]
+        cam = Campaigns.objects.get(id=campaign_id)
+        desig_id = request.POST["emp_desi"]
+        desi = Designation.objects.get(id=desig_id)
+        e = Profile.objects.get(id=id)
+        e.emp_rm1 = rm1.emp_name
+        e.emp_rm1_id = rm1.emp_id
+        e.emp_rm2 = rm2.emp_name
+        e.emp_rm2_id = rm2.emp_id
+        e.emp_rm3 = rm3.emp_name
+        e.emp_rm3_id = rm3.emp_id
+        e.emp_process = cam.name
+        e.emp_process_id = cam.id
+        e.emp_desi = desi.name
+        e.save()
+        messages.success(request, 'Successfully Changed!')
+        return redirect(request.META.get('HTTP_REFERER'))
+    else:
+        messages.error(request, 'Bad Request!')
+        return redirect('/ams/')
 
 
 def addAttendance(request):
