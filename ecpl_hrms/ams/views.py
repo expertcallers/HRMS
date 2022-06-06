@@ -2653,7 +2653,7 @@ def addLeaveBalance(request, a):
             total_bal = i.pl_balance + i.sl_balance
             for j in ecpl_cal:
                 if j.emp_id == i.emp_id:
-                    if j.att_actual == "present" or j.att_actual == "Week OFF" or j.att_actual == "Comp OFF" or j.att_actual == "Holiday":
+                    if j.att_actual == "present" or j.att_actual == "Week OFF" or j.att_actual == "Comp OFF" or j.att_actual == "Client OFF" or j.att_actual == 'PL' or j.att_actual == 'SL':
                         cal += 1
                     elif j.att_actual == 'Half Day':
                         cal += 0.5
