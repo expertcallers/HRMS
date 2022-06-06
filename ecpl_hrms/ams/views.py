@@ -2573,7 +2573,7 @@ def addAttendance(request):
 
 
 def autoApproveLeave(request):
-    leaves = LeaveTable.objects.filter(Q(tl_approval=False) | Q(manager_approval=False))
+    leaves = LeaveTable.objects.filter(Q(tl_approval=False) | Q(manager_approval=False), ~Q(status='Rejected'))
     leave_list = []
     ecpl_cal = []
     for i in leaves:
