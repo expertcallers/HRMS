@@ -1,0 +1,72 @@
+{% extends 'ams/base_common.html' %}
+
+{% block main %}
+  {% load static %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="row pb-3">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <h4 align="center">Current Month Calendar</h4>
+                </div>
+                <div class="card-body" align="center">
+                    <div class="monthly" id="mycalendarid"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+    var sampleEvents = {
+    "monthly": [
+        {% for c in month_cal %}
+        {
+            "id": 1,
+            "name": "{{c.st}}",
+            "startdate": "{{c.dt}}",
+            "enddate": "",
+            {% if c.st == 'Unmarked' %}
+            "color": "grey",
+            {% elif c.st == 'Week OFF' %}
+            "color": "#000000",
+            {% elif c.st == 'Comp OFF' %}
+            "color": "#FF8FFF",
+            {% elif c.st == 'Absent' %}
+            "color": "#FF0000",
+            {% elif c.st == 'present' %}
+            "color": "#008C00",
+            {% elif c.st == 'SL' %}
+            "color": "#FF0000",
+            {% elif c.st == 'PL' %}
+            "color": "#FF0000",
+            {% elif c.st == 'Training' %}
+            "color": "#6990CE",
+            {% elif c.st == 'Half Day' %}
+            "color": "#0000FF",
+            {% elif c.st == 'Client OFF' %}
+            "color": "#FF8FFF",
+            {% else %}
+            "color": "#B52E2E",
+            {% endif %}
+            "url": ""
+        },
+        {% endfor %}
+    ]
+    };
+    $(document).ready( function() {
+        $('#mycalendarid').monthly({
+            mode: 'event',
+            dataType: 'json',
+            weekStart:'Mon',
+            events: sampleEvents,
+        });
+    });
+</script>
+
+{% endblock %}

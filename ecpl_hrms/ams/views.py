@@ -168,29 +168,8 @@ def agentDashBoard(request):  # Test1 Test2
         # Leave status
         leave_hist = LeaveTable.objects.filter(Q(emp_id=emp_id), Q(leave_type__in=['SL', 'PL', 'ML'])).order_by(
             '-id')[:5]
-        # Month view
-        month_days = []
-        todays_date = date.today()
-        year = todays_date.year
-        month = todays_date.month
-        a, num_days = calendar.monthrange(year, month)
-        start_date = date(year, month, 1)
-        end_date = date(year, month, num_days)
-        delta = timedelta(days=1)
-        while start_date <= end_date:
-            month_days.append(start_date.strftime("%Y-%m-%d"))
-            start_date += delta
-        month_cal = []
-        for i in month_days:
-            dict = {}
-            try:
-                st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id)).att_actual
-            except EcplCalander.DoesNotExist:
-                st = 'Unmarked'
-            dict['dt'] = i
-            dict['st'] = st
-            month_cal.append(dict)
-        data = {'emp': emp, 'leave_hist': leave_hist, 'month_cal': month_cal, 'admin_list': admin_list}
+
+        data = {'emp': emp, 'leave_hist': leave_hist, 'admin_list': admin_list}
         return render(request, 'ams/agent-dashboard-new.html', data)
     else:
         return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
@@ -1523,6 +1502,38 @@ def weekAttendanceReport(request):  # Test1
 
 
 import csv
+
+
+
+@login_required
+def attendanceCalendar(request):
+    emp_id = request.user.profile.emp_id
+    # Month view
+    month_days = []
+    todays_date = date.today()
+    year = todays_date.year
+    month = todays_date.month
+    a, num_days = calendar.monthrange(year, month)
+    start_date = date(year, month, 1)
+    end_date = date(year, month, num_days)
+    delta = timedelta(days=1)
+    while start_date <= end_date:
+        month_days.append(start_date.strftime("%Y-%m-%d"))
+        start_date += delta
+    month_cal = []
+    for i in month_days:
+        dict = {}
+        try:
+            st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id)).att_actual
+        except EcplCalander.DoesNotExist:
+            st = 'Unmarked'
+        dict['dt'] = i
+        dict['st'] = st
+        month_cal.append(dict)
+    data = {'month_cal': month_cal}
+    return render(request, 'ams/attendance-calendar.html', data)
+
+
 
 
 @login_required

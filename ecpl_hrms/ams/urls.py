@@ -41,6 +41,7 @@ urlpatterns = [
     path('team-attendance', teamAttendance),
     path('view-emp-attendance', viewTeamAttendance),
     path('team-attendance-report', teamAttendanceReport),
+    path('attendance-calendar', attendanceCalendar),
 
     # Attendance Correction
     path('attendance-correction', attendanceCorrection),

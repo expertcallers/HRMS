@@ -51,13 +51,13 @@
           }
     </style>
   </head>
-  <body class="nav-md" oncontextmenu="alert('Right Click is Blocked'); return false">
+  <body class="nav-md">
   <div class="container body">
       <div class="main_container">
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title clearfix" style="border: 0; background-color: #fff;">
-              <a href="#" class="site_title">
+              <a href="" class="site_title">
                 <img src="{% static 'assets/images/ecpl-logo-new.png' %}" class="imgmd" style="width: 100%">
                 <img src="{% static 'assets/images/expertcallers-icon.png' %}" class="imgsm" style="width: 100%">
               </a>
@@ -67,14 +67,14 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
               <div class="profile_pic mb-2">
-                <img src="{{user.profile.img.url}}" alt="..." class="img-circle profile_img">
+                <img src="{{request.user.profile.img.url}}" alt="..." class="img-circle profile_img">
               </div>
                 <div class="profile_info">
-                <h2><i class="fa fa-user"></i><span>Name</span><br>{{request.user.profile.emp_name}}</h2>
-                <h2><i class="fa fa-id-card"></i><span>Employee ID</span><br> {{request.user.profile.emp_id}}</h2>
-                <h2><i class="fa fa-headset"></i><span>Designation</span><br> {{request.user.profile.emp_desi}}</h2>
-                <h2><i class="fa fa-users"></i><span>Team</span><br>{{request.user.profile.emp_process}}</h2>
-              </div>
+                    <h2><i class="fa fa-user"></i><span>Name</span><br>{{request.user.profile.emp_name}}</h2>
+                    <h2><i class="fa fa-id-card"></i><span>Employee ID</span><br> {{request.user.profile.emp_id}}</h2>
+                    <h2><i class="fa fa-headset"></i><span>Designation</span><br> {{request.user.profile.emp_desi}}</h2>
+                    <h2><i class="fa fa-users"></i><span>Team</span><br>{{request.user.profile.emp_process}}</h2>
+                </div>
             </div>
             <!-- /menu profile quick info -->
 
@@ -84,7 +84,7 @@
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
               <div class="menu_section">
                 <ul class="nav side-menu">
-                  <li><a href="/ams/tl-dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
+                  <li><a href="/ams/dashboard-redirect"><i class="fa fa-home"></i> Dashboard</a></li>
                   <li><a><i class="fa fa-clock-o"></i>Attendance <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/ams/ams-update-attendance">Mark Attendance</a></li>
@@ -100,6 +100,7 @@
                       <li><a href="/ams/ams-apply_leave">Your Leaves</a></li>
                     </ul>
                   </li>
+                  <li><a href="/ams/attendance-calendar"><i class="fa fa-calendar"></i> Attendance Calendar</a></li>
                   {% if request.user.profile.emp_id in admin_list %}
                   {% include 'ams/admin_urls.html' %}
                   {% endif %}
@@ -132,7 +133,7 @@
               <ul class=" navbar-right">
                 <li class="nav-item dropdown open" style="padding-left: 15px;">
                   <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{{user.profile.img.url}}" alt="">{{request.user.profile.emp_name}}
+                    <img src="{{request.user.profile.img.url}}" alt="">{{request.user.profile.emp_name}}
                   </a>
                   <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item"  href="/ams/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
@@ -146,7 +147,16 @@
 {% block main %}
 
 {% endblock %}
-
+        <!-- footer content -->
+        <footer>
+          <div class="text-center">
+            ECPL CC Team
+          </div>
+          <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+      </div>
+    </div>
     <!-- Bootstrap -->
     <script src="{% static 'assets/vendors/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
     <!-- FastClick -->
@@ -166,7 +176,13 @@
     <!-- Flot -->
     <script src="{% static 'assets/vendors/Flot/jquery.flot.js' %}"></script>
     <script src="{% static 'assets/vendors/Flot/jquery.flot.pie.js' %}"></script>
-
+    <script src="{% static 'assets/vendors/Flot/jquery.flot.time.js' %}"></script>
+    <script src="{% static 'assets/vendors/Flot/jquery.flot.stack.js' %}"></script>
+    <script src="{% static 'assets/vendors/Flot/jquery.flot.resize.js' %}"></script>
+    <!-- Flot plugins -->
+    <script src="{% static 'assets/vendors/flot.orderbars/js/jquery.flot.orderBars.js' %}"></script>
+    <script src="{% static 'assets/vendors/flot-spline/js/jquery.flot.spline.min.js' %}"></script>
+    <script src="{% static 'assets/vendors/flot.curvedlines/curvedLines.js' %}"></script>
     <!-- DateJS -->
     <script src="{% static 'assets/vendors/DateJS/build/date.js' %}"></script>
     <!-- JQVMap -->
@@ -184,187 +200,76 @@
     <script src="{% static 'assets/vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js' %}"></script>
     <script src="{% static 'assets/vendors/datatables.net-buttons/js/buttons.flash.min.js' %}"></script>
     <script src="{% static 'assets/vendors/datatables.net-buttons/js/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'assets/vendors/datatables.net-buttons/js/buttons.print.min.js' %}"></script>
+    <script src="{% static 'assets/vendors/datatables.net-fixedheader/js/dataTables.fixedHeader.min.js' %}"></script>
+    <script src="{% static 'assets/vendors/datatables.net-keytable/js/dataTables.keyTable.min.js' %}"></script>
+    <script src="{% static 'assets/vendors/datatables.net-responsive/js/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'assets/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js' %}"></script>
+    <script src="{% static 'assets/vendors/datatables.net-scroller/js/dataTables.scroller.min.js' %}"></script>
     <script src="{% static 'assets/vendors/jszip/dist/jszip.min.js' %}"></script>
+    <script src="{% static 'assets/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
+    <script src="{% static 'assets/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
 
     <!-- The follwing two tags to be added Can be added to base file-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script>
       $('.select2').select2();
     </script>
-
-      <script type="text/javascript" src="{% static 'assets/js/monthly.js' %}"></script>
-      <script type="text/javascript">
-          var sampleEvents = {
-          "monthly": [
-              {% for c in month_cal %}
-              {
-                  "id": 1,
-                  "name": "{{c.st}}",
-                  "startdate": "{{c.dt}}",
-                  "enddate": "",
-                  "starttime": "",
-                  "endtime": "",
-                  {% if c.st == 'Unmarked' %}
-                  "color": "grey",
-                  {% elif c.st == 'Week OFF' %}
-                  "color": "#000000",
-                  {% elif c.st == 'Comp OFF' %}
-                  "color": "#FF8FFF",
-                  {% elif c.st == 'Absent' %}
-                  "color": "#FF0000",
-                  {% elif c.st == 'present' %}
-                  "color": "#008C00",
-                  {% elif c.st == 'SL' %}
-                  "color": "#FF0000",
-                  {% elif c.st == 'PL' %}
-                  "color": "#FF0000",
-                  {% elif c.st == 'Training' %}
-                  "color": "#6990CE",
-                  {% elif c.st == 'Half Day' %}
-                  "color": "#0000FF",
-                  {% elif c.st == 'Client OFF' %}
-                  "color": "#FF8FFF",
-                  {% else %}
-                  "color": "#B52E2E",
-                  {% endif %}
-
-                  "url": ""
-              },
-              {% endfor %}
-          ]
-          };
-          $(document).ready( function() {
-              $('#mycalendarid').monthly({
-                  mode: 'event',
-                  dataType: 'json',
-                  jsonURL: '',
-                  weekStart:'Mon',
-                  events: sampleEvents
-              });
-          });
-      </script>
-
-    <script src="{% static 'assets/vendors/echarts/dist/echarts.js' %}"></script>
-
-    <script type="text/javascript">
-		var echartPie = echarts.init(document.getElementById('main'));
-
-        echartPie.setOption({
-            tooltip: {
-                trigger: 'item',
-                formatter: "{a} <br/>{b} : {c} ({d}%)"
-            },
-            legend: {
-                x: 'center',
-                y: 'bottom',
-                data: ['Present', 'Absent', 'Company Off', 'Week Off', 'Unmarked', 'Half Day','Holiday']
-            },
-            toolbox: {
-                show: true,
-                feature: {
-                    magicType: {
-                        show: true,
-                        type: ['pie', 'funnel'],
-                        option: {
-                            funnel: {
-                                x: '25%',
-                                width: '50%',
-                                funnelAlign: 'left',
-                                max: 1548
-                            }
-                        }
-                    },
-                    restore: {
-                        show: true,
-                        title: "Restore"
-                    },
-                    saveAsImage: {
-                        show: true,
-                        title: "Save Image"
-                    }
-                }
-            },
-            calculable: true,
-            color:["green","red","grey","black","brown", "blue",'violet'],
-            series: [{
-                name: 'ECPL',
-                type: 'pie',
-                radius: '60%',
-                center: ['50%', '48%'],
-                data: [{
-                    value: {{present_count}},
-                    name: 'Present'
-                }, {
-                    value: {{absent_count}},
-                    name: 'Absent'
-                }, {
-                    value: {{comp_off_count}},
-                    name: 'Company Off'
-                }, {
-                    value: {{week_off_count}},
-                    name: 'Week Off'
-                },{
-                    value: {{unmarked_count}},
-                    name: 'Unmarked'
-                }, {
-                    value: {{half_day_count}},
-                    name: 'Half Day'
-                },{
-                    value: {{holiday_count}},
-                    name: 'Holiday'
-                }]
-            }]
-        });
-    </script>
     <!-- Custom Theme Scripts -->
     <script src="{% static 'assets/build/js/custom.min.js' %}"></script>
-          <script type="text/javascript">
-      $(document).ready(function() {
-          $('#datatablex').DataTable({
-            "bPaginate": true,
-            "bLengthChange": true,
-            "bFilter": true,
-            "bInfo": true,
-              dom: 'lBfrtip',
-              buttons: [
-                    {
-                        extend: "copy",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                    {
-                        extend: "csv",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                    {
-                        extend: "excel",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                ],
-                responsive: true
-          } );
+
+
+    <script type="text/javascript" src="{% static 'assets/js/monthly.js' %}"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+      $('#datatablex').DataTable({
+        "bPaginate": true,
+        "bLengthChange": true,
+        "bFilter": true,
+        "bInfo": true,
+        "order": [[ 0, "desc" ]],
+          dom: 'lBfrtip',
+          buttons: [
+                {
+                    extend: "copy",
+                    className: "btn btn-success btn-sm ml-1"
+                },
+                {
+                    extend: "csv",
+                    className: "btn btn-success btn-sm ml-1"
+                },
+                {
+                    extend: "excel",
+                    className: "btn btn-success btn-sm ml-1"
+                },
+            ],
+            responsive: true
       } );
-      $('#datatable').DataTable( {
-          responsive: true
-      } );
-      $('#datatable_two').DataTable( {
-          responsive: true
-      } );
-      $('#datatable_three').DataTable( {
-          responsive: true
-      } );
-    </script>
-    <script type="text/javascript">
-      $today = new Date();
-      $today = moment($today).format('YYYY-MM-DD');
-      $('#end_date').attr("max", $today);
-      $('#start_date').attr("max", $today);
-      function mydate(e) {
-        $start = $('#start_date').val();
-        $end = $('#end_date');
-        $end.attr("min", $start);
-      }
-    </script>
-          <script>
+  } );
+  $('#datatable').DataTable( {
+      responsive: true
+  } );
+  $('#datatable_two').DataTable( {
+      responsive: true
+  } );
+  $('#datatable_three').DataTable( {
+      responsive: true
+  } );
+</script>
+<script type="text/javascript">
+  $today = new Date();
+  $today = moment($today).format('YYYY-MM-DD');
+  $('#end_date').attr("max", $today);
+  $('#start_date').attr("max", $today);
+  function mydate(e) {
+    $start = $('#start_date').val();
+    $end = $('#end_date');
+    $end.attr("min", $start);
+  }
+</script>
+
+
+<script>
   function confirmm(){
       var c = confirm("Are you sure you want to proceed?");
       if (c==true){
@@ -397,13 +302,16 @@
     }
 </script>
 
-           <script>
-      $('.select2').select2();
-      {% if messages %}
-      alert('{% for m in messages %}{{m}}{% endfor %}');
-      {% endif %}
-    </script>
+<script>
+  {% if messages %}
+      {% for m in messages %}
+        alert('{{m}}');
+      {% endfor %}
+  {% endif %}
+</script>
+{% block script %}
 
+{% endblock %}
 
   </body>
 </html>
