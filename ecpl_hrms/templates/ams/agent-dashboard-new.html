@@ -42,6 +42,7 @@
                   {% if request.user.profile.emp_id in admin_list %}
                   {% include 'ams/admin_urls.html' %}
                   {% endif %}
+                  <li><a href="/ams/attendance-calendar"><i class="fa fa-calendar"></i> Attendance Calendar</a></li>
                   <li><a href="/ams/ams-apply_leave"><i class="fa fa-calendar-times"></i> Leaves</a></li>
                   <li><a href="/ams/ams-agent-settings"><i class="fa fa-gears"></i> Settings</a></li>
                 </ul>
@@ -84,27 +85,16 @@
 
         <!-- page content -->
         <div class="right_col" role="main">
-          <div class="row welcometop pb-3">
-            <div class="col-md-6">
+          <div class="row pb-3">
+            <div class="col-md-12">
               <div class="welcome">
                 <p>Welcome</p>
                 <h3>{{emp.emp_name}} <span></span></h3>
               </div>
-
-              <div class="row mt-3">
-                <div class="col-md-12">
-                  <div class="card">
-                    <div class="card-header">
-                      <h2>Month Calendar</h2>
-                    </div>
-                    <div class="card-body">
-                      <div class="monthly" id="mycalendar"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
+          </div>
 
+          <div class="row mt-3">
             <div class="col-md-6">
               <div class="row">
                 <div class="col-md-4">
@@ -164,7 +154,9 @@
                   </div>
                 </div>
               </div>
-              <div class="row mt-3">
+            </div>
+            <div class="col-md-6">
+              <div class="row">
                 <div class="col-md-12">
                   <div class="card">
                     <div class="card-header">
@@ -213,10 +205,7 @@
               </div>
 
             </div>
-
           </div>
-
-
 
         </div>
         <!-- /page content -->

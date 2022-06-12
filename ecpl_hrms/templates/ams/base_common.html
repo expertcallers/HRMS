@@ -67,7 +67,7 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
               <div class="profile_pic mb-2">
-                <img src="{{user.profile.img.url}}" alt="..." class="img-circle profile_img">
+                <img src="{{request.user.profile.img.url}}" alt="..." class="img-circle profile_img">
               </div>
                 <div class="profile_info">
                     <h2><i class="fa fa-user"></i><span>Name</span><br>{{request.user.profile.emp_name}}</h2>
@@ -84,7 +84,7 @@
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
               <div class="menu_section">
                 <ul class="nav side-menu">
-                  <li><a href="/ams/tl-dashboard"><i class="fa fa-home"></i> Dashboard</a></li>
+                  <li><a href="/ams/dashboard-redirect"><i class="fa fa-home"></i> Dashboard</a></li>
                   <li><a href="#" onclick="history.back();"><i class="fa fa-arrow-left"></i> Back</a></li>
                     <!--<li><a href="/ams/add-new-job"><i class="fa fa-check-square-o"></i> Job Requisition Form</a></li>-->
                 </ul>
@@ -113,7 +113,7 @@
               <ul class=" navbar-right">
                 <li class="nav-item dropdown open" style="padding-left: 15px;">
                   <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{{user.profile.img.url}}" alt="">{{request.user.profile.emp_name}}
+                    <img src="{{request.user.profile.img.url}}" alt="">{{request.user.profile.emp_name}}
                   </a>
                   <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item"  href="/ams/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
@@ -197,56 +197,59 @@
     </script>
     <!-- Custom Theme Scripts -->
     <script src="{% static 'assets/build/js/custom.min.js' %}"></script>
-          <script type="text/javascript">
-      $(document).ready(function() {
-          $('#datatablex').DataTable({
-            "bPaginate": true,
-            "bLengthChange": true,
-            "bFilter": true,
-            "bInfo": true,
-            "order": [[ 0, "desc" ]],
-              dom: 'lBfrtip',
-              buttons: [
-                    {
-                        extend: "copy",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                    {
-                        extend: "csv",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                    {
-                        extend: "excel",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                ],
-                responsive: true
-          } );
-      } );
-      $('#datatable').DataTable( {
-          responsive: true
-      } );
-      $('#datatable_two').DataTable( {
-          responsive: true
-      } );
-      $('#datatable_three').DataTable( {
-          responsive: true
-      } );
-    </script>
-    <script type="text/javascript">
-      $today = new Date();
-      $today = moment($today).format('YYYY-MM-DD');
-      $('#end_date').attr("max", $today);
-      $('#start_date').attr("max", $today);
-      function mydate(e) {
-        $start = $('#start_date').val();
-        $end = $('#end_date');
-        $end.attr("min", $start);
-      }
-    </script>
 
 
-          <script>
+    <script type="text/javascript" src="{% static 'assets/js/monthly.js' %}"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+      $('#datatablex').DataTable({
+        "bPaginate": true,
+        "bLengthChange": true,
+        "bFilter": true,
+        "bInfo": true,
+        "order": [[ 0, "desc" ]],
+          dom: 'lBfrtip',
+          buttons: [
+                {
+                    extend: "copy",
+                    className: "btn btn-success btn-sm ml-1"
+                },
+                {
+                    extend: "csv",
+                    className: "btn btn-success btn-sm ml-1"
+                },
+                {
+                    extend: "excel",
+                    className: "btn btn-success btn-sm ml-1"
+                },
+            ],
+            responsive: true
+      } );
+  } );
+  $('#datatable').DataTable( {
+      responsive: true
+  } );
+  $('#datatable_two').DataTable( {
+      responsive: true
+  } );
+  $('#datatable_three').DataTable( {
+      responsive: true
+  } );
+</script>
+<script type="text/javascript">
+  $today = new Date();
+  $today = moment($today).format('YYYY-MM-DD');
+  $('#end_date').attr("max", $today);
+  $('#start_date').attr("max", $today);
+  function mydate(e) {
+    $start = $('#start_date').val();
+    $end = $('#end_date');
+    $end.attr("min", $start);
+  }
+</script>
+
+
+<script>
   function confirmm(){
       var c = confirm("Are you sure you want to proceed?");
       if (c==true){
@@ -279,11 +282,13 @@
     }
 </script>
 
-          <script>
-              {% if messages %}
-              alert('{% for m in messages %}{{m}}{% endfor %}');
-              {% endif %}
-           </script>
+<script>
+  {% if messages %}
+      {% for m in messages %}
+        alert('{{m}}');
+      {% endfor %}
+  {% endif %}
+</script>
 {% block script %}
 
 {% endblock %}

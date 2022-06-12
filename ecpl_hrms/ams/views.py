@@ -53,8 +53,10 @@ def loginPage(request):  # Test1 Test2
     data = {'form': form}
     return render(request, 'ams/login.html', data)
 
+
 def view_403(request, exception=None):
     return redirect('/ams/')
+
 
 def loginAndRedirect(request):  # Test1 Test2
     for i in Designation.objects.filter(category='TL AM'):
@@ -170,29 +172,8 @@ def agentDashBoard(request):  # Test1 Test2
         # Leave status
         leave_hist = LeaveTable.objects.filter(Q(emp_id=emp_id), Q(leave_type__in=['SL', 'PL', 'ML'])).order_by(
             '-id')[:5]
-        # Month view
-        month_days = []
-        todays_date = date.today()
-        year = todays_date.year
-        month = todays_date.month
-        a, num_days = calendar.monthrange(year, month)
-        start_date = date(year, month, 1)
-        end_date = date(year, month, num_days)
-        delta = timedelta(days=1)
-        while start_date <= end_date:
-            month_days.append(start_date.strftime("%Y-%m-%d"))
-            start_date += delta
-        month_cal = []
-        for i in month_days:
-            dict = {}
-            try:
-                st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id)).att_actual
-            except EcplCalander.DoesNotExist:
-                st = 'Unmarked'
-            dict['dt'] = i
-            dict['st'] = st
-            month_cal.append(dict)
-        data = {'emp': emp, 'leave_hist': leave_hist, 'month_cal': month_cal, 'admin_list': admin_list}
+
+        data = {'emp': emp, 'leave_hist': leave_hist, 'admin_list': admin_list}
         return render(request, 'ams/agent-dashboard-new.html', data)
     else:
         return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
@@ -1528,6 +1509,35 @@ import csv
 
 
 @login_required
+def attendanceCalendar(request):
+    emp_id = request.user.profile.emp_id
+    # Month view
+    month_days = []
+    todays_date = date.today()
+    year = todays_date.year
+    month = todays_date.month
+    a, num_days = calendar.monthrange(year, month)
+    start_date = date(year, month, 1)
+    end_date = date(year, month, num_days)
+    delta = timedelta(days=1)
+    while start_date <= end_date:
+        month_days.append(start_date.strftime("%Y-%m-%d"))
+        start_date += delta
+    month_cal = []
+    for i in month_days:
+        dict = {}
+        try:
+            st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id)).att_actual
+        except EcplCalander.DoesNotExist:
+            st = 'Unmarked'
+        dict['dt'] = i
+        dict['st'] = st
+        month_cal.append(dict)
+    data = {'month_cal': month_cal}
+    return render(request, 'ams/attendance-calendar.html', data)
+
+
+@login_required
 def teamAttendanceReport(request):  # Test 1
     if request.method == 'POST':
         start_date = request.POST['start_date']
@@ -1781,6 +1791,15 @@ def applyLeave(request):  # Test1
                 leave_dates_list.append(i.start_date)
                 i.start_date += timedelta(days=1)
         new_leave_dates = []
+        check_start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        if check_start_date < date.today() - monthdelta.monthdelta(
+                1) or check_start_date > date.today() + monthdelta.monthdelta(1):
+            messages.error(request, "Correct the selected dates. "
+                                    "Selected dates must be between " + str(
+                datetime.strptime(str(date.today() - monthdelta.monthdelta(1)), '%Y-%m-%d').strftime(
+                    "%d %B, %Y")) + ' and ' + str(
+                datetime.strptime(str(date.today() + monthdelta.monthdelta(1)), '%Y-%m-%d').strftime("%d %B, %Y")))
+            return redirect('/ams/ams-apply_leave')
         list_start_date = datetime.strptime(start_date,
                                             '%Y-%m-%d').date()  # To Convert type of start_date from string to date
         list_end_date = datetime.strptime(end_date,
@@ -2361,9 +2380,9 @@ def AttendanceCorrectionSubmitAdmin(request):
     if emp_id in admin_list:
         if request.method == 'POST':
             type = request.POST['type']
-            cal_update =[]
-            cal_create =[]
-            att_create =[]
+            cal_update = []
+            cal_create = []
+            att_create = []
             if type == 'single':
                 id = request.POST['id']
                 new_att = request.POST['new_att']
@@ -2469,7 +2488,7 @@ def getMapping(request):
                 Q(emp_desi__in=hr_list) | Q(emp_desi__in=management_list) | Q(emp_desi__in=manager_list) | Q(
                     emp_desi__in=tl_am_list), Q(agent_status='Active')
             )
-            data = {'profile': profile, 'profiles': profiles, 'departments': departments, 'desi': desi, 'rms':rms}
+            data = {'profile': profile, 'profiles': profiles, 'departments': departments, 'desi': desi, 'rms': rms}
             return render(request, 'ams/admin_main/mapping-correction.html', data)
         else:
             profiles = Profile.objects.all()
