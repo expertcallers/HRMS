@@ -1,4 +1,5 @@
 import ast
+from ctypes.wintypes import PINT
 import json
 from datetime import datetime, date
 import monthdelta
@@ -46,6 +47,7 @@ admin_list = ['7875', '8082', '1732', '249', '7297', '5638']
 
 # Create your views here.
 def loginPage(request):  # Test1 Test2
+
     logout(request)
     form = AuthenticationForm()
     data = {'form': form}
@@ -2574,10 +2576,12 @@ def addAttendance(request):
 
 def autoApproveLeave(request):
     leaves = LeaveTable.objects.filter(Q(tl_approval=False) | Q(manager_approval=False), ~Q(status='Rejected'))
+
     leave_list = []
     ecpl_cal = []
     for i in leaves:
         profile = Profile.objects.get(emp_id=i.emp_id)
+
         start_date = i.start_date
         end_date = i.end_date
         current_date = datetime.now(pytz.timezone('Asia/Kolkata'))
@@ -2585,7 +2589,7 @@ def autoApproveLeave(request):
         applied_date = datetime.date(i.applied_date)
         current_date = datetime.date(current_date)
         days = (current_date - applied_date).days
-        if days > 2:
+        if days > 3:
             if i.escalation == True:
                 continue
             if i.tl_approval == False:
@@ -2627,10 +2631,10 @@ def autoApproveLeave(request):
                         )
                     start_date += timedelta(days=1)
 
-    LeaveTable.objects.bulk_update(leave_list, ['tl_approval', 'tl_status', 'tl_reason', 'manager_approval',
-                                                'manager_status', 'manager_reason', 'status'])
-    EcplCalander.objects.bulk_update(ecpl_cal, ['att_actual', 'approved_on', 'appoved_by', 'rm1', 'rm1_id', 'rm2',
-                                                'rm2_id', 'rm3', 'rm3_id'])
+    #LeaveTable.objects.bulk_update(leave_list, ['tl_approval', 'tl_status', 'tl_reason', 'manager_approval',
+    #                                            'manager_status', 'manager_reason', 'status'])
+    #EcplCalander.objects.bulk_update(ecpl_cal, ['att_actual', 'approved_on', 'appoved_by', 'rm1', 'rm1_id', 'rm2',
+    #                                            'rm2_id', 'rm3', 'rm3_id'])
     return redirect('/ams/')
 
 
