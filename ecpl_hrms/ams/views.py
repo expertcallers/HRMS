@@ -2593,14 +2593,12 @@ def addAttendance(request):
     return redirect('/ams/')
 
 
-def autoApproveLeave(request):
-    leaves = LeaveTable.objects.filter(Q(tl_approval=False) | Q(manager_approval=False), ~Q(status='Rejected'))
-
+def autoApproveLeave(request):  # Test 1, 2
+    leaves = LeaveTable.objects.filter(Q(tl_approval=False) | Q(manager_approval=False))
     leave_list = []
     ecpl_cal = []
     for i in leaves:
         profile = Profile.objects.get(emp_id=i.emp_id)
-
         start_date = i.start_date
         end_date = i.end_date
         current_date = datetime.now(pytz.timezone('Asia/Kolkata'))
@@ -2608,52 +2606,61 @@ def autoApproveLeave(request):
         applied_date = datetime.date(i.applied_date)
         current_date = datetime.date(current_date)
         days = (current_date - applied_date).days
-        if days > 3:
-            if i.escalation == True:
-                continue
+        # Update or Create calander for Leaves
+        def updateOrCreateCalander(start_date,end_date):            
+            while start_date <= end_date:
+                try:
+                    j = EcplCalander.objects.get(emp_id=i.emp_id, date=start_date)
+                    j.att_actual = i.leave_type
+                    j.approved_on = datetime.now()
+                    j.appoved_by = "Auto Approved"
+                    j.rm1 = profile.emp_rm1
+                    j.rm1_id = profile.emp_rm1_id
+                    j.rm2 = profile.emp_rm2
+                    j.rm2_id = profile.emp_rm2_id
+                    j.rm3 = profile.emp_rm3
+                    j.rm3_id = profile.emp_rm3_id
+                    ecpl_cal.append(j)
+                except EcplCalander.DoesNotExist:
+                    EcplCalander.objects.create(
+                        emp_id=profile.emp_id, date=start_date, att_actual=i.leave_type,
+                        approved_on=datetime.now(), appoved_by="Auto Approved", rm1=profile.emp_rm1,
+                        rm1_id=profile.emp_rm1_id, rm2=profile.emp_rm2, rm2_id=profile.emp_rm2_id,
+                        rm3=profile.emp_rm3, rm3_id=profile.emp_rm3_id, emp_desi=profile.emp_desi,
+                        team=profile.emp_process, team_id=profile.emp_process_id, emp_name=profile.emp_name
+                    )
+                start_date += timedelta(days=1)
+
+        if i.escalation == False and days > 3:
             if i.tl_approval == False:
                 i.tl_approval = True
-                i.tl_status = "Auto Approved"
+                i.tl_status = "Auto Approved" 
                 i.tl_reason = "Auto Approved"
-            if i.tl_status == "Rejected":
-                i.manager_status = "Auto Rejected"
-                i.manager_reason = "Auto Rejected"
-                i.status = "Auto Rejected"
-                i.manager_approval = True
-                leave_list.append(i)
-            else:
-                i.manager_status = "Auto Approved"
+                i.manager_status = "Auto Approved" 
                 i.manager_reason = "Auto Approved"
                 i.status = "Auto Approved"
                 i.manager_approval = True
                 leave_list.append(i)
-                while start_date <= end_date:
-                    try:
-                        j = EcplCalander.objects.get(emp_id=i.emp_id, date=start_date)
-                        j.att_actual = i.leave_type
-                        j.approved_on = datetime.now()
-                        j.appoved_by = "Auto Approved"
-                        j.rm1 = profile.emp_rm1
-                        j.rm1_id = profile.emp_rm1_id
-                        j.rm2 = profile.emp_rm2
-                        j.rm2_id = profile.emp_rm2_id
-                        j.rm3 = profile.emp_rm3
-                        j.rm3_id = profile.emp_rm3_id
-                        ecpl_cal.append(j)
-                    except EcplCalander.DoesNotExist:
-                        EcplCalander.objects.create(
-                            emp_id=profile.emp_id, date=start_date, att_actual=i.leave_type,
-                            approved_on=datetime.now(), appoved_by="Auto Approved", rm1=profile.emp_rm1,
-                            rm1_id=profile.emp_rm1_id, rm2=profile.emp_rm2, rm2_id=profile.emp_rm2_id,
-                            rm3=profile.emp_rm3, rm3_id=profile.emp_rm3_id, emp_desi=profile.emp_desi,
-                            team=profile.emp_process, team_id=profile.emp_process_id, emp_name=profile.emp_name
-                        )
-                    start_date += timedelta(days=1)
+                updateOrCreateCalander(start_date,end_date)
+            else:                
+                if i.tl_status == "Rejected":
+                    i.manager_status = "Auto Rejected"
+                    i.manager_reason = "Rejected by TL"
+                    i.status = "Rejected"
+                    i.manager_approval = True
+                    leave_list.append(i)
+                else:    
+                    i.manager_status = "Auto Approved" 
+                    i.manager_reason = "Auto Approved"
+                    i.status = "Auto Approved"
+                    i.manager_approval = True
+                    leave_list.append(i)  
+                    updateOrCreateCalander(start_date,end_date)          
 
-    #LeaveTable.objects.bulk_update(leave_list, ['tl_approval', 'tl_status', 'tl_reason', 'manager_approval',
-    #                                            'manager_status', 'manager_reason', 'status'])
-    #EcplCalander.objects.bulk_update(ecpl_cal, ['att_actual', 'approved_on', 'appoved_by', 'rm1', 'rm1_id', 'rm2',
-    #                                            'rm2_id', 'rm3', 'rm3_id'])
+    LeaveTable.objects.bulk_update(leave_list, ['tl_approval', 'tl_status', 'tl_reason', 'manager_approval',
+                                                'manager_status', 'manager_reason', 'status'])
+    EcplCalander.objects.bulk_update(ecpl_cal, ['att_actual', 'approved_on', 'appoved_by', 'rm1', 'rm1_id', 'rm2',
+                                               'rm2_id', 'rm3', 'rm3_id'])
     return redirect('/ams/')
 
 
