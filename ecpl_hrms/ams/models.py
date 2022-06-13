@@ -245,3 +245,9 @@ class Designation(models.Model):
     name = models.CharField(max_length=200)
     category = models.CharField(max_length=200, null=True, blank=True)
     created_by = models.CharField(max_length=200, default="CC Team")
+
+
+class NoticeECPL(models.Model):
+    note = models.TextField()
+    def __str__(self):
+        return str(self.id) +' - '+ self.note

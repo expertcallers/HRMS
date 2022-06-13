@@ -47,10 +47,10 @@ admin_list = ['7875', '8082', '1732', '249', '7297', '5638']
 
 # Create your views here.
 def loginPage(request):  # Test1 Test2
-
     logout(request)
+    notice = NoticeECPL.objects.all()
     form = AuthenticationForm()
-    data = {'form': form}
+    data = {'form': form, 'notice': notice}
     return render(request, 'ams/login.html', data)
 
 
@@ -1200,9 +1200,10 @@ def teamAttendance(request):  # Team Attendance Page # Test1
         dby_dict['emp_id'] = i.emp_id
         dby_dict['att_actual'] = i.att_actual
         dby_dict_list.append(dby_dict)
-
     emp = Profile.objects.get(emp_id=user_empid)
-    data = {'todays_att': todays_dict_list, 'ystdays_att': ystday_dict_list, 'dbys_att': dby_dict_list, 'emp': emp}
+    data = {'todays_att': todays_dict_list, 'ystdays_att': ystday_dict_list, 'dbys_att': dby_dict_list, 'emp': emp,
+            'today': calendar.day_name[today.weekday()], 'yesterday': calendar.day_name[yesterday.weekday()],
+            'dby_date': calendar.day_name[dby_date.weekday()]}
     return render(request, 'ams/team_attendance.html', data)
 
 
@@ -1260,7 +1261,7 @@ def applyAttendace(request):  # Test1
             usr.agent_status = att_actual
             usr.save()
             cal = []
-            for i in EcplCalander.objects.filter(emp_id=emp_id, date__gt=date.today()):
+            for i in EcplCalander.objects.filter(emp_id=emp_id, date__gt=ddate):
                 if i.att_actual == 'Unmarked':
                     i.att_actual = ''
                     cal.append(i)
@@ -1275,6 +1276,12 @@ def applyAttendace(request):  # Test1
                 usr = Profile.objects.get(emp_id=emp_id)
                 usr.agent_status = att_actual
                 usr.save()
+                cal = []
+                for i in EcplCalander.objects.filter(emp_id=emp_id, date__gt=ddate):
+                    if i.att_actual == 'Unmarked':
+                        i.att_actual = ''
+                        cal.append(i)
+                EcplCalander.objects.bulk_update(cal, ['att_actual'])
 
         # Sandwich policy Calculation
 
@@ -2665,7 +2672,7 @@ def autoApproveLeave(request):  # Test 1, 2
 
 
 def addLeaveBalance(request, a):
-    if a == "3cpl@2022#":
+    if a == "3cpl@2022$":
         emp = EmployeeLeaveBalance.objects.all()
         e = date.today()
         month = e.month
