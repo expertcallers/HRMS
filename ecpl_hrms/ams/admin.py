@@ -65,6 +65,7 @@ class OnboardingnewHRCResourse(resources.ModelResource):
 class OnboardingnewHRCSearch(ImportExportModelAdmin):
     search_fields = ('emp_name','emp_id','emp_aadhar','emp_phone')
     list_display = ('emp_name','emp_id','emp_desig','emp_aadhar','emp_phone','hr_name')
+    list_filter = ('user_created',)
     resource_class = OnboardingnewHRCResourse
 
 class LeaveSearchResource(resources.ModelResource):

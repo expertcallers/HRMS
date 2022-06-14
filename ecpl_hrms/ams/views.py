@@ -1284,10 +1284,10 @@ def applyAttendace(request):  # Test1
             usr.agent_status = att_actual
             usr.save()
             cal = []
-            for i in EcplCalander.objects.filter(emp_id=emp_id, date__gt=ddate):
-                if i.att_actual == 'Unmarked':
-                    i.att_actual = att_actual
-                    cal.append(i)
+            for i in EcplCalander.objects.filter(emp_id=emp_id, date__gt=ddate).exclude(
+                    att_actual__in=['PL', 'SL', 'ML']):
+                i.att_actual = att_actual
+                cal.append(i)
             EcplCalander.objects.bulk_update(cal, ['att_actual'])
         if att_actual == 'NCNS':
             today = date.today()
@@ -1300,10 +1300,10 @@ def applyAttendace(request):  # Test1
                 usr.agent_status = att_actual
                 usr.save()
                 cal = []
-                for i in EcplCalander.objects.filter(emp_id=emp_id, date__gt=ddate):
-                    if i.att_actual == 'Unmarked':
-                        i.att_actual = att_actual
-                        cal.append(i)
+                for i in EcplCalander.objects.filter(emp_id=emp_id, date__gt=ddate).exclude(
+                        att_actual__in=['PL', 'SL', 'ML']):
+                    i.att_actual = att_actual
+                    cal.append(i)
                 EcplCalander.objects.bulk_update(cal, ['att_actual'])
 
         # Sandwich policy Calculation
@@ -2059,6 +2059,33 @@ def editAgentStatus(request):  # Test1
                     i.att_actual = 'Unmarked'
                     cal_list.append(i)
             EcplCalander.objects.bulk_update(cal_list, ['att_actual'])
+
+        if agent_status == 'Attrition':
+            cal_list = []
+            cal = EcplCalander.objects.filter(emp_id=profile.emp_id, date__gte=effective)
+            for i in cal:
+                if i.att_actual != "PL" or i.att_actual != "SL":
+                    i.att_actual = 'Attrition'
+                    cal_list.append(i)
+            EcplCalander.objects.bulk_update(cal_list, ['att_actual'])
+
+        if agent_status == 'Bench':
+            cal_list = []
+            cal = EcplCalander.objects.filter(emp_id=profile.emp_id, date__gte=effective)
+            for i in cal:
+                if i.att_actual != "PL" or i.att_actual != "SL":
+                    i.att_actual = 'Bench'
+                    cal_list.append(i)
+            EcplCalander.objects.bulk_update(cal_list, ['att_actual'])
+
+        if agent_status == 'NCNS':
+            cal_list = []
+            cal = EcplCalander.objects.filter(emp_id=profile.emp_id, date__gte=effective)
+            for i in cal:
+                if i.att_actual != "PL" or i.att_actual != "SL":
+                    i.att_actual = 'NCNS'
+                    cal_list.append(i)
+            EcplCalander.objects.bulk_update(cal_list, ['att_actual'])
         return redirect('/ams/viewusers')
     else:
         return HttpResponse('<h1>Not Get Method</h1>')
@@ -2170,10 +2197,9 @@ def approveAttendanceRequest(request):  # test1
                 usr.agent_status = att_actual
                 usr.save()
                 calendar = []
-                for i in EcplCalander.objects.filter(emp_id=cal.emp_id, date__gt=cal.date):
-                    if i.att_actual == 'Unmarked':
-                        i.att_actual = att_actual
-                        cal.append(i)
+                for i in EcplCalander.objects.filter(emp_id=cal.emp_id, date__gt=cal.date).exclude(att_actual__in=['PL', 'SL', 'ML']):
+                    i.att_actual = att_actual
+                    calendar.append(i)
                 EcplCalander.objects.bulk_update(calendar, ['att_actual'])
             if att_actual == 'NCNS':
                 today = cal.date
@@ -2189,10 +2215,9 @@ def approveAttendanceRequest(request):  # test1
                     usr.agent_status = att_actual
                     usr.save()
                     calendar = []
-                    for i in EcplCalander.objects.filter(emp_id=cal.emp_id, date__gt=cal.date):
-                        if i.att_actual == 'Unmarked':
-                            i.att_actual = att_actual
-                            cal.append(i)
+                    for i in EcplCalander.objects.filter(emp_id=cal.emp_id, date__gt=cal.date).exclude(att_actual__in=['PL', 'SL', 'ML']):
+                        i.att_actual = att_actual
+                        calendar.append(i)
                     EcplCalander.objects.bulk_update(calendar, ['att_actual'])
             if old_att == 'PL':
                 leave = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
