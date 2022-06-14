@@ -2169,6 +2169,12 @@ def approveAttendanceRequest(request):  # test1
                 usr = Profile.objects.get(emp_id=cal.emp_id)
                 usr.agent_status = att_actual
                 usr.save()
+                calendar = []
+                for i in EcplCalander.objects.filter(emp_id=cal.emp_id, date__gt=cal.date):
+                    if i.att_actual == 'Unmarked':
+                        i.att_actual = att_actual
+                        cal.append(i)
+                EcplCalander.objects.bulk_update(calendar, ['att_actual'])
             if att_actual == 'NCNS':
                 today = cal.date
                 yesterday = today - timedelta(days=1)
@@ -2182,6 +2188,12 @@ def approveAttendanceRequest(request):  # test1
                     usr = Profile.objects.get(emp_id=cal.emp_id)
                     usr.agent_status = att_actual
                     usr.save()
+                    calendar = []
+                    for i in EcplCalander.objects.filter(emp_id=cal.emp_id, date__gt=cal.date):
+                        if i.att_actual == 'Unmarked':
+                            i.att_actual = att_actual
+                            cal.append(i)
+                    EcplCalander.objects.bulk_update(calendar, ['att_actual'])
             if old_att == 'PL':
                 leave = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
                 leave.pl_balance += 1
