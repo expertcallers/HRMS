@@ -188,7 +188,7 @@ def tlDashboard(request):  # Test1 Test2
         prof = Profile.objects.get(emp_id=emp_id)
         # All Employees
         all_emp = Profile.objects.filter(Q(agent_status='Active'),
-                                         Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
+             Q(emp_id=emp_id) | Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
         # All Active Today
         today = date.today()
 
@@ -311,8 +311,10 @@ def managerDashboard(request):  # Test1 Test2
 
     if request.user.profile.emp_desi in management_list and request.user.profile.emp_desi in manager_list:
         # All Employees
+        # All Employees
         all_emps = Profile.objects.filter(Q(agent_status='Active'),
-                                          Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id))
+                                         Q(emp_id=emp_id) | Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(
+                                             emp_rm3_id=emp_id)).distinct()
         all_emps_under = []
         for i in all_emps:
             if i not in all_emps_under:
@@ -345,8 +347,10 @@ def managerDashboard(request):  # Test1 Test2
         all_ams_count = len(all_ams_under)
     elif request.user.profile.emp_desi in manager_list:
         # All Employees
+        # All Employees
         all_emps = Profile.objects.filter(Q(agent_status='Active'),
-                                          Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
+                                         Q(emp_id=emp_id) | Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(
+                                             emp_rm3_id=emp_id)).distinct()
         all_emps_under = []
         for i in all_emps:
             if i not in all_emps_under:
@@ -1419,7 +1423,7 @@ def viewTeamAttendance(request):  # Test1
         if emp_id == 'All':
             if request.user.profile.emp_desi in management_list:
                 all_emp = Profile.objects.filter(Q(emp_rm1_id=rm) | Q(emp_rm2_id=rm) | Q(emp_rm3_id=rm))
-                emp_id_lst = []
+                emp_id_lst = [rm]
                 for i in all_emp:
                     if i.emp_id not in emp_id_lst:
                         emp_id_lst.append(i.emp_id)
@@ -1451,7 +1455,7 @@ def viewTeamAttendance(request):  # Test1
                 writer = csv.writer(response)
                 writer.writerow(
                     ['Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'])
-                calanders = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),
+                calanders = EcplCalander.objects.filter(Q(emp_id=rm) | Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),
                                                         date__range=[start_date, end_date]).values_list(
                     'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team')
                 for c in calanders:
@@ -2347,7 +2351,8 @@ def onboardingBulkUpload(request):
 @login_required
 def AttendanceReportAdmin(request):
     emp_id = request.user.profile.emp_id
-    if emp_id in admin_list:
+    emp_desi = request.user.profile.emp_desi
+    if emp_id in admin_list or emp_desi in hr_list:
         if request.method == 'POST':
             emp_id = request.POST['emp_id']
             start = request.POST['start']

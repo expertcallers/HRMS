@@ -29,7 +29,7 @@
                       <div class="col-md-4">
                         <div class="form-group">
                           <label for="start">Select Start Date</label>
-                          <input type="date" name="start" id="start" class="form-control" required>
+                          <input type="date" name="start" id="start" onchange="mydate(this);" class="form-control" required>
                         </div>
                       </div>
                       <div class="col-md-4">
@@ -39,7 +39,7 @@
                         </div>
                       </div>
                       <div class="col-md-12" align="center">
-                        <button type="submit" class="form-control mt-4 btn btn-success btn-lg" onclick="return confirmm();">Submit</button>
+                        <button type="submit" class="form-control mt-4 btn btn-success btn-lg">Submit</button>
                       </div>
                     </div>
                   </form>
@@ -110,3 +110,16 @@
 
 
   {% endblock %}
+{% block script %}
+<script>
+  $today = new Date();
+  $today = moment($today).format('YYYY-MM-DD');
+  $('#end').attr("max", $today);
+  $('#start').attr("max", $today);
+  function mydate(e) {
+    $start = $('#start').val();
+    $end = $('#end');
+    $end.attr("min", $start);
+  }
+</script>
+{% endblock %}
