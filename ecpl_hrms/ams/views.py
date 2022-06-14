@@ -2548,31 +2548,25 @@ def changeMapping(request):
         return redirect('/ams/')
 
 
-def addAttendance(request):
+def addAttendance(request): # Test 1,2
     mydate = date.today()
     month = mydate.month
     year = mydate.year
-
     start_date = date(year, month, 1)
     start_date += monthdelta.monthdelta(1)
     last = start_date + monthdelta.monthdelta(1)
     last_date = last - timedelta(days=1)
     delta = last_date - start_date
     date_list = []
-
     for i in range(delta.days + 1):
         day = start_date + timedelta(days=i)
         date_list.append(day)
-
     for i in date_list:
-
         cal_obj = EcplCalander.objects.filter(date=i)
         emp_ids = []
         for k in cal_obj:
             emp_ids.append(k.emp_id)
-
         profile = Profile.objects.exclude(Q(emp_id__in=emp_ids) | Q(agent_status='Attrition'))
-
         cal = []
         for j in profile:
             employees = EcplCalander()
@@ -2596,9 +2590,7 @@ def addAttendance(request):
             employees.rm3_id = j.emp_rm3_id
             cal.append(employees)
         EcplCalander.objects.bulk_create(cal)
-
     return redirect('/ams/')
-
 
 def autoApproveLeave(request):  # Test 1, 2
     leaves = LeaveTable.objects.filter(Q(tl_approval=False) | Q(manager_approval=False))
@@ -2638,7 +2630,7 @@ def autoApproveLeave(request):  # Test 1, 2
                     )
                 start_date += timedelta(days=1)
 
-        if i.escalation == False and days > 3:
+        if i.escalation == False and days > 2:
             if i.tl_approval == False:
                 i.tl_approval = True
                 i.tl_status = "Auto Approved" 
@@ -2690,7 +2682,7 @@ def addLeaveBalance(request, a):
             total_bal = i.pl_balance + i.sl_balance
             for j in ecpl_cal:
                 if j.emp_id == i.emp_id:
-                    if j.att_actual == "present" or j.att_actual == "Week OFF" or j.att_actual == "Comp OFF" or j.att_actual == "Client OFF" or j.att_actual == 'PL' or j.att_actual == 'SL' or j.att_actual == 'Training':
+                    if j.att_actual == "present" or j.att_actual == "Week OFF" or j.att_actual == "Comp OFF" or j.att_actual == "Client OFF" or j.att_actual == 'PL' or j.att_actual == 'SL' or j.att_actual == 'ML' or j.att_actual == 'Training':
                         cal += 1
                     elif j.att_actual == 'Half Day':
                         cal += 0.5
@@ -2726,12 +2718,6 @@ def addLeaveBalance(request, a):
     else:
         messages.success(request, "Unauthorized Access")
         return redirect('/ams/')
-
-
-# def calculatea(start, emp_id):
-#     cal = EcplCalander.objects.get(Q(date=start), Q(emp_id=emp_id)).att_actual
-#     return cal
-
 
 def sandwichPolicy(request):
     return redirect('/ams/')
