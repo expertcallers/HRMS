@@ -1619,6 +1619,11 @@ def rmSettings(request):  # Test1
     data = {'emp': emp, 'form': form}
     return render(request, 'ams/rm-settings.html', data)
 
+def FAQ(request):
+    faqs = FaqHRMS.objects.all()
+    first = FaqHRMS.objects.first()
+    data = {'faqs': faqs, 'first':first.id}
+    return render(request, 'ams/faqs.html', data)
 
 @login_required
 def uploadImageToDB(request):  # Test1

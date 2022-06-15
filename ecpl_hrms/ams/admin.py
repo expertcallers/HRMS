@@ -112,5 +112,6 @@ admin.site.register(AttendanceCorrectionHistory, AttendanceCorrectionHistorySear
 admin.site.register(MappingTickets, MappingSearch)
 admin.site.register(LastEmpId)
 admin.site.register(NoticeECPL)
+admin.site.register(FaqHRMS)
 admin.site.register(Designation, DesignationSearch)
 

@@ -26,6 +26,7 @@ urlpatterns = [
     path('upload-image', uploadImageToDB),
     path('ams-agent-settings', agentSettings),
     path('rm-settings', rmSettings),
+    path('faqs', FAQ),
     path('edit-employee-profile-status', editAgentStatus),
 
     # Dashboard Redirect

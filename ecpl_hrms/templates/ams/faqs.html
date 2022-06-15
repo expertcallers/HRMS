@@ -35,51 +35,52 @@
           from {transform : scale(1);}
           to {transform : scale(1.2);}
         }
+        .auth .auth_right {
+            width: 100%;
+            text-align: left;
+        }
+        .auth, .auth .auth_right.full_img {
+            height: unset;
+        }
+        .btn-style {
+            color: #fff;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        .card-header-style {
+            background:#1abb9c;+
+        }
+        .card-header-style:hover {
+            cursor: pointer;
+        }
     </style>
 
 <script src="https://kit.fontawesome.com/4a95aa7adc.js" crossorigin="anonymous"></script>
 
 </head>
-<body class="font-montserrat">
+<body class="font-montserrat" style="padding: 50px;">
 
 <div class="auth">
-    <div class="auth_left">
-        <div class="card">
-            <div class="text-center mb-2">
-                <img src="{% static 'assets/images/ecpl-logo-new.png' %}" alt="">
-                <p style="color: #1c7ba8;font-weight: 600;">Attendance Management System</p>
-            </div>
-            <form action="/ams/login" method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="card-body">
-                    <div>
-                        {{form|crispy}}
-                    </div>
-
-                    <div class="form-footer">
-                        <button class="btn btn-primary btn-block">Sign In</button>
-                    </div>
-                </div>
-            </form>
-            <div class="text-center text-muted">
-                 Have Questions? Check out our <a href="/ams/faqs" target="_blank">FAQs</a>
-                <div>
-
-                </div>
-            </div>
-        </div>        
-    </div>
-    <div class="auth_right full_img" style="padding-left: 280px; padding-top: 50px; padding-right: 120px;">
+    <div class="auth_right full_img">
         <div class="row">
             <div class="col-md-12">
-                {% if notice %}
-                <h2 style="color: red;" class="flash">** Important Notice **</h2>
-                <ol>
-                    {% for i in notice %}
-                    <h5 align="left"><li>{{i.note|safe}}</li></h5>
-                    {% endfor %}
-                </ol>
-                {% endif %}
+                <div class="accordion" id="accordionFaqs">
+                  {% for i in faqs %}
+                  <div class="card">
+                    <div class="card-header card-header-style" id="heading{{i.id}}" data-toggle="collapse" data-target="#collapse{{i.id}}" aria-expanded="true" aria-controls="collapse{{i.id}}">
+                      <h2 class="mb-0 p-1 btn-style">
+                            {{i.question}}
+                      </h2>
+                    </div>
+
+                    <div id="collapse{{i.id}}" class="collapse  {% if first == i.id %}show{% endif %}" aria-labelledby="heading{{i.id}}" data-parent="#accordionFaqs">
+                      <div class="card-body">
+                        {{i.answer|safe}}
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
             </div>
         </div>
     </div>

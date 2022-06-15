@@ -251,3 +251,9 @@ class NoticeECPL(models.Model):
     note = models.TextField()
     def __str__(self):
         return str(self.id) +' - '+ self.note
+
+class FaqHRMS(models.Model):
+    question = models.TextField()
+    answer = models.TextField()
+    def __str__(self):
+        return self.question
