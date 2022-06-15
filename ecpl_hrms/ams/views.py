@@ -2521,6 +2521,7 @@ def AttendanceCorrectionSubmitAdmin(request):
                                     rm1_id=emp.emp_rm1_id, rm2_id=emp.emp_rm2_id, rm3_id=emp.emp_rm3_id,
                                     team_id=emp.emp_process_id
                                 )
+                                cal.save()
                             else:
                                 cal = EcplCalander(
                                     emp_id=j, date=i, team=emp.emp_process, emp_name=emp.emp_name,
@@ -2529,7 +2530,7 @@ def AttendanceCorrectionSubmitAdmin(request):
                                     rm1_id=emp.emp_rm1_id, rm2_id=emp.emp_rm2_id, rm3_id=emp.emp_rm3_id,
                                     team_id=emp.emp_process_id
                                 )
-
+                                cal.save()
                             att_his = AttendanceCorrectionHistory(
                                 applied_by=emp_name, applied_by_id=emp_id, applied_date=date.today(),
                                 date_for=cal.date, att_old=None, att_new=new_att,
@@ -2538,7 +2539,6 @@ def AttendanceCorrectionSubmitAdmin(request):
                                 om_response="Approved", comments="Approved by CCTeam", reason="Approved by CCTeam"
                             )
                             att_create.append(att_his)
-                            cal_create.append(cal)
             EcplCalander.objects.bulk_create(cal_create)
             EcplCalander.objects.bulk_update(cal_update, ['att_actual', 'approved_on', 'appoved_by'])
             AttendanceCorrectionHistory.objects.bulk_create(att_create)
