@@ -1621,8 +1621,11 @@ def rmSettings(request):  # Test1
 
 def FAQ(request):
     faqs = FaqHRMS.objects.all()
-    first = FaqHRMS.objects.first()
-    data = {'faqs': faqs, 'first':first.id}
+    try:
+        first = FaqHRMS.objects.first().id
+    except:
+        first = 0
+    data = {'faqs': faqs, 'first':first}
     return render(request, 'ams/faqs.html', data)
 
 @login_required
