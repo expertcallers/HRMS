@@ -1284,10 +1284,10 @@ def applyAttendace(request):  # Test1
             usr.agent_status = att_actual
             usr.save()
             cal = []
-            for i in EcplCalander.objects.filter(emp_id=emp_id, date__gt=ddate):
-                if i.att_actual == 'Unmarked':
-                    i.att_actual = att_actual
-                    cal.append(i)
+            for i in EcplCalander.objects.filter(emp_id=emp_id, date__gt=ddate).exclude(
+                    att_actual__in=['PL', 'SL', 'ML']):
+                i.att_actual = att_actual
+                cal.append(i)
             EcplCalander.objects.bulk_update(cal, ['att_actual'])
         if att_actual == 'NCNS':
             today = date.today()
@@ -1300,10 +1300,10 @@ def applyAttendace(request):  # Test1
                 usr.agent_status = att_actual
                 usr.save()
                 cal = []
-                for i in EcplCalander.objects.filter(emp_id=emp_id, date__gt=ddate):
-                    if i.att_actual == 'Unmarked':
-                        i.att_actual = att_actual
-                        cal.append(i)
+                for i in EcplCalander.objects.filter(emp_id=emp_id, date__gt=ddate).exclude(
+                        att_actual__in=['PL', 'SL', 'ML']):
+                    i.att_actual = att_actual
+                    cal.append(i)
                 EcplCalander.objects.bulk_update(cal, ['att_actual'])
 
         # Sandwich policy Calculation
@@ -1619,6 +1619,14 @@ def rmSettings(request):  # Test1
     data = {'emp': emp, 'form': form}
     return render(request, 'ams/rm-settings.html', data)
 
+def FAQ(request):
+    faqs = FaqHRMS.objects.all()
+    try:
+        first = FaqHRMS.objects.first().id
+    except:
+        first = 0
+    data = {'faqs': faqs, 'first':first}
+    return render(request, 'ams/faqs.html', data)
 
 @login_required
 def uploadImageToDB(request):  # Test1
@@ -2059,6 +2067,33 @@ def editAgentStatus(request):  # Test1
                     i.att_actual = 'Unmarked'
                     cal_list.append(i)
             EcplCalander.objects.bulk_update(cal_list, ['att_actual'])
+
+        if agent_status == 'Attrition':
+            cal_list = []
+            cal = EcplCalander.objects.filter(emp_id=profile.emp_id, date__gte=effective)
+            for i in cal:
+                if i.att_actual != "PL" or i.att_actual != "SL":
+                    i.att_actual = 'Attrition'
+                    cal_list.append(i)
+            EcplCalander.objects.bulk_update(cal_list, ['att_actual'])
+
+        if agent_status == 'Bench':
+            cal_list = []
+            cal = EcplCalander.objects.filter(emp_id=profile.emp_id, date__gte=effective)
+            for i in cal:
+                if i.att_actual != "PL" or i.att_actual != "SL":
+                    i.att_actual = 'Bench'
+                    cal_list.append(i)
+            EcplCalander.objects.bulk_update(cal_list, ['att_actual'])
+
+        if agent_status == 'NCNS':
+            cal_list = []
+            cal = EcplCalander.objects.filter(emp_id=profile.emp_id, date__gte=effective)
+            for i in cal:
+                if i.att_actual != "PL" or i.att_actual != "SL":
+                    i.att_actual = 'NCNS'
+                    cal_list.append(i)
+            EcplCalander.objects.bulk_update(cal_list, ['att_actual'])
         return redirect('/ams/viewusers')
     else:
         return HttpResponse('<h1>Not Get Method</h1>')
@@ -2170,10 +2205,9 @@ def approveAttendanceRequest(request):  # test1
                 usr.agent_status = att_actual
                 usr.save()
                 calendar = []
-                for i in EcplCalander.objects.filter(emp_id=cal.emp_id, date__gt=cal.date):
-                    if i.att_actual == 'Unmarked':
-                        i.att_actual = att_actual
-                        cal.append(i)
+                for i in EcplCalander.objects.filter(emp_id=cal.emp_id, date__gt=cal.date).exclude(att_actual__in=['PL', 'SL', 'ML']):
+                    i.att_actual = att_actual
+                    calendar.append(i)
                 EcplCalander.objects.bulk_update(calendar, ['att_actual'])
             if att_actual == 'NCNS':
                 today = cal.date
@@ -2189,10 +2223,9 @@ def approveAttendanceRequest(request):  # test1
                     usr.agent_status = att_actual
                     usr.save()
                     calendar = []
-                    for i in EcplCalander.objects.filter(emp_id=cal.emp_id, date__gt=cal.date):
-                        if i.att_actual == 'Unmarked':
-                            i.att_actual = att_actual
-                            cal.append(i)
+                    for i in EcplCalander.objects.filter(emp_id=cal.emp_id, date__gt=cal.date).exclude(att_actual__in=['PL', 'SL', 'ML']):
+                        i.att_actual = att_actual
+                        calendar.append(i)
                     EcplCalander.objects.bulk_update(calendar, ['att_actual'])
             if old_att == 'PL':
                 leave = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
@@ -2491,6 +2524,7 @@ def AttendanceCorrectionSubmitAdmin(request):
                                     rm1_id=emp.emp_rm1_id, rm2_id=emp.emp_rm2_id, rm3_id=emp.emp_rm3_id,
                                     team_id=emp.emp_process_id
                                 )
+                                cal.save()
                             else:
                                 cal = EcplCalander(
                                     emp_id=j, date=i, team=emp.emp_process, emp_name=emp.emp_name,
@@ -2499,7 +2533,7 @@ def AttendanceCorrectionSubmitAdmin(request):
                                     rm1_id=emp.emp_rm1_id, rm2_id=emp.emp_rm2_id, rm3_id=emp.emp_rm3_id,
                                     team_id=emp.emp_process_id
                                 )
-
+                                cal.save()
                             att_his = AttendanceCorrectionHistory(
                                 applied_by=emp_name, applied_by_id=emp_id, applied_date=date.today(),
                                 date_for=cal.date, att_old=None, att_new=new_att,
@@ -2508,7 +2542,6 @@ def AttendanceCorrectionSubmitAdmin(request):
                                 om_response="Approved", comments="Approved by CCTeam", reason="Approved by CCTeam"
                             )
                             att_create.append(att_his)
-                            cal_create.append(cal)
             EcplCalander.objects.bulk_create(cal_create)
             EcplCalander.objects.bulk_update(cal_update, ['att_actual', 'approved_on', 'appoved_by'])
             AttendanceCorrectionHistory.objects.bulk_create(att_create)
