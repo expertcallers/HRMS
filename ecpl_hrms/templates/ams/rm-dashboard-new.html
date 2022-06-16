@@ -108,7 +108,7 @@
                         <select id="emp_name" name="emp_id" class="form-control select2" required>
                           <option value="All">All</option>
                           {% for i in all_emp %}
-                          <option value="{{i.emp_id}}">{{i.emp_name}}</option>
+                          <option value="{{i.emp_id}}">{{i.emp_name}} ({{i.emp_id}})</option>
                           {% endfor %}
                         </select>
                       </div>

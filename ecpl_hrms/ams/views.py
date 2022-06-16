@@ -188,7 +188,7 @@ def tlDashboard(request):  # Test1 Test2
         prof = Profile.objects.get(emp_id=emp_id)
         # All Employees
         all_emp = Profile.objects.filter(Q(agent_status='Active'),
-                                         Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
+             Q(emp_id=emp_id) | Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
         # All Active Today
         today = date.today()
 
@@ -311,8 +311,10 @@ def managerDashboard(request):  # Test1 Test2
 
     if request.user.profile.emp_desi in management_list and request.user.profile.emp_desi in manager_list:
         # All Employees
+        # All Employees
         all_emps = Profile.objects.filter(Q(agent_status='Active'),
-                                          Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id))
+                                         Q(emp_id=emp_id) | Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(
+                                             emp_rm3_id=emp_id)).distinct()
         all_emps_under = []
         for i in all_emps:
             if i not in all_emps_under:
@@ -345,8 +347,10 @@ def managerDashboard(request):  # Test1 Test2
         all_ams_count = len(all_ams_under)
     elif request.user.profile.emp_desi in manager_list:
         # All Employees
+        # All Employees
         all_emps = Profile.objects.filter(Q(agent_status='Active'),
-                                          Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
+                                         Q(emp_id=emp_id) | Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(
+                                             emp_rm3_id=emp_id)).distinct()
         all_emps_under = []
         for i in all_emps:
             if i not in all_emps_under:
@@ -1054,6 +1058,7 @@ def addNewUserHR(request):  # Test1  # calander pending
                                                 rm2=j.emp_rm2, rm3=j.emp_rm3, rm1_id=j.emp_rm1_id,
                                                 rm2_id=j.emp_rm2_id, rm3_id=j.emp_rm3_id)
             date_list_week = []
+            start_date = datetime.strptime(emp_doj, '%Y-%m-%d').date()
             if start_date.weekday() != 6:
                 for i in range(1, start_date.weekday() + 2):
                     date_list_week.append(start_date - timedelta(days=i))
@@ -1066,6 +1071,24 @@ def addNewUserHR(request):  # Test1  # calander pending
                                                 team=j.emp_process, team_id=j.emp_process_id, rm1=j.emp_rm1,
                                                 rm2=j.emp_rm2, rm3=j.emp_rm3, rm1_id=j.emp_rm1_id,
                                                 rm2_id=j.emp_rm2_id, rm3_id=j.emp_rm3_id)
+            date_list_month = []
+            start_date = datetime.strptime(emp_doj, '%Y-%m-%d').date()
+            start_date = date(start_date.year, start_date.month, 1)
+            while start_date < datetime.strptime(emp_doj, '%Y-%m-%d').date():
+                date_list_month.append(start_date)
+                start_date += timedelta(days=1)
+            for i in date_list_month:
+                try:
+                    EcplCalander.objects.get(emp_id=j.emp_id, date=i)
+                except EcplCalander.DoesNotExist:
+                    EcplCalander.objects.create(date=i, emp_id=j.emp_id, att_actual='',
+                                                emp_name=j.emp_name, emp_desi=j.emp_desi,
+                                                team=j.emp_process, team_id=j.emp_process_id, rm1=j.emp_rm1,
+                                                rm2=j.emp_rm2, rm3=j.emp_rm3, rm1_id=j.emp_rm1_id,
+                                                rm2_id=j.emp_rm2_id, rm3_id=j.emp_rm3_id)
+
+
+
         messages.info(request, 'User and Profile Successfully Created')
         return redirect('/ams/add-new-user')
     else:
@@ -1263,7 +1286,7 @@ def applyAttendace(request):  # Test1
             cal = []
             for i in EcplCalander.objects.filter(emp_id=emp_id, date__gt=ddate):
                 if i.att_actual == 'Unmarked':
-                    i.att_actual = ''
+                    i.att_actual = att_actual
                     cal.append(i)
             EcplCalander.objects.bulk_update(cal, ['att_actual'])
         if att_actual == 'NCNS':
@@ -1279,7 +1302,7 @@ def applyAttendace(request):  # Test1
                 cal = []
                 for i in EcplCalander.objects.filter(emp_id=emp_id, date__gt=ddate):
                     if i.att_actual == 'Unmarked':
-                        i.att_actual = ''
+                        i.att_actual = att_actual
                         cal.append(i)
                 EcplCalander.objects.bulk_update(cal, ['att_actual'])
 
@@ -1400,7 +1423,7 @@ def viewTeamAttendance(request):  # Test1
         if emp_id == 'All':
             if request.user.profile.emp_desi in management_list:
                 all_emp = Profile.objects.filter(Q(emp_rm1_id=rm) | Q(emp_rm2_id=rm) | Q(emp_rm3_id=rm))
-                emp_id_lst = []
+                emp_id_lst = [rm]
                 for i in all_emp:
                     if i.emp_id not in emp_id_lst:
                         emp_id_lst.append(i.emp_id)
@@ -1432,7 +1455,7 @@ def viewTeamAttendance(request):  # Test1
                 writer = csv.writer(response)
                 writer.writerow(
                     ['Date', 'Emp ID', 'Emp Name', 'Attendance', 'Designation', 'RM 1', 'RM 2', 'RM 3', 'Team'])
-                calanders = EcplCalander.objects.filter(Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),
+                calanders = EcplCalander.objects.filter(Q(emp_id=rm) | Q(rm1_id=rm) | Q(rm2_id=rm) | Q(rm3_id=rm),
                                                         date__range=[start_date, end_date]).values_list(
                     'date', 'emp_id', 'emp_name', 'att_actual', 'emp_desi', 'rm1', 'rm2', 'rm3', 'team')
                 for c in calanders:
@@ -2046,20 +2069,25 @@ def attendanceCorrection(request):  # Test1
     emp_idd = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_idd)
     if request.method == 'POST':
-        date = request.POST['date']
+        datee = request.POST['date']
         emp_id = request.POST['emp_id']
         profile = Profile.objects.get(emp_id=emp_id)
-        if profile.doj:
-            if datetime.strptime(date, "%Y-%m-%d").date() >= profile.doj:
-                cal = EcplCalander.objects.get(Q(date=date), Q(emp_id=emp_id))
-                data = {'cal': cal, 'emp': emp}
-                return render(request, 'ams/view_att_correction_apply.html', data)
+        if datetime.strptime(datee, "%Y-%m-%d").month == date.today().month:
+            if profile.doj:
+                if datetime.strptime(datee, "%Y-%m-%d").date() >= profile.doj:
+                    cal = EcplCalander.objects.get(Q(date=datee), Q(emp_id=emp_id))
+                    data = {'cal': cal, 'emp': emp}
+                    return render(request, 'ams/view_att_correction_apply.html', data)
+                else:
+                    messages.error(request, "Invalid Date Request as EMP DOJ is: " + str(profile.doj))
+                    return redirect('/ams/attendance-correction')
             else:
-                messages.error(request, "Invalid Date Request as EMP DOJ is: " + str(profile.doj))
+                messages.error(request, "Invalid EMP DOJ. Contact CC team with the Employee's DOJ.")
                 return redirect('/ams/attendance-correction')
         else:
-            messages.error(request, "Invalid EMP DOJ. Contact CC team with the Employee's DOJ.")
+            messages.error(request, "You cannot correct previous month attendance!")
             return redirect('/ams/attendance-correction')
+
 
     else:
         all_emp = Profile.objects.filter(Q(agent_status='Active'),
@@ -2141,6 +2169,12 @@ def approveAttendanceRequest(request):  # test1
                 usr = Profile.objects.get(emp_id=cal.emp_id)
                 usr.agent_status = att_actual
                 usr.save()
+                calendar = []
+                for i in EcplCalander.objects.filter(emp_id=cal.emp_id, date__gt=cal.date):
+                    if i.att_actual == 'Unmarked':
+                        i.att_actual = att_actual
+                        cal.append(i)
+                EcplCalander.objects.bulk_update(calendar, ['att_actual'])
             if att_actual == 'NCNS':
                 today = cal.date
                 yesterday = today - timedelta(days=1)
@@ -2154,6 +2188,12 @@ def approveAttendanceRequest(request):  # test1
                     usr = Profile.objects.get(emp_id=cal.emp_id)
                     usr.agent_status = att_actual
                     usr.save()
+                    calendar = []
+                    for i in EcplCalander.objects.filter(emp_id=cal.emp_id, date__gt=cal.date):
+                        if i.att_actual == 'Unmarked':
+                            i.att_actual = att_actual
+                            cal.append(i)
+                    EcplCalander.objects.bulk_update(calendar, ['att_actual'])
             if old_att == 'PL':
                 leave = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
                 leave.pl_balance += 1
@@ -2323,7 +2363,8 @@ def onboardingBulkUpload(request):
 @login_required
 def AttendanceReportAdmin(request):
     emp_id = request.user.profile.emp_id
-    if emp_id in admin_list:
+    emp_desi = request.user.profile.emp_desi
+    if emp_id in admin_list or emp_desi in hr_list:
         if request.method == 'POST':
             emp_id = request.POST['emp_id']
             start = request.POST['start']
@@ -2505,7 +2546,6 @@ def getMapping(request):
         messages.info(request, 'Unauthorized Access')
         return redirect('/ams/')
 
-
 @login_required
 def changeMapping(request):
     if request.method == "POST":
@@ -2593,7 +2633,7 @@ def addAttendance(request): # Test 1,2
     return redirect('/ams/')
 
 def autoApproveLeave(request):  # Test 1, 2
-    leaves = LeaveTable.objects.filter(Q(tl_approval=False) | Q(manager_approval=False))
+    leaves = LeaveTable.objects.filter(Q(tl_approval=False) | Q(manager_approval=False), Q(escalation=False))
     leave_list = []
     ecpl_cal = []
     for i in leaves:
@@ -2640,7 +2680,7 @@ def autoApproveLeave(request):  # Test 1, 2
                 i.status = "Auto Approved"
                 i.manager_approval = True
                 leave_list.append(i)
-                updateOrCreateCalander(start_date,end_date)
+                updateOrCreateCalander(start_date, end_date)
             else:                
                 if i.tl_status == "Rejected":
                     i.manager_status = "Auto Rejected"
