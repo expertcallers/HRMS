@@ -722,3 +722,12 @@
     <!-- End Change Name Pop-Up -->
 
 {% endblock %}
+
+
+{% block script %}
+<script type="text/javascript">
+      $today = new Date();
+      $today = moment($today).format('YYYY-MM-DD');
+      $('#effective').attr("max", $today);
+</script>
+{% endblock %}
