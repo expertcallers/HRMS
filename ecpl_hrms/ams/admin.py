@@ -114,4 +114,7 @@ admin.site.register(LastEmpId)
 admin.site.register(NoticeECPL)
 admin.site.register(FaqHRMS)
 admin.site.register(Designation, DesignationSearch)
+admin.site.register(BillAdministration)
+admin.site.register(ItemDescriptionAdministration)
+admin.site.register(SupplierAdministration)
 

@@ -1,0 +1,250 @@
+{% extends 'ams/administration/base.html' %}
+{% block style %}
+<style>
+  body {
+    overflow-x: hidden;
+  }
+</style>
+{% endblock %}
+{% block main %}
+  {% load static %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>Create PO</h3>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <form method="POST" action="" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="project">Project Name: </label>
+                        <input type="text" name="project" id="project" class="form-control" required>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="date">Date</label>
+                        <input type="date" name="date" id="date" class="form-control" required>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="po_no">PO No.</label>
+                        <input type="text" name="po_no" id="po_no" class="form-control" readonly value="{{po_no}}" required>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="delivery">Delivery Office</label>
+                        <select name="delivery" id="delivery" class="form-control" required>
+                          <option selected disabled>-- PLease Select --</option>
+                          <option value="old">HBR Office</option>
+                          <option value="new">Kothanur Office</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="billing">Billing Office</label>
+                        <select name="billing" id="billing" class="form-control" required>
+                          <option selected disabled>-- PLease Select --</option>
+                          <option value="old">HBR Office</option>
+                          <option value="new">Kothanur Office</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="del_contact_name">Buyer Contact Name</label>
+                        <input type="text" name="del_contact_name" id="del_contact_name" class="form-control" required>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="del_contact_no">Buyer Contact Number</label>
+                        <input type="number" name="del_contact_no" onKeyPress="if(this.value.length==11) return false;" id="del_contact_no" class="form-control" required>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="del_email">Buyer Email</label>
+                        <input type="email" name="del_email" id="del_email" class="form-control" required>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="supplier">Supplier</label>
+                        <select name="supplier" id="supplier" class="form-control select2" onchange="Supplier(this)" required>
+                          <option selected disabled>-- PLease Select --</option>
+                          {% for i in suppliers %}
+                          <option value="{{i.id}}">{{i.name}}</option>
+                          {% endfor %}
+                          <option value="other">Other/New</option>
+                        </select>
+                      </div>
+                      <div class="col-md-12 mt-2 border d-none" id="supplier_hidden">
+                        <div class="row">
+                          <div class="text-center col-md-12">
+                            <h4>New Supplier Details</h4>
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="sup_name">Supplier Name</label>
+                            <input type="text" name="sup_name" id="sup_name" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="sup_address">Supplier Address</label>
+                            <textarea name="sup_address" id="sup_address" class="form-control"></textarea>
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="sup_contact_person">Supplier Contact Person</label>
+                            <input type="text" name="sup_contact_person" id="sup_contact_person" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="sup_contact_no">Contact Person Number</label>
+                            <input type="number" name="sup_contact_no" onKeyPress="if(this.value.length==11) return false;" id="sup_contact_no" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="sup_contact_email">Contact Person Email</label>
+                            <input type="email" name="sup_contact_email" id="sup_contact_email" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="sup_pan">PAN Number</label>
+                            <input type="text" name="sup_pan" id="sup_pan" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="sup_gst">Vendor GST Number</label>
+                            <input type="text" name="sup_gst" id="sup_gst" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="cin_code">CIN Code</label>
+                            <input type="text" name="cin_code" id="cin_code" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="acc_name">Name as per Bank</label>
+                            <input type="text" name="acc_name" id="acc_name" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="acc_no">Account Number</label>
+                            <input type="number" name="acc_no" onKeyPress="if(this.value.length==20) return false;" id="acc_no" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="acc_bank">Bank</label>
+                            <input type="text" name="acc_bank" id="acc_bank" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="bank_branch">Bank Branch</label>
+                            <input type="text" name="bank_branch" id="bank_branch" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="bank_ifsc">IFSC Code</label>
+                            <input type="text" name="bank_ifsc" id="bank_ifsc" class="form-control">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-12 mt-2 border" id="description_box">
+                        <div class="row">
+                          <div class="text-center col-md-12">
+                            <h4>Description</h4>
+                          </div>
+                        </div>
+                        <div class="row mt-2">
+                          <div class="col-md-4 mt-2 form-group">
+                            <label for="description_1">Description</label>
+                            <textarea name="description_1" id="description_1" class="form-control" required></textarea>
+                          </div>
+                          <div class="col-md-2 mt-2 form-group">
+                            <label for="des_gst_1">GST</label>
+                            <input type="number" max="50" min="0" name="des_gst_1" id="des_gst_1" class="form-control" required>
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="qty_1">Quantity</label>
+                            <input type="number" name="qty_1" id="qty_1" class="form-control" required>
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="price_1">Price</label>
+                            <input type="number" name="price_1" id="price_1" class="form-control" required>
+                          </div>
+                          <input type="hidden" value="1" id="num_of_desc" name="num_of_desc">
+                        </div>
+                      </div>
+                      <div class="col-md-12 mt-2 form-group">
+                        <div align="center">
+                          <button type="button" class="btn btn-sm btn-success" onclick="addNewDescription()">Add More</button>
+                          <button type="button" class="btn btn-sm btn-danger" onclick="removeDescription()">Remove Last</button>
+                        </div>
+                      </div>
+                      <div class="col-md-12 mt-2 form-group">
+                        <label for="terms">Terms & Conditions</label>
+                        <textarea name="terms" maxlength="5" id="terms" class="form-control" rows="5" required></textarea>
+                      </div>
+                      <div class="col-md-12 mt-2 form-group">
+                        <button type="submit" class="btn btn-success form-control" onclick="return confirmm()">Submit</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+
+
+  {% endblock %}
+{% block script %}
+<script>
+  function Supplier(e) {
+    if ( e.value == 'other' ) {
+      $('#supplier_hidden').removeClass('d-none');
+      $('#sup_name').attr('required','');
+      $('#sup_address').attr('required','');
+      $('#sup_contact_person').attr('required','');
+      $('#sup_contact_no').attr('required','');
+      $('#sup_contact_email').attr('required','');
+      $('#sup_pan').attr('required','');
+      $('#sup_gst').attr('required','');
+      $('#acc_name').attr('required','');
+      $('#acc_no').attr('required','');
+      $('#acc_bank').attr('required','');
+      $('#bank_branch').attr('required','');
+      $('#bank_ifsc').attr('required','');
+    } else {
+      $('#supplier_hidden').addClass('d-none');
+      $('#sup_name').removeAttr('required');
+      $('#sup_address').removeAttr('required');
+      $('#sup_contact_person').removeAttr('required');
+      $('#sup_contact_no').removeAttr('required');
+      $('#sup_contact_email').removeAttr('required');
+      $('#sup_pan').removeAttr('required');
+      $('#sup_gst').removeAttr('required');
+      $('#acc_name').removeAttr('required');
+      $('#acc_no').removeAttr('required');
+      $('#acc_bank').removeAttr('required');
+      $('#bank_branch').removeAttr('required');
+      $('#bank_ifsc').removeAttr('required');
+    }
+  }
+  n = 1
+  function addNewDescription() {
+    n = n + 1;
+    desc = ''
+    desc += '<div class="row mt-2" id="item_'+n+'">';
+    desc += '<div class="col-md-4 mt-2 form-group">';
+    desc += '<label for="description_'+n+'">Description</label>';
+    desc += '<textarea name="description_'+n+'" id="description_'+n+'" class="form-control" required></textarea>';
+    desc += '</div>';
+    desc += '<div class="col-md-2 mt-2 form-group">';
+    desc += '<label for="des_gst_'+n+'">GST</label>';
+    desc += '<input type="number" min="0" max="50" name="des_gst_'+n+'" id="des_gst_'+n+'" class="form-control" required>';
+    desc += '</div>';
+    desc += '<div class="col-md-3 mt-2 form-group">';
+    desc += '<label for="qty_'+n+'">Quantity</label>';
+    desc += '<input type="number" name="qty_'+n+'" id="qty_'+n+'" class="form-control" required>';
+    desc += '</div>';
+    desc += '<div class="col-md-3 mt-2 form-group">';
+    desc += '<label for="price_'+n+'">Price</label>';
+    desc += '<input type="number" name="price_'+n+'" id="price_'+n+'" class="form-control" required>';
+    desc += '</div>';
+    desc += '</div>';
+    $('#description_box').append(desc);
+    $('#num_of_desc').val(n);
+  }
+  function removeDescription() {
+    if ($('#item_'+n+'').html()) {
+      item = $('#item_'+n+'').remove();
+      n = n - 1;
+      $('#num_of_desc').val(n);
+    }
+  }
+</script>
+{% endblock %}

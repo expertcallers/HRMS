@@ -21,6 +21,9 @@ import xlwt
 from .admin import *
 from tablib import Dataset
 
+# for converting Numbers to Words
+from num2words import num2words
+
 c = Calendar()
 
 # Getting Model from other Apps
@@ -2622,6 +2625,107 @@ def changeMapping(request):
         return redirect('/ams/')
 
 
+def PrintBill(request, pk):
+    bill = BillAdministration.objects.get(id=pk)
+    description = ItemDescriptionAdministration.objects.filter(bill=bill)
+    data = {'bill':bill, 'description':description}
+    return render(request, 'ams/administration/bill.html', data)
+
+def CreateBill(request):
+    if request.method == "POST":
+        project = request.POST["project"]
+        date = request.POST["date"]
+        po_no = request.POST["po_no"]
+        delivery = request.POST["delivery"]
+        if delivery == 'old':
+            delivery_office = 'Expert Callers Solutions Pvt Ltd'
+            delivery_address = '# 18774/4, HBR Layout, 2nd Block 1st Stage, 80ft Main Road, Bangalore - 560043'
+        else:
+            delivery_office = 'Expert Callers Solutions Pvt Ltd'
+            delivery_address = 'Gubbi Cross (Towards Dodda Gubbi), Kuvempu Layout, Kothanur, Bengaluru, Karnataka 560077'
+
+        billing = request.POST["billing"]
+        if billing == 'old':
+            billing_office = '# 18774/4, HBR Layout, 2nd Block 1st Stage, 80ft Main Road, Bangalore - 560043'
+        else:
+            billing_office = 'Gubbi Cross (Towards Dodda Gubbi), Kuvempu Layout, Kothanur, Bengaluru, Karnataka 560077'
+
+        contact_person = request.POST["del_contact_name"]
+        contact_no = request.POST["del_contact_no"]
+        contact_email = request.POST["del_email"]
+        supplier = request.POST["supplier"]
+        if supplier == 'other':
+            sup_name = request.POST.get("sup_name")
+            sup_address = request.POST.get("sup_address")
+            sup_contact_person = request.POST.get("sup_contact_person")
+            sup_contact_no = request.POST.get("sup_contact_no")
+            sup_contact_email = request.POST.get("sup_contact_email")
+            sup_pan = request.POST.get("sup_pan")
+            sup_gst = request.POST.get("sup_gst")
+            acc_name = request.POST.get("acc_name")
+            acc_no = request.POST.get("acc_no")
+            acc_bank = request.POST.get("acc_bank")
+            bank_branch = request.POST.get("bank_branch")
+            bank_ifsc = request.POST.get("bank_ifsc")
+            cin_code = request.POST.get("cin_code")
+            supplier = SupplierAdministration.objects.create(
+                name=sup_name, address=sup_address, cantact_person=sup_contact_person, contact_no=sup_contact_no,
+                contact_email=sup_contact_email, pan=sup_pan, gst=sup_gst, acc_name=acc_name, acc_no=acc_no,
+                bank_name=acc_bank, bank_branch=bank_branch, ifsc=bank_ifsc, cin_code=cin_code,
+            )
+        else:
+            supplier = SupplierAdministration.objects.get(id=supplier)
+        terms = request.POST["terms"]
+        terms = terms.replace('\n', '<br>')
+        bill = BillAdministration.objects.create(
+            project=project, po_no=po_no, date=date, supplier=supplier, delivery_office=delivery_office,
+            delivery_address=delivery_address, contact_person=contact_person, contact_no=contact_no,
+            contact_email=contact_email, terms_conditions=terms, billing_office=billing_office
+        )
+        num_of_desc = int(request.POST["num_of_desc"])
+        for i in range(1, num_of_desc + 1):
+            bill = bill
+            description = request.POST.get('description_'+str(i))
+            qty = int(request.POST.get('qty_'+str(i)))
+            gst_percent = int(request.POST.get('des_gst_'+str(i)))
+            price = int(request.POST.get('price_'+str(i)))
+            amount = qty * price
+            gst_amount = (amount * gst_percent)/100
+            amount += gst_amount
+            ItemDescriptionAdministration.objects.create(
+                bill=bill, description=description, qty=qty, price=price, amount=amount, gst_percent=gst_percent,
+                gst_amount=gst_amount
+            )
+        total_amount = 0
+        gst_amount = 0
+        for i in ItemDescriptionAdministration.objects.filter(bill=bill):
+            total_amount += i.amount
+            gst_amount += i.gst_amount
+        grand_total = total_amount + gst_amount
+        grand_total = round(grand_total, 2)
+        amount_words = num2words(grand_total, lang='en_IN')
+        amount_words = amount_words.replace(',', '')
+        bill.total_amount = total_amount
+        bill.gst_amount = gst_amount
+        bill.grand_total = grand_total
+        bill.amount_words = amount_words
+        bill.save()
+        first = LastEmpId.objects.first()
+        po_no = LastEmpId.objects.exclude(id=first.id)
+        for i in po_no:
+            i.emp_id = int(i.emp_id) + 1
+            i.save()
+        return redirect('/ams/print-bill/'+str(bill.id))
+    else:
+        first = LastEmpId.objects.first()
+        po_no = LastEmpId.objects.exclude(id=first.id)
+        for i in po_no:
+            po_no = '%.2d' % int(i.emp_id)
+        po_no = 'EC'+str(datetime.today().month)+str(datetime.today().year)[2:4]+po_no
+        suppliers = SupplierAdministration.objects.all()
+        data = {'suppliers': suppliers, 'po_no': po_no}
+        return render(request, 'ams/administration/create_bill.html', data)
+
 def addAttendance(request):
     mydate = date.today()
     month = mydate.month
@@ -2747,7 +2851,10 @@ def autoApproveLeave(request):  # Test 1, 2
 
 def addLeaveBalance(request, a):
     if a == "3cpl@2022$":
-        emp = EmployeeLeaveBalance.objects.all()
+        emp_ids = []
+        for i in Profile.objects.exclude(agent_status='Attrition'):
+            emp_ids.append(i.emp_id)
+        emp = EmployeeLeaveBalance.objects.filter(emp_id__in=emp_ids)
         e = date.today()
         month = e.month
         year = e.year
@@ -2757,7 +2864,8 @@ def addLeaveBalance(request, a):
         end_date = end_date - timedelta(days=1)
         leavebal = []
         leavehist = []
-        ecpl_cal = EcplCalander.objects.filter(date__range=[start_date, end_date]).exclude(att_actual='Unmarked')
+        ecpl_cal = EcplCalander.objects.filter(
+            emp_id__in=emp_ids, date__range=[start_date, end_date]).exclude(att_actual='Unmarked')
         for i in emp:
             cal = 0
             i.unique_id = e
@@ -2882,6 +2990,12 @@ def sandwichPolicy(request):
 #                 start_date += timedelta(days=1)
 #     EcplCalander.objects.bulk_update(cal_list,['att_actual'])
 #     return redirect('/ams/')
+
+
+
+
+
+
 
 def TestFun(request):
     cal = EcplCalander.objects.filter(Q(att_actual='Bench') | Q(att_actual='Attrition') | Q(att_actual='NCNS'))

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from statistics import mode
 
 from django.contrib.auth.models import User
@@ -257,3 +257,49 @@ class FaqHRMS(models.Model):
     answer = models.TextField()
     def __str__(self):
         return self.question
+
+class SupplierAdministration(models.Model):
+    name = models.CharField(max_length=200)
+    address = models.TextField()
+    cantact_person = models.CharField(max_length=200)
+    contact_no = models.CharField(max_length=50)
+    contact_email = models.CharField(max_length=200)
+    pan = models.CharField(max_length=200)
+    gst = models.CharField(max_length=200)
+    acc_name = models.CharField(max_length=200)
+    acc_no = models.CharField(max_length=200)
+    bank_name = models.CharField(max_length=200)
+    bank_branch = models.CharField(max_length=200)
+    ifsc = models.CharField(max_length=200)
+    cin_code = models.CharField(max_length=200, null=True, blank=True)
+
+class BillAdministration(models.Model):
+    project = models.CharField(max_length=200)
+    po_no = models.CharField(max_length=50)
+    date = models.DateField()
+    supplier = models.ForeignKey(SupplierAdministration, on_delete=models.CASCADE)
+    billing_office = models.CharField(max_length=200, null=True, blank=True)
+    delivery_office = models.CharField(max_length=200)
+    delivery_address = models.TextField()
+    contact_person = models.CharField(max_length=200)
+    contact_no = models.CharField(max_length=50)
+    contact_email = models.EmailField()
+    terms_conditions = models.TextField()
+    amount_words = models.TextField(null=True, blank=True)
+    pan = models.CharField(max_length=200, default='AAECE0810D')
+    gst = models.CharField(max_length=200, default='29AAECE0810D1Z6')
+    total_amount = models.FloatField(null=True, blank=True)
+    gst_amount = models.FloatField(null=True, blank=True)
+    grand_total = models.FloatField(null=True, blank=True)
+
+class ItemDescriptionAdministration(models.Model):
+    bill = models.ForeignKey(BillAdministration, on_delete=models.CASCADE)
+    description = models.TextField()
+    qty = models.IntegerField()
+    gst_percent = models.IntegerField(null=True, blank=True)
+    gst_amount = models.FloatField(null=True, blank=True)
+    price = models.FloatField()
+    amount = models.FloatField()
+
+
+

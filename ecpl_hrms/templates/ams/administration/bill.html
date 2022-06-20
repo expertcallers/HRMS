@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    {% load humanize %}
+    <meta charset="UTF-8">
+    <title>Title</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+    <style>
+        .table td, .table th {
+            padding: 2px 0.75rem;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+    <table class="table table-bordered nopadding" style="margin:0;">
+        <thead>
+            <tr>
+                <th colspan="4" style="padding-top: 10px; padding-bottom: 10px;">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="{% static 'assets/images/ecpl-logo-new.png' %}" class="imgmd" style="width:100%">
+                        </div>
+                        <div class="col-md-6 align-middle" align="center">
+                            <h1 class="align-middle">PURCHASE ORDER</h1>
+                        </div>
+                        <div class="col-md-3" align="center">
+
+                        </div>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th class="align-middle"  rowspan="2" style="width: 25%">Project Name: </th>
+                <td class="align-middle"  rowspan="2" style="width: 25%">{{bill.project}}</td>
+                <td class="align-middle"  style="width: 25%">DATE: </td>
+                <td class="align-middle"  style="width: 25%">{{bill.date}}</td>
+            </tr>
+            <tr>
+                <td class="align-middle" >PO.No </td>
+                <td class="align-middle" >{{bill.po_no}}</td>
+            </tr>
+            <tr>
+                <td class="align-middle" >Supplier Address:</td>
+                <td class="align-middle" >
+                    <b>{{bill.supplier.name}}</b><br>
+                    {{bill.supplier.address}}
+                </td>
+                <td class="align-middle" >Delivery Address: </td>
+                <td class="align-middle" >
+                    <b>{{bill.delivery_office}}</b><br>
+                    {{bill.delivery_address}}
+                </td>
+            </tr>
+            <tr>
+                <td class="align-middle" >Supplier Contact Name </td>
+                <td class="align-middle" >{{bill.supplier.cantact_person}}</td>
+                <td class="align-middle" >Contact Name</td>
+                <td class="align-middle" >{{bill.contact_person}}</td>
+            </tr>
+            <tr>
+                <td class="align-middle" >Supplier Contact Number </td>
+                <td class="align-middle" >{{bill.supplier.contact_no}}</td>
+                <td class="align-middle" >Buyer Contact Number</td>
+                <td class="align-middle" >{{bill.contact_no}}</td>
+            </tr>
+            <tr>
+                <td class="align-middle" >Email Address</td>
+                <td class="align-middle" >{{bill.supplier.contact_email}}</td>
+                <td class="align-middle" >Email Address</td>
+                <td class="align-middle" >{{bill.contact_email}}</td>
+            </tr>
+            <tr>
+                <td class="align-middle" >PAN. No:</td>
+                <td class="align-middle" >{{bill.supplier.pan}}</td>
+                <td class="align-middle" >PAN. No:</td>
+                <td class="align-middle" >{{bill.pan}}</td>
+            </tr>
+            <tr>
+                <td class="align-middle" >Vendor GST No:</td>
+                <td class="align-middle" >{{bill.supplier.gst}}</td>
+                <td class="align-middle" >Buyer-GST NO:</td>
+                <td class="align-middle" >{{bill.gst}}</td>
+            </tr>
+            <tr>
+                <td class="align-middle"  colspan="4"><b>Billing Address:</b> {{bill.billing_office}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-bordered" style="margin:0;">
+        <tbody>
+            <tr>
+                <th class="text-center">Description</th>
+                <th class="text-center">Qty</th>
+                <th class="text-center">Price</th>
+                <th class="text-center">GST Percentage %</th>
+                <th class="text-center">Amount (including GST)</th>
+            </tr>
+            {% for i in description %}
+            <tr>
+                <td>{{i.description}}</td>
+                <td>{{i.qty}}</td>
+                <td>{{i.price|floatformat:2|intcomma}}/-</td>
+                <td>{{i.gst_percent}}%</td>
+                <td>{{i.amount|floatformat:2|intcomma}}/-</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <th colspan="4" class="text-right">Total Amount (excluding GST)</th>
+                <td>{{bill.total_amount|floatformat:2|intcomma}}/-</td>
+            </tr>
+            <tr>
+                <th colspan="4" class="text-right">GST</th>
+                <td>{{bill.gst_amount|floatformat:2|intcomma}}/-</td>
+            </tr>
+            <tr>
+                <th colspan="4" class="text-right">Grand Total</th>
+                <th>{{bill.grand_total|floatformat:2|intcomma}}/-</th>
+            </tr>
+        </tbody>
+    </table>
+    <table class="table table-bordered nopadding" style="margin:0;">
+        <tbody>
+            <tr>
+                <th style="width: 25%;">Amount in words:</th>
+                <td colspan="3">{{bill.amount_words}}</td>
+            </tr>
+            <tr>
+                <th style="width: 25%;">CIN Code:</th>
+                <td colspan="3">{{bill.supplier.cin_code}}</td>
+            </tr>
+            <tr>
+                <th colspan="4" class="text-center">Terms and Condition</th>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-left">{{bill.terms_conditions|safe}}</td>
+            </tr>
+            <tr>
+                <td colspan="4" class="text-left">Mode of Payment (NEFT/RTGS) :</td>
+            </tr>
+            <tr>
+                <th style="width: 25%;">Account Details: </th>
+                <td colspan="3">{{bill.supplier.acc_name}}</td>
+            </tr>
+            <tr>
+                <th style="width: 25%;">Bank and Branch</th>
+                <td colspan="3">{{bill.supplier.bank_name}} and {{bill.supplier.bank_branch}}</td>
+            </tr>
+            <tr>
+                <th style="width: 25%;">Account No:</th>
+                <td colspan="3">{{bill.supplier.acc_no}}</td>
+            </tr>
+            <tr>
+                <th style="width: 25%;">IFSC Code</th>
+                <td colspan="3">{{bill.supplier.ifsc}}</td>
+            </tr>
+            <tr>
+                <th colspan="2" style="width: 50%" class="text-center">For {{bill.supplier.name}}</th>
+                <th colspan="2" class="text-center">For {{bill.delivery_office}}</th>
+            </tr>
+            <tr>
+                <th colspan="2" style="width: 50%; padding: 80px;" class="text-center"></th>
+                <th colspan="2" style="width: 50%; padding: 80px;" class="text-center"></th>
+            </tr>
+            <tr>
+                <th colspan="2" style="width: 50%" class="text-center">Seal and Signature</th>
+                <th colspan="2" class="text-center">Seal and Signature</th>
+            </tr>
+        </tbody>
+    </table>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js"></script>
+
+<script>
+    window.print();
+</script>
+</body>
+</html>
