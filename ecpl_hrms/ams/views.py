@@ -1,5 +1,6 @@
 import ast
 from ctypes.wintypes import PINT
+from email import message
 import json
 from datetime import datetime, date
 import monthdelta
@@ -135,7 +136,9 @@ def redirectTOAllDashBoards(request):  # Test1 Test2
     elif request.user.profile.emp_desi in agent_list:
         return redirect('/ams/agent-dashboard')
     else:
-        return HttpResponse('<h1>Not Authorised to view this page</h1>')
+        logout(request)
+        message.info('Please login back to continue')
+        return redirect('/ams/')
 
 
 def logoutView(request):  # Test1 Test2
@@ -2703,7 +2706,7 @@ def autoApproveLeave(request):  # Test 1, 2
                     )
                 start_date += timedelta(days=1)
 
-        if i.escalation == False and days > 2:
+        if days > 2:
             if i.tl_approval == False:
                 i.tl_approval = True
                 i.tl_status = "Auto Approved" 
