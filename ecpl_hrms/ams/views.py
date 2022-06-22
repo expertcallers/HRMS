@@ -145,7 +145,8 @@ def redirectTOAllDashBoards(request):  # Test1 Test2
     elif request.user.profile.emp_desi in agent_list:
         return redirect('/ams/agent-dashboard')
     else:
-        return HttpResponse('<h1>Not Authorised to view this page</h1>')
+        messages.info(request, 'Not Authorised to view this page')
+        return redirect("/ams/")
 
 
 def logoutView(request):  # Test1 Test2
@@ -2709,7 +2710,6 @@ def CreateBill(request):
                 price = int(request.POST.get('price_'+str(i)))
                 amount = qty * price
                 gst_amount = (amount * gst_percent)/100
-                amount += gst_amount
                 ItemDescriptionAdministration.objects.create(
                     bill=bill, description=description, qty=qty, price=price, amount=amount, gst_percent=gst_percent,
                     gst_amount=gst_amount

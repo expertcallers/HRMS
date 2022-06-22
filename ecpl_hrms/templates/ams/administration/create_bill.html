@@ -127,7 +127,7 @@
                           </div>
                           <div class="col-md-3 mt-2 form-group">
                             <label for="bank_ifsc">IFSC Code</label>
-                            <input type="text" name="bank_ifsc" id="bank_ifsc" class="form-control">
+                            <input type="text" name="bank_ifsc" maxlength="12" id="bank_ifsc" class="form-control">
                           </div>
                         </div>
                       </div>
@@ -165,7 +165,7 @@
                       </div>
                       <div class="col-md-12 mt-2 form-group">
                         <label for="terms">Terms & Conditions</label>
-                        <textarea name="terms" maxlength="5" id="terms" class="form-control" rows="5" required></textarea>
+                        <textarea name="terms" id="terms" class="form-control" rows="5" required></textarea>
                       </div>
                       <div class="col-md-12 mt-2 form-group">
                         <button type="submit" class="btn btn-success form-control" onclick="return confirmm()">Submit</button>

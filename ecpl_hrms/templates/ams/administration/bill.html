@@ -98,7 +98,7 @@
                 <th class="text-center">Qty</th>
                 <th class="text-center">Price</th>
                 <th class="text-center">GST Percentage %</th>
-                <th class="text-center">Amount (including GST)</th>
+                <th class="text-center">Amount (Exclusive of GST)</th>
             </tr>
             {% for i in description %}
             <tr>
@@ -110,7 +110,7 @@
             </tr>
             {% endfor %}
             <tr>
-                <th colspan="4" class="text-right">Total Amount (excluding GST)</th>
+                <th colspan="4" class="text-right">Total Amount</th>
                 <td>{{bill.total_amount|floatformat:2|intcomma}}/-</td>
             </tr>
             <tr>
