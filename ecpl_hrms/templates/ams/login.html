@@ -75,7 +75,7 @@
                 <h2 style="color: red;" class="flash">** Important Notice **</h2>
                 <ol>
                     {% for i in notice %}
-                    <h5 align="left"><li>{{i.note|safe}}</li></h5>
+                    <li style="font-size:1.25rem;"><h5 align="left">{{i.note|safe}}</h5></li>
                     {% endfor %}
                 </ol>
                 {% endif %}
