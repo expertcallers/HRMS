@@ -57,7 +57,7 @@
             <tr>
                 <td class="align-middle" >Supplier Address:</td>
                 <td class="align-middle" >
-                    <b>{{bill.supplier.name}}</b><br>
+                    <b>{{bill.supplier}}</b><br>
                     {{bill.supplier_address}}
                 </td>
                 <td class="align-middle" >Delivery Address: </td>
@@ -142,7 +142,7 @@
             </tr>
             <tr>
                 <th style="width: 25%;">CIN Code:</th>
-                <td colspan="3">{{bill.supplier.cin_code}}</td>
+                <td colspan="3">{{bill.cin_code}}</td>
             </tr>
             <tr>
                 <th colspan="4" class="text-center">Terms and Condition</th>
@@ -170,7 +170,7 @@
                 <td colspan="3">{{bill.ifsc}}</td>
             </tr>
             <tr>
-                <th colspan="2" style="width: 50%" class="text-center">For {{bill.supplier.name}}</th>
+                <th colspan="2" style="width: 50%" class="text-center">For {{bill.supplier}}</th>
                 <th colspan="2" class="text-center">For {{bill.delivery_office}}</th>
             </tr>
             <tr>

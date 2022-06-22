@@ -272,12 +272,13 @@ class SupplierAdministration(models.Model):
     bank_branch = models.CharField(max_length=200)
     ifsc = models.CharField(max_length=200)
     cin_code = models.CharField(max_length=200, null=True, blank=True)
+    def __str__(self):
+        return self.name
 
 class BillAdministration(models.Model):
     project = models.CharField(max_length=200)
     po_no = models.CharField(max_length=50)
     date = models.DateField()
-    supplier = models.ForeignKey(SupplierAdministration, on_delete=models.CASCADE)
     billing_office = models.CharField(max_length=200, null=True, blank=True)
     delivery_office = models.CharField(max_length=200)
     delivery_address = models.TextField()
@@ -292,6 +293,7 @@ class BillAdministration(models.Model):
     gst_amount = models.FloatField(null=True, blank=True)
     grand_total = models.FloatField(null=True, blank=True)
 
+    supplier = models.CharField(max_length=200, null=True, blank=True)
     supplier_address = models.TextField(null=True, blank=True)
     supplier_contact_person = models.CharField(max_length=200, null=True, blank=True)
     supplier_contact_no = models.CharField(max_length=50, null=True, blank=True)
@@ -303,6 +305,7 @@ class BillAdministration(models.Model):
     bank_name = models.CharField(max_length=200, null=True, blank=True)
     bank_branch = models.CharField(max_length=200, null=True, blank=True)
     ifsc = models.CharField(max_length=200, null=True, blank=True)
+    cin_code = models.CharField(max_length=200, null=True, blank=True)
 
 class ItemDescriptionAdministration(models.Model):
     bill = models.ForeignKey(BillAdministration, on_delete=models.CASCADE)

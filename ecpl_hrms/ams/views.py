@@ -2688,7 +2688,7 @@ def CreateBill(request):
             contact_email = request.POST["del_email"]
             supplier = request.POST["supplier"]
             if supplier == 'other':
-                sup_name = request.POST.get("sup_name")
+                supplier_name = request.POST.get("sup_name")
                 sup_address = request.POST.get("sup_address")
                 sup_contact_person = request.POST.get("sup_contact_person")
                 sup_contact_no = request.POST.get("sup_contact_no")
@@ -2701,13 +2701,15 @@ def CreateBill(request):
                 bank_branch = request.POST.get("bank_branch")
                 bank_ifsc = request.POST.get("bank_ifsc")
                 cin_code = request.POST.get("cin_code")
-                supplier = SupplierAdministration.objects.create(
-                    name=sup_name, address=sup_address, cantact_person=sup_contact_person, contact_no=sup_contact_no,
-                    contact_email=sup_contact_email, pan=sup_pan, gst=sup_gst, acc_name=acc_name, acc_no=acc_no,
-                    bank_name=acc_bank, bank_branch=bank_branch, ifsc=bank_ifsc, cin_code=cin_code,
+                SupplierAdministration.objects.create(
+                    name=supplier_name, address=sup_address, cantact_person=sup_contact_person,
+                    contact_no=sup_contact_no, contact_email=sup_contact_email, pan=sup_pan, gst=sup_gst,
+                    acc_name=acc_name, acc_no=acc_no, bank_name=acc_bank, bank_branch=bank_branch, ifsc=bank_ifsc,
+                    cin_code=cin_code,
                 )
             else:
                 supplier = SupplierAdministration.objects.get(id=supplier)
+                supplier_name = supplier.name
                 sup_address = supplier.address
                 sup_contact_person = supplier.cantact_person
                 sup_contact_no = supplier.contact_no
@@ -2719,15 +2721,16 @@ def CreateBill(request):
                 acc_bank = supplier.bank_name
                 bank_branch = supplier.bank_branch
                 bank_ifsc = supplier.ifsc
+                cin_code = supplier.cin_code
             terms = request.POST["terms"]
             terms = terms.replace('\n', '<br>')
             bill = BillAdministration.objects.create(
-                project=project, po_no=po_no, date=date, supplier=supplier, delivery_office=delivery_office,
+                project=project, po_no=po_no, date=date, supplier=supplier_name, delivery_office=delivery_office,
                 delivery_address=delivery_address, contact_person=contact_person, contact_no=contact_no,
                 contact_email=contact_email, terms_conditions=terms, billing_office=billing_office,
                 supplier_address=sup_address, supplier_contact_person=sup_contact_person, supplier_contact_no=sup_contact_no,
                 supplier_contact_email=sup_contact_email, supplier_pan=sup_pan, supplier_gst=sup_gst, acc_name=acc_name,
-                acc_no=acc_no, bank_name=acc_bank, bank_branch=bank_branch, ifsc=bank_ifsc
+                acc_no=acc_no, bank_name=acc_bank, bank_branch=bank_branch, ifsc=bank_ifsc, cin_code=cin_code
             )
             num_of_desc = int(request.POST["num_of_desc"])
             for i in range(1, num_of_desc + 1):
