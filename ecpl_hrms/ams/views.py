@@ -1040,10 +1040,7 @@ def addNewUserHR(request):  # Test1  # calander pending
                 except:
                     pass
             new_emp_id = max(int_emp_id_lst) + 1
-            lastModel = LastEmpId.objects.all()
-            last = ''
-            for i in lastModel:
-                last = LastEmpId.objects.get(id=i.id)
+            last = LastEmpId.objects.first()
             last.emp_id = new_emp_id
             last.save()
             # Creating Leave Balance
