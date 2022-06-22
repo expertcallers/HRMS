@@ -1099,7 +1099,23 @@ def addNewUserHR(request):  # Test1  # calander pending
                                                 team=j.emp_process, team_id=j.emp_process_id, rm1=j.emp_rm1,
                                                 rm2=j.emp_rm2, rm3=j.emp_rm3, rm1_id=j.emp_rm1_id,
                                                 rm2_id=j.emp_rm2_id, rm3_id=j.emp_rm3_id)
-
+            # For Access Control
+            dates = []
+            start = date(date.today().year, date.today().month, 1)
+            end = date(2025, 12, 31)
+            while start < end:
+                dates.append(start)
+                start += monthdelta.monthdelta(1)
+            balance = []
+            for j in dates:
+                try:
+                    AccessControl.objects.get(emp_id=emp_id, month=j.month, year=j.year)
+                except AccessControl.DoesNotExist:
+                    bal = CheckLeaveBalance(
+                        emp_id=emp_id, month=j.month, year=j.year
+                    )
+                    balance.append(bal)
+            CheckLeaveBalance.objects.bulk_create(balance)
 
 
         messages.info(request, 'User and Profile Successfully Created')
@@ -3164,7 +3180,7 @@ def sandwichPolicy(request):
 
 def TestFun(request):
     dates = []
-    start = date(2022, 4, 1)
+    start = date(2022, 5, 1)
     end = date(2025, 12, 31)
     while start < end:
         dates.append(start)
@@ -3172,10 +3188,13 @@ def TestFun(request):
     balance = []
     for i in Profile.objects.all():
         for j in dates:
-            bal = CheckLeaveBalance(
-                        emp_id=i.emp_id, month=j.month, year=j.year
-                    )
-            balance.append(bal)
+            try:
+                AccessControl.objects.get(emp_id=i.emp_id, month=j.month, year=j.year)
+            except AccessControl.DoesNotExist:
+                bal = CheckLeaveBalance(
+                            emp_id=i.emp_id, month=j.month, year=j.year
+                        )
+                balance.append(bal)
     CheckLeaveBalance.objects.bulk_create(balance)
 
     # cal = EcplCalander.objects.filter(Q(att_actual='Bench') | Q(att_actual='Attrition') | Q(att_actual='NCNS'))
