@@ -2639,10 +2639,14 @@ def changeMapping(request):
 def PrintBill(request, pk):
     logged_emp_id = request.user.profile.emp_id
     if logged_emp_id in administration_list:
-        bill = BillAdministration.objects.get(id=pk)
-        description = ItemDescriptionAdministration.objects.filter(bill=bill)
-        data = {'bill':bill, 'description':description}
-        return render(request, 'ams/administration/bill.html', data)
+        try:
+            bill = BillAdministration.objects.get(id=pk)
+            description = ItemDescriptionAdministration.objects.filter(bill=bill)
+            data = {'bill':bill, 'description':description}
+            return render(request, 'ams/administration/bill.html', data)
+        except BillAdministration.DoesNotExist:
+            messages.error(request, 'Bad Request')
+            return redirect('/ams/dashboard-redirect')
     else:
         messages.error(request, 'Unauthorized Access!')
         return redirect('/ams/dashboard-redirect')
