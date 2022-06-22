@@ -1122,10 +1122,7 @@ def addNewUserHR(request):  # Test1  # calander pending
         return redirect('/ams/add-new-user')
     else:
         emp_id = request.user.profile.emp_id
-        last_emp_id = LastEmpId.objects.all()
-        lst_emp_id = ""
-        for i in last_emp_id:
-            lst_emp_id = i.emp_id
+        lst_emp_id = LastEmpId.objects.first().emp_id
         emp = Profile.objects.get(emp_id=emp_id)
         all_desi = Designation.objects.all()
 
