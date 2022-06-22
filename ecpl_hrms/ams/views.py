@@ -2726,6 +2726,61 @@ def CreateBill(request):
         data = {'suppliers': suppliers, 'po_no': po_no}
         return render(request, 'ams/administration/create_bill.html', data)
 
+def ViewBill(request):
+    bills = BillAdministration.objects.all()
+    data = {'bills': bills}
+    return render(request, 'ams/administration/view_bills.html', data)
+
+def ViewSuppliers(request):
+    if request.method == "POST":
+        type = request.POST["type"]
+        print(type, 'type')
+        sup_name = request.POST.get("sup_name")
+        sup_address = request.POST.get("sup_address")
+        sup_contact_person = request.POST.get("sup_contact_person")
+        sup_contact_no = request.POST.get("sup_contact_no")
+        sup_contact_email = request.POST.get("sup_contact_email")
+        sup_pan = request.POST.get("sup_pan")
+        sup_gst = request.POST.get("sup_gst")
+        acc_name = request.POST.get("acc_name")
+        acc_no = request.POST.get("acc_no")
+        acc_bank = request.POST.get("acc_bank")
+        bank_branch = request.POST.get("bank_branch")
+        bank_ifsc = request.POST.get("bank_ifsc")
+        cin_code = request.POST.get("cin_code")
+        if type == 'add':
+            SupplierAdministration.objects.create(
+                name=sup_name, address=sup_address, cantact_person=sup_contact_person, contact_no=sup_contact_no,
+                contact_email=sup_contact_email, pan=sup_pan, gst=sup_gst, acc_name=acc_name, acc_no=acc_no,
+                bank_name=acc_bank, bank_branch=bank_branch, ifsc=bank_ifsc, cin_code=cin_code,
+            )
+        elif type == 'edit':
+            id = request.POST["id"]
+            print(id, 'edit')
+            supplier = SupplierAdministration.objects.get(id=id)
+            supplier.name = sup_name
+            supplier.address = sup_address
+            supplier.cantact_person = sup_contact_person
+            supplier.contact_no = sup_contact_no
+            supplier.contact_email = sup_contact_email
+            supplier.pan = sup_pan
+            supplier.gst = sup_gst
+            supplier.acc_name = acc_name
+            supplier.acc_no = acc_no
+            supplier.bank_name = acc_bank
+            supplier.bank_branch = bank_branch
+            supplier.ifsc = bank_ifsc
+            supplier.cin_code = cin_code
+            supplier.save()
+        else:
+            messages.error(request, 'Bad Request!')
+            return redirect('/ams/')
+        return redirect('/ams/view-suppliers')
+    else:
+        suppliers = SupplierAdministration.objects.all()
+        data = {'suppliers': suppliers}
+        return render(request, 'ams/administration/view_suppliers.html', data)
+
 def addAttendance(request):
     mydate = date.today()
     month = mydate.month
@@ -2848,13 +2903,70 @@ def autoApproveLeave(request):  # Test 1, 2
                                                'rm2_id', 'rm3', 'rm3_id'])
     return redirect('/ams/')
 
+#
+# def addLeaveBalance(request, a):
+#     if a == "3cpl@2022$":
+#         emp = EmployeeLeaveBalance.objects.all()
+#         e = date.today()
+#         month = e.month
+#         year = e.year
+#         start_date = date(year, month, 1)
+#         start_date = start_date - monthdelta.monthdelta(1)
+#         end_date = date(year, month, 1)
+#         end_date = end_date - timedelta(days=1)
+#         leavebal = []
+#         leavehist = []
+#         ecpl_cal = EcplCalander.objects.filter(date__range=[start_date, end_date]).exclude(att_actual='Unmarked')
+#         for i in emp:
+#             cal = 0
+#             i.unique_id = e
+#             total_bal = i.pl_balance + i.sl_balance
+#             for j in ecpl_cal:
+#                 if j.emp_id == i.emp_id:
+#                     if j.att_actual == "present" or j.att_actual == "Week OFF" or j.att_actual == "Comp OFF" or j.att_actual == "Client OFF" or j.att_actual == 'PL' or j.att_actual == 'SL' or j.att_actual == 'Training':
+#                         cal += 1
+#                     elif j.att_actual == 'Half Day':
+#                         cal += 0.5
+#
+#             i.sl_balance += 1
+#             pl = round(cal / 20, 2)
+#             i.pl_balance += pl
+#             leavebal.append(i)
+#
+#             if pl > 0:
+#                 pl_hist = leaveHistory()
+#                 pl_hist.unique_id = e
+#                 pl_hist.emp_id = i.emp_id
+#                 pl_hist.date = date.today()
+#                 pl_hist.leave_type = "PL"
+#                 pl_hist.transaction = "Leaves Earned"
+#                 pl_hist.no_days = pl
+#                 pl_hist.total = total_bal + pl
+#                 leavehist.append(pl_hist)
+#
+#             sl_hist = leaveHistory()
+#             sl_hist.unique_id = e
+#             sl_hist.emp_id = i.emp_id
+#             sl_hist.date = date.today()
+#             sl_hist.leave_type = "SL"
+#             sl_hist.transaction = "Leaves Earned"
+#             sl_hist.no_days = 1
+#             sl_hist.total = total_bal + pl + 1
+#             leavehist.append(sl_hist)
+#
+#         EmployeeLeaveBalance.objects.bulk_update(leavebal, ['sl_balance', 'pl_balance'])
+#         leaveHistory.objects.bulk_create(leavehist)
+#         return redirect('/ams/')
+#     else:
+#         messages.success(request, "Unauthorized Access")
+#         return redirect('/ams/')
 
+# Modified
 def addLeaveBalance(request, a):
     if a == "3cpl@2022$":
         emp_ids = []
         for i in Profile.objects.exclude(agent_status='Attrition'):
             emp_ids.append(i.emp_id)
-        emp = EmployeeLeaveBalance.objects.filter(emp_id__in=emp_ids)
         e = date.today()
         month = e.month
         year = e.year
@@ -2862,10 +2974,14 @@ def addLeaveBalance(request, a):
         start_date = start_date - monthdelta.monthdelta(1)
         end_date = date(year, month, 1)
         end_date = end_date - timedelta(days=1)
+        done = []
+        for i in CheckLeaveBalance.objects.filter(status=True, year=start_date.year, month=start_date.month):
+            done.append(i.emp_id)
+        emp = EmployeeLeaveBalance.objects.filter(emp_id__in=emp_ids).exclude(emp_id__in=done)
         leavebal = []
         leavehist = []
         ecpl_cal = EcplCalander.objects.filter(
-            emp_id__in=emp_ids, date__range=[start_date, end_date]).exclude(att_actual='Unmarked')
+            emp_id__in=emp_ids, date__range=[start_date, end_date]).exclude(att_actual='Unmarked', emp_id__in=done)
         for i in emp:
             cal = 0
             i.unique_id = e
@@ -2880,7 +2996,7 @@ def addLeaveBalance(request, a):
             i.sl_balance += 1
             pl = round(cal / 20, 2)
             i.pl_balance += pl
-            leavebal.append(i)
+            i.save()
 
             if pl > 0:
                 pl_hist = leaveHistory()
@@ -2891,7 +3007,7 @@ def addLeaveBalance(request, a):
                 pl_hist.transaction = "Leaves Earned"
                 pl_hist.no_days = pl
                 pl_hist.total = total_bal + pl
-                leavehist.append(pl_hist)
+                pl_hist.save()
 
             sl_hist = leaveHistory()
             sl_hist.unique_id = e
@@ -2901,9 +3017,10 @@ def addLeaveBalance(request, a):
             sl_hist.transaction = "Leaves Earned"
             sl_hist.no_days = 1
             sl_hist.total = total_bal + pl + 1
-            leavehist.append(sl_hist)
-        EmployeeLeaveBalance.objects.bulk_update(leavebal, ['sl_balance', 'pl_balance'])
-        leaveHistory.objects.bulk_create(leavehist)
+            sl_hist.save()
+            check = CheckLeaveBalance.objects.get(emp_id=i.emp_id, year=start_date.year, month=start_date.month)
+            check.status = True
+            check.save()
         return redirect('/ams/')
     else:
         messages.success(request, "Unauthorized Access")
@@ -2998,25 +3115,41 @@ def sandwichPolicy(request):
 
 
 def TestFun(request):
-    cal = EcplCalander.objects.filter(Q(att_actual='Bench') | Q(att_actual='Attrition') | Q(att_actual='NCNS'))
-    ecplcalendar = []
-    for j in cal:
-        startdate = j.date
-        try:
-            enddate = ''
-            cal = EcplCalander.objects.filter(Q(emp_id=j.emp_id), Q(date__gt=startdate),
-                                              ~Q(att_actual='Unmarked')).order_by('date')[:1]
-            for i in cal:
-                enddate = i.date
-            blank_cal = EcplCalander.objects.filter(Q(emp_id=j.emp_id), Q(date__gt=startdate), Q(date__lte=enddate),
-                                                    Q(att_actual='Unmarked'))
-            for i in blank_cal:
-                i.att_actual = j.att_actual
-                ecplcalendar.append(i)
-        except:
-            cal = EcplCalander.objects.filter(Q(emp_id=j.emp_id), Q(date__gt=startdate), Q(att_actual='Unmarked'))
-            for i in cal:
-                i.att_actual = j.att_actual
-                ecplcalendar.append(i)
-    EcplCalander.objects.bulk_update(ecplcalendar, ['att_actual'])
+    dates = []
+    start = date(2022, 4, 1)
+    end = date(2025, 12, 31)
+    while start < end:
+        dates.append(start)
+        start += monthdelta.monthdelta(1)
+    balance = []
+    for i in Profile.objects.all():
+        for j in dates:
+            bal = CheckLeaveBalance(
+                        emp_id=i.emp_id, month=j.month, year=j.year
+                    )
+            balance.append(bal)
+    CheckLeaveBalance.objects.bulk_create(balance)
+
+    # cal = EcplCalander.objects.filter(Q(att_actual='Bench') | Q(att_actual='Attrition') | Q(att_actual='NCNS'))
+    # ecplcalendar = []
+    # for j in cal:
+    #     startdate = j.date
+    #     try:
+    #         enddate = ''
+    #         cal = EcplCalander.objects.filter(Q(emp_id=j.emp_id), Q(date__gt=startdate),
+    #                                           ~Q(att_actual='Unmarked')).order_by('date')[:1]
+    #         for i in cal:
+    #             enddate = i.date
+    #         blank_cal = EcplCalander.objects.filter(Q(emp_id=j.emp_id), Q(date__gt=startdate), Q(date__lte=enddate),
+    #                                                 Q(att_actual='Unmarked'))
+    #         for i in blank_cal:
+    #             i.att_actual = j.att_actual
+    #             ecplcalendar.append(i)
+    #     except:
+    #         cal = EcplCalander.objects.filter(Q(emp_id=j.emp_id), Q(date__gt=startdate), Q(att_actual='Unmarked'))
+    #         for i in cal:
+    #             i.att_actual = j.att_actual
+    #             ecplcalendar.append(i)
+    # EcplCalander.objects.bulk_update(ecplcalendar, ['att_actual'])
+
     return redirect("/ams/")

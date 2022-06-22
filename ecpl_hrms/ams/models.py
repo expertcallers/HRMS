@@ -301,5 +301,9 @@ class ItemDescriptionAdministration(models.Model):
     price = models.FloatField()
     amount = models.FloatField()
 
-
+class CheckLeaveBalance(models.Model):
+    emp_id = models.CharField(max_length=30)
+    month = models.IntegerField()
+    year = models.IntegerField()
+    status = models.BooleanField(default=False)
 
