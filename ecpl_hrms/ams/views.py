@@ -2665,13 +2665,13 @@ def CreateBill(request):
                 delivery_address = '# 18774/4, HBR Layout, 2nd Block 1st Stage, 80ft Main Road, Bangalore - 560043'
             else:
                 delivery_office = 'Expert Callers Solutions Pvt Ltd'
-                delivery_address = 'Gubbi Cross (Towards Dodda Gubbi), Kuvempu Layout, Kothanur, Bengaluru, Karnataka 560077'
+                delivery_address = 'Indraprastha, Gubbi cross, 1st Main Rd, Kuvempu Layout, Kothanur, Bengaluru, Karnataka 560077'
 
             billing = request.POST["billing"]
             if billing == 'old':
                 billing_office = '# 18774/4, HBR Layout, 2nd Block 1st Stage, 80ft Main Road, Bangalore - 560043'
             else:
-                billing_office = 'Gubbi Cross (Towards Dodda Gubbi), Kuvempu Layout, Kothanur, Bengaluru, Karnataka 560077'
+                billing_office = 'Indraprastha, Gubbi cross, 1st Main Rd, Kuvempu Layout, Kothanur, Bengaluru, Karnataka 560077'
 
             contact_person = request.POST["del_contact_name"]
             contact_no = request.POST["del_contact_no"]
@@ -2698,12 +2698,26 @@ def CreateBill(request):
                 )
             else:
                 supplier = SupplierAdministration.objects.get(id=supplier)
+                sup_address = supplier.address
+                sup_contact_person = supplier.cantact_person
+                sup_contact_no = supplier.contact_no
+                sup_contact_email = supplier.contact_email
+                sup_pan = supplier.pan
+                sup_gst = supplier.gst
+                acc_name = supplier.acc_name
+                acc_no = supplier.acc_no
+                acc_bank = supplier.bank_name
+                bank_branch = supplier.bank_branch
+                bank_ifsc = supplier.ifsc
             terms = request.POST["terms"]
             terms = terms.replace('\n', '<br>')
             bill = BillAdministration.objects.create(
                 project=project, po_no=po_no, date=date, supplier=supplier, delivery_office=delivery_office,
                 delivery_address=delivery_address, contact_person=contact_person, contact_no=contact_no,
-                contact_email=contact_email, terms_conditions=terms, billing_office=billing_office
+                contact_email=contact_email, terms_conditions=terms, billing_office=billing_office,
+                supplier_address=sup_address, supplier_contact_person=sup_contact_person, supplier_contact_no=sup_contact_no,
+                supplier_contact_email=sup_contact_email, supplier_pan=sup_pan, supplier_gst=sup_gst, acc_name=acc_name,
+                acc_no=acc_no, bank_name=acc_bank, bank_branch=bank_branch, ifsc=bank_ifsc
             )
             num_of_desc = int(request.POST["num_of_desc"])
             for i in range(1, num_of_desc + 1):

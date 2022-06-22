@@ -47,7 +47,7 @@
                 <td class="align-middle" >Supplier Address:</td>
                 <td class="align-middle" >
                     <b>{{bill.supplier.name}}</b><br>
-                    {{bill.supplier.address}}
+                    {{bill.supplier_address}}
                 </td>
                 <td class="align-middle" >Delivery Address: </td>
                 <td class="align-middle" >
@@ -57,31 +57,31 @@
             </tr>
             <tr>
                 <td class="align-middle" >Supplier Contact Name </td>
-                <td class="align-middle" >{{bill.supplier.cantact_person}}</td>
+                <td class="align-middle" >{{bill.supplier_contact_person}}</td>
                 <td class="align-middle" >Contact Name</td>
                 <td class="align-middle" >{{bill.contact_person}}</td>
             </tr>
             <tr>
                 <td class="align-middle" >Supplier Contact Number </td>
-                <td class="align-middle" >{{bill.supplier.contact_no}}</td>
+                <td class="align-middle" >{{bill.supplier_contact_no}}</td>
                 <td class="align-middle" >Buyer Contact Number</td>
                 <td class="align-middle" >{{bill.contact_no}}</td>
             </tr>
             <tr>
                 <td class="align-middle" >Email Address</td>
-                <td class="align-middle" >{{bill.supplier.contact_email}}</td>
+                <td class="align-middle" >{{bill.supplier_contact_email}}</td>
                 <td class="align-middle" >Email Address</td>
                 <td class="align-middle" >{{bill.contact_email}}</td>
             </tr>
             <tr>
                 <td class="align-middle" >PAN. No:</td>
-                <td class="align-middle" >{{bill.supplier.pan}}</td>
+                <td class="align-middle" >{{bill.supplier_pan}}</td>
                 <td class="align-middle" >PAN. No:</td>
                 <td class="align-middle" >{{bill.pan}}</td>
             </tr>
             <tr>
                 <td class="align-middle" >Vendor GST No:</td>
-                <td class="align-middle" >{{bill.supplier.gst}}</td>
+                <td class="align-middle" >{{bill.supplier_gst}}</td>
                 <td class="align-middle" >Buyer-GST NO:</td>
                 <td class="align-middle" >{{bill.gst}}</td>
             </tr>
@@ -144,19 +144,19 @@
             </tr>
             <tr>
                 <th style="width: 25%;">Account Details: </th>
-                <td colspan="3">{{bill.supplier.acc_name}}</td>
+                <td colspan="3">{{bill.acc_name}}</td>
             </tr>
             <tr>
                 <th style="width: 25%;">Bank and Branch</th>
-                <td colspan="3">{{bill.supplier.bank_name}} and {{bill.supplier.bank_branch}}</td>
+                <td colspan="3">{{bill.bank_name}} and {{bill.bank_branch}}</td>
             </tr>
             <tr>
                 <th style="width: 25%;">Account No:</th>
-                <td colspan="3">{{bill.supplier.acc_no}}</td>
+                <td colspan="3">{{bill.acc_no}}</td>
             </tr>
             <tr>
                 <th style="width: 25%;">IFSC Code</th>
-                <td colspan="3">{{bill.supplier.ifsc}}</td>
+                <td colspan="3">{{bill.ifsc}}</td>
             </tr>
             <tr>
                 <th colspan="2" style="width: 50%" class="text-center">For {{bill.supplier.name}}</th>

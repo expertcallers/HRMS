@@ -292,6 +292,18 @@ class BillAdministration(models.Model):
     gst_amount = models.FloatField(null=True, blank=True)
     grand_total = models.FloatField(null=True, blank=True)
 
+    supplier_address = models.TextField()
+    supplier_contact_person = models.CharField(max_length=200)
+    supplier_contact_no = models.CharField(max_length=50)
+    supplier_contact_email = models.CharField(max_length=200)
+    supplier_pan = models.CharField(max_length=200)
+    supplier_gst = models.CharField(max_length=200)
+    acc_name = models.CharField(max_length=200)
+    acc_no = models.CharField(max_length=200)
+    bank_name = models.CharField(max_length=200)
+    bank_branch = models.CharField(max_length=200)
+    ifsc = models.CharField(max_length=200)
+
 class ItemDescriptionAdministration(models.Model):
     bill = models.ForeignKey(BillAdministration, on_delete=models.CASCADE)
     description = models.TextField()
