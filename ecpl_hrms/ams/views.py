@@ -1109,8 +1109,8 @@ def addNewUserHR(request):  # Test1  # calander pending
             balance = []
             for j in dates:
                 try:
-                    AccessControl.objects.get(emp_id=emp_id, month=j.month, year=j.year)
-                except AccessControl.DoesNotExist:
+                    CheckLeaveBalance.objects.get(emp_id=emp_id, month=j.month, year=j.year)
+                except CheckLeaveBalance.DoesNotExist:
                     bal = CheckLeaveBalance(
                         emp_id=emp_id, month=j.month, year=j.year
                     )
@@ -3186,8 +3186,8 @@ def TestFun(request):
     for i in Profile.objects.all():
         for j in dates:
             try:
-                AccessControl.objects.get(emp_id=i.emp_id, month=j.month, year=j.year)
-            except AccessControl.DoesNotExist:
+                CheckLeaveBalance.objects.get(emp_id=i.emp_id, month=j.month, year=j.year)
+            except CheckLeaveBalance.DoesNotExist:
                 bal = CheckLeaveBalance(
                             emp_id=i.emp_id, month=j.month, year=j.year
                         )
