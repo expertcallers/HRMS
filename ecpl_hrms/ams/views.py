@@ -45,7 +45,8 @@ management_list = []
 rm_list = []
 hr_tl_am_list = []
 hr_om_list = []
-admin_list = ['7875', '8082', '1732', '249', '7297', '5638']
+admin_list = []
+administration_list = []
 
 
 # Create your views here.
@@ -62,10 +63,16 @@ def view_403(request, exception=None):
 
 
 def loginAndRedirect(request):  # Test1 Test2
+    for i in AccessControl.objects.all():
+        if i.access == 'Administration':
+            if i.emp_id not in administration_list:
+                administration_list.append(i.emp_id)
+        elif i.access == 'Admin':
+            if i.emp_id not in admin_list:
+                admin_list.append(i.emp_id)
     for i in Designation.objects.filter(category='TL AM'):
         if i.name not in tl_am_list:
             tl_am_list.append(i.name)
-
     for i in Designation.objects.filter(Q(category='Manager List') | Q(category='Management List')):
         if i.name not in manager_list:
             manager_list.append(i.name)
@@ -176,7 +183,8 @@ def agentDashBoard(request):  # Test1 Test2
         leave_hist = LeaveTable.objects.filter(Q(emp_id=emp_id), Q(leave_type__in=['SL', 'PL', 'ML'])).order_by(
             '-id')[:5]
 
-        data = {'emp': emp, 'leave_hist': leave_hist, 'admin_list': admin_list}
+        data = {'emp': emp, 'leave_hist': leave_hist, 'admin_list': admin_list,
+                'administration_list': administration_list}
         return render(request, 'ams/agent-dashboard-new.html', data)
     else:
         return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
@@ -260,7 +268,7 @@ def tlDashboard(request):  # Test1 Test2
                 'unmarked_count': unmarked_count, 'map_tickets_counts': map_tickets_counts,
                 'all_emp': all_emp, 'sl_count': sl_count, 'pl_count': pl_count, 'attrition_count': attrition_count,
                 'training_count': training_count, 'leave_req_count': leave_req_count, 'month_cal': month_cal,
-                "rm3": rm3, 'admin_list': admin_list}
+                "rm3": rm3, 'admin_list': admin_list, 'administration_list': administration_list}
 
         return render(request, 'ams/rm-dashboard-new.html', data)
 
@@ -383,7 +391,7 @@ def managerDashboard(request):  # Test1 Test2
             'all_ams': all_ams_under, 'all_ams_count': all_ams_count,
             'map_tickets_counts': map_tickets_counts, 'att_requests_count': att_requests_count,
             'leave_req_count': leave_req_count, 'leave_esc_count': leave_esc_count, 'all_emp': all_emps_under,
-            'month_cal': month_cal, 'admin_list': admin_list,
+            'month_cal': month_cal, 'admin_list': admin_list, 'administration_list': administration_list
             }
     return render(request, 'ams/manager-dashboard.html', data)
 
@@ -622,7 +630,8 @@ def hrDashboard(request):  # Test1
                 "leave_req_count": leave_req_count, "map_tickets_counts": map_tickets_counts,
                 "leave_esc_count": leave_esc_count, "att_requests_count": att_requests_count,
                 "hr_tl_am_list": hr_tl_am_list, "hr_om_list": hr_om_list,
-                "leave_req_count_final": leave_req_count_final, 'admin_list': admin_list}
+                "leave_req_count_final": leave_req_count_final, 'admin_list': admin_list,
+                'administration_list': administration_list}
         return render(request, 'ams/hr_dashboard.html', data)
     else:
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
@@ -2625,36 +2634,136 @@ def changeMapping(request):
         return redirect('/ams/')
 
 
+@login_required
 def PrintBill(request, pk):
-    bill = BillAdministration.objects.get(id=pk)
-    description = ItemDescriptionAdministration.objects.filter(bill=bill)
-    data = {'bill':bill, 'description':description}
-    return render(request, 'ams/administration/bill.html', data)
+    logged_emp_id = request.user.profile.emp_id
+    if logged_emp_id in administration_list:
+        bill = BillAdministration.objects.get(id=pk)
+        description = ItemDescriptionAdministration.objects.filter(bill=bill)
+        data = {'bill':bill, 'description':description}
+        return render(request, 'ams/administration/bill.html', data)
+    else:
+        messages.error(request, 'Unauthorized Access!')
+        return redirect('/ams/dashboard-redirect')
 
+@login_required
 def CreateBill(request):
-    if request.method == "POST":
-        project = request.POST["project"]
-        date = request.POST["date"]
-        po_no = request.POST["po_no"]
-        delivery = request.POST["delivery"]
-        if delivery == 'old':
-            delivery_office = 'Expert Callers Solutions Pvt Ltd'
-            delivery_address = '# 18774/4, HBR Layout, 2nd Block 1st Stage, 80ft Main Road, Bangalore - 560043'
-        else:
-            delivery_office = 'Expert Callers Solutions Pvt Ltd'
-            delivery_address = 'Gubbi Cross (Towards Dodda Gubbi), Kuvempu Layout, Kothanur, Bengaluru, Karnataka 560077'
+    logged_emp_id = request.user.profile.emp_id
+    if logged_emp_id in administration_list:
+        if request.method == "POST":
+            project = request.POST["project"]
+            date = request.POST["date"]
+            po_no = request.POST["po_no"]
+            delivery = request.POST["delivery"]
+            if delivery == 'old':
+                delivery_office = 'Expert Callers Solutions Pvt Ltd'
+                delivery_address = '# 18774/4, HBR Layout, 2nd Block 1st Stage, 80ft Main Road, Bangalore - 560043'
+            else:
+                delivery_office = 'Expert Callers Solutions Pvt Ltd'
+                delivery_address = 'Gubbi Cross (Towards Dodda Gubbi), Kuvempu Layout, Kothanur, Bengaluru, Karnataka 560077'
 
-        billing = request.POST["billing"]
-        if billing == 'old':
-            billing_office = '# 18774/4, HBR Layout, 2nd Block 1st Stage, 80ft Main Road, Bangalore - 560043'
-        else:
-            billing_office = 'Gubbi Cross (Towards Dodda Gubbi), Kuvempu Layout, Kothanur, Bengaluru, Karnataka 560077'
+            billing = request.POST["billing"]
+            if billing == 'old':
+                billing_office = '# 18774/4, HBR Layout, 2nd Block 1st Stage, 80ft Main Road, Bangalore - 560043'
+            else:
+                billing_office = 'Gubbi Cross (Towards Dodda Gubbi), Kuvempu Layout, Kothanur, Bengaluru, Karnataka 560077'
 
-        contact_person = request.POST["del_contact_name"]
-        contact_no = request.POST["del_contact_no"]
-        contact_email = request.POST["del_email"]
-        supplier = request.POST["supplier"]
-        if supplier == 'other':
+            contact_person = request.POST["del_contact_name"]
+            contact_no = request.POST["del_contact_no"]
+            contact_email = request.POST["del_email"]
+            supplier = request.POST["supplier"]
+            if supplier == 'other':
+                sup_name = request.POST.get("sup_name")
+                sup_address = request.POST.get("sup_address")
+                sup_contact_person = request.POST.get("sup_contact_person")
+                sup_contact_no = request.POST.get("sup_contact_no")
+                sup_contact_email = request.POST.get("sup_contact_email")
+                sup_pan = request.POST.get("sup_pan")
+                sup_gst = request.POST.get("sup_gst")
+                acc_name = request.POST.get("acc_name")
+                acc_no = request.POST.get("acc_no")
+                acc_bank = request.POST.get("acc_bank")
+                bank_branch = request.POST.get("bank_branch")
+                bank_ifsc = request.POST.get("bank_ifsc")
+                cin_code = request.POST.get("cin_code")
+                supplier = SupplierAdministration.objects.create(
+                    name=sup_name, address=sup_address, cantact_person=sup_contact_person, contact_no=sup_contact_no,
+                    contact_email=sup_contact_email, pan=sup_pan, gst=sup_gst, acc_name=acc_name, acc_no=acc_no,
+                    bank_name=acc_bank, bank_branch=bank_branch, ifsc=bank_ifsc, cin_code=cin_code,
+                )
+            else:
+                supplier = SupplierAdministration.objects.get(id=supplier)
+            terms = request.POST["terms"]
+            terms = terms.replace('\n', '<br>')
+            bill = BillAdministration.objects.create(
+                project=project, po_no=po_no, date=date, supplier=supplier, delivery_office=delivery_office,
+                delivery_address=delivery_address, contact_person=contact_person, contact_no=contact_no,
+                contact_email=contact_email, terms_conditions=terms, billing_office=billing_office
+            )
+            num_of_desc = int(request.POST["num_of_desc"])
+            for i in range(1, num_of_desc + 1):
+                bill = bill
+                description = request.POST.get('description_'+str(i))
+                qty = int(request.POST.get('qty_'+str(i)))
+                gst_percent = int(request.POST.get('des_gst_'+str(i)))
+                price = int(request.POST.get('price_'+str(i)))
+                amount = qty * price
+                gst_amount = (amount * gst_percent)/100
+                amount += gst_amount
+                ItemDescriptionAdministration.objects.create(
+                    bill=bill, description=description, qty=qty, price=price, amount=amount, gst_percent=gst_percent,
+                    gst_amount=gst_amount
+                )
+            total_amount = 0
+            gst_amount = 0
+            for i in ItemDescriptionAdministration.objects.filter(bill=bill):
+                total_amount += i.amount
+                gst_amount += i.gst_amount
+            grand_total = total_amount + gst_amount
+            grand_total = round(grand_total, 2)
+            amount_words = num2words(grand_total, lang='en_IN')
+            amount_words = amount_words.replace(',', '')
+            bill.total_amount = total_amount
+            bill.gst_amount = gst_amount
+            bill.grand_total = grand_total
+            bill.amount_words = amount_words
+            bill.save()
+            first = LastEmpId.objects.first()
+            po_no = LastEmpId.objects.exclude(id=first.id)
+            for i in po_no:
+                i.emp_id = int(i.emp_id) + 1
+                i.save()
+            return redirect('/ams/print-bill/'+str(bill.id))
+        else:
+            first = LastEmpId.objects.first()
+            po_no = LastEmpId.objects.exclude(id=first.id)
+            for i in po_no:
+                po_no = '%.2d' % int(i.emp_id)
+            po_no = 'EC'+str(datetime.today().month)+str(datetime.today().year)[2:4]+po_no
+            suppliers = SupplierAdministration.objects.all()
+            data = {'suppliers': suppliers, 'po_no': po_no}
+            return render(request, 'ams/administration/create_bill.html', data)
+
+    else:
+        messages.error(request, 'Unauthorized Access!')
+        return redirect('/ams/dashboard-redirect')
+
+@login_required
+def ViewBill(request):
+    logged_emp_id = request.user.profile.emp_id
+    if logged_emp_id in administration_list:
+        bills = BillAdministration.objects.all()
+        data = {'bills': bills}
+        return render(request, 'ams/administration/view_bills.html', data)
+    else:
+        messages.error(request, 'Unauthorized Access!')
+        return redirect('/ams/dashboard-redirect')
+
+def ViewSuppliers(request):
+    logged_emp_id = request.user.profile.emp_id
+    if logged_emp_id in administration_list:
+        if request.method == "POST":
+            type = request.POST["type"]
             sup_name = request.POST.get("sup_name")
             sup_address = request.POST.get("sup_address")
             sup_contact_person = request.POST.get("sup_contact_person")
@@ -2668,118 +2777,40 @@ def CreateBill(request):
             bank_branch = request.POST.get("bank_branch")
             bank_ifsc = request.POST.get("bank_ifsc")
             cin_code = request.POST.get("cin_code")
-            supplier = SupplierAdministration.objects.create(
-                name=sup_name, address=sup_address, cantact_person=sup_contact_person, contact_no=sup_contact_no,
-                contact_email=sup_contact_email, pan=sup_pan, gst=sup_gst, acc_name=acc_name, acc_no=acc_no,
-                bank_name=acc_bank, bank_branch=bank_branch, ifsc=bank_ifsc, cin_code=cin_code,
-            )
+            if type == 'add':
+                SupplierAdministration.objects.create(
+                    name=sup_name, address=sup_address, cantact_person=sup_contact_person, contact_no=sup_contact_no,
+                    contact_email=sup_contact_email, pan=sup_pan, gst=sup_gst, acc_name=acc_name, acc_no=acc_no,
+                    bank_name=acc_bank, bank_branch=bank_branch, ifsc=bank_ifsc, cin_code=cin_code,
+                )
+            elif type == 'edit':
+                id = request.POST["id"]
+                supplier = SupplierAdministration.objects.get(id=id)
+                supplier.name = sup_name
+                supplier.address = sup_address
+                supplier.cantact_person = sup_contact_person
+                supplier.contact_no = sup_contact_no
+                supplier.contact_email = sup_contact_email
+                supplier.pan = sup_pan
+                supplier.gst = sup_gst
+                supplier.acc_name = acc_name
+                supplier.acc_no = acc_no
+                supplier.bank_name = acc_bank
+                supplier.bank_branch = bank_branch
+                supplier.ifsc = bank_ifsc
+                supplier.cin_code = cin_code
+                supplier.save()
+            else:
+                messages.error(request, 'Bad Request!')
+                return redirect('/ams/')
+            return redirect('/ams/view-suppliers')
         else:
-            supplier = SupplierAdministration.objects.get(id=supplier)
-        terms = request.POST["terms"]
-        terms = terms.replace('\n', '<br>')
-        bill = BillAdministration.objects.create(
-            project=project, po_no=po_no, date=date, supplier=supplier, delivery_office=delivery_office,
-            delivery_address=delivery_address, contact_person=contact_person, contact_no=contact_no,
-            contact_email=contact_email, terms_conditions=terms, billing_office=billing_office
-        )
-        num_of_desc = int(request.POST["num_of_desc"])
-        for i in range(1, num_of_desc + 1):
-            bill = bill
-            description = request.POST.get('description_'+str(i))
-            qty = int(request.POST.get('qty_'+str(i)))
-            gst_percent = int(request.POST.get('des_gst_'+str(i)))
-            price = int(request.POST.get('price_'+str(i)))
-            amount = qty * price
-            gst_amount = (amount * gst_percent)/100
-            amount += gst_amount
-            ItemDescriptionAdministration.objects.create(
-                bill=bill, description=description, qty=qty, price=price, amount=amount, gst_percent=gst_percent,
-                gst_amount=gst_amount
-            )
-        total_amount = 0
-        gst_amount = 0
-        for i in ItemDescriptionAdministration.objects.filter(bill=bill):
-            total_amount += i.amount
-            gst_amount += i.gst_amount
-        grand_total = total_amount + gst_amount
-        grand_total = round(grand_total, 2)
-        amount_words = num2words(grand_total, lang='en_IN')
-        amount_words = amount_words.replace(',', '')
-        bill.total_amount = total_amount
-        bill.gst_amount = gst_amount
-        bill.grand_total = grand_total
-        bill.amount_words = amount_words
-        bill.save()
-        first = LastEmpId.objects.first()
-        po_no = LastEmpId.objects.exclude(id=first.id)
-        for i in po_no:
-            i.emp_id = int(i.emp_id) + 1
-            i.save()
-        return redirect('/ams/print-bill/'+str(bill.id))
+            suppliers = SupplierAdministration.objects.all()
+            data = {'suppliers': suppliers}
+            return render(request, 'ams/administration/view_suppliers.html', data)
     else:
-        first = LastEmpId.objects.first()
-        po_no = LastEmpId.objects.exclude(id=first.id)
-        for i in po_no:
-            po_no = '%.2d' % int(i.emp_id)
-        po_no = 'EC'+str(datetime.today().month)+str(datetime.today().year)[2:4]+po_no
-        suppliers = SupplierAdministration.objects.all()
-        data = {'suppliers': suppliers, 'po_no': po_no}
-        return render(request, 'ams/administration/create_bill.html', data)
-
-def ViewBill(request):
-    bills = BillAdministration.objects.all()
-    data = {'bills': bills}
-    return render(request, 'ams/administration/view_bills.html', data)
-
-def ViewSuppliers(request):
-    if request.method == "POST":
-        type = request.POST["type"]
-        print(type, 'type')
-        sup_name = request.POST.get("sup_name")
-        sup_address = request.POST.get("sup_address")
-        sup_contact_person = request.POST.get("sup_contact_person")
-        sup_contact_no = request.POST.get("sup_contact_no")
-        sup_contact_email = request.POST.get("sup_contact_email")
-        sup_pan = request.POST.get("sup_pan")
-        sup_gst = request.POST.get("sup_gst")
-        acc_name = request.POST.get("acc_name")
-        acc_no = request.POST.get("acc_no")
-        acc_bank = request.POST.get("acc_bank")
-        bank_branch = request.POST.get("bank_branch")
-        bank_ifsc = request.POST.get("bank_ifsc")
-        cin_code = request.POST.get("cin_code")
-        if type == 'add':
-            SupplierAdministration.objects.create(
-                name=sup_name, address=sup_address, cantact_person=sup_contact_person, contact_no=sup_contact_no,
-                contact_email=sup_contact_email, pan=sup_pan, gst=sup_gst, acc_name=acc_name, acc_no=acc_no,
-                bank_name=acc_bank, bank_branch=bank_branch, ifsc=bank_ifsc, cin_code=cin_code,
-            )
-        elif type == 'edit':
-            id = request.POST["id"]
-            print(id, 'edit')
-            supplier = SupplierAdministration.objects.get(id=id)
-            supplier.name = sup_name
-            supplier.address = sup_address
-            supplier.cantact_person = sup_contact_person
-            supplier.contact_no = sup_contact_no
-            supplier.contact_email = sup_contact_email
-            supplier.pan = sup_pan
-            supplier.gst = sup_gst
-            supplier.acc_name = acc_name
-            supplier.acc_no = acc_no
-            supplier.bank_name = acc_bank
-            supplier.bank_branch = bank_branch
-            supplier.ifsc = bank_ifsc
-            supplier.cin_code = cin_code
-            supplier.save()
-        else:
-            messages.error(request, 'Bad Request!')
-            return redirect('/ams/')
-        return redirect('/ams/view-suppliers')
-    else:
-        suppliers = SupplierAdministration.objects.all()
-        data = {'suppliers': suppliers}
-        return render(request, 'ams/administration/view_suppliers.html', data)
+        messages.error(request, 'Unauthorized Access!')
+        return redirect('/ams/dashboard-redirect')
 
 def addAttendance(request):
     mydate = date.today()

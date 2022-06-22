@@ -120,6 +120,11 @@ class SupplierAdministrationSearch(admin.ModelAdmin):
     search_fields = ('name',)
     list_display = ('name', 'cantact_person', 'contact_no', 'contact_email')
 
+class AccessControlSearch(admin.ModelAdmin):
+    search_fields = ('emp_id', 'access')
+    list_display = ('emp_id', 'access')
+    list_filter = ('emp_id', 'access')
+
 
 admin.site.register(EcplCalander, AttendanceSearch)
 admin.site.register(OnboardingnewHRC, OnboardingnewHRCSearch)
@@ -140,4 +145,5 @@ admin.site.register(BillAdministration, BillAdministrationSearch)
 admin.site.register(ItemDescriptionAdministration, ItemDescriptionAdministrationSearch)
 admin.site.register(SupplierAdministration, SupplierAdministrationSearch)
 admin.site.register(CheckLeaveBalance, CheckLeaveBalanceSearch)
+admin.site.register(AccessControl, AccessControlSearch)
 

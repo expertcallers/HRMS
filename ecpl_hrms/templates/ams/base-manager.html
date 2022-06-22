@@ -97,7 +97,7 @@
                       <!--<li><a href="all_emp.html">Active Employees</a></li>-->
                     </ul>
                   </li>
-                    <li><a><i class="fa fa-check-square-o"></i>Leave Management<span class="fa fa-chevron-down"></span></a>
+                  <li><a><i class="fa fa-check-square-o"></i>Leave Management<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/ams/leave-history"> Agent Leave History</a></li>
                       <li><a href="/ams/ams-apply_leave">Your Leaves</a></li>
@@ -106,6 +106,10 @@
                   <li><a href="/ams/attendance-calendar"><i class="fa fa-calendar"></i> Attendance Calendar</a></li>
                   {% if request.user.profile.emp_id in admin_list %}
                   {% include 'ams/admin_urls.html' %}
+                  {% endif %}
+
+                  {% if request.user.profile.emp_id in administration_list %}
+                  {% include 'ams/administration_urls.html' %}
                   {% endif %}
                     <li><a href="/ams/rm-mapping-index"><i class="fa fa-user"></i> Mapping</a></li>
                   <li><a href="/ams/rm-settings"><i class="fa fa-gears"></i> Settings</a></li>

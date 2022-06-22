@@ -42,6 +42,10 @@
                   {% if request.user.profile.emp_id in admin_list %}
                   {% include 'ams/admin_urls.html' %}
                   {% endif %}
+
+                  {% if request.user.profile.emp_id in administration_list %}
+                  {% include 'ams/administration_urls.html' %}
+                  {% endif %}
                   <li><a href="/ams/attendance-calendar"><i class="fa fa-calendar"></i> Attendance Calendar</a></li>
                   <li><a href="/ams/ams-apply_leave"><i class="fa fa-calendar-times"></i> Leaves</a></li>
                   <li><a href="/ams/ams-agent-settings"><i class="fa fa-gears"></i> Settings</a></li>

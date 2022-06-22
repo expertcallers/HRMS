@@ -307,3 +307,6 @@ class CheckLeaveBalance(models.Model):
     year = models.IntegerField()
     status = models.BooleanField(default=False)
 
+class AccessControl(models.Model):
+    emp_id = models.CharField(max_length=30)
+    access = models.CharField(max_length=200)
