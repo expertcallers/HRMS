@@ -2479,8 +2479,8 @@ def AttendanceCorrectionSubmitAdmin(request):
                 att_his = AttendanceCorrectionHistory(
                     applied_by=emp_name, applied_by_id=emp_id, applied_date=date.today(),
                     date_for=cal.date, att_old=old_att, att_new=new_att,
-                    emp_name=cal.emp_name, emp_id=cal.emp_id, rm3_name=cal.emp_rm3,
-                    rm3_id=cal.emp_rm3_id, approved_by='CC TEAM', status=True, cal_id=cal.id,
+                    emp_name=cal.emp_name, emp_id=cal.emp_id, rm3_name=cal.rm3,
+                    rm3_id=cal.rm3_id, approved_by='CC TEAM', status=True, cal_id=cal.id,
                     om_response="Approved", comments="Approved by CCTeam", reason="Approved by CCTeam"
                 )
                 att_create.append(att_his)
@@ -2963,6 +2963,7 @@ def autoApproveLeave(request):  # Test 1, 2
 
 # Modified
 def addLeaveBalance(request, a):
+    print(datetime.now(), 'Start')
     if a == "3cpl@2022$":
         emp_ids = []
         for i in Profile.objects.exclude(agent_status='Attrition'):
@@ -2981,7 +2982,7 @@ def addLeaveBalance(request, a):
         leavebal = []
         leavehist = []
         ecpl_cal = EcplCalander.objects.filter(
-            emp_id__in=emp_ids, date__range=[start_date, end_date]).exclude(att_actual='Unmarked', emp_id__in=done)
+            emp_id__in=emp_ids, date__range=[start_date, end_date]).exclude(emp_id__in=done)
         for i in emp:
             cal = 0
             i.unique_id = e
@@ -3021,6 +3022,8 @@ def addLeaveBalance(request, a):
             check = CheckLeaveBalance.objects.get(emp_id=i.emp_id, year=start_date.year, month=start_date.month)
             check.status = True
             check.save()
+
+        print(datetime.now(), 'End')
         return redirect('/ams/')
     else:
         messages.success(request, "Unauthorized Access")
