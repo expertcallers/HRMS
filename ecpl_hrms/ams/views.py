@@ -2963,10 +2963,9 @@ def autoApproveLeave(request):  # Test 1, 2
 
 # Modified
 def addLeaveBalance(request, a):
-    print(datetime.now(), 'Start')
     if a == "3cpl@2022$":
         emp_ids = []
-        for i in Profile.objects.exclude(agent_status='Attrition'):
+        for i in Profile.objects.all():
             emp_ids.append(i.emp_id)
         e = date.today()
         month = e.month
@@ -2979,8 +2978,6 @@ def addLeaveBalance(request, a):
         for i in CheckLeaveBalance.objects.filter(status=True, year=start_date.year, month=start_date.month):
             done.append(i.emp_id)
         emp = EmployeeLeaveBalance.objects.filter(emp_id__in=emp_ids).exclude(emp_id__in=done)
-        leavebal = []
-        leavehist = []
         ecpl_cal = EcplCalander.objects.filter(
             emp_id__in=emp_ids, date__range=[start_date, end_date]).exclude(emp_id__in=done)
         for i in emp:
@@ -3023,7 +3020,6 @@ def addLeaveBalance(request, a):
             check.status = True
             check.save()
 
-        print(datetime.now(), 'End')
         return redirect('/ams/')
     else:
         messages.success(request, "Unauthorized Access")
