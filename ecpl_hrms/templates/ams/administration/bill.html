@@ -28,8 +28,8 @@
     <table class="table table-bordered nopadding" style="margin:0;">
         <thead>
             <tr>
-                <th colspan="4" style="padding-top: 10px; padding-bottom: 10px;">
-                    <div class="row">
+                <th colspan="4" class="align-middle" style="padding-top: 10px; padding-bottom: 10px;">
+                    <div class="row align-middle">
                         <div class="col-md-3">
                             <img src="{% static 'assets/images/ecpl-logo-new.png' %}" class="imgmd" style="width:100%">
                         </div>
@@ -105,32 +105,40 @@
     <table class="table table-bordered" style="margin:0;">
         <tbody>
             <tr>
-                <th class="text-center">Description</th>
-                <th class="text-center">Qty</th>
-                <th class="text-center">Price</th>
-                <th class="text-center">GST Percentage %</th>
-                <th class="text-center">Amount (Exclusive of GST)</th>
+                <th class="text-center align-middle" rowspan="2">Description</th>
+                <th class="text-center align-middle" rowspan="2">Qty</th>
+                <th class="text-center align-middle" rowspan="2">Price</th>
+                <th class="text-center align-middle" rowspan="2">GST Percentage %</th>
+                <th class="text-center align-middle" colspan="2">Amount (Exclusive of GST)</th>
+            </tr>
+            <tr>
+                <th class="text-center">Rupees</th>
+                <th class="text-center" width="20px;">Paise</th>
             </tr>
             {% for i in description %}
             <tr>
                 <td>{{i.description}}</td>
                 <td>{{i.qty}}</td>
-                <td>{{i.price|floatformat:2|intcomma}}/-</td>
+                <td align="right">{{i.price|intcomma}}</td>
                 <td>{{i.gst_percent}}%</td>
-                <td>{{i.amount|floatformat:2|intcomma}}/-</td>
+                <td align="right">{{i.amount_rupees|intcomma}}</td>
+                <td align="right">{{i.amount_paise}}</td>
             </tr>
             {% endfor %}
             <tr>
                 <th colspan="4" class="text-right">Total Amount</th>
-                <td>{{bill.total_amount|floatformat:2|intcomma}}/-</td>
+                <td align="right">{{total_amount_rupees|intcomma}}</td>
+                <td align="right">{{total_amount_paise|intcomma}}</td>
             </tr>
             <tr>
                 <th colspan="4" class="text-right">GST</th>
-                <td>{{bill.gst_amount|floatformat:2|intcomma}}/-</td>
+                <td align="right">{{gst_rupees|intcomma}}</td>
+                <td align="right">{{gst_paise}}</td>
             </tr>
             <tr>
                 <th colspan="4" class="text-right">Grand Total</th>
-                <th>{{bill.grand_total|floatformat:2|intcomma}}/-</th>
+                <th align="right" class="text-right">{{grand_total_rupees|intcomma}}</th>
+                <th align="right" class="text-right">{{grand_total_paise|intcomma}}</th>
             </tr>
         </tbody>
     </table>

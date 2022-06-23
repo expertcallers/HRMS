@@ -2651,8 +2651,28 @@ def PrintBill(request, pk):
     if logged_emp_id in administration_list:
         try:
             bill = BillAdministration.objects.get(id=pk)
-            description = ItemDescriptionAdministration.objects.filter(bill=bill)
-            data = {'bill':bill, 'description':description}
+            descriptions = ItemDescriptionAdministration.objects.filter(bill=bill)
+            description = []
+            for i in descriptions:
+                a = {}
+                a['description'] = i.description
+                a['qty'] = i.qty
+                a['price'] = i.price
+                a['gst_percent'] = i.gst_percent
+                amount_rupees = int(i.amount)
+                amount_paise = str(round(i.amount - amount_rupees, 2))[2:4]
+                a['amount_rupees'] = amount_rupees
+                a['amount_paise'] = amount_paise
+                description.append(a)
+            gst_rupees = int(bill.gst_amount)
+            gst_paise = str(round(bill.gst_amount - gst_rupees, 2))[2:4]
+            total_amount_rupees = int(bill.total_amount)
+            total_amount_paise = str(round(bill.total_amount - total_amount_rupees, 2))[2:4]
+            grand_total_rupees = int(bill.grand_total)
+            grand_total_paise = str(round(bill.grand_total - grand_total_rupees, 2))[2:4]
+            data = {'bill': bill, 'description': description, 'gst_rupees': gst_rupees, 'gst_paise': gst_paise,
+                    'total_amount_rupees': total_amount_rupees, 'total_amount_paise': total_amount_paise,
+                    'grand_total_rupees': grand_total_rupees, 'grand_total_paise': grand_total_paise}
             return render(request, 'ams/administration/bill.html', data)
         except BillAdministration.DoesNotExist:
             messages.error(request, 'Bad Request')
@@ -2738,7 +2758,7 @@ def CreateBill(request):
                 description = request.POST.get('description_'+str(i))
                 qty = int(request.POST.get('qty_'+str(i)))
                 gst_percent = int(request.POST.get('des_gst_'+str(i)))
-                price = int(request.POST.get('price_'+str(i)))
+                price = float(request.POST.get('price_'+str(i)))
                 amount = qty * price
                 gst_amount = (amount * gst_percent)/100
                 ItemDescriptionAdministration.objects.create(

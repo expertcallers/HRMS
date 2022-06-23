@@ -56,7 +56,7 @@
                       </div>
                       <div class="col-md-3 mt-2 form-group">
                         <label for="del_contact_no">Buyer Contact Number</label>
-                        <input type="number" name="del_contact_no" onKeyPress="if(this.value.length==11) return false;" id="del_contact_no" class="form-control" required>
+                        <input type="text" maxlength="10" pattern="[0-9]{10}" name="del_contact_no" id="del_contact_no" class="form-control" required>
                       </div>
                       <div class="col-md-3 mt-2 form-group">
                         <label for="del_email">Buyer Email</label>
@@ -91,7 +91,7 @@
                           </div>
                           <div class="col-md-3 mt-2 form-group">
                             <label for="sup_contact_no">Contact Person Number</label>
-                            <input type="number" name="sup_contact_no" onKeyPress="if(this.value.length==11) return false;" id="sup_contact_no" class="form-control">
+                            <input type="text" maxlength="10" pattern="[0-9]{10}" name="sup_contact_no" id="sup_contact_no" class="form-control">
                           </div>
                           <div class="col-md-3 mt-2 form-group">
                             <label for="sup_contact_email">Contact Person Email</label>
@@ -99,15 +99,15 @@
                           </div>
                           <div class="col-md-3 mt-2 form-group">
                             <label for="sup_pan">PAN Number</label>
-                            <input type="text" name="sup_pan" id="sup_pan" class="form-control">
+                            <input type="text" name="sup_pan" maxlength="10" id="sup_pan" class="form-control">
                           </div>
                           <div class="col-md-3 mt-2 form-group">
                             <label for="sup_gst">Vendor GST Number</label>
-                            <input type="text" name="sup_gst" id="sup_gst" class="form-control">
+                            <input type="text" name="sup_gst" maxlength="15" id="sup_gst" class="form-control">
                           </div>
                           <div class="col-md-3 mt-2 form-group">
                             <label for="cin_code">CIN Code</label>
-                            <input type="text" name="cin_code" id="cin_code" class="form-control">
+                            <input type="text" name="cin_code" maxlength="21" pattern="[0-9]{21}" title="Enter only Numbers" id="cin_code" class="form-control">
                           </div>
                           <div class="col-md-3 mt-2 form-group">
                             <label for="acc_name">Name as per Bank</label>
@@ -115,7 +115,7 @@
                           </div>
                           <div class="col-md-3 mt-2 form-group">
                             <label for="acc_no">Account Number</label>
-                            <input type="number" name="acc_no" onKeyPress="if(this.value.length==20) return false;" id="acc_no" class="form-control">
+                            <input type="text" name="acc_no" maxlength="20" pattern=".{8,20}" id="acc_no" class="form-control">
                           </div>
                           <div class="col-md-3 mt-2 form-group">
                             <label for="acc_bank">Bank</label>
@@ -152,7 +152,7 @@
                           </div>
                           <div class="col-md-3 mt-2 form-group">
                             <label for="price_1">Price</label>
-                            <input type="number" name="price_1" id="price_1" class="form-control" required>
+                            <input type="number" name="price_1" id="price_1" step="any" class="form-control" required>
                           </div>
                           <input type="hidden" value="1" id="num_of_desc" name="num_of_desc">
                         </div>
@@ -233,7 +233,7 @@
     desc += '</div>';
     desc += '<div class="col-md-3 mt-2 form-group">';
     desc += '<label for="price_'+n+'">Price</label>';
-    desc += '<input type="number" name="price_'+n+'" id="price_'+n+'" class="form-control" required>';
+    desc += '<input type="number" step="any" name="price_'+n+'" id="price_'+n+'" class="form-control" required>';
     desc += '</div>';
     desc += '</div>';
     $('#description_box').append(desc);
