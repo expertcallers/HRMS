@@ -628,8 +628,8 @@
         price = (parseFloat(price_list[i]) * parseFloat(qty_list[i]))
         total_gst += ((price * parseFloat(gst_list[i])) / 100)
         total_price += price
-        grand_total += (total_price + total_gst)
     }
+    grand_total = (total_price + total_gst)
     $('#total_amount_view').html(parseFloat(total_price).toFixed(2))
     $('#gst_amount_view').html(parseFloat(total_gst).toFixed(2))
     $('#grand_total_view').html(parseFloat(grand_total).toFixed(2))
