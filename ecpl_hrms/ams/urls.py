@@ -103,6 +103,7 @@ urlpatterns = [
     path('print-bill/<int:pk>', PrintBill),
     path('create-bill', CreateBill),
     path('get-supplier', getSupplier),
+    path('get-amount-words', getWords),
     path('view-bills', ViewBill),
     path('view-suppliers', ViewSuppliers),
 

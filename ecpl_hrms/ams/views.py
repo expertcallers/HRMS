@@ -2784,14 +2784,15 @@ def CreateBill(request):
             for i in po_no:
                 i.emp_id = int(i.emp_id) + 1
                 i.save()
-            return redirect('/ams/print-bill/'+str(bill.id))
+            return redirect('/ams/view-bills')
         else:
             first = LastEmpId.objects.first()
             po_no = LastEmpId.objects.exclude(id=first.id)
             for i in po_no:
                 po_no = '%.2d' % int(i.emp_id)
+            num = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25]
             suppliers = SupplierAdministration.objects.all()
-            data = {'suppliers': suppliers, 'po': po_no}
+            data = {'suppliers': suppliers, 'po': po_no, 'num':num}
             return render(request, 'ams/administration/create_bill.html', data)
 
     else:
@@ -2800,13 +2801,10 @@ def CreateBill(request):
 
 @login_required
 def getSupplier(request):
-    print('IN FUN')
     logged_emp_id = request.user.profile.emp_id
     if logged_emp_id in administration_list:
-        print('IN IF')
         id = request.POST['id']
         supplier = SupplierAdministration.objects.get(id=id)
-        print(supplier, 'supplier')
         dic = {}
         dic['name'] = str(supplier.name)
         dic['address'] = str(supplier.address)
@@ -2822,6 +2820,18 @@ def getSupplier(request):
         dic['ifsc'] = str(supplier.ifsc)
         dic['cin_code'] = str(supplier.cin_code)
         return HttpResponse(json.dumps(dic))
+    else:
+        messages.error(request, 'Unauthorized Access!')
+        pass
+
+@login_required
+def getWords(request):
+    logged_emp_id = request.user.profile.emp_id
+    if logged_emp_id in administration_list:
+        amount = request.POST['amount']
+        amount_words = num2words(amount, lang='en_IN')
+        amount_words = amount_words.replace(',', '')
+        return HttpResponse(amount_words)
     else:
         messages.error(request, 'Unauthorized Access!')
         pass

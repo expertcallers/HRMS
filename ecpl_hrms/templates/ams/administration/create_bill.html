@@ -153,7 +153,7 @@
                           </div>
                           <div class="col-md-3 mt-2 form-group">
                             <label for="price_1">Price</label>
-                            <input type="number" name="price_1" id="price_1" step="any" class="form-control" required>
+                            <input type="number" name="price_1" id="price_1" step="0.01" class="form-control" required>
                           </div>
                           <input type="hidden" value="1" id="num_of_desc" name="num_of_desc">
                         </div>
@@ -284,7 +284,7 @@
                     <td id="price_view_1" align="right"></td>
                     <td id="gst_view_1"></td>
                     <td id="amount_rs_view_1" align="right"></td>
-                    <td id="amount_p_view_1" align="right"></td>
+                    <td id="amount_p_view_1" align="right">00</td>
                 </tr>
             </tbody>
         </table>
@@ -308,7 +308,7 @@
             <tbody>
                 <tr>
                     <th style="width: 25%;">Amount in words:</th>
-                    <td colspan="3">{{bill.amount_words}}</td>
+                    <td colspan="3" id="bill_amount_words">{{bill.amount_words}}</td>
                 </tr>
                 <tr>
                     <th style="width: 25%;">CIN Code:</th>
@@ -318,7 +318,7 @@
                     <th colspan="4" class="text-center">Terms and Condition</th>
                 </tr>
                 <tr>
-                    <td colspan="4" class="text-left">{{bill.terms_conditions|safe}}</td>
+                    <td colspan="4" class="text-left" id="terms_view">{{bill.terms_conditions|safe}}</td>
                 </tr>
                 <tr>
                     <td colspan="4" class="text-left">Mode of Payment (NEFT/RTGS) :</td>
@@ -407,6 +407,11 @@
         $('#billing_view').html(billing)
     }
   });
+
+  $("#terms").focusout(function(){
+    $('#terms_view').html((this.value).replace("\n", "<br>"));
+  });
+
   $("#project").focusout(function(){
     $('#project_name').html(this.value);
   });
@@ -427,19 +432,18 @@
   var price_list = [];
   var qty_list = [];
   var gst_list = [];
-  var total_price = 0
-  var total_gst = 0
-  var grand_total = 0
   $("#description_1").focusout(function(){
     $('#description_view_1').html(this.value);
   });
   $("#des_gst_1").focusout(function(){
     $('#gst_view_1').html(this.value);
     gst_list[0] = this.value;
+    calculate_price();
   });
   $("#qty_1").focusout(function(){
     $('#qty_view_1').html(this.value);
     qty_list[0] = this.value;
+    calculate_price();
   });
   $("#price_1").focusout(function(){
     $('#price_view_1').html(this.value);
@@ -447,8 +451,10 @@
     amount_float = parseFloat(qty_list[0]) * parseFloat(price_list[0])
     amount = parseInt(amount_float)
     $('#amount_rs_view_1').html(parseInt(amount))
-    paise = (amount_float - amount).toString().slice(2,4)
-    $('#amount_p_view_1').html(parseInt(paise))
+    paise = parseFloat((amount_float - amount))
+    if (paise > 0) {
+        $('#amount_p_view_1').html(paise.toFixed(2).toString().slice(2,))
+    }
     calculate_price();
   });
 
@@ -467,6 +473,18 @@
       $('#acc_bank').attr('required','');
       $('#bank_branch').attr('required','');
       $('#bank_ifsc').attr('required','');
+        $('#supplier_view').html('')
+        $('#supplier_contact_name_view').html('')
+        $('#supplier_contact_no_view').html('')
+        $('#supplier_contact_email_view').html('')
+        $('#supplier_pan_view').html('')
+        $('#supplier_gst_view').html('')
+        $('#supplier_name').html('')
+        $('#supplier_acc').html('')
+        $('#supplier_acc_no').html('')
+        $('#supplier_acc_bank').html('')
+        $('#supplier_acc_ifsc').html('')
+        $('#supplier_acc_cin').html('')
     } else {
       $('#supplier_hidden').addClass('d-none');
       $('#sup_name').removeAttr('required');
@@ -481,14 +499,27 @@
       $('#acc_bank').removeAttr('required');
       $('#bank_branch').removeAttr('required');
       $('#bank_ifsc').removeAttr('required');
-
-        $csrf = $('[name="csrfmiddlewaretoken"]').val();
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
         $.ajax({
           type: "POST",
           url: "get-supplier",
           data: {
             id: e.value,
-            csrfmiddlewaretoken: $csrf
+            csrfmiddlewaretoken: csrftoken
           },
           success: function(data) {
             var supplier = eval('(' + data + ')');
@@ -522,19 +553,19 @@
     desc += '<div class="row mt-2" id="item_'+n+'">';
     desc += '<div class="col-md-4 mt-2 form-group">';
     desc += '<label for="description_'+n+'">Description</label>';
-    desc += '<textarea name="description_'+n+'" id="description_'+n+'" class="form-control" required></textarea>';
+    desc += '<textarea name="description_'+n+'" onfocusout="description_view_'+n+'(this)" id="description_'+n+'" class="form-control" required></textarea>';
     desc += '</div>';
     desc += '<div class="col-md-2 mt-2 form-group">';
     desc += '<label for="des_gst_'+n+'">GST</label>';
-    desc += '<input type="number" min="0" max="50" name="des_gst_'+n+'" id="des_gst_'+n+'" class="form-control" required>';
+    desc += '<input type="number" min="0" onfocusout="gst_view_'+n+'(this)" max="50" name="des_gst_'+n+'" id="des_gst_'+n+'" class="form-control" required>';
     desc += '</div>';
     desc += '<div class="col-md-3 mt-2 form-group">';
     desc += '<label for="qty_'+n+'">Quantity</label>';
-    desc += '<input type="number" name="qty_'+n+'" id="qty_'+n+'" class="form-control" required>';
+    desc += '<input type="number" onfocusout="qty_view_'+n+'(this)" name="qty_'+n+'" id="qty_'+n+'" class="form-control" required>';
     desc += '</div>';
     desc += '<div class="col-md-3 mt-2 form-group">';
     desc += '<label for="price_'+n+'">Price</label>';
-    desc += '<input type="number" step="any" name="price_'+n+'" id="price_'+n+'" class="form-control" required>';
+    desc += '<input type="number" step="0.01" onfocusout="price_view_'+n+'(this)" name="price_'+n+'" id="price_'+n+'" class="form-control" required>';
     desc += '</div>';
     desc += '</div>';
     $('#description_box').append(desc);
@@ -545,27 +576,145 @@
     rows += '<td id="price_view_'+n+'" align="right"></td>';
     rows += '<td id="gst_view_'+n+'"></td>';
     rows += '<td id="amount_rs_view_'+n+'" align="right"></td>';
-    rows += '<td id="amount_p_view_'+n+'" align="right"></td>';
+    rows += '<td id="amount_p_view_'+n+'" align="right">00</td>';
     rows += '</tr>';
     $('#my_rows').append(rows);
   }
+  {% for i in num %}
+  function description_view_{{i}}(e) {
+    $('#description_view_{{i}}').html(e.value);
+  }
+  function gst_view_{{i}}(e) {
+    $('#gst_view_{{i}}').html(e.value);
+    gst_list[{{i}}-1] = e.value;
+    calculate_price();
+  }
+  function qty_view_{{i}}(e) {
+    $('#qty_view_{{i}}').html(e.value);
+    qty_list[{{i}}-1] = e.value;
+    calculate_price();
+  }
+  function price_view_{{i}}(e) {
+    $('#price_view_{{i}}').html(e.value);
+    price_list[{{i}}-1] = e.value;
+    amount_float = parseFloat(qty_list[{{i}}-1]) * parseFloat(price_list[{{i}}-1])
+    amount = parseInt(amount_float)
+    $('#amount_rs_view_{{i}}').html(parseInt(amount))
+    paise = parseFloat((amount_float - amount))
+    if (paise > 0) {
+        $('#amount_p_view_{{i}}').html(paise.toFixed(2).toString().slice(2,))
+    }
+    calculate_price();
+  }
+  {% endfor %}
+
   function removeDescription() {
     if ($('#item_'+n+'').html()) {
+      price_list.pop();
+      qty_list.pop();
+      gst_list.pop();
       row_name = $('#row_'+n+'').remove();
       item = $('#item_'+n+'').remove();
       n = n - 1;
       $('#num_of_desc').val(n);
+      calculate_price();
     }
   }
   function calculate_price() {
+    var total_price = 0
+    var total_gst = 0
+    var grand_total = 0
     for (var i=0; i < price_list.length; i++) {
-        total_price += parseFloat(price_list[i]) * parseFloat(qty_list[i])
-        total_gst += (total_price * parseFloat(gst_list[i])) / 100
-        grand_total += total_price + total_gst
-        $('#total_amount_view').html(total_price)
-        $('#gst_amount_view').html(total_gst)
-        $('#grand_total_view').html(grand_total)
+        price = (parseFloat(price_list[i]) * parseFloat(qty_list[i]))
+        total_gst += ((price * parseFloat(gst_list[i])) / 100)
+        total_price += price
+        grand_total += (total_price + total_gst)
     }
+    grand_total = parseFloat(grand_total).toFixed(2)
+    $('#total_amount_view').html(parseFloat(total_price).toFixed(2))
+    $('#gst_amount_view').html(parseFloat(total_gst).toFixed(2))
+    $('#grand_total_view').html(parseFloat(grand_total).toFixed(2))
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    $.ajax({
+      type: "POST",
+      url: "get-amount-words",
+      data: {
+        amount: grand_total,
+        csrfmiddlewaretoken: csrftoken
+      },
+      success: function(data) {
+        $('#bill_amount_words').html(data)
+      },
+      error:function(e){
+          alert("something wrong "+ e) // this will alert an error
+      }
+    });
   }
+
+  $("#sup_name").focusout(function(){
+    content = '<b>';
+    content += this.value;
+    content += '</b>';
+    $('#supplier_view').html(content);
+    $('#supplier_name').html('For '+this.value)
+  });
+  $("#sup_address").focusout(function(){
+    content = '<p>';
+    content += this.value;
+    content += '</p>';
+    $('#supplier_view').append(content);
+  });
+  $("#sup_contact_person").focusout(function(){
+    $('#supplier_contact_name_view').html(this.value);
+  });
+  $("#sup_contact_no").focusout(function(){
+    $('#supplier_contact_no_view').html(this.value);
+  });
+  $("#sup_contact_email").focusout(function(){
+    $('#supplier_contact_email_view').html(this.value);
+  });
+  $("#sup_pan").focusout(function(){
+    $('#supplier_pan_view').html(this.value);
+  });
+  $("#sup_gst").focusout(function(){
+    $('#supplier_gst_view').html(this.value);
+  });
+  $("#cin_code").focusout(function(){
+    $('#supplier_acc_cin').html(this.value);
+  });
+  $("#acc_name").focusout(function(){
+    $('#supplier_acc').html(this.value);
+  });
+  $("#acc_no").focusout(function(){
+    $('#supplier_acc_no').html(this.value);
+  });
+  supplier_acc_bank = ''
+  $("#acc_bank").focusout(function(){
+    supplier_acc_bank += this.value;
+    supplier_acc_bank += ' and ';
+    $('#supplier_acc_bank').html(supplier_acc_bank);
+  });
+  $("#bank_branch").focusout(function(){
+    supplier_acc_bank += this.value;
+    $('#supplier_acc_bank').html(supplier_acc_bank);
+  });
+  $("#bank_ifsc").focusout(function(){
+    $('#supplier_acc_ifsc').html(this.value);
+  });
 </script>
 {% endblock %}
