@@ -630,7 +630,6 @@
         total_price += price
         grand_total += (total_price + total_gst)
     }
-    grand_total = parseFloat(grand_total).toFixed(2)
     $('#total_amount_view').html(parseFloat(total_price).toFixed(2))
     $('#gst_amount_view').html(parseFloat(total_gst).toFixed(2))
     $('#grand_total_view').html(parseFloat(grand_total).toFixed(2))
@@ -654,7 +653,7 @@
       type: "POST",
       url: "get-amount-words",
       data: {
-        amount: grand_total,
+        amount: parseFloat(grand_total).toFixed(2),
         csrfmiddlewaretoken: csrftoken
       },
       success: function(data) {
