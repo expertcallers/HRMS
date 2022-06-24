@@ -649,18 +649,20 @@
         return cookieValue;
     }
     const csrftoken = getCookie('csrftoken');
+    var amount = parseFloat(grand_total).toFixed(2);
+    console.log(amount)
     $.ajax({
       type: "POST",
       url: "get-amount-words",
       data: {
-        amount: parseFloat(grand_total).toFixed(2),
+        amount: amount,
         csrfmiddlewaretoken: csrftoken
       },
       success: function(data) {
         $('#bill_amount_words').html(data)
       },
       error:function(e){
-          alert("something wrong "+ e) // this will alert an error
+          console.log("something wrong "+ e) // this will alert an error
       }
     });
   }
