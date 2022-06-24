@@ -102,6 +102,7 @@ urlpatterns = [
     # PO for Administration
     path('print-bill/<int:pk>', PrintBill),
     path('create-bill', CreateBill),
+    path('get-supplier', getSupplier),
     path('view-bills', ViewBill),
     path('view-suppliers', ViewSuppliers),
 

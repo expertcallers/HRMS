@@ -2790,14 +2790,41 @@ def CreateBill(request):
             po_no = LastEmpId.objects.exclude(id=first.id)
             for i in po_no:
                 po_no = '%.2d' % int(i.emp_id)
-            po_no = 'EC'+str(datetime.today().month)+str(datetime.today().year)[2:4]+po_no
             suppliers = SupplierAdministration.objects.all()
-            data = {'suppliers': suppliers, 'po_no': po_no}
+            data = {'suppliers': suppliers, 'po': po_no}
             return render(request, 'ams/administration/create_bill.html', data)
 
     else:
         messages.error(request, 'Unauthorized Access!')
         return redirect('/ams/dashboard-redirect')
+
+@login_required
+def getSupplier(request):
+    print('IN FUN')
+    logged_emp_id = request.user.profile.emp_id
+    if logged_emp_id in administration_list:
+        print('IN IF')
+        id = request.POST['id']
+        supplier = SupplierAdministration.objects.get(id=id)
+        print(supplier, 'supplier')
+        dic = {}
+        dic['name'] = str(supplier.name)
+        dic['address'] = str(supplier.address)
+        dic['cantact_person'] = str(supplier.cantact_person)
+        dic['contact_no'] = str(supplier.contact_no)
+        dic['contact_email'] = str(supplier.contact_email)
+        dic['pan'] = str(supplier.pan)
+        dic['gst'] = str(supplier.gst)
+        dic['acc_name'] = str(supplier.acc_name)
+        dic['acc_no'] = str(supplier.acc_no)
+        dic['bank_name'] = str(supplier.bank_name)
+        dic['bank_branch'] = str(supplier.bank_branch)
+        dic['ifsc'] = str(supplier.ifsc)
+        dic['cin_code'] = str(supplier.cin_code)
+        return HttpResponse(json.dumps(dic))
+    else:
+        messages.error(request, 'Unauthorized Access!')
+        pass
 
 @login_required
 def ViewBill(request):
@@ -2810,6 +2837,7 @@ def ViewBill(request):
         messages.error(request, 'Unauthorized Access!')
         return redirect('/ams/dashboard-redirect')
 
+@login_required
 def ViewSuppliers(request):
     logged_emp_id = request.user.profile.emp_id
     if logged_emp_id in administration_list:
@@ -3196,6 +3224,7 @@ def sandwichPolicy(request):
 
 
 def TestFun(request):
+    CheckLeaveBalance.objects.all().delete()
     dates = []
     start = date(2022, 5, 1)
     end = date(2025, 12, 31)
@@ -3205,13 +3234,10 @@ def TestFun(request):
     balance = []
     for i in Profile.objects.all():
         for j in dates:
-            try:
-                CheckLeaveBalance.objects.get(emp_id=i.emp_id, month=j.month, year=j.year)
-            except CheckLeaveBalance.DoesNotExist:
-                bal = CheckLeaveBalance(
-                            emp_id=i.emp_id, month=j.month, year=j.year
-                        )
-                balance.append(bal)
+            bal = CheckLeaveBalance(
+                        emp_id=i.emp_id, month=j.month, year=j.year
+                    )
+            balance.append(bal)
     CheckLeaveBalance.objects.bulk_create(balance)
 
     # cal = EcplCalander.objects.filter(Q(att_actual='Bench') | Q(att_actual='Attrition') | Q(att_actual='NCNS'))

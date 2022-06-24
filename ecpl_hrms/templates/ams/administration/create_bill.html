@@ -7,6 +7,7 @@
 </style>
 {% endblock %}
 {% block main %}
+  {% load humanize %}
   {% load static %}
         <!-- page content -->
         <div class="right_col" role="main">
@@ -24,7 +25,7 @@
                     <div class="row">
                       <div class="col-md-3 mt-2 form-group">
                         <label for="project">Project Name: </label>
-                        <input type="text" name="project" id="project" class="form-control" required>
+                        <input type="text" name="project" id="project" onkeypress="project(this)" class="form-control" required>
                       </div>
                       <div class="col-md-3 mt-2 form-group">
                         <label for="date">Date</label>
@@ -36,7 +37,7 @@
                       </div>
                       <div class="col-md-3 mt-2 form-group">
                         <label for="delivery">Delivery Office</label>
-                        <select name="delivery" id="delivery" class="form-control" required>
+                        <select name="delivery" id="delivery" onchange="get_po(this)" class="form-control" required>
                           <option value="" selected disabled>-- PLease Select --</option>
                           <option value="old">HBR Office</option>
                           <option value="new">Kothanur Office</option>
@@ -168,6 +169,7 @@
                         <textarea name="terms" id="terms" class="form-control" rows="5" required></textarea>
                       </div>
                       <div class="col-md-12 mt-2 form-group">
+                        <button type="button" class="btn btn-primary form-control" data-toggle="modal" data-target="#view_bill">View Bill</button>
                         <button type="submit" class="btn btn-success form-control" onclick="return confirmm()">Submit</button>
                       </div>
                     </div>
@@ -180,9 +182,276 @@
         <!-- /page content -->
 
 
-  {% endblock %}
+<div class="modal fade" id="view_bill" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">View Bill</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-bordered nopadding" style="margin:0;">
+            <thead>
+                <tr>
+                    <th colspan="4" class="align-middle" style="padding-top: 10px; padding-bottom: 10px;">
+                        <div class="row align-middle">
+                            <div class="col-md-3">
+                                <img src="{% static 'assets/images/ecpl-logo-new.png' %}" class="imgmd" style="width:100%">
+                            </div>
+                            <div class="col-md-6 align-middle" align="center">
+                                <h1 class="align-middle">PURCHASE ORDER</h1>
+                            </div>
+                            <div class="col-md-3" align="center">
+
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th class="align-middle"  rowspan="2" style="width: 25%">Project Name: </th>
+                    <td class="align-middle"  rowspan="2" style="width: 25%" id="project_name"></td>
+                    <td class="align-middle"  style="width: 25%">DATE: </td>
+                    <td class="align-middle"  style="width: 25%" id="date_value"></td>
+                </tr>
+                <tr>
+                    <td class="align-middle" >PO.No </td>
+                    <td class="align-middle" id="po_no_value"></td>
+                </tr>
+                <tr>
+                    <td class="align-middle" >Supplier Address:</td>
+                    <td class="align-middle" id="supplier_view">
+                    </td>
+                    <td class="align-middle" >Delivery Address: </td>
+                    <td class="align-middle" id="delivery_view">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="align-middle" >Supplier Contact Name </td>
+                    <td class="align-middle" id="supplier_contact_name_view"></td>
+                    <td class="align-middle" >Contact Name</td>
+                    <td class="align-middle"  id="contact_name_view"></td>
+                </tr>
+                <tr>
+                    <td class="align-middle" >Supplier Contact Number </td>
+                    <td class="align-middle" id="supplier_contact_no_view"></td>
+                    <td class="align-middle" >Buyer Contact Number</td>
+                    <td class="align-middle"  id="contact_no_view"></td>
+                </tr>
+                <tr>
+                    <td class="align-middle" >Email Address</td>
+                    <td class="align-middle" id="supplier_contact_email_view"></td>
+                    <td class="align-middle" >Email Address</td>
+                    <td class="align-middle"  id="contact_email_view"></td>
+                </tr>
+                <tr>
+                    <td class="align-middle" >PAN. No:</td>
+                    <td class="align-middle" id="supplier_pan_view"></td>
+                    <td class="align-middle" >PAN. No:</td>
+                    <td class="align-middle" id="pan_view"></td>
+                </tr>
+                <tr>
+                    <td class="align-middle" >Vendor GST No:</td>
+                    <td class="align-middle" id="supplier_gst_view"></td>
+                    <td class="align-middle" >Buyer-GST NO:</td>
+                    <td class="align-middle" id="gst_view"></td>
+                </tr>
+                <tr>
+                    <td class="align-middle"  colspan="4"><b>Billing Address:</b> <span id="billing_view"></span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="table table-bordered" style="margin:0;">
+            <tbody id="my_rows">
+                <tr>
+                    <th class="text-center align-middle" rowspan="2">Description</th>
+                    <th class="text-center align-middle" rowspan="2">Qty</th>
+                    <th class="text-center align-middle" rowspan="2">Price</th>
+                    <th class="text-center align-middle" rowspan="2">GST Percentage %</th>
+                    <th class="text-center align-middle" colspan="2">Amount (Exclusive of GST)</th>
+                </tr>
+                <tr>
+                    <th class="text-center">Rupees</th>
+                    <th class="text-center" width="20px;">Paise</th>
+                </tr>
+                <tr id="row_1">
+                    <td id="description_view_1"></td>
+                    <td id="qty_view_1"></td>
+                    <td id="price_view_1" align="right"></td>
+                    <td id="gst_view_1"></td>
+                    <td id="amount_rs_view_1" align="right"></td>
+                    <td id="amount_p_view_1" align="right"></td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="table table-bordered" style="margin:0;">
+            <tbody>
+                <tr>
+                    <th colspan="5" class="text-right">Total Amount</th>
+                    <td align="right" id="total_amount_view">{{total_amount_rupees|intcomma}}</td>
+                </tr>
+                <tr>
+                    <th colspan="5" class="text-right">GST</th>
+                    <td align="right" id="gst_amount_view">{{gst_rupees|intcomma}}</td>
+                </tr>
+                <tr>
+                    <th colspan="5" class="text-right">Grand Total</th>
+                    <th align="right" class="text-right" id="grand_total_view">{{grand_total_rupees|intcomma}}</th>
+                </tr>
+            </tbody>
+        </table>
+        <table class="table table-bordered nopadding" style="margin:0;">
+            <tbody>
+                <tr>
+                    <th style="width: 25%;">Amount in words:</th>
+                    <td colspan="3">{{bill.amount_words}}</td>
+                </tr>
+                <tr>
+                    <th style="width: 25%;">CIN Code:</th>
+                    <td colspan="3" id="supplier_acc_cin"></td>
+                </tr>
+                <tr>
+                    <th colspan="4" class="text-center">Terms and Condition</th>
+                </tr>
+                <tr>
+                    <td colspan="4" class="text-left">{{bill.terms_conditions|safe}}</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="text-left">Mode of Payment (NEFT/RTGS) :</td>
+                </tr>
+                <tr>
+                    <th style="width: 25%;">Account Details: </th>
+                    <td colspan="3" id="supplier_acc"></td>
+                </tr>
+                <tr>
+                    <th style="width: 25%;">Bank and Branch</th>
+                    <td colspan="3" id="supplier_acc_bank"></td>
+                </tr>
+                <tr>
+                    <th style="width: 25%;">Account No:</th>
+                    <td colspan="3" id="supplier_acc_no"></td>
+                </tr>
+                <tr>
+                    <th style="width: 25%;">IFSC Code</th>
+                    <td colspan="3" id="supplier_acc_ifsc"></td>
+                </tr>
+                <tr>
+                    <th colspan="2" style="width: 50%" class="text-center" id="supplier_name">For {{bill.supplier}}</th>
+                    <th colspan="2" class="text-center">For Expert Callers Solutions Pvt Ltd</th>
+                </tr>
+                <tr>
+                    <th colspan="2" style="width: 50%; padding: 80px;" class="text-center"></th>
+                    <th colspan="2" style="width: 50%; padding: 80px;" class="text-center"></th>
+                </tr>
+                <tr>
+                    <th colspan="2" style="width: 50%" class="text-center">Seal and Signature</th>
+                    <th colspan="2" class="text-center">Seal and Signature</th>
+                </tr>
+            </tbody>
+        </table>
+        <div class="row mt-5 mb-5">
+            <div class="col-md-12" align="center">
+                <p>This is the computer generated purchase order hence no signature required.</p>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% csrf_token %}
+{% endblock %}
+
 {% block script %}
 <script>
+  function get_po(e) {
+    var d = new Date(),
+    n = d.getMonth() + 1,
+    y = d.getFullYear().toString().slice(-2);
+    if (e.value=='old'){
+        po = 'E1';
+        po += n;
+        po += y;
+        po += '{{po}}';
+        $('#po_no').val(po);
+        $('#po_no_value').html(po);
+        delivery = '<b>Expert Callers Solutions Pvt Ltd</b><br>';
+        delivery += '# 18774/4, HBR Layout, 2nd Block 1st Stage, 80ft Main Road, Bangalore - 560043';
+        $('#delivery_view').html(delivery)
+    } else {
+        po = 'E2';
+        po += n;
+        po += y;
+        po += '{{po}}';
+        $('#po_no').val(po);
+        $('#po_no_value').html(po);
+        delivery = '<b>Expert Callers Solutions Pvt Ltd</b><br>';
+        delivery += 'Indraprastha, Gubbi cross, 1st Main Rd, Kuvempu Layout, Kothanur, Bengaluru, Karnataka 560077';
+        $('#delivery_view').html(delivery)
+    }
+    $('#pan_view').html('AAECE0810D')
+    $('#gst_view').html('29AAECE0810D1Z6')
+  }
+  $("#billing").on("change", function(){
+    if (this.value=='old'){
+        billing = '# 18774/4, HBR Layout, 2nd Block 1st Stage, 80ft Main Road, Bangalore - 560043';
+        $('#billing_view').html(billing)
+    } else {
+        billing = 'Indraprastha, Gubbi cross, 1st Main Rd, Kuvempu Layout, Kothanur, Bengaluru, Karnataka 560077';
+        $('#billing_view').html(billing)
+    }
+  });
+  $("#project").focusout(function(){
+    $('#project_name').html(this.value);
+  });
+
+  $("#del_contact_name").focusout(function(){
+    $('#contact_name_view').html(this.value);
+  });
+  $("#del_contact_no").focusout(function(){
+    $('#contact_no_view').html(this.value);
+  });
+  $("#del_email").focusout(function(){
+    $('#contact_email_view').html(this.value);
+  });
+
+  $("#date").focusout(function(){
+    $('#date_value').html(moment(this.value).format('DD MMM, YYYY'));
+  });
+  var price_list = [];
+  var qty_list = [];
+  var gst_list = [];
+  var total_price = 0
+  var total_gst = 0
+  var grand_total = 0
+  $("#description_1").focusout(function(){
+    $('#description_view_1').html(this.value);
+  });
+  $("#des_gst_1").focusout(function(){
+    $('#gst_view_1').html(this.value);
+    gst_list[0] = this.value;
+  });
+  $("#qty_1").focusout(function(){
+    $('#qty_view_1').html(this.value);
+    qty_list[0] = this.value;
+  });
+  $("#price_1").focusout(function(){
+    $('#price_view_1').html(this.value);
+    price_list[0] = this.value;
+    amount_float = parseFloat(qty_list[0]) * parseFloat(price_list[0])
+    amount = parseInt(amount_float)
+    $('#amount_rs_view_1').html(parseInt(amount))
+    paise = (amount_float - amount).toString().slice(2,4)
+    $('#amount_p_view_1').html(parseInt(paise))
+    calculate_price();
+  });
+
   function Supplier(e) {
     if ( e.value == 'other' ) {
       $('#supplier_hidden').removeClass('d-none');
@@ -212,6 +481,38 @@
       $('#acc_bank').removeAttr('required');
       $('#bank_branch').removeAttr('required');
       $('#bank_ifsc').removeAttr('required');
+
+        $csrf = $('[name="csrfmiddlewaretoken"]').val();
+        $.ajax({
+          type: "POST",
+          url: "get-supplier",
+          data: {
+            id: e.value,
+            csrfmiddlewaretoken: $csrf
+          },
+          success: function(data) {
+            var supplier = eval('(' + data + ')');
+            supplier_name = '<b>'+supplier.name+'</b><br>'+supplier.address
+            $('#supplier_view').html(supplier_name)
+            $('#supplier_contact_name_view').html(supplier.cantact_person)
+            $('#supplier_contact_no_view').html(supplier.contact_no)
+            $('#supplier_contact_email_view').html(supplier.contact_email)
+            $('#supplier_pan_view').html(supplier.pan)
+            $('#supplier_gst_view').html(supplier.gst)
+            $('#supplier_name').html('For '+supplier.name)
+            $('#supplier_acc').html(supplier.acc_name)
+            $('#supplier_acc_no').html(supplier.acc_no)
+            supplier_acc_bank = supplier.bank_name;
+            supplier_acc_bank += ' and ';
+            supplier_acc_bank += supplier.bank_branch
+            $('#supplier_acc_bank').html(supplier_acc_bank)
+            $('#supplier_acc_ifsc').html(supplier.ifsc)
+            $('#supplier_acc_cin').html(supplier.cin_code)
+          },
+          error:function(e){
+              alert("something wrong "+ e) // this will alert an error
+          }
+        });
     }
   }
   n = 1
@@ -238,12 +539,32 @@
     desc += '</div>';
     $('#description_box').append(desc);
     $('#num_of_desc').val(n);
+    rows = '<tr id="row_'+n+'">';
+    rows += '<td id="description_view_'+n+'"></td>';
+    rows += '<td id="qty_view_'+n+'"></td>';
+    rows += '<td id="price_view_'+n+'" align="right"></td>';
+    rows += '<td id="gst_view_'+n+'"></td>';
+    rows += '<td id="amount_rs_view_'+n+'" align="right"></td>';
+    rows += '<td id="amount_p_view_'+n+'" align="right"></td>';
+    rows += '</tr>';
+    $('#my_rows').append(rows);
   }
   function removeDescription() {
     if ($('#item_'+n+'').html()) {
+      row_name = $('#row_'+n+'').remove();
       item = $('#item_'+n+'').remove();
       n = n - 1;
       $('#num_of_desc').val(n);
+    }
+  }
+  function calculate_price() {
+    for (var i=0; i < price_list.length; i++) {
+        total_price += parseFloat(price_list[i]) * parseFloat(qty_list[i])
+        total_gst += (total_price * parseFloat(gst_list[i])) / 100
+        grand_total += total_price + total_gst
+        $('#total_amount_view').html(total_price)
+        $('#gst_amount_view').html(total_gst)
+        $('#grand_total_view').html(grand_total)
     }
   }
 </script>
