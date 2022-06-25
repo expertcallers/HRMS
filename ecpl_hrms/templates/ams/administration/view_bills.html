@@ -1,0 +1,138 @@
+{% extends 'ams/administration/base.html' %}
+{% block style %}
+<style>
+  body {
+    overflow-x: hidden;
+  }
+</style>
+{% endblock %}
+{% block main %}
+  {% load static %}
+  {% load humanize %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>All POs</h3>
+            </div>
+          </div>
+          <div class="row pb-3">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <table  id="datatablex" class="table table-striped" style="width: 100% !important;">
+                    <thead>
+                      <tr>
+                        <th>PO No.</th>
+                        <th>PO Date</th>
+                        <th>Project</th>
+                        <th>Supplier</th>
+                        <th>Buyer</th>
+                        <th>Total Amount</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tfoot>
+                      <tr>
+                        <th>PO No.</th>
+                        <th>PO Date</th>
+                        <th>Project</th>
+                        <th>Supplier</th>
+                        <th>Buyer</th>
+                        <th>Total Amount</th>
+                        <th>Action</th>
+                      </tr>
+                    </tfoot>
+                    <tbody>
+                      {% for i in bills %}
+                      <tr>
+                          <td>{{i.po_no}}</td>
+                          <td>{{i.date}}</td>
+                          <td>{{i.project}}</td>
+                          <td style="text-transform: capitalize;">{{i.supplier}}</td>
+                          <td>{{i.contact_person}}</td>
+                          <td>{{i.grand_total|floatformat:2|intcomma}}</td>
+                          <td>
+                            <a href="/ams/print-bill/{{i.id}}" target="_blank" class="btn btn-sm btn-success">Print/Download Bill</a>
+                          </td>
+                      </tr>
+                      {% endfor %}
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+
+
+  {% endblock %}
+{% block script %}
+<script>
+  function Supplier(e) {
+    if ( e.value == 'other' ) {
+      $('#supplier_hidden').removeClass('d-none');
+      $('#sup_name').attr('required','');
+      $('#sup_address').attr('required','');
+      $('#sup_contact_person').attr('required','');
+      $('#sup_contact_no').attr('required','');
+      $('#sup_contact_email').attr('required','');
+      $('#sup_pan').attr('required','');
+      $('#sup_gst').attr('required','');
+      $('#acc_name').attr('required','');
+      $('#acc_no').attr('required','');
+      $('#acc_bank').attr('required','');
+      $('#bank_branch').attr('required','');
+      $('#bank_ifsc').attr('required','');
+    } else {
+      $('#supplier_hidden').addClass('d-none');
+      $('#sup_name').removeAttr('required');
+      $('#sup_address').removeAttr('required');
+      $('#sup_contact_person').removeAttr('required');
+      $('#sup_contact_no').removeAttr('required');
+      $('#sup_contact_email').removeAttr('required');
+      $('#sup_pan').removeAttr('required');
+      $('#sup_gst').removeAttr('required');
+      $('#acc_name').removeAttr('required');
+      $('#acc_no').removeAttr('required');
+      $('#acc_bank').removeAttr('required');
+      $('#bank_branch').removeAttr('required');
+      $('#bank_ifsc').removeAttr('required');
+    }
+  }
+  n = 1
+  function addNewDescription() {
+    n = n + 1;
+    desc = ''
+    desc += '<div class="row mt-2" id="item_'+n+'">';
+    desc += '<div class="col-md-4 mt-2 form-group">';
+    desc += '<label for="description_'+n+'">Description</label>';
+    desc += '<textarea name="description_'+n+'" id="description_'+n+'" class="form-control" required></textarea>';
+    desc += '</div>';
+    desc += '<div class="col-md-2 mt-2 form-group">';
+    desc += '<label for="des_gst_'+n+'">GST</label>';
+    desc += '<input type="number" min="0" max="50" name="des_gst_'+n+'" id="des_gst_'+n+'" class="form-control" required>';
+    desc += '</div>';
+    desc += '<div class="col-md-3 mt-2 form-group">';
+    desc += '<label for="qty_'+n+'">Quantity</label>';
+    desc += '<input type="number" name="qty_'+n+'" id="qty_'+n+'" class="form-control" required>';
+    desc += '</div>';
+    desc += '<div class="col-md-3 mt-2 form-group">';
+    desc += '<label for="price_'+n+'">Price</label>';
+    desc += '<input type="number" name="price_'+n+'" id="price_'+n+'" class="form-control" required>';
+    desc += '</div>';
+    desc += '</div>';
+    $('#description_box').append(desc);
+    $('#num_of_desc').val(n);
+  }
+  function removeDescription() {
+    if ($('#item_'+n+'').html()) {
+      item = $('#item_'+n+'').remove();
+      n = n - 1;
+      $('#num_of_desc').val(n);
+    }
+  }
+</script>
+{% endblock %}

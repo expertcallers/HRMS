@@ -1,0 +1,316 @@
+{% extends 'ams/administration/base.html' %}
+{% block style %}
+<style>
+  body {
+    overflow-x: hidden;
+  }
+</style>
+{% endblock %}
+{% block main %}
+  {% load static %}
+  {% load humanize %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>All POs</h3>
+            </div>
+          </div>
+          <div class="row pb-3">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="row">
+                      <div class="col-md-8"></div>
+                      <div class="col-md-4" align="right">
+                          <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#add">
+                              <i class="fa fa-plus"> </i> Add New
+                          </button>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-12">
+                          <table  id="datatablex" class="table table-striped" style="width: 100% !important;">
+                            <thead>
+                              <tr>
+                                <th>Company Name</th>
+                                <th>Cantact Person</th>
+                                <th>PAN</th>
+                                <th>GST</th>
+                                <th>Action</th>
+                              </tr>
+                            </thead>
+                            <tfoot>
+                              <tr>
+                                <th>Company Name</th>
+                                <th>Cantact Person</th>
+                                <th>PAN</th>
+                                <th>GST</th>
+                                <th>Action</th>
+                              </tr>
+                            </tfoot>
+                            <tbody>
+                              {% for i in suppliers %}
+                              <tr>
+                                  <td>{{i.name}}</td>
+                                  <td>{{i.cantact_person}}</td>
+                                  <td>{{i.pan}}</td>
+                                  <td>{{i.gst}}</td>
+                                  <td>
+                                      <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#view_{{i.id}}">View</button>
+                                      <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#edit_{{i.id}}">Edit</button>
+                                  </td>
+                              </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+
+<div class="modal fade" id="add" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Add New</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="modal-body">
+              <div class="row">
+                  <div class="col-md-12">
+                      <div class="row">
+                          <div class="col-md-4 mt-2 form-group">
+                            <label for="sup_name">Company Name</label>
+                            <input type="text" name="sup_name" id="sup_name" class="form-control" required>
+                          </div>
+                          <div class="col-md-4 mt-2 form-group">
+                            <label for="sup_address">Supplier Address</label>
+                            <textarea name="sup_address" id="sup_address" class="form-control" required></textarea>
+                          </div>
+                          <div class="col-md-4 mt-2 form-group">
+                            <label for="sup_contact_person">Supplier Contact Person</label>
+                            <input type="text" name="sup_contact_person" id="sup_contact_person" class="form-control" required>
+                          </div>
+                          <div class="col-md-4 mt-2 form-group">
+                            <label for="sup_contact_no">Contact Person Number</label>
+                            <input type="number" name="sup_contact_no" onKeyPress="if(this.value.length==11) return false;" id="sup_contact_no" class="form-control" required>
+                          </div>
+                          <div class="col-md-4 mt-2 form-group">
+                            <label for="sup_contact_email">Contact Person Email</label>
+                            <input type="email" name="sup_contact_email" id="sup_contact_email" class="form-control" required>
+                          </div>
+                          <div class="col-md-4 mt-2 form-group">
+                            <label for="sup_pan">PAN Number</label>
+                            <input type="text" name="sup_pan" id="sup_pan" class="form-control" required>
+                          </div>
+                          <div class="col-md-4 mt-2 form-group">
+                            <label for="sup_gst">Vendor GST Number</label>
+                            <input type="text" name="sup_gst" id="sup_gst" class="form-control" required>
+                          </div>
+                          <div class="col-md-4 mt-2 form-group">
+                            <label for="cin_code">CIN Code</label>
+                            <input type="text" name="cin_code" id="cin_code" class="form-control">
+                          </div>
+                          <div class="col-md-4 mt-2 form-group">
+                            <label for="acc_name">Name as per Bank</label>
+                            <input type="text" name="acc_name" id="acc_name" class="form-control" required>
+                          </div>
+                          <div class="col-md-4 mt-2 form-group">
+                            <label for="acc_no">Account Number</label>
+                            <input type="number" name="acc_no" onKeyPress="if(this.value.length==20) return false;" id="acc_no" class="form-control" required>
+                          </div>
+                          <div class="col-md-4 mt-2 form-group">
+                            <label for="acc_bank">Bank</label>
+                            <input type="text" name="acc_bank" id="acc_bank" class="form-control" required>
+                          </div>
+                          <div class="col-md-4 mt-2 form-group">
+                            <label for="bank_branch">Bank Branch</label>
+                            <input type="text" name="bank_branch" id="bank_branch" class="form-control" required>
+                          </div>
+                          <div class="col-md-4 mt-2 form-group">
+                            <label for="bank_ifsc">IFSC Code</label>
+                            <input type="text" name="bank_ifsc" id="bank_ifsc" class="form-control" required>
+                          </div>
+                          <input type="hidden" value="add" name="type">
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% for i in suppliers %}
+<div class="modal fade" id="view_{{i.id}}" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="View_Supplier">View {{i.name}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <div class="row">
+              <div class="col-md-12">
+                  <div class="row">
+                      <div class="col-md-4 mt-2 form-group">
+                        <label for="view_sup_name">Company Name</label>
+                        <input type="text" name="sup_name" id="view_sup_name" class="form-control" value="{{i.name}}" disabled>
+                      </div>
+                      <div class="col-md-4 mt-2 form-group">
+                        <label for="view_sup_address">Supplier Address</label>
+                        <textarea name="sup_address" id="view_sup_address" class="form-control" disabled>{{i.address}}</textarea>
+                      </div>
+                      <div class="col-md-4 mt-2 form-group">
+                        <label for="view_sup_contact_person">Supplier Contact Person</label>
+                        <input type="text" name="sup_contact_person" id="view_sup_contact_person" class="form-control" value="{{i.cantact_person}}" disabled>
+                      </div>
+                      <div class="col-md-4 mt-2 form-group">
+                        <label for="view_sup_contact_no">Contact Person Number</label>
+                        <input type="number" name="sup_contact_no" value="{{i.contact_no}}" disabled onKeyPress="if(this.value.length==11) return false;" id="view_sup_contact_no" class="form-control">
+                      </div>
+                      <div class="col-md-4 mt-2 form-group">
+                        <label for="view_sup_contact_email">Contact Person Email</label>
+                        <input type="email" name="sup_contact_email" value="{{i.contact_email}}" disabled id="view_sup_contact_email" class="form-control">
+                      </div>
+                      <div class="col-md-4 mt-2 form-group">
+                        <label for="view_sup_pan">PAN Number</label>
+                        <input type="text" name="sup_pan" value="{{i.pan}}" disabled id="view_sup_pan" class="form-control">
+                      </div>
+                      <div class="col-md-4 mt-2 form-group">
+                        <label for="view_sup_gst">Vendor GST Number</label>
+                        <input type="text" name="sup_gst" value="{{i.gst}}" disabled id="view_sup_gst" class="form-control">
+                      </div>
+                      <div class="col-md-4 mt-2 form-group">
+                        <label for="view_cin_code">CIN Code</label>
+                        <input type="text" name="cin_code" value="{{i.cin_code}}" disabled id="view_cin_code" class="form-control">
+                      </div>
+                      <div class="col-md-4 mt-2 form-group">
+                        <label for="view_acc_name">Name as per Bank</label>
+                        <input type="text" name="acc_name" value="{{i.acc_name}}" disabled id="view_acc_name" class="form-control">
+                      </div>
+                      <div class="col-md-4 mt-2 form-group">
+                        <label for="view_acc_no">Account Number</label>
+                        <input type="number" name="acc_no" value="{{i.acc_no}}" disabled onKeyPress="if(this.value.length==20) return false;" id="view_acc_no" class="form-control">
+                      </div>
+                      <div class="col-md-4 mt-2 form-group">
+                        <label for="view_acc_bank">Bank</label>
+                        <input type="text" name="acc_bank" value="{{i.bank_name}}" disabled id="view_acc_bank" class="form-control">
+                      </div>
+                      <div class="col-md-4 mt-2 form-group">
+                        <label for="view_bank_branch">Bank Branch</label>
+                        <input type="text" name="bank_branch" value="{{i.bank_branch}}" disabled id="view_bank_branch" class="form-control">
+                      </div>
+                      <div class="col-md-4 mt-2 form-group">
+                        <label for="view_bank_ifsc">IFSC Code</label>
+                        <input type="text" name="bank_ifsc" value="{{i.ifsc}}" disabled id="view_bank_ifsc" class="form-control">
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="edit_{{i.id}}" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="Edit_Supplier">Add New</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="modal-body">
+              <div class="row">
+                  <div class="col-md-4 mt-2 form-group">
+                    <label for="edit_sup_name">Company Name</label>
+                    <input type="text" name="sup_name" id="edit_sup_name" class="form-control" required value="{{i.name}}">
+                  </div>
+                  <div class="col-md-4 mt-2 form-group">
+                    <label for="edit_sup_address">Supplier Address</label>
+                    <textarea name="sup_address" id="edit_sup_address" class="form-control" required>{{i.address}}</textarea>
+                  </div>
+                  <div class="col-md-4 mt-2 form-group">
+                    <label for="edit_sup_contact_person">Supplier Contact Person</label>
+                    <input type="text" name="sup_contact_person" id="edit_sup_contact_person" class="form-control" required value="{{i.cantact_person}}">
+                  </div>
+                  <div class="col-md-4 mt-2 form-group">
+                    <label for="edit_sup_contact_no">Contact Person Number</label>
+                    <input type="number" name="sup_contact_no" value="{{i.contact_no}}" onKeyPress="if(this.value.length==11) return false;" id="edit_sup_contact_no" class="form-control" required>
+                  </div>
+                  <div class="col-md-4 mt-2 form-group">
+                    <label for="edit_sup_contact_email">Contact Person Email</label>
+                    <input type="email" name="sup_contact_email" value="{{i.contact_email}}" id="edit_sup_contact_email" class="form-control" required>
+                  </div>
+                  <div class="col-md-4 mt-2 form-group">
+                    <label for="edit_sup_pan">PAN Number</label>
+                    <input type="text" name="sup_pan" value="{{i.pan}}" id="edit_sup_pan" class="form-control" required>
+                  </div>
+                  <div class="col-md-4 mt-2 form-group">
+                    <label for="edit_sup_gst">Vendor GST Number</label>
+                    <input type="text" name="sup_gst" value="{{i.gst}}" id="edit_sup_gst" class="form-control" required>
+                  </div>
+                  <div class="col-md-4 mt-2 form-group">
+                    <label for="edit_cin_code">CIN Code</label>
+                    <input type="text" name="cin_code" value="{{i.cin_code}}" id="edit_cin_code" class="form-control">
+                  </div>
+                  <div class="col-md-4 mt-2 form-group">
+                    <label for="edit_acc_name">Name as per Bank</label>
+                    <input type="text" name="acc_name" value="{{i.acc_name}}" id="edit_acc_name" class="form-control" required>
+                  </div>
+                  <div class="col-md-4 mt-2 form-group">
+                    <label for="edit_acc_no">Account Number</label>
+                    <input type="number" name="acc_no" value="{{i.acc_no}}" onKeyPress="if(this.value.length==20) return false;" id="edit_acc_no" class="form-control" required>
+                  </div>
+                  <div class="col-md-4 mt-2 form-group">
+                    <label for="edit_acc_bank">Bank</label>
+                    <input type="text" name="acc_bank" value="{{i.bank_name}}" id="edit_acc_bank" class="form-control" required>
+                  </div>
+                  <div class="col-md-4 mt-2 form-group">
+                    <label for="edit_bank_branch">Bank Branch</label>
+                    <input type="text" name="bank_branch" value="{{i.bank_branch}}" id="edit_bank_branch" class="form-control" required>
+                  </div>
+                  <div class="col-md-4 mt-2 form-group">
+                    <label for="edit_bank_ifsc">IFSC Code</label>
+                    <input type="text" name="bank_ifsc" value="{{i.ifsc}}" id="edit_bank_ifsc" class="form-control" required>
+                  </div>
+                  <input type="hidden" value="edit" name="type">
+                  <input type="hidden" value="{{i.id}}" name="id">
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}
+{% block script %}
+
+{% endblock %}

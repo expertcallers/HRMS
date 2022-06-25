@@ -1,0 +1,718 @@
+{% extends 'ams/administration/base.html' %}
+{% block style %}
+<style>
+  body {
+    overflow-x: hidden;
+  }
+</style>
+{% endblock %}
+{% block main %}
+  {% load humanize %}
+  {% load static %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>Create PO</h3>
+            </div>
+          </div>
+          <div class="row pb-5">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <form method="POST" action="" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="project">Project Name: </label>
+                        <input type="text" name="project" id="project" onkeypress="project(this)" class="form-control" required>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="date">Date</label>
+                        <input type="date" name="date" id="date" class="form-control" required>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="po_no">PO No.</label>
+                        <input type="text" name="po_no" id="po_no" class="form-control" readonly value="{{po_no}}" required>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="delivery">Delivery Office</label>
+                        <select name="delivery" id="delivery" onchange="get_po(this)" class="form-control" required>
+                          <option value="" selected disabled>-- PLease Select --</option>
+                          <option value="old">HBR Office</option>
+                          <option value="new">Kothanur Office</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="billing">Billing Office</label>
+                        <select name="billing" id="billing" class="form-control" required>
+                          <option value="" selected disabled>-- PLease Select --</option>
+                          <option value="old">HBR Office</option>
+                          <option value="new">Kothanur Office</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="del_contact_name">Buyer Contact Name</label>
+                        <input type="text" name="del_contact_name" id="del_contact_name" class="form-control" required>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="del_contact_no">Buyer Contact Number</label>
+                        <input type="text" maxlength="10" pattern="[0-9]{10}" name="del_contact_no" id="del_contact_no" class="form-control" required>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="del_email">Buyer Email</label>
+                        <input type="email" name="del_email" id="del_email" class="form-control" required>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
+                        <label for="supplier">Supplier</label>
+                        <select name="supplier" id="supplier" class="form-control select2" onchange="Supplier(this)" required>
+                          <option selected disabled>-- PLease Select --</option>
+                          {% for i in suppliers %}
+                          <option value="{{i.id}}">{{i.name}}</option>
+                          {% endfor %}
+                          <option value="other">Other/New</option>
+                        </select>
+                      </div>
+                      <div class="col-md-12 mt-2 border d-none" id="supplier_hidden">
+                        <div class="row">
+                          <div class="text-center col-md-12">
+                            <h4>New Supplier Details</h4>
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="sup_name">Company Name</label>
+                            <input type="text" name="sup_name" id="sup_name" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="sup_address">Supplier Address</label>
+                            <textarea name="sup_address" id="sup_address" class="form-control"></textarea>
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="sup_contact_person">Supplier Contact Person</label>
+                            <input type="text" name="sup_contact_person" id="sup_contact_person" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="sup_contact_no">Contact Person Number</label>
+                            <input type="text" maxlength="10" pattern="[0-9]{10}" name="sup_contact_no" id="sup_contact_no" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="sup_contact_email">Contact Person Email</label>
+                            <input type="email" name="sup_contact_email" id="sup_contact_email" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="sup_pan">PAN Number</label>
+                            <input type="text" name="sup_pan" maxlength="10" id="sup_pan" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="sup_gst">Vendor GST Number</label>
+                            <input type="text" name="sup_gst" maxlength="15" id="sup_gst" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="cin_code">CIN Code</label>
+                            <input type="text" name="cin_code" maxlength="21" pattern="[0-9]{21}" title="Enter 21 Numbers" id="cin_code" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="acc_name">Name as per Bank</label>
+                            <input type="text" name="acc_name" id="acc_name" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="acc_no">Account Number</label>
+                            <input type="text" name="acc_no" maxlength="20" pattern=".{8,20}" id="acc_no" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="acc_bank">Bank</label>
+                            <input type="text" name="acc_bank" id="acc_bank" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="bank_branch">Bank Branch</label>
+                            <input type="text" name="bank_branch" id="bank_branch" class="form-control">
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="bank_ifsc">IFSC Code</label>
+                            <input type="text" name="bank_ifsc" maxlength="12" id="bank_ifsc" class="form-control">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-12 mt-2 border" id="description_box">
+                        <div class="row">
+                          <div class="text-center col-md-12">
+                            <h4>Description</h4>
+                          </div>
+                        </div>
+                        <div class="row mt-2">
+                          <div class="col-md-4 mt-2 form-group">
+                            <label for="description_1">Description</label>
+                            <textarea name="description_1" id="description_1" class="form-control" required></textarea>
+                          </div>
+                          <div class="col-md-2 mt-2 form-group">
+                            <label for="des_gst_1">GST</label>
+                            <input type="number" max="50" min="0" name="des_gst_1" id="des_gst_1" class="form-control" required>
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="qty_1">Quantity</label>
+                            <input type="number" name="qty_1" id="qty_1" class="form-control" required>
+                          </div>
+                          <div class="col-md-3 mt-2 form-group">
+                            <label for="price_1">Price</label>
+                            <input type="number" name="price_1" id="price_1" step="0.01" class="form-control" required>
+                          </div>
+                          <input type="hidden" value="1" id="num_of_desc" name="num_of_desc">
+                        </div>
+                      </div>
+                      <div class="col-md-12 mt-2 form-group">
+                        <div align="center">
+                          <button type="button" class="btn btn-sm btn-success" onclick="addNewDescription()">Add More</button>
+                          <button type="button" class="btn btn-sm btn-danger" onclick="removeDescription()">Remove Last</button>
+                        </div>
+                      </div>
+                      <div class="col-md-12 mt-2 form-group">
+                        <label for="terms">Terms & Conditions</label>
+                        <textarea name="terms" id="terms" class="form-control" rows="5" required></textarea>
+                      </div>
+                      <div class="col-md-12 mt-2 form-group">
+                        <button type="button" class="btn btn-primary form-control" data-toggle="modal" data-target="#view_bill">View Bill</button>
+                        <button type="submit" class="btn btn-success form-control" onclick="return confirmm()">Submit</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+
+
+<div class="modal fade" id="view_bill" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">View Bill</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-bordered nopadding" style="margin:0;">
+            <thead>
+                <tr>
+                    <th colspan="4" class="align-middle" style="padding-top: 10px; padding-bottom: 10px;">
+                        <div class="row align-middle">
+                            <div class="col-md-3">
+                                <img src="{% static 'assets/images/ecpl-logo-new.png' %}" class="imgmd" style="width:100%">
+                            </div>
+                            <div class="col-md-6 align-middle" align="center">
+                                <h1 class="align-middle">PURCHASE ORDER</h1>
+                            </div>
+                            <div class="col-md-3" align="center">
+
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th class="align-middle"  rowspan="2" style="width: 25%">Project Name: </th>
+                    <td class="align-middle"  rowspan="2" style="width: 25%" id="project_name"></td>
+                    <td class="align-middle"  style="width: 25%">DATE: </td>
+                    <td class="align-middle"  style="width: 25%" id="date_value"></td>
+                </tr>
+                <tr>
+                    <td class="align-middle" >PO.No </td>
+                    <td class="align-middle" id="po_no_value"></td>
+                </tr>
+                <tr>
+                    <td class="align-middle" >Supplier Address:</td>
+                    <td class="align-middle" id="supplier_view">
+                    </td>
+                    <td class="align-middle" >Delivery Address: </td>
+                    <td class="align-middle" id="delivery_view">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="align-middle" >Supplier Contact Name </td>
+                    <td class="align-middle" id="supplier_contact_name_view"></td>
+                    <td class="align-middle" >Contact Name</td>
+                    <td class="align-middle"  id="contact_name_view"></td>
+                </tr>
+                <tr>
+                    <td class="align-middle" >Supplier Contact Number </td>
+                    <td class="align-middle" id="supplier_contact_no_view"></td>
+                    <td class="align-middle" >Buyer Contact Number</td>
+                    <td class="align-middle"  id="contact_no_view"></td>
+                </tr>
+                <tr>
+                    <td class="align-middle" >Email Address</td>
+                    <td class="align-middle" id="supplier_contact_email_view"></td>
+                    <td class="align-middle" >Email Address</td>
+                    <td class="align-middle"  id="contact_email_view"></td>
+                </tr>
+                <tr>
+                    <td class="align-middle" >PAN. No:</td>
+                    <td class="align-middle" id="supplier_pan_view"></td>
+                    <td class="align-middle" >PAN. No:</td>
+                    <td class="align-middle" id="pan_view"></td>
+                </tr>
+                <tr>
+                    <td class="align-middle" >Vendor GST No:</td>
+                    <td class="align-middle" id="supplier_gst_view"></td>
+                    <td class="align-middle" >Buyer-GST NO:</td>
+                    <td class="align-middle" id="gst_view"></td>
+                </tr>
+                <tr>
+                    <td class="align-middle"  colspan="4"><b>Billing Address:</b> <span id="billing_view"></span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table class="table table-bordered" style="margin:0;">
+            <tbody id="my_rows">
+                <tr>
+                    <th class="text-center align-middle" rowspan="2">Description</th>
+                    <th class="text-center align-middle" rowspan="2">Qty</th>
+                    <th class="text-center align-middle" rowspan="2">Price</th>
+                    <th class="text-center align-middle" rowspan="2">GST Percentage %</th>
+                    <th class="text-center align-middle" colspan="2">Amount (Exclusive of GST)</th>
+                </tr>
+                <tr>
+                    <th class="text-center">Rupees</th>
+                    <th class="text-center" width="20px;">Paise</th>
+                </tr>
+                <tr id="row_1">
+                    <td id="description_view_1"></td>
+                    <td id="qty_view_1"></td>
+                    <td id="price_view_1" align="right"></td>
+                    <td id="gst_view_1"></td>
+                    <td id="amount_rs_view_1" align="right"></td>
+                    <td id="amount_p_view_1" align="right">00</td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="table table-bordered" style="margin:0;">
+            <tbody>
+                <tr>
+                    <th colspan="5" class="text-right">Total Amount</th>
+                    <td align="right" id="total_amount_view">{{total_amount_rupees|intcomma}}</td>
+                </tr>
+                <tr>
+                    <th colspan="5" class="text-right">GST</th>
+                    <td align="right" id="gst_amount_view">{{gst_rupees|intcomma}}</td>
+                </tr>
+                <tr>
+                    <th colspan="5" class="text-right">Grand Total</th>
+                    <th align="right" class="text-right" id="grand_total_view">{{grand_total_rupees|intcomma}}</th>
+                </tr>
+            </tbody>
+        </table>
+        <table class="table table-bordered nopadding" style="margin:0;">
+            <tbody>
+                <tr>
+                    <th style="width: 25%;">Amount in words:</th>
+                    <td colspan="3" id="bill_amount_words">{{bill.amount_words}}</td>
+                </tr>
+                <tr>
+                    <th style="width: 25%;">CIN Code:</th>
+                    <td colspan="3" id="supplier_acc_cin"></td>
+                </tr>
+                <tr>
+                    <th colspan="4" class="text-center">Terms and Condition</th>
+                </tr>
+                <tr>
+                    <td colspan="4" class="text-left" id="terms_view">{{bill.terms_conditions|safe}}</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="text-left">Mode of Payment (NEFT/RTGS) :</td>
+                </tr>
+                <tr>
+                    <th style="width: 25%;">Account Details: </th>
+                    <td colspan="3" id="supplier_acc"></td>
+                </tr>
+                <tr>
+                    <th style="width: 25%;">Bank and Branch</th>
+                    <td colspan="3" id="supplier_acc_bank"></td>
+                </tr>
+                <tr>
+                    <th style="width: 25%;">Account No:</th>
+                    <td colspan="3" id="supplier_acc_no"></td>
+                </tr>
+                <tr>
+                    <th style="width: 25%;">IFSC Code</th>
+                    <td colspan="3" id="supplier_acc_ifsc"></td>
+                </tr>
+                <tr>
+                    <th colspan="2" style="width: 50%" class="text-center" id="supplier_name">For {{bill.supplier}}</th>
+                    <th colspan="2" class="text-center">For Expert Callers Solutions Pvt Ltd</th>
+                </tr>
+                <tr>
+                    <th colspan="2" style="width: 50%; padding: 80px;" class="text-center"></th>
+                    <th colspan="2" style="width: 50%; padding: 80px;" class="text-center"></th>
+                </tr>
+                <tr>
+                    <th colspan="2" style="width: 50%" class="text-center">Seal and Signature</th>
+                    <th colspan="2" class="text-center">Seal and Signature</th>
+                </tr>
+            </tbody>
+        </table>
+        <div class="row mt-5 mb-5">
+            <div class="col-md-12" align="center">
+                <p>This is the computer generated purchase order hence no signature required.</p>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% csrf_token %}
+{% endblock %}
+
+{% block script %}
+<script>
+  function get_po(e) {
+    var d = new Date(),
+    n = d.getMonth() + 1,
+    y = d.getFullYear().toString().slice(-2);
+    if (e.value=='old'){
+        po = 'E1';
+        po += n;
+        po += y;
+        po += '{{po}}';
+        $('#po_no').val(po);
+        $('#po_no_value').html(po);
+        delivery = '<b>Expert Callers Solutions Pvt Ltd</b><br>';
+        delivery += '# 18774/4, HBR Layout, 2nd Block 1st Stage, 80ft Main Road, Bangalore - 560043';
+        $('#delivery_view').html(delivery)
+    } else {
+        po = 'E2';
+        po += n;
+        po += y;
+        po += '{{po}}';
+        $('#po_no').val(po);
+        $('#po_no_value').html(po);
+        delivery = '<b>Expert Callers Solutions Pvt Ltd</b><br>';
+        delivery += 'Indraprastha, Gubbi cross, 1st Main Rd, Kuvempu Layout, Kothanur, Bengaluru, Karnataka 560077';
+        $('#delivery_view').html(delivery)
+    }
+    $('#pan_view').html('AAECE0810D')
+    $('#gst_view').html('29AAECE0810D1Z6')
+  }
+  $("#billing").on("change", function(){
+    if (this.value=='old'){
+        billing = '# 18774/4, HBR Layout, 2nd Block 1st Stage, 80ft Main Road, Bangalore - 560043';
+        $('#billing_view').html(billing)
+    } else {
+        billing = 'Indraprastha, Gubbi cross, 1st Main Rd, Kuvempu Layout, Kothanur, Bengaluru, Karnataka 560077';
+        $('#billing_view').html(billing)
+    }
+  });
+
+  $("#terms").focusout(function(){
+    $('#terms_view').html((this.value).replace("\n", "<br>"));
+  });
+
+  $("#project").focusout(function(){
+    $('#project_name').html(this.value);
+  });
+
+  $("#del_contact_name").focusout(function(){
+    $('#contact_name_view').html(this.value);
+  });
+  $("#del_contact_no").focusout(function(){
+    $('#contact_no_view').html(this.value);
+  });
+  $("#del_email").focusout(function(){
+    $('#contact_email_view').html(this.value);
+  });
+
+  $("#date").focusout(function(){
+    $('#date_value').html(moment(this.value).format('DD MMM, YYYY'));
+  });
+  var price_list = [];
+  var qty_list = [];
+  var gst_list = [];
+  $("#description_1").focusout(function(){
+    $('#description_view_1').html(this.value);
+  });
+  $("#des_gst_1").focusout(function(){
+    $('#gst_view_1').html(this.value);
+    gst_list[0] = this.value;
+    calculate_price();
+  });
+  $("#qty_1").focusout(function(){
+    $('#qty_view_1').html(this.value);
+    qty_list[0] = this.value;
+    calculate_price();
+  });
+  $("#price_1").focusout(function(){
+    $('#price_view_1').html(this.value);
+    price_list[0] = this.value;
+    amount_float = parseFloat(qty_list[0]) * parseFloat(price_list[0])
+    amount = parseInt(amount_float)
+    $('#amount_rs_view_1').html(parseInt(amount))
+    paise = parseFloat((amount_float - amount))
+    if (paise > 0) {
+        $('#amount_p_view_1').html(paise.toFixed(2).toString().slice(2,))
+    }
+    calculate_price();
+  });
+
+  function Supplier(e) {
+    if ( e.value == 'other' ) {
+      $('#supplier_hidden').removeClass('d-none');
+      $('#sup_name').attr('required','');
+      $('#sup_address').attr('required','');
+      $('#sup_contact_person').attr('required','');
+      $('#sup_contact_no').attr('required','');
+      $('#sup_contact_email').attr('required','');
+      $('#sup_pan').attr('required','');
+      $('#sup_gst').attr('required','');
+      $('#acc_name').attr('required','');
+      $('#acc_no').attr('required','');
+      $('#acc_bank').attr('required','');
+      $('#bank_branch').attr('required','');
+      $('#bank_ifsc').attr('required','');
+        $('#supplier_view').html('')
+        $('#supplier_contact_name_view').html('')
+        $('#supplier_contact_no_view').html('')
+        $('#supplier_contact_email_view').html('')
+        $('#supplier_pan_view').html('')
+        $('#supplier_gst_view').html('')
+        $('#supplier_name').html('')
+        $('#supplier_acc').html('')
+        $('#supplier_acc_no').html('')
+        $('#supplier_acc_bank').html('')
+        $('#supplier_acc_ifsc').html('')
+        $('#supplier_acc_cin').html('')
+    } else {
+      $('#supplier_hidden').addClass('d-none');
+      $('#sup_name').removeAttr('required');
+      $('#sup_address').removeAttr('required');
+      $('#sup_contact_person').removeAttr('required');
+      $('#sup_contact_no').removeAttr('required');
+      $('#sup_contact_email').removeAttr('required');
+      $('#sup_pan').removeAttr('required');
+      $('#sup_gst').removeAttr('required');
+      $('#acc_name').removeAttr('required');
+      $('#acc_no').removeAttr('required');
+      $('#acc_bank').removeAttr('required');
+      $('#bank_branch').removeAttr('required');
+      $('#bank_ifsc').removeAttr('required');
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+        $.ajax({
+          type: "POST",
+          url: "get-supplier",
+          data: {
+            id: e.value,
+            csrfmiddlewaretoken: csrftoken
+          },
+          success: function(data) {
+            var supplier = eval('(' + data + ')');
+            supplier_name = '<b>'+supplier.name+'</b><br>'+supplier.address
+            $('#supplier_view').html(supplier_name)
+            $('#supplier_contact_name_view').html(supplier.cantact_person)
+            $('#supplier_contact_no_view').html(supplier.contact_no)
+            $('#supplier_contact_email_view').html(supplier.contact_email)
+            $('#supplier_pan_view').html(supplier.pan)
+            $('#supplier_gst_view').html(supplier.gst)
+            $('#supplier_name').html('For '+supplier.name)
+            $('#supplier_acc').html(supplier.acc_name)
+            $('#supplier_acc_no').html(supplier.acc_no)
+            supplier_acc_bank = supplier.bank_name;
+            supplier_acc_bank += ' and ';
+            supplier_acc_bank += supplier.bank_branch
+            $('#supplier_acc_bank').html(supplier_acc_bank)
+            $('#supplier_acc_ifsc').html(supplier.ifsc)
+            $('#supplier_acc_cin').html(supplier.cin_code)
+          },
+          error:function(e){
+              alert("something wrong "+ e) // this will alert an error
+          }
+        });
+    }
+  }
+  n = 1
+  function addNewDescription() {
+    n = n + 1;
+    desc = ''
+    desc += '<div class="row mt-2" id="item_'+n+'">';
+    desc += '<div class="col-md-4 mt-2 form-group">';
+    desc += '<label for="description_'+n+'">Description</label>';
+    desc += '<textarea name="description_'+n+'" onfocusout="description_view_'+n+'(this)" id="description_'+n+'" class="form-control" required></textarea>';
+    desc += '</div>';
+    desc += '<div class="col-md-2 mt-2 form-group">';
+    desc += '<label for="des_gst_'+n+'">GST</label>';
+    desc += '<input type="number" min="0" onfocusout="gst_view_'+n+'(this)" max="50" name="des_gst_'+n+'" id="des_gst_'+n+'" class="form-control" required>';
+    desc += '</div>';
+    desc += '<div class="col-md-3 mt-2 form-group">';
+    desc += '<label for="qty_'+n+'">Quantity</label>';
+    desc += '<input type="number" onfocusout="qty_view_'+n+'(this)" name="qty_'+n+'" id="qty_'+n+'" class="form-control" required>';
+    desc += '</div>';
+    desc += '<div class="col-md-3 mt-2 form-group">';
+    desc += '<label for="price_'+n+'">Price</label>';
+    desc += '<input type="number" step="0.01" onfocusout="price_view_'+n+'(this)" name="price_'+n+'" id="price_'+n+'" class="form-control" required>';
+    desc += '</div>';
+    desc += '</div>';
+    $('#description_box').append(desc);
+    $('#num_of_desc').val(n);
+    rows = '<tr id="row_'+n+'">';
+    rows += '<td id="description_view_'+n+'"></td>';
+    rows += '<td id="qty_view_'+n+'"></td>';
+    rows += '<td id="price_view_'+n+'" align="right"></td>';
+    rows += '<td id="gst_view_'+n+'"></td>';
+    rows += '<td id="amount_rs_view_'+n+'" align="right"></td>';
+    rows += '<td id="amount_p_view_'+n+'" align="right">00</td>';
+    rows += '</tr>';
+    $('#my_rows').append(rows);
+  }
+  {% for i in num %}
+  function description_view_{{i}}(e) {
+    $('#description_view_{{i}}').html(e.value);
+  }
+  function gst_view_{{i}}(e) {
+    $('#gst_view_{{i}}').html(e.value);
+    gst_list[{{i}}-1] = e.value;
+    calculate_price();
+  }
+  function qty_view_{{i}}(e) {
+    $('#qty_view_{{i}}').html(e.value);
+    qty_list[{{i}}-1] = e.value;
+    calculate_price();
+  }
+  function price_view_{{i}}(e) {
+    $('#price_view_{{i}}').html(e.value);
+    price_list[{{i}}-1] = e.value;
+    amount_float = parseFloat(qty_list[{{i}}-1]) * parseFloat(price_list[{{i}}-1])
+    amount = parseInt(amount_float)
+    $('#amount_rs_view_{{i}}').html(parseInt(amount))
+    paise = parseFloat((amount_float - amount))
+    if (paise > 0) {
+        $('#amount_p_view_{{i}}').html(paise.toFixed(2).toString().slice(2,))
+    }
+    calculate_price();
+  }
+  {% endfor %}
+
+  function removeDescription() {
+    if ($('#item_'+n+'').html()) {
+      price_list.pop();
+      qty_list.pop();
+      gst_list.pop();
+      row_name = $('#row_'+n+'').remove();
+      item = $('#item_'+n+'').remove();
+      n = n - 1;
+      $('#num_of_desc').val(n);
+      calculate_price();
+    }
+  }
+  function calculate_price() {
+    var total_price = 0
+    var total_gst = 0
+    var grand_total = 0
+    for (var i=0; i < price_list.length; i++) {
+        price = (parseFloat(price_list[i]) * parseFloat(qty_list[i]))
+        total_gst += ((price * parseFloat(gst_list[i])) / 100)
+        total_price += price
+    }
+    grand_total = (total_price + total_gst)
+    $('#total_amount_view').html(parseFloat(total_price).toFixed(2))
+    $('#gst_amount_view').html(parseFloat(total_gst).toFixed(2))
+    $('#grand_total_view').html(parseFloat(grand_total).toFixed(2))
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+    var amount = parseFloat(grand_total).toFixed(2);
+    console.log(amount)
+    $.ajax({
+      type: "POST",
+      url: "get-amount-words",
+      data: {
+        amount: amount,
+        csrfmiddlewaretoken: csrftoken
+      },
+      success: function(data) {
+        $('#bill_amount_words').html(data)
+      }
+    });
+  }
+
+  $("#sup_name").focusout(function(){
+    content = '<b>';
+    content += this.value;
+    content += '</b>';
+    $('#supplier_view').html(content);
+    $('#supplier_name').html('For '+this.value)
+  });
+  $("#sup_address").focusout(function(){
+    content = '<p>';
+    content += this.value;
+    content += '</p>';
+    $('#supplier_view').append(content);
+  });
+  $("#sup_contact_person").focusout(function(){
+    $('#supplier_contact_name_view').html(this.value);
+  });
+  $("#sup_contact_no").focusout(function(){
+    $('#supplier_contact_no_view').html(this.value);
+  });
+  $("#sup_contact_email").focusout(function(){
+    $('#supplier_contact_email_view').html(this.value);
+  });
+  $("#sup_pan").focusout(function(){
+    $('#supplier_pan_view').html(this.value);
+  });
+  $("#sup_gst").focusout(function(){
+    $('#supplier_gst_view').html(this.value);
+  });
+  $("#cin_code").focusout(function(){
+    $('#supplier_acc_cin').html(this.value);
+  });
+  $("#acc_name").focusout(function(){
+    $('#supplier_acc').html(this.value);
+  });
+  $("#acc_no").focusout(function(){
+    $('#supplier_acc_no').html(this.value);
+  });
+  supplier_acc_bank = ''
+  $("#acc_bank").focusout(function(){
+    supplier_acc_bank += this.value;
+    supplier_acc_bank += ' and ';
+    $('#supplier_acc_bank').html(supplier_acc_bank);
+  });
+  $("#bank_branch").focusout(function(){
+    supplier_acc_bank += this.value;
+    $('#supplier_acc_bank').html(supplier_acc_bank);
+  });
+  $("#bank_ifsc").focusout(function(){
+    $('#supplier_acc_ifsc').html(this.value);
+  });
+</script>
+{% endblock %}

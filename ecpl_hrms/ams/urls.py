@@ -99,4 +99,12 @@ urlpatterns = [
     path('mapping-correction', getMapping),
     path('mapping-correction-submit', changeMapping),
 
+    # PO for Administration
+    path('print-bill/<int:pk>', PrintBill),
+    path('create-bill', CreateBill),
+    path('get-supplier', getSupplier),
+    path('get-amount-words', getWords),
+    path('view-bills', ViewBill),
+    path('view-suppliers', ViewSuppliers),
+
 ]
