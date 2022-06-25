@@ -2752,6 +2752,7 @@ def addLeaveBalance(request, a):
         leavebal = []
         leavehist = []
         ecpl_cal = EcplCalander.objects.filter(date__range=[start_date, end_date]).exclude(att_actual='Unmarked')
+
         for i in emp:
             cal = 0
             i.unique_id = e
@@ -2788,9 +2789,12 @@ def addLeaveBalance(request, a):
             sl_hist.no_days = 1
             sl_hist.total = total_bal + pl + 1
             leavehist.append(sl_hist)
-        EmployeeLeaveBalance.objects.bulk_update(leavebal, ['sl_balance', 'pl_balance'])
-        leaveHistory.objects.bulk_create(leavehist)
-        return redirect('/ams/')
+        
+        print(leavebal)
+
+        # EmployeeLeaveBalance.objects.bulk_update(leavebal, ['sl_balance', 'pl_balance'])
+        # leaveHistory.objects.bulk_create(leavehist)
+        # return redirect('/ams/')
     else:
         messages.success(request, "Unauthorized Access")
         return redirect('/ams/')
