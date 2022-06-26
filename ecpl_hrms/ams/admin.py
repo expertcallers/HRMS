@@ -99,25 +99,25 @@ class DesignationSearch(ImportExportModelAdmin):
     list_display = ('id', 'name', 'category','created_by')
     resource_class = DesignationSearchResource
 
-# class BillAdministrationSearch(admin.ModelAdmin):
-#     search_fields = ('po_no',)
-#     list_display = ('po_no', 'date', 'supplier', 'contact_person', 'grand_total')
-#     list_filter = ('supplier', 'contact_person')
+class BillAdministrationSearch(admin.ModelAdmin):
+    search_fields = ('po_no',)
+    list_display = ('po_no', 'date', 'supplier', 'contact_person', 'grand_total')
+    list_filter = ('supplier', 'contact_person')
 
 
-# class ItemDescriptionAdministrationSearch(admin.ModelAdmin):
-#     search_fields = ('bill',)
-#     list_display = ('bill', 'description', 'qty', 'gst_percent', 'amount')
+class ItemDescriptionAdministrationSearch(admin.ModelAdmin):
+    search_fields = ('bill',)
+    list_display = ('bill', 'description', 'qty', 'gst_percent', 'amount')
 
 
-# class SupplierAdministrationSearch(admin.ModelAdmin):
-#     search_fields = ('name',)
-#     list_display = ('name', 'cantact_person', 'contact_no', 'contact_email')
+class SupplierAdministrationSearch(admin.ModelAdmin):
+    search_fields = ('name',)
+    list_display = ('name', 'cantact_person', 'contact_no', 'contact_email')
 
-# class AccessControlSearch(admin.ModelAdmin):
-#     search_fields = ('emp_id', 'access')
-#     list_display = ('emp_id', 'access')
-#     list_filter = ('emp_id', 'access')
+class AccessControlSearch(admin.ModelAdmin):
+    search_fields = ('emp_id', 'access')
+    list_display = ('emp_id', 'access')
+    list_filter = ('emp_id', 'access')
 
 
 admin.site.register(EcplCalander, AttendanceSearch)
@@ -135,9 +135,9 @@ admin.site.register(LastEmpId)
 admin.site.register(NoticeECPL)
 admin.site.register(FaqHRMS)
 admin.site.register(Designation, DesignationSearch)
-# admin.site.register(BillAdministration, BillAdministrationSearch)
-# admin.site.register(ItemDescriptionAdministration, ItemDescriptionAdministrationSearch)
-# admin.site.register(SupplierAdministration, SupplierAdministrationSearch)
-# admin.site.register(AccessControl, AccessControlSearch)
+admin.site.register(BillAdministration, BillAdministrationSearch)
+admin.site.register(ItemDescriptionAdministration, ItemDescriptionAdministrationSearch)
+admin.site.register(SupplierAdministration, SupplierAdministrationSearch)
+admin.site.register(AccessControl, AccessControlSearch)
 
 
