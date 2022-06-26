@@ -2921,7 +2921,7 @@ def addAttendance(request):
         emp_ids = []
         for k in cal_obj:
             emp_ids.append(k.emp_id)
-            
+
         profile = Profile.objects.exclude(Q(emp_id__in=emp_ids) | Q(agent_status='Attrition'))
 
         cal = []
@@ -3073,6 +3073,7 @@ def addLeaveBalanceMonthly(request,a):
         # Bulk upload/Create leave balance/history 
         EmployeeLeaveBalance.objects.bulk_update(leaves,['pl_balance','sl_balance','unique_id'])
         leaveHistory.objects.bulk_create(history)
+        return redirect('/ams/')
 
     else:
         messages.success(request, "Unauthorized Access")
