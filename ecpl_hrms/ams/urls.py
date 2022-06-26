@@ -85,7 +85,7 @@ urlpatterns = [
     path('add-new-designation', addNewDesi),
     path('test', TestFun),
 
-    path('add-leave-balance/<str:a>', addLeaveBalance),
+    path('add-leave-balance/<str:a>', addLeaveBalanceMonthly),
     path('auto-approve-leave', autoApproveLeave),
     path('add-attendance', addAttendance),
     path('sandwich', sandwichPolicy),
@@ -106,5 +106,7 @@ urlpatterns = [
     path('get-amount-words', getWords),
     path('view-bills', ViewBill),
     path('view-suppliers', ViewSuppliers),
+
+    
 
 ]

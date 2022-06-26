@@ -99,12 +99,6 @@ class DesignationSearch(ImportExportModelAdmin):
     list_display = ('id', 'name', 'category','created_by')
     resource_class = DesignationSearchResource
 
-
-class CheckLeaveBalanceSearch(admin.ModelAdmin):
-    search_fields = ('emp_id',)
-    list_display = ('emp_id', 'status', 'month', 'year')
-    list_filter = ('status', 'month', 'year')
-
 class BillAdministrationSearch(admin.ModelAdmin):
     search_fields = ('po_no',)
     list_display = ('po_no', 'date', 'supplier', 'contact_person', 'grand_total')
@@ -144,6 +138,6 @@ admin.site.register(Designation, DesignationSearch)
 admin.site.register(BillAdministration, BillAdministrationSearch)
 admin.site.register(ItemDescriptionAdministration, ItemDescriptionAdministrationSearch)
 admin.site.register(SupplierAdministration, SupplierAdministrationSearch)
-admin.site.register(CheckLeaveBalance, CheckLeaveBalanceSearch)
 admin.site.register(AccessControl, AccessControlSearch)
+
 

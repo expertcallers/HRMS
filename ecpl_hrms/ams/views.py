@@ -2905,7 +2905,6 @@ def addAttendance(request):
     mydate = date.today()
     month = mydate.month
     year = mydate.year
-
     start_date = date(year, month, 1)
     start_date += monthdelta.monthdelta(1)
     last = start_date + monthdelta.monthdelta(1)
@@ -2918,12 +2917,11 @@ def addAttendance(request):
         date_list.append(day)
 
     for i in date_list:
-
         cal_obj = EcplCalander.objects.filter(date=i)
         emp_ids = []
         for k in cal_obj:
             emp_ids.append(k.emp_id)
-
+            
         profile = Profile.objects.exclude(Q(emp_id__in=emp_ids) | Q(agent_status='Attrition'))
 
         cal = []
@@ -3023,7 +3021,65 @@ def autoApproveLeave(request):  # Test 1, 2
                                                'rm2_id', 'rm3', 'rm3_id'])
     return redirect('/ams/')
 
-#
+
+def addLeaveBalanceMonthly(request,a):
+    if a == "3cpl@2022$":
+        # Start Date and End Date
+        e = date.today()
+        month = e.month
+        year = e.year
+        start_date = date(year, month, 1)
+        start_date = start_date - monthdelta.monthdelta(1)
+        end_date = date(year, month, 1)
+        end_date = end_date - timedelta(days=1)   
+        # Collect all employee ID's if not created already
+        lst = []
+        for i in EmployeeLeaveBalance.objects.exclude(unique_id= month):
+            lst.append(i.emp_id)
+        # PL and SL Balance calculator
+        def plSlCalculator(emp_id):
+            full_day_count = EcplCalander.objects.filter(Q(emp_id=emp_id),Q(date__range=[start_date, end_date]),Q(att_actual__in =['present','Week OFF','Comp OFF','Client OFF','Training','PL','SL','ML'])).count()
+            half_day_count = EcplCalander.objects.filter(Q(emp_id=emp_id),Q(date__range=[start_date, end_date]),Q(att_actual = 'Half Day')).count()
+            earned = full_day_count+(half_day_count/2)
+            pl_balance = round(earned/20,2)
+            sl_balance = 1 if pl_balance > 0 else 0
+            return(pl_balance,sl_balance)
+        # Leave Balance and History objects
+        leaves = []
+        history = []
+
+        for i in lst:
+            e = EmployeeLeaveBalance.objects.get(emp_id = i)        
+            pl_balance , sl_balance = plSlCalculator(i)
+            ini = e.pl_balance + e.sl_balance      
+            e.pl_balance += pl_balance
+            e.sl_balance += sl_balance
+            e.unique_id = month     
+            leaves.append(e)
+            # Creating Leave History's
+            def createHistory(emp_id,lt,lc,total):
+                l_hist = leaveHistory()
+                l_hist.emp_id = emp_id
+                l_hist.date = date.today()
+                l_hist.leave_type = lt
+                l_hist.transaction = "Leaves Earned"
+                l_hist.no_days = lc
+                l_hist.total = total
+                history.append(l_hist)
+            if pl_balance> 0:
+                total = pl_balance+ini
+                createHistory(i,'PL',pl_balance,total)
+                createHistory(i,'SL',sl_balance,total=total+sl_balance)
+        # Bulk upload/Create leave balance/history 
+        EmployeeLeaveBalance.objects.bulk_update(leaves,['pl_balance','sl_balance','unique_id'])
+        leaveHistory.objects.bulk_create(history)
+
+    else:
+        messages.success(request, "Unauthorized Access")
+        return redirect('/ams/')
+
+
+
 # def addLeaveBalance(request, a):
 #     if a == "3cpl@2022$":
 #         emp = EmployeeLeaveBalance.objects.all()
@@ -3082,68 +3138,77 @@ def autoApproveLeave(request):  # Test 1, 2
 #         return redirect('/ams/')
 
 # Modified
-def addLeaveBalance(request, a):
-    if a == "3cpl@2022$":
-        emp_ids = []
-        for i in Profile.objects.all():
-            emp_ids.append(i.emp_id)
-        e = date.today()
-        month = e.month
-        year = e.year
-        start_date = date(year, month, 1)
-        start_date = start_date - monthdelta.monthdelta(1)
-        end_date = date(year, month, 1)
-        end_date = end_date - timedelta(days=1)
-        done = []
-        for i in CheckLeaveBalance.objects.filter(status=True, year=start_date.year, month=start_date.month):
-            done.append(i.emp_id)
-        emp = EmployeeLeaveBalance.objects.filter(emp_id__in=emp_ids).exclude(emp_id__in=done)
-        ecpl_cal = EcplCalander.objects.filter(
-            emp_id__in=emp_ids, date__range=[start_date, end_date]).exclude(emp_id__in=done)
-        for i in emp:
-            cal = 0
-            i.unique_id = e
-            total_bal = i.pl_balance + i.sl_balance
-            for j in ecpl_cal:
-                if j.emp_id == i.emp_id:
-                    if j.att_actual == "present" or j.att_actual == "Week OFF" or j.att_actual == "Comp OFF" or j.att_actual == "Client OFF" or j.att_actual == 'PL' or j.att_actual == 'SL' or j.att_actual == 'Training':
-                        cal += 1
-                    elif j.att_actual == 'Half Day':
-                        cal += 0.5
+# def addLeaveBalance(request, a):
+#     if a == "3cpl@2022$":
+#         emp_ids = []
+#         for i in Profile.objects.all():
+#             emp_ids.append(i.emp_id)
+        
+#         print(emp_ids)    
+        
+#         e = date.today()
+#         month = e.month
+#         year = e.year
+#         start_date = date(year, month, 1)
+#         start_date = start_date - monthdelta.monthdelta(1)
+#         end_date = date(year, month, 1)
+#         end_date = end_date - timedelta(days=1)
+        
+#         print(start_date,end_date)
 
-            i.sl_balance += 1
-            pl = round(cal / 20, 2)
-            i.pl_balance += pl
-            i.save()
+#         done = []
+#         for i in CheckLeaveBalance.objects.filter(status=True, year=start_date.year, month=start_date.month):
+#             done.append(i.emp_id)
+        
+#         print(done)
 
-            if pl > 0:
-                pl_hist = leaveHistory()
-                pl_hist.unique_id = e
-                pl_hist.emp_id = i.emp_id
-                pl_hist.date = date.today()
-                pl_hist.leave_type = "PL"
-                pl_hist.transaction = "Leaves Earned"
-                pl_hist.no_days = pl
-                pl_hist.total = total_bal + pl
-                pl_hist.save()
+#         emp = EmployeeLeaveBalance.objects.filter(emp_id__in=emp_ids).exclude(emp_id__in=done)
+#         ecpl_cal = EcplCalander.objects.filter(
+#             emp_id__in=emp_ids, date__range=[start_date, end_date]).exclude(emp_id__in=done)
+#         for i in emp:
+#             cal = 0
+#             i.unique_id = e
+#             total_bal = i.pl_balance + i.sl_balance
+#             for j in ecpl_cal:
+#                 if j.emp_id == i.emp_id:
+#                     if j.att_actual == "present" or j.att_actual == "Week OFF" or j.att_actual == "Comp OFF" or j.att_actual == "Client OFF" or j.att_actual == 'PL' or j.att_actual == 'SL' or j.att_actual == 'Training':
+#                         cal += 1
+#                     elif j.att_actual == 'Half Day':
+#                         cal += 0.5
 
-            sl_hist = leaveHistory()
-            sl_hist.unique_id = e
-            sl_hist.emp_id = i.emp_id
-            sl_hist.date = date.today()
-            sl_hist.leave_type = "SL"
-            sl_hist.transaction = "Leaves Earned"
-            sl_hist.no_days = 1
-            sl_hist.total = total_bal + pl + 1
-            sl_hist.save()
-            check = CheckLeaveBalance.objects.get(emp_id=i.emp_id, year=start_date.year, month=start_date.month)
-            check.status = True
-            check.save()
+#             i.sl_balance += 1
+#             pl = round(cal / 20, 2)
+#             i.pl_balance += pl
+#             i.save()
 
-        return redirect('/ams/')
-    else:
-        messages.success(request, "Unauthorized Access")
-        return redirect('/ams/')
+#             if pl > 0:
+#                 pl_hist = leaveHistory()
+#                 pl_hist.unique_id = e
+#                 pl_hist.emp_id = i.emp_id
+#                 pl_hist.date = date.today()
+#                 pl_hist.leave_type = "PL"
+#                 pl_hist.transaction = "Leaves Earned"
+#                 pl_hist.no_days = pl
+#                 pl_hist.total = total_bal + pl
+#                 pl_hist.save()
+
+#             sl_hist = leaveHistory()
+#             sl_hist.unique_id = e
+#             sl_hist.emp_id = i.emp_id
+#             sl_hist.date = date.today()
+#             sl_hist.leave_type = "SL"
+#             sl_hist.transaction = "Leaves Earned"
+#             sl_hist.no_days = 1
+#             sl_hist.total = total_bal + pl + 1
+#             sl_hist.save()
+#             check = CheckLeaveBalance.objects.get(emp_id=i.emp_id, year=start_date.year, month=start_date.month)
+#             check.status = True
+#             check.save()
+
+#         return redirect('/ams/')
+#     else:
+#         messages.success(request, "Unauthorized Access")
+#         return redirect('/ams/')
 
 
 # def calculatea(start, emp_id):
@@ -3153,7 +3218,6 @@ def addLeaveBalance(request, a):
 
 def sandwichPolicy(request):
     return redirect('/ams/')
-
 
 #     # Sandwich policy Calculation
 #     ddate = date.today()
@@ -3227,28 +3291,22 @@ def sandwichPolicy(request):
 #     EcplCalander.objects.bulk_update(cal_list,['att_actual'])
 #     return redirect('/ams/')
 
-
-
-
-
-
-
 def TestFun(request):
-    CheckLeaveBalance.objects.all().delete()
-    dates = []
-    start = date(2022, 5, 1)
-    end = date(2025, 12, 31)
-    while start < end:
-        dates.append(start)
-        start += monthdelta.monthdelta(1)
-    balance = []
-    for i in Profile.objects.all():
-        for j in dates:
-            bal = CheckLeaveBalance(
-                        emp_id=i.emp_id, month=j.month, year=j.year
-                    )
-            balance.append(bal)
-    CheckLeaveBalance.objects.bulk_create(balance)
+#     CheckLeaveBalance.objects.all().delete()
+#     dates = []
+#     start = date(2022, 5, 1)
+#     end = date(2025, 12, 31)
+#     while start < end:
+#         dates.append(start)
+#         start += monthdelta.monthdelta(1)
+#     balance = []
+#     for i in Profile.objects.all():
+#         for j in dates:
+#             bal = CheckLeaveBalance(
+#                         emp_id=i.emp_id, month=j.month, year=j.year
+#                     )
+#             balance.append(bal)
+#     CheckLeaveBalance.objects.bulk_create(balance)
 
     # cal = EcplCalander.objects.filter(Q(att_actual='Bench') | Q(att_actual='Attrition') | Q(att_actual='NCNS'))
     # ecplcalendar = []
