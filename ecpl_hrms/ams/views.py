@@ -3044,10 +3044,7 @@ def addLeaveBalanceMonthly(request,a):
             pl_balance = round(earned/20,2)
             sl_balance = 1 if pl_balance > 0 else 0
             return(pl_balance,sl_balance)
-        # Leave Balance and History objects
-        leaves = []
-        history = []
-
+       
         for i in lst:
             e = EmployeeLeaveBalance.objects.get(emp_id = i)        
             pl_balance , sl_balance = plSlCalculator(i)
@@ -3055,7 +3052,7 @@ def addLeaveBalanceMonthly(request,a):
             e.pl_balance += pl_balance
             e.sl_balance += sl_balance
             e.unique_id = month     
-            leaves.append(e)
+            e.save()
             # Creating Leave History's
             def createHistory(emp_id,lt,lc,total):
                 l_hist = leaveHistory()
@@ -3065,14 +3062,12 @@ def addLeaveBalanceMonthly(request,a):
                 l_hist.transaction = "Leaves Earned"
                 l_hist.no_days = lc
                 l_hist.total = total
-                history.append(l_hist)
+                l_hist.save()
             if pl_balance> 0:
                 total = pl_balance+ini
                 createHistory(i,'PL',pl_balance,total)
                 createHistory(i,'SL',sl_balance,total=total+sl_balance)
         # Bulk upload/Create leave balance/history 
-        EmployeeLeaveBalance.objects.bulk_update(leaves,['pl_balance','sl_balance','unique_id'])
-        leaveHistory.objects.bulk_create(history)
         return redirect('/ams/')
 
     else:
