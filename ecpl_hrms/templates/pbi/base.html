@@ -91,8 +91,9 @@
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
               <div class="menu_section">
                 <ul class="nav side-menu">
+                  <li><a href="/ams/dashboard-redirect"><i class="fa fa-arrow-left"></i>Back to AMS</a></li>
                     {% if user.campaign.campaignid == "all" %}
-                        <li><a href="/pbireport/management-dashboard"><i class="fa fa-home"></i>Dashboard</a></li>
+                        <li><a href="/pbireport/management-dashboard"><i class="fa fa-home"></i>PBi Dashboard</a></li>
                         <li><a href="/pbireport/campaigns/all"><i class="fa fa-list-alt"></i>All Campaigns</a></li>
                         <li><a href="/pbireport/campaigns/Outbound"><i class="fa fa-phone-volume"></i>Outbound Campaigns</a></li>
                         <li><a href="/pbireport/campaigns/Inbound"><i class="fa fa-headphones"></i>Inbound Campaigns</a></li>
