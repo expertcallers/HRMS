@@ -41,7 +41,7 @@ management_list = ['Associate Director']
 
 def index(request):
     logout(request)
-    return render(request, "index.html")
+    return render(request, "erf/index.html")
 
 def Login(request):
     if request.method == "POST":
@@ -123,7 +123,7 @@ def AddEmail(request):
             return redirect("/erf/verify-email")
     else:
         messages.info(request, 'Please add your Email ID')
-        return render(request, "add-email.html")
+        return render(request, "erf/add-email.html")
 
 @login_required
 def VerifyEmail(request):
@@ -171,7 +171,7 @@ def VerifyEmail(request):
             return redirect("/erf/verify-email")
     else:
         data = {"profile":e}
-        return render(request, "verify-email.html",data)
+        return render(request, "erf/verify-email.html",data)
 
 
 @login_required
@@ -262,7 +262,7 @@ def forgotPassword(request):
             messages.info(request,"Invalid Username! Enter Correct Username")
             return redirect("/erf/forgot-password")
     else:
-        return render(request, "forgot_password.html")
+        return render(request, "erf/forgot_password.html")
 
 def resetPassword(request,emp_id,otp):
     logout(request)
@@ -284,7 +284,7 @@ def resetPassword(request,emp_id,otp):
     else:
         if timee <= 300:
             if profile.otp == otp and profile.emp_id == emp_id:
-                return render(request, "reset_password.html")
+                return render(request, "erf/reset_password.html")
             else:
                 messages.info(request, "Invalid Link :)")
                 return redirect("/erf/")
@@ -347,7 +347,7 @@ def ManagerDashboard(request):
 
         data = {"all": all, "open": open, "closed": closed, "dead_line": dead_line_count, "approval": approval,
                 "manager": mgr_list,"manager_approval":manager_approval,"waiting":waiting}
-        return render(request, "manager_dashboard.html", data)
+        return render(request, "erf/manager_dashboard.html", data)
     else:
         messages.info(request, "Invalid Request. You have been logged out :)")
         return redirect("/erf/")
@@ -374,7 +374,7 @@ def HRDashboard(request):
         dead_line_count = len(dead_line_count_list)
         data = {"all": all, "open": open, "closed": closed, "added": added, "manager": manager, "waiting": waiting,
                 "dead_line": dead_line_count,"management":management_list,"deletion":deletion}
-        return render(request, "hr_dashboard.html", data)
+        return render(request, "erf/hr_dashboard.html", data)
     else:
         messages.info(request, "Invalid Request. You have been logged out :)")
         return redirect("/erf/")
@@ -579,7 +579,7 @@ def job_requisition(request):
         today = date.today()
         campaigns = Campaigns.objects.all()
         data = {"today": today, "managers": managers, "campaigns": campaigns}
-        return render(request, "job_requisition.html", data)
+        return render(request, "erf/job_requisition.html", data)
 
 
 @login_required
@@ -588,7 +588,7 @@ def jobRequisitionOpen(request):
     if designation in hr_list:
         job = JobRequisition.objects.filter(initial_status=False, manager_approval=True, ticket_status=True)
         data = {"job": job, "number": number, "type": "open", 'desi': 'hr', "editaccess": edit_list}
-        return render(request, "job_requisition_table.html", data)
+        return render(request, "erf/job_requisition_table.html", data)
     else:
         messages.info(request, "Invalid Request. You have been logged out :)")
         return redirect("/erf/")
@@ -600,15 +600,15 @@ def jobRequisitionSelf(request, type):
     if type == "all":
         job = JobRequisition.objects.filter(Q(created_by_id=user) | Q(created_by_rm1_id=user) | Q(created_by_manager_id=user), manager_approval=True, ticket_status=True)
         data = {"job": job, "type": type, "number": number, "editaccess": edit_list}
-        return render(request, "job_requisition_table.html", data)
+        return render(request, "erf/job_requisition_table.html", data)
     elif type == "open":
         job = JobRequisition.objects.filter(Q(created_by_id=user) | Q(created_by_rm1_id=user) | Q(created_by_manager_id=user), final_status=False, manager_approval=True, ticket_status=True)
         data = {"job": job, "type": type, "number": number, "editaccess": edit_list}
-        return render(request, "job_requisition_table.html", data)
+        return render(request, "erf/job_requisition_table.html", data)
     elif type == "closed":
         job = JobRequisition.objects.filter(Q(created_by_id=user) | Q(created_by_rm1_id=user) | Q(created_by_manager_id=user), final_status=True, manager_approval=True, ticket_status=True)
         data = {"job": job, "type": type, "number": number, "editaccess": edit_list}
-        return render(request, "job_requisition_table.html", data)
+        return render(request, "erf/job_requisition_table.html", data)
     elif type == "dead-line":
         today = datetime.date.today()
         job = JobRequisition.objects.filter(Q(created_by_id=user) | Q(created_by_rm1_id=user) | Q(created_by_manager_id=user), final_status=False, manager_approval=True, ticket_status=True)
@@ -617,11 +617,11 @@ def jobRequisitionSelf(request, type):
             if i.dead_line < today:
                 job_list.append(i)
         data = {"job": job_list, "type": type, "number": number, "editaccess": edit_list}
-        return render(request, "job_requisition_table.html", data)
+        return render(request, "erf/job_requisition_table.html", data)
     elif type == "approval":
         job = JobRequisition.objects.filter(created_by_manager_id=user, initial_status=True, final_status=False, ticket_status=True)
         data = {"job": job, "type": type, "number": number, "editaccess": edit_list, "manager": mgr_list}
-        return render(request, "job_requisition_table.html", data)
+        return render(request, "erf/job_requisition_table.html", data)
     elif type == "range":
         if request.method == "POST":
             status = request.POST["status"]
@@ -644,18 +644,18 @@ def jobRequisitionSelf(request, type):
             else:
                 pass
             data = {"job": job, "type": type, "number": number, "editaccess": edit_list}
-            return render(request, "job_requisition_table.html", data)
+            return render(request, "erf/job_requisition_table.html", data)
         else:
             messages.info(request, "Invalid Request. You have been logged out :)")
             return redirect("/erf/")
     elif type == "initial":
         job = JobRequisition.objects.filter(created_by_rm1_id=user, ticket_status=False, manager_approval=False)
         data = {"job": job, "type": type, "number": number, "editaccess": edit_list, "manager": mgr_list}
-        return render(request, "job_requisition_table.html", data)
+        return render(request, "erf/job_requisition_table.html", data)
     elif type == 'waiting':
         job = JobRequisition.objects.filter(created_by_id=user, manager_approval=False, ticket_status=False)
         data = {"job": job, "type": type, "number": number, "editaccess": edit_list, "manager": mgr_list}
-        return render(request, "job_requisition_table.html", data)
+        return render(request, "erf/job_requisition_table.html", data)
     else:
         messages.info(request, "Invalid Request. You have been logged out :)")
         return redirect("/erf/")
@@ -666,15 +666,15 @@ def jobRequisitionAll(request, type):
     if type == "all":
         job = JobRequisition.objects.filter(manager_approval=True, ticket_status=True)
         data = {"job": job, "type": type, "number": number, "editaccess": edit_list}
-        return render(request, "job_requisition_table.html", data)
+        return render(request, "erf/job_requisition_table.html", data)
     if type == "closed":
         job = JobRequisition.objects.filter(final_status=True, manager_approval=True, ticket_status=True)
         data = {"job": job, "type": type, "number": number, "editaccess": edit_list}
-        return render(request, "job_requisition_table.html", data)
+        return render(request, "erf/job_requisition_table.html", data)
     elif type == "waiting":
         job = JobRequisition.objects.filter(initial_status=True, final_status=False, manager_approval=True, ticket_status=True)
         data = {"job": job, "type": type, "number": number, "editaccess": edit_list}
-        return render(request, "job_requisition_table.html", data)
+        return render(request, "erf/job_requisition_table.html", data)
     elif type == "range":
         if request.method == "POST":
             manager = request.POST["manager"]
@@ -704,7 +704,7 @@ def jobRequisitionAll(request, type):
             else:
                 pass
             data = {"job": job, "type": type, "number": number, "editaccess": edit_list}
-            return render(request, "job_requisition_table.html", data)
+            return render(request, "erf/job_requisition_table.html", data)
         else:
             messages.info(request, "Invalid Request. You have been logged out :)")
             return redirect("/erf/")
@@ -733,7 +733,7 @@ def jobRequisitionAll(request, type):
                     job = JobRequisition.objects.filter(department=department, ticket_status=True)
 
             data = {"job": job, "type": type, "number": number, "editaccess": edit_list}
-            return render(request, "job_requisition_table.html", data)
+            return render(request, "erf/job_requisition_table.html", data)
         else:
             messages.info(request, "Invalid Request. You have been logged out :)")
             return redirect("/erf/")
@@ -746,11 +746,11 @@ def jobRequisitionAll(request, type):
             if i.dead_line < today:
                 job_list.append(i)
         data = {"job": job_list, "type": type, "number": number, "editaccess": edit_list}
-        return render(request, "job_requisition_table.html", data)
+        return render(request, "erf/job_requisition_table.html", data)
     elif type == "deletion":
         job = JobRequisition.objects.filter(deletion=True, ticket_status=True)
         data = {"job": job, "type": type, "number": number, "editaccess": edit_list}
-        return render(request, "job_requisition_table.html", data)
+        return render(request, "erf/job_requisition_table.html", data)
     else:
         messages.info(request, "Invalid Request. You have been logged out :)")
         return redirect("/erf/")
@@ -766,7 +766,7 @@ def jobRequisitionEditView(request, id):
             campaigns = Campaigns.objects.all()
             employees = AllAgents.objects.all()
             data = {"today": today, "job": job, "number": number, "employees": employees, "campaigns": campaigns}
-            return render(request, "job_requisition_edit.html", data)
+            return render(request, "erf/job_requisition_edit.html", data)
         except JobRequisition.DoesNotExist:
             messages.info(request, "Invalid Request!!")
             if designation in hr_list:
@@ -797,7 +797,7 @@ def EditRequest(request):
                 today = date.today()
                 campaigns = Campaigns.objects.all()
                 data = {"today": today, "managers": managers, "job": job, "campaigns": campaigns}
-                return render(request, "edit_job_requisition.html", data)
+                return render(request, "erf/edit_job_requisition.html", data)
             else:
                 messages.info(request, "You are not authorize to edit this :)")
                 if designation in hr_list:
@@ -1636,7 +1636,7 @@ def change_password(request):
             messages.error(request, 'Please correct the error below.')
     else:
         form = PasswordChangeForm(request.user)
-    return render(request, 'settings.html', {'form': form})
+    return render(request, 'erf/settings.html', {'form': form})
 
 @login_required
 def approval(request):
@@ -1745,7 +1745,7 @@ def ExportReport(request, type):
             else:
                 pass
             data = {"job": job, "type": type, "number": number, "editaccess": edit_list}
-            return render(request, "export_table.html", data)
+            return render(request, "erf/export_table.html", data)
         else:
             messages.info(request, "Invalid Request. You have been logged out :)")
             return redirect("/erf/")
@@ -1774,7 +1774,7 @@ def ExportReport(request, type):
                     job = JobRequisition.objects.filter(department=department)
 
             data = {"job": job, "type": type, "number": number, "editaccess": edit_list}
-            return render(request, "export_table.html", data)
+            return render(request, "erf/export_table.html", data)
         else:
             messages.info(request, "Invalid Request. You have been logged out :)")
             return redirect("/erf/")
