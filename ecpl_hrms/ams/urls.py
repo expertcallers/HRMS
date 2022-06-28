@@ -50,7 +50,7 @@ urlpatterns = [
     path('approve-att-correction-req', approveAttendanceRequest),
     path('week-attendance', weekAttendanceReport),
 
-    # User Managfement, Onboarding
+    # User Management, On-boarding
     path('add-new-user', addNewUserHR),
     path('viewusers', viewUsersHR),
     path('view-employee-profile/<int:id>/<str:on_id>', viewEmployeeProfile),
@@ -106,7 +106,5 @@ urlpatterns = [
     path('get-amount-words', getWords),
     path('view-bills', ViewBill),
     path('view-suppliers', ViewSuppliers),
-
-    
 
 ]

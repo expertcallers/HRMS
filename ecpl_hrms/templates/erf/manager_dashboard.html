@@ -1,0 +1,232 @@
+{% extends 'manager_base.html' %}
+{% load static %}
+
+{% block main %}
+
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+          <div class="row mb-3">
+            <div class="col-md-2">
+              <div class="card-base">
+                <div class="card-icon">
+                  <span title="All Requisitions" class="imagecard widgetCardIcon">
+                    <i class="fa fa-database"></i>
+                  </span>
+                  <div class="card-data widgetCardData">
+                    <h2 class="box-title mt-5" style="color: #2A3F54;">All Requisitions</h2>
+                    <h1>{{all}}</h1>
+                    <a href="/erf/job-requisition-table/all" title="All Requisitions" class="anchor btn btn-default" style="background: #1ABB9C; color: #fff;">
+                      View
+                    </a>
+                  </div>
+                </div>
+                <div class="space"></div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="card-base">
+                <div class="card-icon">
+                  <span title="Open Requisitions" class="imagecard widgetCardIcon" style="background: #fcbf55 !important; box-shadow: 1px 2px 5px 0 rgba(252, 191, 85,0.25), 0 2px 10px 0 rgba(252, 191, 85,0.25)">
+                    <i class="fa fa-user-times"></i>
+                  </span>
+                  <div class="card-data widgetCardData" style="box-shadow: 1px 2px 5px 0 rgba(252, 191, 85,0.25), 0 2px 10px 0 rgba(252, 191, 85,0.25)">
+                    <h2 class="box-title mt-5" style="color: #2A3F54;">Open Requisitions</h2>
+                    <h1>{{open}}</h1>
+                    <a href="/erf/job-requisition-table/open" title="Open Requisitions" class="anchor btn btn-default" style="background: #1ABB9C; color: #fff;">
+                      View
+                    </a>
+                  </div>
+                </div>
+                <div class="space"></div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="card-base">
+                <div class="card-icon">
+                  <span title="Completed Requisitions" class="imagecard widgetCardIcon" style="background: #0aaa4d !important; box-shadow: 1px 2px 5px 0 rgba(10, 170, 77,0.25), 0 2px 10px 0 rgba(10, 170, 77,0.25)">
+                    <i class="fa fa-thumbs-up"></i>
+                  </span>
+                  <div class="card-data widgetCardData" style="box-shadow: 1px 2px 5px 0 rgba(10, 170, 77,0.25), 0 2px 10px 0 rgba(10, 170, 77,0.25)">
+                    <h2 class="box-title mt-5" style="color: #2A3F54;">Completed Requisitions</h2>
+                    <h1>{{closed}}</h1>
+                    <a href="/erf/job-requisition-table/closed" title="Completed Requisitions" class="anchor btn btn-default" style="background: #1ABB9C; color: #fff;">
+                      View
+                    </a>
+                  </div>
+                </div>
+                <div class="space"></div>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="card-base">
+                <div class="card-icon">
+                  <span title="Crossed Deadline" class="imagecard widgetCardIcon" style="background: #fe5f55 !important; box-shadow: 1px 2px 5px 0 rgba(254, 95, 85,0.25), 0 2px 10px 0 rgba(254, 95, 85,0.25)">
+                    <i class="fa fa-exclamation-triangle"></i>
+                  </span>
+                  <div class="card-data widgetCardData" style=" box-shadow: 1px 2px 5px 0 rgba(254, 95, 85,0.25), 0 2px 10px 0 rgba(254, 95, 85,0.25)">
+                    <h2 class="box-title mt-5" style="color: #2A3F54;">Crossed Deadline</h2>
+                    <h1>{{dead_line}}</h1>
+                    <a href="/erf/job-requisition-table/dead-line" title="Crossed Deadline" class="anchor btn btn-default" style="background: #1ABB9C; color: #fff;">
+                      View
+                    </a>
+                  </div>
+                </div>
+                <div class="space"></div>
+              </div>
+            </div>
+            {% if request.user.profile.emp_desi == 'Assistant Manager' %}
+              <div class="col-md-2">
+                <div class="card-base">
+                  <div class="card-icon">
+                    <span title="Waiting for Requisition Approval" class="imagecard widgetCardIcon">
+                      <i class="fa fa-hourglass-half"></i>
+                    </span>
+                    <div class="card-data widgetCardData">
+                      <h2 class="box-title mt-5" style="color: #2A3F54;">Waiting for Approval</h2>
+                      <h1>{{waiting}}</h1>
+                      <a href="/erf/job-requisition-table/waiting" title="Waiting for Requisition Approval" class="anchor btn btn-default" style="background: #1ABB9C; color: #fff;">
+                        View
+                      </a>
+                    </div>
+                  </div>
+                  <div class="space"></div>
+                </div>
+              </div>
+            {% endif %}
+            {% if request.user.profile.emp_desi in manager %}
+              <div class="col-md-2">
+                <div class="card-base">
+                  <div class="card-icon">
+                    <span title="Final Approval Requests" class="imagecard widgetCardIcon">
+                      <i class="fa fa-check"></i>
+                    </span>
+                    <div class="card-data widgetCardData">
+                      <h2 class="box-title mt-5" style="color: #2A3F54;">Final Approval Requests</h2>
+                      <h1>{{approval}}</h1>
+                      <a href="/erf/job-requisition-table/approval" title="Final Approval Requests" class="anchor btn btn-default" style="background: #1ABB9C; color: #fff;">
+                        View
+                      </a>
+                    </div>
+                  </div>
+                  <div class="space"></div>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <div class="card-base">
+                  <div class="card-icon">
+                    <span title="Pending Requests from AM" class="imagecard widgetCardIcon">
+                      <i class="fa fa-check"></i>
+                    </span>
+                    <div class="card-data widgetCardData">
+                      <h2 class="box-title mt-5" style="color: #2A3F54;">Pending Requests from AM</h2>
+                      <h1>{{manager_approval}}</h1>
+                      <a href="/erf/job-requisition-table/initial" title="Pending Requests from AM" class="anchor btn btn-default" style="background: #1ABB9C; color: #fff;">
+                        View
+                      </a>
+                    </div>
+                  </div>
+                  <div class="space"></div>
+                </div>
+              </div>
+              {% endif %}
+
+          </div>
+
+            <div class="row mt-3">
+              <div class="col-md-4">
+                <div class="card-base">
+                  <div class="card-icon">
+                    <span title="Reports" class="imagecard widgetCardIcon">
+                      <i class="fa fa-chart-line"></i>
+                    </span>
+                    <div class="card-data widgetCardData" style="background: #fff;">
+                      <h2 class="box-title mt-5" style="color: #2A3F54;">Reports</h2>
+                      <div class="card" style="border: none;">
+                        <div class="card-body">
+                          <div class="row">
+                            <form action="/erf/job-requisition-table/range" method="POST" enctype="multipart/form-data" style="width: 100%">
+                              {% csrf_token %}
+                              <div class="col-md-12">
+                                <div class="row">
+                                  <div class="col-md-12">
+                                    <div class="form-group">
+                                      <label for="report_status">Status</label>
+                                      <select required class="form-control select2" name="status" id="report_status">
+                                        <option value="" selected disabled>Please Select Status</option>
+                                        <option value="all">All</option>
+                                        <option value="open">Open Status</option>
+                                        <option value="closed">Completed Status</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-md-12">
+                                <div class="row">
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label for="cam_start">Start Date</label>
+                                      <input type="date" onchange="cam_end_datefn()" name="start_date" required id="cam_start" class="form-control start">
+                                    </div>
+                                  </div>
+                                  <div class="col-md-6">
+                                    <div class="form-group">
+                                      <label for="cam_end">End Date</label>
+                                      <input type="date"  name="end_date" id="cam_end" required class="form-control end">
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-md-12">
+                                <button class="btn btn-success form-control">Submit</button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="space"></div>
+                </div>
+              </div>
+              <div class="col-md-4">
+
+              </div>
+            </div>
+
+        </div>
+        <!-- /page content -->
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+  $today = new Date();
+  $today = moment($today).format("YYYY-MM-DD");
+
+  $cam_start = $("#cam_start");
+  $cam_end = $("#cam_end");
+  $cam_start.attr("max",$today)
+  $cam_end.attr("max",$today)
+  function cam_end_datefn(){
+    $cam_start = $("#cam_start").val()
+    $cam_end.attr("min",$cam_start)
+    $cam_end.attr("required","required")
+  }
+
+
+  $start = $("#start");
+  $end = $("#end");
+  $start.attr("max",$today)
+  $end.attr("max",$today)
+  function end_datefn(){
+    $start = $("#start").val()
+    $end.attr("min",$start)
+    $end.attr("required","required")
+  }
+
+</script>
+{% endblock %}

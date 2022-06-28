@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.conf.urls import handler403
+from django.conf.urls import handler403, handler404
 
 urlpatterns = [
   path('admin/', admin.site.urls),
@@ -25,6 +25,9 @@ urlpatterns = [
   path('accounts/', include('ams.urls')),
   path('ams/', include('ams.urls')),
   path('mapping/', include('mapping.urls')),
+  path('pbireport/', include("powerbireports.urls")),
+  path("erf/", include("job_requisition_app.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler403 = 'ams.views.view_403'
+handler404 = 'powerbireports.views.view_404'

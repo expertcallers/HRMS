@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	 <link rel="icon" href="images/expertcallers-icon.png" type="image/ico" />
 
-    <title>ECPL Attendance Management | Dashboard</title>
+    <title>ECPL PowerBi Reports | Dashboard</title>
 
     <!-- Bootstrap -->
     <link href="{% static 'assets/vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
@@ -49,6 +49,10 @@
         .monthly-prev, .monthly-next{
             display:none;
           }
+      iframe {
+        width: 100% !important;
+        height: 100vh !important;
+      }
     </style>
 {% block style %}
 
@@ -87,46 +91,18 @@
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
               <div class="menu_section">
                 <ul class="nav side-menu">
-                  <li><a href="/ams/dashboard-redirect"><i class="fa fa-home"></i> Dashboard</a></li>
-                  <li><a><i class="fa fa-clock-o"></i>Attendance <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="/ams/ams-update-attendance">Mark Attendance</a></li>
-                        <li><a href="/ams/team-attendance">Team Attendance</a></li>
-                        <li><a href="/ams/week-attendance">Week Report</a></li>
-                        <li><a href="/ams/attendance-correction">Attendance Correction</a></li>
-                      <!--<li><a href="all_emp.html">Active Employees</a></li>-->
-                    </ul>
-                  </li>
-
-                  <li><a><i class="fa fa-user"></i>Mapping <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="/ams/rm-mapping-index"> Mapping</a></li>
-                      <li><a href="/ams/mapping-application-status"> Mapping Change Status</a></li>
-                    </ul>
-                  </li>
-
-                  <li><a><i class="fa fa-check-square-o"></i>Leave Management<span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="/ams/leave-history"> Agent Leave History</a></li>
-                      <li><a href="/ams/ams-apply_leave">Your Leaves</a></li>
-                    </ul>
-                  </li>
-                  <li><a href="/ams/attendance-calendar"><i class="fa fa-calendar"></i> Attendance Calendar</a></li>
-                  {% if request.user.profile.emp_id in admin_list %}
-                  {% include 'ams/admin_urls.html' %}
-                  {% endif %}
-
-                  {% if request.user.profile.emp_id in administration_list %}
-                  {% include 'ams/administration_urls.html' %}
-                  {% endif %}
-                  <li><a href="/pbireport/management-dashboard"><i class="fa fa-file"></i> PowerBi Reports</a></li>
-                  <li><a href="/ams/rm-settings"><i class="fa fa-gears"></i> Settings</a></li>
-                  <!--<li><a><i class="fa fa-briefcase"></i> Job Requisition <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="/ams/add-new-job">Add New</a></li>
-                      <li><a href="/ams/view-job-table-rm">View Submissions</a></li>
-                    </ul>
-                  </li>-->
+                    {% if user.campaign.campaignid == "all" %}
+                        <li><a href="/pbireport/management-dashboard"><i class="fa fa-home"></i>Dashboard</a></li>
+                        <li><a href="/pbireport/campaigns/all"><i class="fa fa-list-alt"></i>All Campaigns</a></li>
+                        <li><a href="/pbireport/campaigns/Outbound"><i class="fa fa-phone-volume"></i>Outbound Campaigns</a></li>
+                        <li><a href="/pbireport/campaigns/Inbound"><i class="fa fa-headphones"></i>Inbound Campaigns</a></li>
+                        <li><a href="/pbireport/campaigns/Email"><i class="fa fa-envelope"></i>Email Campaigns</a></li>
+                        <li><a href="/pbireport/campaigns/Other"><i class="fa fa-list-alt"></i>Other Campaigns</a></li>
+                        {% if user.campaign.campaign_type == None %}
+                        <li><a href="/pbireport/campaign-assigning"><i class="fa fa-users"></i>Campaign Mapping</a></li>
+                        {% endif %}
+                    {% endif %}
+                  <li><a href="/ams/dashboard-redirect"><i class="fa fa-arrow-left"></i>Back to AMS</a></li>
                 </ul>
               </div>
             </div>

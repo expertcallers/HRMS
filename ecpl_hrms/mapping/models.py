@@ -22,6 +22,9 @@ class Profile(models.Model):
     active = models.BooleanField(default=True)
     on_id = models.IntegerField(null=True,blank=True)
     agent_status = models.CharField(max_length=20,default='Active')
+    otp = models.CharField(max_length=12, null=True, blank=True)
+    otp_time = models.DateTimeField(null=True, blank=True)
+    email_verify = models.BooleanField(default=False, blank=True)
 
     def __str__(self):
         return self.emp_name

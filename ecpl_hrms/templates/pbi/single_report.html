@@ -1,0 +1,21 @@
+{% extends 'pbi/base.html' %}
+{% load static %}
+{% block main %}
+
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="page-title">
+        <div class="title_left">
+            <h1>{{campaign.campaign}}</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <iframe title="{{campaign.campaign}}" src="{{link}}" frameborder="0" allowFullScreen="true"></iframe>
+        </div>
+    </div>
+</div>
+<!-- /page content -->
+
+
+{% endblock %}
