@@ -434,7 +434,7 @@ def job_requisition(request):
         new_campaign = request.POST.get("new_campaign")
         if new_campaign:
             try:
-                c = Campaigns.objects.get(campaign_name__iexact=new_campaign)
+                c = Campaigns.objects.get(name__iexact=new_campaign)
                 campaign = c.name
                 messages.info(request, "Campaign Not added! Campaign with same name already exist!!")
             except Campaigns.DoesNotExist:
@@ -783,11 +783,15 @@ def EditRequest(request):
         if timee <= 86400:
             if emp_id == by:
                 job = JobRequisition.objects.get(id=id)
-                managers = Profile.objects.filter(emp_desi__in=mgr_list)
-                today = date.today()
-                campaigns = Campaigns.objects.all()
-                data = {"today": today, "managers": managers, "job": job, "campaigns": campaigns}
-                return render(request, "erf/edit_job_requisition.html", data)
+                if job.candidate_name_1:
+                    messages.info(request, "Can not be edited now!")
+                    return redirect("/erf/dashboard")
+                else:
+                    managers = Profile.objects.filter(emp_desi__in=mgr_list)
+                    today = date.today()
+                    campaigns = Campaigns.objects.all()
+                    data = {"today": today, "managers": managers, "job": job, "campaigns": campaigns}
+                    return render(request, "erf/edit_job_requisition.html", data)
             else:
                 messages.info(request, "You are not authorize to edit this :)")
                 if designation in hr_list:
@@ -913,28 +917,28 @@ def job_requisition_manager_edit(request):
             if str(e.languages) != str(languages):
                 content += "Edited Languages from " + str(e.languages) + " to " + str(languages) + ", "
             if e.shift_timing != shift_timing:
-                content += "Edited Type of Shift Timing from " + e.shift_timing + " to " + shift_timing + ", "
+                content += "Edited Type of Shift Timing from " + str(e.shift_timing) + " to " + str(shift_timing) + ", "
             if e.shift_timing_frm != shift_timing_frm:
-                content += "Edited Shift Timing From from " + e.shift_timing_frm + " to " + shift_timing_frm + ", "
+                content += "Edited Shift Timing From from " + str(e.shift_timing_frm) + " to " + str(shift_timing_frm) + ", "
             if e.shift_timing_to != shift_timing_to:
-                content += "Edited Shift Timing To from " + e.shift_timing_to + " to " + shift_timing_to + ", "
+                content += "Edited Shift Timing To from " + str(e.shift_timing_to) + " to " + str(shift_timing_to) + ", "
             if e.working_from != working_from:
-                content += "Edited Working From from " + e.working_from + " to " + working_from + ", "
+                content += "Edited Working From from " + str(e.working_from) + " to " + str(working_from) + ", "
             if e.working_to != working_to:
-                content += "Edited Working To from " + e.working_to + " to " + working_to + ", "
+                content += "Edited Working To from " + str(e.working_to) + " to " + str(working_to) + ", "
             if e.requisition_type != requisition_typ:
-                content += "Edited Requisition Type from " + e.requisition_type + " to " + requisition_typ + ", "
+                content += "Edited Requisition Type from " + str(e.requisition_type) + " to " + str(requisition_typ) + ", "
             if e.reason_for_replace != replace_reason:
-                content += "Edited Reason For Replace from " + e.reason_for_replace + " to " + replace_reason + ", "
+                content += "Edited Reason For Replace from " + str(e.reason_for_replace) + " to " + str(replace_reason) + ", "
             if week_no_days:
                 if e.week_no_days != week_no_days:
-                    content += "Edited Number of Week offs from " + e.week_no_days + " to " + week_no_days + ", "
+                    content += "Edited Number of Week offs from " + str(e.week_no_days) + " to " + str(week_no_days) + ", "
             if week_from:
                 if e.week_from != week_from:
-                    content += "Edited Week off 1 from " + e.week_from + " to " + week_from + ", "
+                    content += "Edited Week off 1 from " + str(e.week_from) + " to " + str(week_from) + ", "
             if week_to:
                 if e.week_to != week_to:
-                    content += "Edited Week off 2 from " + e.week_to + " to " + week_to + ", "
+                    content += "Edited Week off 2 from " + str(e.week_to) + " to " + str(week_to) + ", "
             if content == "":
                 content = "Nothing"
 

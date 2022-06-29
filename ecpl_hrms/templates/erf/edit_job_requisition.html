@@ -76,7 +76,7 @@
                                 <select name="campaign" id="campaign" required class="form-control select2">
                                   <option value="" selected disabled>Please Select</option>
                                   {% for i in campaigns %}
-                                  <option value="{{i.campaign_name}}" {% if i.campaign_name == job.campaign %}selected{% endif %}>{{i.campaign_name}}</option>
+                                  <option value="{{i.name}}" {% if i.name == job.campaign %}selected{% endif %}>{{i.name}}</option>
                                   {% endfor %}
                                 </select>
                               </div>
