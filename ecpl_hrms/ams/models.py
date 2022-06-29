@@ -130,7 +130,7 @@ class MappingTickets(models.Model):
 class Campaigns(models.Model):
     unique_id = models.CharField(max_length=150,null=True,blank=True)
     name = models.CharField(max_length=100)
-    om = models.CharField(max_length=50)
+    om = models.CharField(max_length=50, null=True, blank=True)
     created_by = models.CharField(max_length=50,null=True,blank=True)
     def __str__(self):
         return self.name

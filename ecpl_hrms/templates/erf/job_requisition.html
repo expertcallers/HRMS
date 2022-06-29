@@ -73,7 +73,7 @@
                                         <option value="" selected disabled>Please Select</option>
                                         <option value="new">New</option>
                                         {% for i in campaigns %}
-                                        <option value="{{i.campaign_name}}">{{i.campaign_name}}</option>
+                                        <option value="{{i.name}}">{{i.name}}</option>
                                         {% endfor %}
                                       </select>
                                       <input type="text" name="new_campaign" id="new_campaign" class="mt-2 form-control d-none" placeholder="Enter New Campaign Name">

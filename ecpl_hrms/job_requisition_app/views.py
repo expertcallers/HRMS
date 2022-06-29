@@ -27,62 +27,54 @@ number = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 hr_list = ['HR', 'HR Manager', 'Manager ER', 'HR Lead', 'Sr Recruiter', 'MIS Executive HR', 'Lead HRBP',
            'Employee Relations Specialist', 'Payroll Specialist', 'Recruiter', 'HR Generalist', 'Associate Director',
            'Junior Recruiter']
+
 am_mgr_list = ['Assistant Manager', 'Learning and Development Head', 'Quality Head', 'Operations Manager',
                'Service Delivery Manager', 'Command Centre Head', 'Manager']
 # Edit/Update
 edit_list = ['HR', 'HR Manager', 'Manager ER', 'HR Lead',
              'Sr Recruiter', 'MIS Executive HR', 'Lead HRBP', 'Employee Relations Specialist', 'Payroll Specialist',
              'Recruiter', 'Junior Recruiter', 'HR Generalist']
+
 # Frontend filtering managers
 mgr_list = ['Learning and Development Head', 'Quality Head', 'Operations Manager', 'Service Delivery Manager',
             'Command Centre Head', 'Manager']
+
+
 # Frontend export option
 management_list = ['Associate Director']
 
-def index(request):
-    logout(request)
-    return render(request, "erf/index.html")
+@login_required
+def Index(request):
+    return redirect('/ams/dashboard-redirect')
 
+@login_required
 def Login(request):
-    if request.method == "POST":
-        username = request.POST["user"]
-        password = request.POST["pass"]
-        user = authenticate(username=username, password=password)
-        if user is not None:
-            # user_login
-            login(request, user)
-            user = Profile.objects.get(emp_id=username)
-            system = socket.gethostname()
-            IPAddr = socket.gethostbyname(system)
-            date_time = datetime.datetime.now()
-            emp_id = request.user.profile.emp_id
-            emp_name = request.user.profile.emp_name
-            e = LoginHistory()
-            e.emp_id = emp_id
-            e.emp_name = emp_name
-            e.date_time = date_time
-            e.ip = IPAddr
-            e.system = system
-            e.save()
-            designation = request.user.profile.emp_desi
+    username = request.user.profile.emp_id
+    user = Profile.objects.get(emp_id=username)
+    system = socket.gethostname()
+    IPAddr = socket.gethostbyname(system)
+    date_time = datetime.datetime.now()
+    emp_id = request.user.profile.emp_id
+    emp_name = request.user.profile.emp_name
+    e = LoginHistory()
+    e.emp_id = emp_id
+    e.emp_name = emp_name
+    e.date_time = date_time
+    e.ip = IPAddr
+    e.system = system
+    e.save()
+    designation = request.user.profile.emp_desi
 
-            if user.emp_email is not None and user.email_verify == True:
-                if designation in am_mgr_list:
-                    return redirect("/erf/manager-dashboard")
-                elif designation in hr_list:
-                    return redirect("/erf/hr-dashboard")
-                else:
-                    messages.info(request, 'Not authorised to view this page !')
-                    return redirect("/erf/")
-            else:
-                return redirect("/erf/add-email")
-
+    if user.emp_email is not None and user.email_verify == True:
+        if designation in am_mgr_list:
+            return redirect("/erf/manager-dashboard")
+        elif designation in hr_list:
+            return redirect("/erf/hr-dashboard")
         else:
-            messages.info(request, 'Invalid user !')
+            messages.info(request, 'Not authorised to view this page !')
             return redirect("/erf/")
     else:
-        messages.info(request, 'Invalid Request !')
-        return redirect("/erf/")
+        return redirect("/erf/add-email")
 
 @login_required
 def AddEmail(request):
@@ -265,7 +257,6 @@ def forgotPassword(request):
         return render(request, "erf/forgot_password.html")
 
 def resetPassword(request,emp_id,otp):
-    logout(request)
     profile = Profile.objects.get(emp_id=emp_id)
     start = profile.otp_time.timestamp()
     timee = datetime.datetime.now(pytz.timezone('Asia/Kolkata')).timestamp() - start
@@ -444,13 +435,12 @@ def job_requisition(request):
         if new_campaign:
             try:
                 c = Campaigns.objects.get(campaign_name__iexact=new_campaign)
-                campaign = c.campaign_name
+                campaign = c.name
                 messages.info(request, "Campaign Not added! Campaign with same name already exist!!")
             except Campaigns.DoesNotExist:
                 cam = Campaigns()
-                cam.campaign_name = new_campaign
-                cam.manager = "Created while adding Request "+ str(request.user.profile.emp_id)
-                cam.manager_id = "0000"
+                cam.name = new_campaign
+                cam.created_by = "Created while adding Request by "+ str(request.user.profile.emp_id)
                 cam.save()
                 campaign = new_campaign
 
@@ -527,7 +517,7 @@ def job_requisition(request):
             if user.emp_desi != "Assistant Manager":
                 action = "Created"
                 subject = action + " - Employee Requisition [" + str(e.id) + "]"
-                html_path = 'email.html'
+                html_path = 'erf/email.html'
                 data = {'id': e.id, "created_date": edited_date, "hc": hc_req, "department": department,
                         "position": designation,
                         "deadline": dead_line, "campaign": campaign, "user": user.emp_name, "action": action,
@@ -548,7 +538,7 @@ def job_requisition(request):
             else:
                 action = "Created"
                 subject = action + " - Employee Requisition [" + str(e.id) +"]"
-                html_path = 'email.html'
+                html_path = 'erf/email.html'
                 data = {'id': e.id, "created_date": edited_date, "hc": hc_req, "department": department,
                         "position": designation,
                         "deadline": dead_line, "campaign": campaign, "user": user.emp_name, "action": action,
@@ -996,7 +986,7 @@ def job_requisition_manager_edit(request):
 
             action = "Edited"
             subject = action + " - Employee Requisition [" + str(e.id) +"]"
-            html_path = 'email.html'
+            html_path = 'erf/email.html'
             data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
                     "position": e.designation,
                     "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
@@ -1585,7 +1575,7 @@ def jobRequisitionEditUpdate(request):
 
             action = "Updated"
             subject = action + " - Employee Requisition [" + str(e.id) +"]"
-            html_path = 'email.html'
+            html_path = 'erf/email.html'
             data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
                     "position": e.designation,
                     "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
@@ -1684,7 +1674,7 @@ def approval(request):
             messages.info(request, message)
 
             subject = action + " - Employee Requisition [" + str(e.id) + "]"
-            html_path = 'email.html'
+            html_path = 'erf/email.html'
             data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
                     "position": e.designation,
                     "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
@@ -1832,7 +1822,7 @@ def CreationApproval(request):
             messages.info(request, message)
 
             subject = action + " - Employee Requisition [" + str(e.id) + "]"
-            html_path = 'email.html'
+            html_path = 'erf/email.html'
             data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
                     "position": e.designation,
                     "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
@@ -1904,7 +1894,7 @@ def DeteleRequest(request, type):
                 a.edited_by = adding
                 a.save()
                 subject = action + " - Employee Requisition [" + str(e.id) +"]"
-                html_path = 'email.html'
+                html_path = 'erf/email.html'
                 data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
                         "position": e.designation,
                         "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
@@ -1968,7 +1958,7 @@ def DeteleRequest(request, type):
                 a.save()
                 action = "Requested for Deletion"
                 subject = action + " - Employee Requisition [" + str(e.id) +"]"
-                html_path = 'email.html'
+                html_path = 'erf/email.html'
                 data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
                         "position": e.designation,
                         "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
