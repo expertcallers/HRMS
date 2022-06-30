@@ -120,7 +120,9 @@
                   {% include 'ams/administration_urls.html' %}
                   {% endif %}
                   <li><a href="/pbireport/management-dashboard"><i class="fa fa-file"></i> PowerBi Reports</a></li>
+                  {% if request.user.profile.emp_desi != 'Team Leader' %}
                   <li><a href="/erf/login"><i class="fa">&#x1F4CB;</i> ERF</a></li>
+                  {% endif %}
                   <li><a href="/ams/rm-settings"><i class="fa fa-gears"></i> Settings</a></li>
                   <!--<li><a><i class="fa fa-briefcase"></i> Job Requisition <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
