@@ -380,7 +380,7 @@ def job_requisition(request):
         time = datetime.datetime.now(pytz.timezone('Asia/Kolkata')).time()
         today7pm = time.replace(hour=19, minute=0, second=0, microsecond=0)
         new_weekday = datetime.datetime.now(pytz.timezone('Asia/Kolkata')).weekday()
-        edited_date = datetime.datetime.today()
+        edited_date = datetime.datetime.now()
         if weekday < 5:
             if time > today7pm:
                 edited_date = (datetime.datetime.today() + datetime.timedelta(days=1)).replace(hour=9, minute=0, second=0, microsecond=0)
@@ -390,7 +390,7 @@ def job_requisition(request):
         elif new_weekday == 6:
             edited_date = (datetime.datetime.today() + datetime.timedelta(days=1)).replace(hour=9, minute=0, second=0, microsecond=0)
         else:
-            edited_date = edited_date.replace(hour=9, minute=0, second=0, microsecond=0)
+            edited_date = edited_date
         hc_req = request.POST["hc_required"]
         req_raised_by = request.POST["req_rais_by"]
         created_by_id = request.user.profile.emp_id
@@ -447,13 +447,7 @@ def job_requisition(request):
         try:
             JobRequisition.objects.get(unique_id=unique_id)
             messages.info(request, "Request added please wait!")
-            if request.user.profile.emp_desi in am_mgr_list:
-                return redirect("/erf/manager-dashboard")
-            elif request.user.profile.emp_desi in hr_list:
-                return redirect("/erf/hr-dashboard")
-            else:
-                messages.info(request, "Invalid Request. You have been logged out :)")
-                return redirect("/erf/")
+            return redirect("/erf/dashboard")
 
         except JobRequisition.DoesNotExist:
             e = JobRequisition()
@@ -556,13 +550,7 @@ def job_requisition(request):
                                          reply_to=['erf@expertcallers.com'])
                 email_msg.content_subtype = 'html'
                 email_msg.send(fail_silently=False)
-            if request.user.profile.emp_desi in am_mgr_list:
-                return redirect("/erf/manager-dashboard")
-            elif request.user.profile.emp_desi in hr_list:
-                return redirect("/erf/hr-dashboard")
-            else:
-                messages.info(request, "Invalid Request. You have been logged out :)")
-                return redirect("/erf/")
+            return redirect("/erf/dashboard")
 
     else:
         managers = Profile.objects.filter(emp_desi__in=mgr_list)
@@ -759,13 +747,7 @@ def jobRequisitionEditView(request, id):
             return render(request, "erf/job_requisition_edit.html", data)
         except JobRequisition.DoesNotExist:
             messages.info(request, "Invalid Request!!")
-            if designation in hr_list:
-                return redirect("/erf/hr-dashboard")
-            elif designation in am_mgr_list:
-                return redirect("/erf/manager-dashboard")
-            else:
-                messages.info(request, "Invalid Request!!. You have been logged out :)")
-                return redirect("/erf/")
+            return redirect("/erf/dashboard")
     else:
         messages.info(request, "Invalid Request. You have been logged out :)")
         return redirect("/erf/")
@@ -794,22 +776,10 @@ def EditRequest(request):
                     return render(request, "erf/edit_job_requisition.html", data)
             else:
                 messages.info(request, "You are not authorize to edit this :)")
-                if designation in hr_list:
-                    return redirect("/erf/hr-dashboard")
-                elif designation in am_mgr_list:
-                    return redirect("/erf/manager-dashboard")
-                else:
-                    messages.info(request, "Invalid Request!! You have been logged out :)")
-                    return redirect("/erf/")
+                return redirect("/erf/dashboard")
         else:
             messages.info(request, "Can not edit now. Time limit has been exceeded :)")
-            if designation in hr_list:
-                return redirect("/erf/hr-dashboard")
-            elif designation in am_mgr_list:
-                return redirect("/erf/manager-dashboard")
-            else:
-                messages.info(request, "Invalid Request!!. You have been logged out :)")
-                return redirect("/erf/")
+            return redirect("/erf/dashboard")
     else:
         pass
 
