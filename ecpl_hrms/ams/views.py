@@ -198,62 +198,34 @@ def tlDashboard(request):  # Test1 Test2
         emp_name = request.user.profile.emp_name
         emp_id = request.user.profile.emp_id
         prof = Profile.objects.get(emp_id=emp_id)
-        # All Employees
-        all_emp = Profile.objects.filter(Q(agent_status='Active'),
-             Q(emp_id=emp_id) | Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
+        # All Employees # Used in dropdown attendance report
+        all_emp = Profile.objects.filter(Q(agent_status='Active'),Q(emp_id=emp_id) | Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
         # All Active Today
         today = date.today()
-
+        # All team members attendance details
         emps = Profile.objects.filter(Q(emp_rm1_id=emp_id), Q(agent_status='Active')).values('emp_id')
-        att_details = EcplCalander.objects.filter(Q(date=today), Q(emp_id__in=emps))
+        att_details = EcplCalander.objects.filter(Q(date=today), Q(emp_id__in=emps))        
         # counts
-        emp_count = Profile.objects.filter(Q(agent_status='Active'), Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(
-            emp_rm3_id=emp_id)).distinct().count()
+        emp_count = all_emp.count()-1
 
-        def allCounts(cat):
-            return EcplCalander.objects.filter(Q(rm1_id=emp_id) | Q(rm2_id=emp_id) | Q(rm3_id=emp_id), Q(date=today),
-                                               Q(att_actual=cat)).count()
-
-        present_count = allCounts('present')
-        absent_count = allCounts('Absent')
-        week_off_count = allCounts('Week OFF')
-        comp_off_count = allCounts('Comp OFF')
-        half_day_count = allCounts('Half Day')
-        client_off_count = allCounts('Client OFF')
-        sl_count = allCounts('SL')
-        pl_count = allCounts('PL')
-        attrition_count = allCounts('Attrition')
-        training_count = allCounts('Training')
-        unmarked_count = allCounts('Unmarked')
+        # def allCounts(cat):
+        #     return EcplCalander.objects.filter(Q(rm1_id=emp_id) | Q(rm2_id=emp_id) | Q(rm3_id=emp_id), Q(date=today),Q(att_actual=cat)).count()
+        # present_count = allCounts('present')
+        # absent_count = allCounts('Absent')
+        # week_off_count = allCounts('Week OFF')
+        # comp_off_count = allCounts('Comp OFF')
+        # half_day_count = allCounts('Half Day')
+        # client_off_count = allCounts('Client OFF')
+        # sl_count = allCounts('SL')
+        # pl_count = allCounts('PL')
+        # attrition_count = allCounts('Attrition')
+        # training_count = allCounts('Training')
+        # unmarked_count = allCounts('Unmarked')
 
         # Mapping Tickets 
         map_tickets_counts = MappingTickets.objects.filter(new_rm3_id=emp_id, status=False).count()
         # Leaves
         leave_req_count = LeaveTable.objects.filter(emp_rm1_id=emp_id, tl_approval=False).count()
-
-        # Month view
-        month_days = []
-        todays_date = date.today()
-        year = todays_date.year
-        month = todays_date.month
-        a, num_days = calendar.monthrange(year, month)
-        start_date = date(year, month, 1)
-        end_date = date(year, month, num_days)
-        delta = timedelta(days=1)
-        while start_date <= end_date:
-            month_days.append(start_date.strftime("%Y-%m-%d"))
-            start_date += delta
-        month_cal = []
-        for i in month_days:
-            dict = {}
-            try:
-                st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id), ~Q(att_actual='Unmarked')).att_actual
-            except EcplCalander.DoesNotExist:
-                st = 'Unmarked'
-            dict['dt'] = i
-            dict['st'] = st
-            month_cal.append(dict)
-
         # Add Comment
         emps = Profile.objects.filter(Q(emp_rm3_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm1_id=emp_id))
         rm3 = ""
@@ -263,14 +235,8 @@ def tlDashboard(request):  # Test1 Test2
                 break
 
         data = {'emp_name': emp_name, 'emp': prof, 'att_details': att_details, 'emp_count': emp_count,
-                'present_count': present_count, 'absent_count': absent_count, 'week_off_count': week_off_count,
-                'comp_off_count': comp_off_count, 'half_day_count': half_day_count,
-                'client_off_count': client_off_count,
-                'unmarked_count': unmarked_count, 'map_tickets_counts': map_tickets_counts,
-                'all_emp': all_emp, 'sl_count': sl_count, 'pl_count': pl_count, 'attrition_count': attrition_count,
-                'training_count': training_count, 'leave_req_count': leave_req_count, 'month_cal': month_cal,
+                'map_tickets_counts': map_tickets_counts,'all_emp': all_emp, 'leave_req_count': leave_req_count,
                 "rm3": rm3, 'admin_list': admin_list, 'administration_list': administration_list}
-
         return render(request, 'ams/rm-dashboard-new.html', data)
 
     elif usr_desi in manager_list:
