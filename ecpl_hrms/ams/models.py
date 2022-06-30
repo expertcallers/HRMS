@@ -280,6 +280,7 @@ class BillAdministration(models.Model):
     po_no = models.CharField(max_length=50)
     date = models.DateField()
     billing_office = models.CharField(max_length=200, null=True, blank=True)
+    category = models.CharField(max_length=200, null=True, blank=True)
     delivery_office = models.CharField(max_length=200)
     delivery_address = models.TextField()
     contact_person = models.CharField(max_length=200)

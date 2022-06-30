@@ -2621,6 +2621,7 @@ def CreateBill(request):
     if logged_emp_id in administration_list:
         if request.method == "POST":
             project = request.POST["project"]
+            category = request.POST["category"]
             date = request.POST["date"]
             po_no = request.POST["po_no"]
             delivery = request.POST["delivery"]
@@ -2682,9 +2683,10 @@ def CreateBill(request):
                 project=project, po_no=po_no, date=date, supplier=supplier_name, delivery_office=delivery_office,
                 delivery_address=delivery_address, contact_person=contact_person, contact_no=contact_no,
                 contact_email=contact_email, terms_conditions=terms, billing_office=billing_office,
-                supplier_address=sup_address, supplier_contact_person=sup_contact_person, supplier_contact_no=sup_contact_no,
-                supplier_contact_email=sup_contact_email, supplier_pan=sup_pan, supplier_gst=sup_gst, acc_name=acc_name,
-                acc_no=acc_no, bank_name=acc_bank, bank_branch=bank_branch, ifsc=bank_ifsc, cin_code=cin_code
+                supplier_address=sup_address, supplier_contact_person=sup_contact_person,
+                supplier_contact_no=sup_contact_no, supplier_contact_email=sup_contact_email, supplier_pan=sup_pan,
+                supplier_gst=sup_gst, acc_name=acc_name, acc_no=acc_no, bank_name=acc_bank, bank_branch=bank_branch,
+                ifsc=bank_ifsc, cin_code=cin_code, category=category
             )
             num_of_desc = int(request.POST["num_of_desc"])
             for i in range(1, num_of_desc + 1):

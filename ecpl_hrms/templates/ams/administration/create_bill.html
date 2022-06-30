@@ -28,6 +28,14 @@
                         <input type="text" name="project" id="project" onkeypress="project(this)" class="form-control" required>
                       </div>
                       <div class="col-md-3 mt-2 form-group">
+                        <label for="project">Category: </label>
+                        <select name="category" id="category" class="form-control" required>
+                            <option value="" selected disabled>-- Please Select --</option>
+                            <option value="Capex">Capex</option>
+                            <option value="Opex">Opex</option>
+                        </select>
+                      </div>
+                      <div class="col-md-3 mt-2 form-group">
                         <label for="date">Date</label>
                         <input type="date" name="date" id="date" class="form-control" required>
                       </div>
@@ -212,12 +220,14 @@
             </thead>
             <tbody>
                 <tr>
-                    <th class="align-middle"  rowspan="2" style="width: 25%">Project Name: </th>
-                    <td class="align-middle"  rowspan="2" style="width: 25%" id="project_name"></td>
+                    <th class="align-middle"  style="width: 25%">Project Name: </th>
+                    <td class="align-middle"  style="width: 25%" id="project_name"></td>
                     <td class="align-middle"  style="width: 25%">DATE: </td>
                     <td class="align-middle"  style="width: 25%" id="date_value"></td>
                 </tr>
                 <tr>
+                    <td class="align-middle" >Category</td>
+                    <td class="align-middle" id="category_view"></td>
                     <td class="align-middle" >PO.No </td>
                     <td class="align-middle" id="po_no_value"></td>
                 </tr>
@@ -406,6 +416,9 @@
         billing = 'Indraprastha, Gubbi cross, 1st Main Rd, Kuvempu Layout, Kothanur, Bengaluru, Karnataka 560077';
         $('#billing_view').html(billing)
     }
+  });
+  $("#category").on("change", function(){
+    $('#category_view').html((this.value));
   });
 
   $("#terms").focusout(function(){
