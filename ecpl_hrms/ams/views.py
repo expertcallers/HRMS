@@ -113,17 +113,8 @@ def loginAndRedirect(request):  # Test1 Test2
             if request.user.profile.agent_status == "Active":
                 if request.user.profile.pc == False:
                     return redirect('/ams/change-password')
-                if request.user.profile.emp_desi in tl_am_list:
-                    return redirect('/ams/tl-dashboard')
-                elif request.user.profile.emp_desi in manager_list:
-                    return redirect('/ams/manager-dashboard')
-                elif request.user.profile.emp_desi in hr_list:
-                    return redirect('/ams/hr-dashboard')
-                elif request.user.profile.emp_desi in agent_list:
-                    return redirect('/ams/agent-dashboard')
                 else:
-                    messages.info(request, 'Something Went Wrong! Contact CC Team.')
-                    return redirect('/ams/')
+                    return redirect('/ams/dashboard-redirect')
             else:
                 messages.info(request, 'You are Inactive. Please contact HR.')
                 return redirect("/ams/")
@@ -445,61 +436,6 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
                         emp_name=emp_name
                     )
                     cal.save()
-
-            # sandwich policy calculation    
-
-            # week_off = []
-            # last = ''
-            # if leave_type == 'SL':
-            #     start_date = e.start_date
-            #     sand_start_date = start_date - timedelta(days=1)
-            #     cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-            #     if cal == "Week OFF" or cal == "SL" or cal == "PL":
-            #         week_off.append(sand_start_date)
-            #         sand_start_date -= timedelta(days=1)
-            #         sand_end_date = start_date - timedelta(days=15)
-            #         while sand_start_date > sand_end_date:
-            #             cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-            #             if cal == "Week OFF":
-            #                 week_off.append(sand_start_date)
-            #             elif cal == 'SL' or cal == 'PL':
-            #                 last = sand_start_date
-            #                 break
-            #             else:
-            #                 break
-            #             sand_start_date -= timedelta(days=1)
-
-            # elif leave_type == 'PL':
-            #     start_date = e.start_date
-            #     sand_start_date = start_date - timedelta(days=1)
-            #     try:
-            #         cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-            #         if cal == "Week OFF" or cal == "PL" or cal == "SL":
-            #             week_off.append(sand_start_date)
-            #             sand_start_date -= timedelta(days=1)
-            #             sand_end_date = start_date - timedelta(days=15)
-            #             while sand_start_date > sand_end_date:
-            #                 cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-            #                 if cal == "Week OFF":
-            #                     week_off.append(sand_start_date)
-            #                 elif cal == 'SL' or cal == 'PL':
-            #                     last = sand_start_date
-            #                     break
-            #                 else:
-            #                     break
-            #                 sand_start_date -= timedelta(days=1)
-            #     except:
-            #         pass
-            # if last != '':
-            #     cal_list = []
-            #     last += timedelta(days=1)
-            #     while start_date > last:
-            #         start_date -= timedelta(days=1)
-            #         cal = EcplCalander.objects.get(Q(date=start_date), Q(emp_id=emp_id))
-            #         cal.att_actual = "Absent (Sandwich)"
-            #         cal_list.append(cal)
-            #     EcplCalander.objects.bulk_update(cal_list,['att_actual'])
-
         else:
             manager_approval = True
             manager_status = 'Rejected'
@@ -529,7 +465,7 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
         e.manager_status = manager_status
         e.status = status
         e.save()
-        return redirect('/ams/tl-dashboard')
+        return redirect('/ams/dashboard-redirect')
     else:
 
         emp_id = request.user.profile.emp_id
@@ -1429,7 +1365,7 @@ def viewTeamAttendance(request):  # Test1
         return render(request, 'ams/agent-calander-status.html', data)
     else:
         messages.info(request, "Invalid Request!")
-        return redirect('/ams/tl-dashboard')
+        return redirect('/ams/dashboard-redirect')
 
 
 @login_required
@@ -1564,8 +1500,14 @@ def agentSettings(request):  # Test1
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     form = PasswordChangeForm(request.user)
-    data = {'emp': emp, 'form': form}
-    return render(request, 'ams/agent-settings.html', data)
+    try:
+        onboard = OnboardingnewHRC.objects.get(emp_id=emp_id)
+        on = True
+    except OnboardingnewHRC.DoesNotExist:
+        onboard = ''
+        on = False
+    data = {'emp': emp, 'form': form, 'onboard': onboard, 'profile': emp, 'on': on}
+    return render(request, 'ams/settings.html', data)
 
 
 @login_required
@@ -1573,8 +1515,14 @@ def rmSettings(request):  # Test1
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     form = PasswordChangeForm(request.user)
-    data = {'emp': emp, 'form': form}
-    return render(request, 'ams/rm-settings.html', data)
+    try:
+        onboard = OnboardingnewHRC.objects.get(emp_id=emp_id)
+        on = True
+    except OnboardingnewHRC.DoesNotExist:
+        onboard = ''
+        on = False
+    data = {'emp': emp, 'form': form, 'onboard': onboard, 'profile': emp, 'on': on}
+    return render(request, 'ams/settings.html', data)
 
 def FAQ(request):
     faqs = FaqHRMS.objects.all()
@@ -1593,14 +1541,7 @@ def uploadImageToDB(request):  # Test1
         prof = Profile.objects.get(id=id)
         prof.img = user_image
         prof.save()
-        if request.user.profile.emp_desi in tl_am_list:
-            return redirect('/ams/tl-dashboard')
-        elif request.user.profile.emp_desi in hr_list:
-            return redirect('/ams/hr-dashboard')
-        elif request.user.profile.emp_desi in manager_list:
-            return redirect('/ams/manager-dashboard')
-        else:
-            return redirect('/ams/agent-dashboard')
+        return redirect('/ams/dashboard-redirect')
     else:
         pass
 

@@ -1,0 +1,722 @@
+{% extends 'ams/base_common.html' %}
+
+{% load static %}
+{% block main %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+          <div class="page-title">
+            <div class="title_left">
+              <h3>Employee Details</h3>
+            </div>
+          </div>
+          <div class="row pb-4">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+
+                  <div class="row pb-4">
+                    <div class="col-md-6">
+                      <div class="card">
+                        <div class="card-header">
+                          <h2>Change Password</h2>
+                        </div>
+                        <div class="card-body">
+                          {% load crispy_forms_tags %}
+                          <form method="post" action="/mapping/change-password" enctype="multipart/form-data">
+                              {% csrf_token %}
+                              {{ form|crispy }}
+                                <br><br>
+                              <button type="submit" class="btn btn-primary">Save changes</button>
+                            </form>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="card">
+                        <div class="card-header">
+                          <h2>Profile Image</h2>
+                        </div>
+                        <div class="card-body">
+                          <div class="row">
+                            <form action="/ams/upload-image" method="POST" style="width: 100%;" enctype="multipart/form-data">
+                              {% csrf_token %}
+                              <div class="col-md-8">
+                                <div class="form-group">
+                                  <label for="pimg">Select the Profile Picture:</label>
+                                  <input type="file" name="user-img" id="pimg" class="form-control uploadFile" accept=".png, .jpg, .jpeg" required>
+                                  <input type="hidden" name="id" value="{{user.profile.id}}">
+                                </div>
+                              </div>
+                              <div class="col-md-4 mt-4">
+                                <button type="submit" class="btn btn-dark form-control">Upload</button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <hr>
+                {% if on == True %}
+                  <div class="row">
+                    <div class="col-md-12">
+                      <h4>Personal Details</h4>
+                      <hr>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="name">Name(As per Aadhar)</label> 
+                        <input type="text" value="{{onboard.emp_name}}" readonly id="name" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="dob">Date Of Birth</label> 
+                        <input type="text" value="{{onboard.emp_dob}}" readonly id="dob" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="desg">Designation (Refer offer letter and mention)</label> 
+                        <input type="text" value="{{onboard.emp_desig}}" readonly id="desg" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="pro">Process (Refer offer letter and mention)</label> 
+                        <input type="text" value="{{onboard.emp_process}}" readonly id="pro" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_pan">PAN Number</label> 
+                        <input type="text" value="{{onboard.emp_pan}}" readonly id="emp_pan" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_aad">Aadhar Number</label> 
+                        <input type="text" value="{{onboard.emp_aadhar}}" readonly id="emp_aad" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_fat">Father's Name</label> 
+                        <input type="text" value="{{onboard.emp_father_name}}" readonly id="emp_fat" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_mar">Marital Status</label>
+                        <input type="text" value="{{onboard.emp_marital_status}}" id="emp_mar" class="form-control" readonly>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_email">Email Address</label> 
+                        <input type="email" value="{{onboard.emp_email}}" readonly id="emp_email" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_ph">Contact Number</label> 
+                        <input type="text" value="{{onboard.emp_phone}}" readonly id="emp_ph" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_add">Present Address</label> 
+                        <textarea id="emp_add"  readonly class="form-control" rows="4">{{onboard.emp_present_address}}</textarea>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_per_add">Permanent Address</label> 
+                        <textarea readonly id="emp_per_add" class="form-control" rows="4">{{onboard.emp_permanent_address}}</textarea>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_alph">Alternate Contact Number</label> 
+                        <input type="text" value="{{onboard.emp_alt_phone}}" readonly id="emp_alph" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_blo">Blood Group</label> 
+                        <input type="text" value="{{onboard.emp_blood}}" readonly id="emp_blo" class="form-control">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mt-4">
+                    <div class="col-md-12">
+                      <h4>Emergency Contact</h4>
+                      <p>Person to be contacted in case of emergency.</p>
+                      <hr>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_emer_name">Name</label> 
+                        <input type="text" value="{{onboard.emp_emergency_person}}" readonly id="emp_emer_name" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_emer_ph">Phone Number</label> 
+                        <input type="text" value="{{onboard.emp_emergency_number}}" readonly id="emp_emer_ph" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_emer_add">Address</label> 
+                        <textarea readonly id="emp_emer_add" class="form-control" rows="4">{{onboard.emp_emergency_address}}</textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mt-4">
+                    <div class="col-md-12">
+                      <h4>Emergency Contact 2</h4>
+                      <p>Person to be contacted in case of emergency.</p>
+                      <hr>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_emer_name2">Name</label> 
+                        <input type="text" value="{{onboard.emp_emergency_person_two}}" readonly id="emp_emer_name2" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_emer_ph2">Phone Number</label> 
+                        <input type="text" value="{{onboard.emp_emergency_number_two}}" readonly id="emp_emer_ph2" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_emer_add2">Address</label> 
+                        <textarea readonly id="emp_emer_add2" class="form-control" rows="4">{{onboard.emp_emergency_address_two}}</textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mt-4">
+                    <div class="col-md-12">
+                      <h4>Qualification Details</h4>
+                      <!-- <p>Person to be contacted in case of emergency.</p> -->
+                      <hr>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_high_qua">Highest Qualification</label>
+                        <input type="text" value="{{onboard.emp_edu_qualification}}" readonly id="emp_high_qua" class="form-control">
+                      </div>
+                    </div>
+                    {% if onboard.emp_quali_other %}
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_cou">Other Qualification</label>
+                        <input type="text" value="{{onboard.emp_quali_other}}" readonly id="emp_cou" class="form-control">
+                      </div>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_cour">Course</label>
+                        <input type="text" value="{{onboard.emp_edu_course}}" readonly id="emp_cour" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_ins">Institution Name</label> 
+                        <input type="text" value="{{onboard.emp_edu_institute}}" readonly id="emp_ins" class="form-control">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mt-4">
+                    <div class="col-md-12">
+                      <h4>Previous Work / Experience 1</h4>
+                      <!-- <p>Person to be contacted in case of emergency.</p> -->
+                      <hr>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_exp">Experience in Years</label>                   
+                        <input type="text" value="{{onboard.emp_pre_exp}}" readonly id="emp_exp" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_ind">Industry (Ex : Agriculture/IT/BPO)</label> 
+                        <input type="text" value="{{onboard.emp_pre_industry}}" readonly id="emp_ind" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_pre_org">Name of previous organisation</label> 
+                        <input type="text" value="{{onboard.emp_pre_org_name}}" readonly id="emp_pre_org" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_pre_desg">Previous Designation</label> 
+                        <input type="text" value="{{onboard.emp_pre_desg}}" readonly id="emp_pre_desg" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_pre_empl">Period of Employment</label> 
+                        <div style="display: inline-flex; width: 100%">
+                          <input type="text" value="{{onboard.emp_pre_period_of_employment_frm}}" readonly id="emp_pre_empl" class="form-control">
+                          <input type="text" value="{{onboard.emp_pre_period_of_employment_to}}" readonly id="emp_pre2_empl" class="form-control">
+                        </div>                 
+                      </div>
+                    </div>
+                  </div>
+                  {% if onboard.emp_pre_exp_two %}
+                  <div class="row mt-4">
+                    <div class="col-md-12">
+                      <h4>Previous Work / Experience 2</h4>
+                      <!-- <p>Person to be contacted in case of emergency.</p> -->
+                      <hr>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_exp2">Experience in Years</label>                   
+                        <input type="text" value="{{onboard.emp_pre_exp_two}}" readonly id="emp_exp2" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_ind">Industry (Ex : Agriculture/IT/BPO)</label> 
+                        <input type="text2" value="{{onboard.emp_pre_industry_two}}" readonly id="emp_ind2" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_pre_org">Name of previous organisation</label> 
+                        <input type="text2" value="{{onboard.emp_pre_org_name_two}}" readonly id="emp_pre_org2" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_pre_desg">Previous Designation</label> 
+                        <input type="text" value="{{onboard.emp_pre_desg_two}}" readonly id="emp_pre_desg2" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_pre_empl2">Period of Employment</label> 
+                        <div style="display: inline-flex; width: 100%">
+                          <input type="text" value="{{onboard.emp_pre_period_of_employment_frm_two}}" readonly id="emp_pre_empl2" class="form-control">
+                          <input type="text" value="{{onboard.emp_pre_period_of_employment_to_two}}" readonly id="emp_pre2_empl2" class="form-control">
+                        </div>                    
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
+                  {% if onboard.emp_pre_exp_three %}
+                  <div class="row mt-4">
+                    <div class="col-md-12">
+                      <h4>Previous Work / Experience 3</h4>
+                      <!-- <p>Person to be contacted in case of emergency.</p> -->
+                      <hr>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_exp3">Experience in Years</label>                   
+                        <input type="text" value="{{onboard.emp_pre_exp_three}}" readonly id="emp_exp3" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_ind3">Industry (Ex : Agriculture/IT/BPO)</label> 
+                        <input type="text" value="{{onboard.emp_pre_industry_three}}" readonly id="emp_ind3" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_pre_org3">Name of previous organisation</label> 
+                        <input type="text" value="{{onboard.emp_pre_org_name_three}}" readonly id="emp_pre_org3" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_pre_desg3">Previous Designation</label> 
+                        <input type="text" value="{{onboard.emp_pre_desg_three}}" readonly id="emp_pre_desg3" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_pre_empl3">Period of Employment</label> 
+                        <div style="display: inline-flex; width: 100%">
+                          <input type="text" value="{{onboard.emp_pre_period_of_employment_frm_three}}" readonly id="emp_pre_empl3" class="form-control">
+                          <input type="text" value="{{onboard.emp_pre_period_of_employment_to_three}}" readonly id="emp_pre2_empl3" class="form-control">
+                        </div>                   
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
+                  <div class="row mt-4">
+                    <div class="col-md-12">
+                      <h4>Bank Account Details</h4>
+                      <!-- <p>Person to be contacted in case of emergency.</p> -->
+                      <hr>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_bank_name">Account Holder Name</label>                   
+                        <input type="text" value="{{onboard.emp_bank_holder_name}}" readonly id="emp_bank_name" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="bank_name">Bank Name</label>                    
+                        <input type="text" value="{{onboard.emp_bank_name}}" readonly id="bank_name" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_bank_no">Account Number</label>                    
+                        <input type="text" value="{{onboard.emp_bank_acco_no}}" readonly id="emp_bank_no" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_bank_ifsc">IFSC Code</label> 
+                        <input type="text" value="{{onboard.emp_bank_ifsc}}" readonly id="emp_bank_ifsc" class="form-control">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row mt-4">
+                    <div class="col-md-12">
+                      <h4>Documentation Form</h4>
+                      <!-- <p>Person to be contacted in case of emergency.</p> -->
+                      <hr>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="have_system">Do you have your own system/laptop?</label>
+                        <input type="text" id="have_system" readonly value="{{onboard.have_system}}" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="require_system">Do you require a system to be provided from the company?</label>
+                        <input type="text" id="require_system" readonly value="{{onboard.require_system}}" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="wifi">Do you have Wifi/Broadbrand services at home? if yes the amount can be claimed will be reimbursed by submitting the broadbrand bill every month</label>
+                        <input type="text" id="wifi" readonly value="{{onboard.wifi_broadband}}" class="form-control">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row mt-4">
+                    <div class="col-md-12">
+                      <h4>Upload Documents</h4>
+                      <!-- <p>Person to be contacted in case of emergency.</p> -->
+                      <hr>
+                    </div>
+
+                    {% if onboard.emp_upload_aadhar %}
+                    <div class="col-md-3 border">
+                      <div class="form-group">
+                        <label for="emp_up_aad">Aadhar Card Front</label>
+                        <a href="/media/{{onboard.emp_upload_aadhar}}" target="_blank">
+                          <center><button class="btn btn-primary form-control">View</button></center>
+                        </a>
+                      </div>
+                    </div>
+                    {% endif %}
+
+                    {% if onboard.emp_upload_aadhar_back %}
+                    <div class="col-md-3 border">
+                      <div class="form-group">
+                        <label for="emp_up_aad_back">Aadhar Card Back</label>
+                        <a href="/media/{{onboard.emp_upload_aadhar_back}}"  target="_blank">
+                          <center><button class="btn btn-primary form-control">View</button></center>
+                        </a>
+                      </div>
+                    </div>
+                    {% endif %}
+
+
+                    {% if onboard.emp_upload_id %}
+                    <div class="col-md-3 border">
+                      <div class="form-group">
+                        <label for="emp_up_id">ID Proof Document - Passport/DL/Voters ID/Other (Government Approved) Front</label>
+                        <a href="/media/{{onboard.emp_upload_id}}" target="_blank">
+                          <center><button class="btn btn-primary  form-control">View</button></center>
+                        </a>
+                      </div>
+                    </div>
+                    {% endif %}
+
+                    {% if onboard.emp_upload_id_back %}
+                    <div class="col-md-3 border">
+                      <div class="form-group">
+                        <label for="emp_up_id">ID Proof Document - Passport/DL/Voters ID/Other (Government Approved) Back</label>
+                        <a href="/media/{{onboard.emp_upload_id_back}}" target="_blank">
+                          <center><button class="btn btn-primary  form-control">View</button></center>
+                        </a>
+                      </div>
+                    </div>
+                    {% endif %}
+
+
+                    {% if onboard.emp_upload_pan %}
+                    <div class="col-md-4 border">
+                      <div class="form-group">
+                        <label for="emp_up_pan">PAN Card</label>
+                        <a href="/media/{{onboard.emp_upload_pan}}" target="_blank">
+                          <center><button class="btn btn-primary  form-control">View</button></center>
+                        </a>
+                      </div>
+                    </div>
+                    {% endif %}
+
+                    {% if onboard.emp_upload_edu_sslc %}
+                    <div class="col-md-4 border">
+                      <div class="form-group">
+                        <label for="emp_up_edu">Educational Documents 10th</label>
+                        <a href="/media/{{onboard.emp_upload_edu_sslc}}" target="_blank">
+                          <center><button class="btn btn-primary  form-control">View</button></center>
+                        </a>
+                      </div>
+                    </div>
+                    {% endif %}
+
+                    {% if onboard.emp_upload_edu_twelveth %}
+                    <div class="col-md-4 border">
+                      <div class="form-group">
+                        <label for="emp_up_edu">Educational Documents 12th</label>
+                        <a href="/media/{{onboard.emp_upload_edu_twelveth}}" target="_blank">
+                          <center><button class="btn btn-primary  form-control">View</button></center>
+                        </a>
+                      </div>
+                    </div>
+                     {% endif %}
+
+                    {% if onboard.emp_upload_edu_gradu %}
+                    <div class="col-md-4 border">
+                      <div class="form-group">
+                        <label for="emp_up_edu">Educational Documents (Graduation/Post Graduation)</label>
+                        <a href="/media/{{onboard.emp_upload_edu_gradu}}" target="_blank">
+                          <center><button class="btn btn-primary  form-control">View</button></center>
+                        </a>
+                      </div>
+                    </div>
+                    {% endif %}
+
+                    {% if onboard.emp_upload_experience %}
+                    <div class="col-md-4 border">
+                      <div class="form-group">
+                        <label for="emp_up_cer">Certificates of work experience (If any)</label>
+                        <a href="/media/{{onboard.emp_upload_experience}}" target="_blank">
+                          <center><button class="btn btn-primary  form-control">View</button></center>
+                        </a>
+                      </div>
+                    </div>
+                    {% endif %}
+
+                    {% if onboard.emp_upload_experience_two %}
+                    <div class="col-md-4 border">
+                      <div class="form-group">
+                        <label for="emp_up_cer">Certificates of work experience (If any) 2</label>
+                        <a href="/media/{{onboard.emp_upload_experience_two}}" target="_blank">
+                          <center><button class="btn btn-primary  form-control">View</button></center>
+                        </a>
+                      </div>
+                    </div>
+                    {% endif %}
+
+                    {% if onboard.emp_upload_experience_three %}
+                    <div class="col-md-4 border">
+                      <div class="form-group">
+                        <label for="emp_up_cer">Certificates of work experience (If any) 3</label>
+                        <a href="/media/{{onboard.emp_upload_experience_three}}" target="_blank">
+                          <center><button class="btn btn-primary  form-control">View</button></center>
+                        </a>
+                      </div>
+                    </div>
+                    {% endif %}
+
+                    {% if onboard.emp_upload_bank %}
+                    <div class="col-md-4 border">
+                      <div class="form-group">
+                        <label for="emp_up_bank">Cancelled cheque/passbook/bank statement (to validate your account details)</label>
+                        <a href="/media/{{onboard.emp_upload_bank}}" target="_blank">
+                          <center><button class="btn btn-primary  form-control">View</button></center>
+                        </a>
+                      </div>
+                    </div>
+                    {% endif %}
+                  </div>
+                  <div class="row mt-4">
+                    <div class="col-md-12">
+                      <h4>Important Questions</h4>
+                      <!-- <p>Person to be contacted in case of emergency.</p> -->
+                      <hr>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="ESIC" style="font-size: 18px; font-weight: 600;">ESIC</label>
+                        <input type="text" id="ESIC" readonly value="{{onboard.esic}}" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="PF" style="font-size: 18px; font-weight: 600;">PF</label>
+                        <input type="text" id="PF" readonly value="{{onboard.pf}}" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="TDS" style="font-size: 18px; font-weight: 600;">TDS</label>
+                        <input type="text" id="TDS" readonly value="{{onboard.tds}}" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="PT" style="font-size: 18px; font-weight: 600;">PT</label>
+                        <input type="text" id="PT" readonly value="{{onboard.pt}}" class="form-control">
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+                  <div class="row mt-4">
+                    <div class="col-md-12">
+                      <h4>Official Details</h4>
+                      <!-- <p>Person to be contacted in case of emergency.</p> -->
+                      <hr>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_name">Employee Name</label>                   
+                        <input type="text" value="{{profile.emp_name}}" readonly id="emp_name" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_id">Employee ID</label>                   
+                        <input type="text" value="{{profile.emp_id}}" readonly id="emp_id" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_desg">Employee Designation</label>                   
+                        <input type="text" value="{{profile.emp_desi}}" readonly id="emp_desg" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_pro">Employee Process</label>                   
+                        <input type="text" value="{{profile.emp_process}}" readonly id="emp_pro" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_rm1">RM1</label>                   
+                        <input type="text" value="{{profile.emp_rm1}}" readonly id="emp_rm1" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_rm2">RM2</label>                   
+                        <input type="text" value="{{profile.emp_rm2}}" readonly id="emp_rm2" class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-group">
+                        <label for="emp_rm3">RM3</label>                   
+                        <input type="text" value="{{profile.emp_rm3}}" readonly id="emp_rm3" class="form-control">
+                      </div>
+                    </div>
+                  </div>
+
+
+
+                  <hr>
+
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+        </div>
+        <!-- /page content -->
+
+
+
+    <!-- View Pop-Up -->
+      <div class="modal fade" id="change_name" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="change_name_pop">Change Name of {{profile.emp_name}} ({{profile.emp_id}})</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form action="" method="POST" enctype="multipart/form-data">
+              <div class="modal-body">
+                  {% csrf_token %}
+                  <input type="hidden" value="name" name="from">
+                  <input type="text" value="{{profile.emp_name}}" class="form-control" name="emp_name" required>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-success">Save Changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    <!-- End Change Name Pop-Up -->
+
+    <!-- View Pop-Up -->
+      <div class="modal fade" id="change_desi" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="change_desi_pop">Change Designation of {{profile.emp_name}} ({{profile.emp_id}})</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form action="" method="POST" enctype="multipart/form-data">
+              <div class="modal-body">
+                  {% csrf_token %}
+                  <input type="hidden" value="desi" name="from">
+                  <select class="form-control select2" required name="emp_desi">
+                    {% for i in designations %}
+                    <option value="{{i.name}}" {% if profile.emp_desi == i.name %}selected{% endif %}>{{i.name}}</option>
+                    {% endfor %}
+                  </select>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-success">Save Changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    <!-- End Change Name Pop-Up -->
+
+{% endblock %}
+
+
+{% block script %}
+<script type="text/javascript">
+      $today = new Date();
+      $today = moment($today).format('YYYY-MM-DD');
+      $('#effective').attr("max", $today);
+</script>
+{% endblock %}
