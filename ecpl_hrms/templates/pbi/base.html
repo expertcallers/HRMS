@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	 <link rel="icon" href="images/expertcallers-icon.png" type="image/ico" />
 
-    <title>ECPL Attendance Management | Dashboard</title>
+    <title>ECPL PowerBi Reports | Dashboard</title>
 
     <!-- Bootstrap -->
     <link href="{% static 'assets/vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
@@ -46,12 +46,19 @@
         .select2-container {
             width: 100% !important;
         }
+        .monthly-prev, .monthly-next{
+            display:none;
+          }
+      iframe {
+        width: 100% !important;
+        height: 100vh !important;
+      }
     </style>
 {% block style %}
 
 {% endblock %}
   </head>
-  <body class="nav-md" oncontextmenu="alert('Right Click is Blocked'); return false">
+  <body class="nav-md">
   <div class="container body">
       <div class="main_container">
         <div class="col-md-3 left_col">
@@ -67,7 +74,7 @@
             <!-- menu profile quick info -->
             <div class="profile clearfix">
               <div class="profile_pic mb-2">
-                <img src="{{user.profile.img.url}}" alt="..." class="img-circle profile_img">
+                <img src="{{request.user.profile.img.url}}" alt="..." class="img-circle profile_img">
               </div>
                 <div class="profile_info">
                     <h2><i class="fa fa-user"></i><span>Name</span><br>{{request.user.profile.emp_name}}</h2>
@@ -84,10 +91,18 @@
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
               <div class="menu_section">
                 <ul class="nav side-menu">
-                  <li><a href="/ams/dashboard-redirect"><i class="fa fa-home"></i> Dashboard</a></li>
-                  <li><a href="/ams/attendance-calendar"><i class="fa fa-calendar"></i> Attendance Calendar</a></li>
-                  <li><a href="/pbireport/management-dashboard"><i class="fa fa-file"></i> PowerBi Reports</a></li>
-                  <li><a href="/ams/rm-settings"><i class="fa fa-gears"></i> Settings</a></li>
+                  <li><a href="/ams/dashboard-redirect"><i class="fa fa-arrow-left"></i>Back to AMS</a></li>
+                    {% if user.campaign.campaignid == "all" %}
+                        <li><a href="/pbireport/management-dashboard"><i class="fa fa-home"></i>PBi Dashboard</a></li>
+                        <li><a href="/pbireport/campaigns/all"><i class="fa fa-list-alt"></i>All Campaigns</a></li>
+                        <li><a href="/pbireport/campaigns/Outbound"><i class="fa fa-phone-volume"></i>Outbound Campaigns</a></li>
+                        <li><a href="/pbireport/campaigns/Inbound"><i class="fa fa-headphones"></i>Inbound Campaigns</a></li>
+                        <li><a href="/pbireport/campaigns/Email"><i class="fa fa-envelope"></i>Email Campaigns</a></li>
+                        <li><a href="/pbireport/campaigns/Other"><i class="fa fa-list-alt"></i>Other Campaigns</a></li>
+                        {% if user.campaign.campaign_type == None %}
+                        <li><a href="/pbireport/campaign-assigning"><i class="fa fa-users"></i>Campaign Mapping</a></li>
+                        {% endif %}
+                    {% endif %}
                 </ul>
               </div>
             </div>
@@ -114,7 +129,7 @@
               <ul class=" navbar-right">
                 <li class="nav-item dropdown open" style="padding-left: 15px;">
                   <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{{user.profile.img.url}}" alt="">{{request.user.profile.emp_name}}
+                    <img src="{{request.user.profile.img.url}}" alt="">{{request.user.profile.emp_name}}
                   </a>
                   <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item"  href="/ams/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
@@ -128,8 +143,7 @@
 {% block main %}
 
 {% endblock %}
-
-    <!-- footer content -->
+        <!-- footer content -->
         <footer>
           <div class="text-center">
             ECPL CC Team
@@ -137,7 +151,8 @@
           <div class="clearfix"></div>
         </footer>
         <!-- /footer content -->
-
+      </div>
+    </div>
     <!-- Bootstrap -->
     <script src="{% static 'assets/vendors/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
     <!-- FastClick -->
@@ -196,188 +211,61 @@
     <script>
       $('.select2').select2();
     </script>
-      <script type="text/javascript" src="{% static 'assets/js/monthly.js' %}"></script>
-      <script type="text/javascript">
-          var sampleEvents = {
-          "monthly": [
-              {% for c in month_cal %}
-              {
-                  "id": 1,
-                  "name": "{{c.st}}",
-                  "startdate": "{{c.dt}}",
-                  "enddate": "",
-                  "starttime": "",
-                  "endtime": "",
-                  {% if c.st == 'Unmarked' %}
-                  "color": "grey",
-                  {% elif c.st == 'Week OFF' %}
-                  "color": "#000000",
-                  {% elif c.st == 'Comp OFF' %}
-                  "color": "#FF8FFF",
-                  {% elif c.st == 'Absent' %}
-                  "color": "#FF0000",
-                  {% elif c.st == 'present' %}
-                  "color": "#008C00",
-                  {% elif c.st == 'SL' %}
-                  "color": "#FF0000",
-                  {% elif c.st == 'PL' %}
-                  "color": "#FF0000",
-                  {% elif c.st == 'Training' %}
-                  "color": "#6990CE",
-                  {% elif c.st == 'Half Day' %}
-                  "color": "#0000FF",
-                  {% elif c.st == 'Client OFF' %}
-                  "color": "#FF8FFF",
-                  {% else %}
-                  "color": "#B52E2E",
-                  {% endif %}
-
-                  "url": ""
-              },
-              {% endfor %}
-          ]
-          };
-
-          $(window).load( function() {
-              $('#mycalendar').monthly({
-                  mode: 'event',
-                  dataType: 'json',
-                  jsonURL: '',
-                  weekStart:'Mon',
-                  events: sampleEvents
-              });
-          });
-      </script>
-
-    <script src="{% static 'assets/vendors/echarts/dist/echarts.js' %}"></script>
-
-    <script type="text/javascript">
-		var echartPie = echarts.init(document.getElementById('main'));
-
-        echartPie.setOption({
-            tooltip: {
-                trigger: 'item',
-                formatter: "{a} <br/>{b} : {c} ({d}%)"
-            },
-            legend: {
-                x: 'center',
-                y: 'bottom',
-                data: ['Present', 'Absent', 'Company Off', 'Week Off', 'Unmarked', 'Half Day','Holiday']
-            },
-            toolbox: {
-                show: true,
-                feature: {
-                    magicType: {
-                        show: true,
-                        type: ['pie', 'funnel'],
-                        option: {
-                            funnel: {
-                                x: '25%',
-                                width: '50%',
-                                funnelAlign: 'left',
-                                max: 1548
-                            }
-                        }
-                    },
-                    restore: {
-                        show: true,
-                        title: "Restore"
-                    },
-                    saveAsImage: {
-                        show: true,
-                        title: "Save Image"
-                    }
-                }
-            },
-            calculable: true,
-            color:["green","red","grey","black","brown", "blue",'violet'],
-            series: [{
-                name: 'ECPL',
-                type: 'pie',
-                radius: '60%',
-                center: ['50%', '48%'],
-                data: [{
-                    value: {{present_count}},
-                    name: 'Present'
-                }, {
-                    value: {{absent_count}},
-                    name: 'Absent'
-                }, {
-                    value: {{comp_off_count}},
-                    name: 'Company Off'
-                }, {
-                    value: {{week_off_count}},
-                    name: 'Week Off'
-                },{
-                    value: {{unmarked_count}},
-                    name: 'Unmarked'
-                }, {
-                    value: {{half_day_count}},
-                    name: 'Half Day'
-                },{
-                    value: {{holiday_count}},
-                    name: 'Holiday'
-                }]
-            }]
-        });
-    </script>
     <!-- Custom Theme Scripts -->
     <script src="{% static 'assets/build/js/custom.min.js' %}"></script>
-          <script type="text/javascript">
-      $(document).ready(function() {
-          $('#datatablex').DataTable({
-            "bPaginate": true,
-            "bLengthChange": true,
-            "bFilter": true,
-            "bInfo": true,
-              dom: 'lBfrtip',
-              buttons: [
-                    {
-                        extend: "copy",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                    {
-                        extend: "csv",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                    {
-                        extend: "excel",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                    {
-                        extend: "pdfHtml5",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                    {
-                        extend: "print",
-                        className: "btn btn-success btn-sm ml-1"
-                    },
-                ],
-                responsive: true
-          } );
+
+
+    <script type="text/javascript" src="{% static 'assets/js/monthly.js' %}"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+      $('#datatablex').DataTable({
+        "bPaginate": true,
+        "bLengthChange": true,
+        "bFilter": true,
+        "bInfo": true,
+        "order": [[ 0, "desc" ]],
+          dom: 'lBfrtip',
+          buttons: [
+                {
+                    extend: "copy",
+                    className: "btn btn-success btn-sm ml-1"
+                },
+                {
+                    extend: "csv",
+                    className: "btn btn-success btn-sm ml-1"
+                },
+                {
+                    extend: "excel",
+                    className: "btn btn-success btn-sm ml-1"
+                },
+            ],
+            responsive: true
       } );
-      $('#datatable').DataTable( {
-          responsive: true
-      } );
-      $('#datatable_two').DataTable( {
-          responsive: true
-      } );
-      $('#datatable_three').DataTable( {
-          responsive: true
-      } );
-    </script>
-    <script type="text/javascript">
-      $today = new Date();
-      $today = moment($today).format('YYYY-MM-DD');
-      $('#end_date').attr("max", $today);
-      $('#start_date').attr("max", $today);
-      function mydate(e) {
-        $start = $('#start_date').val();
-        $end = $('#end_date');
-        $end.attr("min", $start);
-      }
-    </script>
-          <script>
+  } );
+  $('#datatable').DataTable( {
+      responsive: true
+  } );
+  $('#datatable_two').DataTable( {
+      responsive: true
+  } );
+  $('#datatable_three').DataTable( {
+      responsive: true
+  } );
+</script>
+<script type="text/javascript">
+  $today = new Date();
+  $today = moment($today).format('YYYY-MM-DD');
+  $('#end_date').attr("max", $today);
+  $('#start_date').attr("max", $today);
+  function mydate(e) {
+    $start = $('#start_date').val();
+    $end = $('#end_date');
+    $end.attr("min", $start);
+  }
+</script>
+
+
+<script>
   function confirmm(){
       var c = confirm("Are you sure you want to proceed?");
       if (c==true){
@@ -409,12 +297,17 @@
       }
     }
 </script>
- <script>
-      $('.select2').select2();
-      {% if messages %}
-      alert('{% for m in messages %}{{m}}{% endfor %}');
-      {% endif %}
-    </script>
+
+<script>
+  {% if messages %}
+      {% for m in messages %}
+        alert('{{m}}');
+      {% endfor %}
+  {% endif %}
+</script>
+{% block script %}
+
+{% endblock %}
 
   </body>
 </html>

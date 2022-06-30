@@ -1,0 +1,109 @@
+{% extends 'pbi/base.html' %}
+{% load static %}
+{% block main %}
+
+<!-- page content -->
+<div class="right_col" role="main">
+    <div class="page-title">
+        <div class="title_left">
+            <h1>Assigning Campaigns</h1>
+        </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+          <div class="card">
+              <div class="card-body">
+                  <div class="row">
+                      <div class="col-md-8"></div>
+                      <div class="col-md-4" align="right">
+                          <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#add">
+                              <i class="fa fa-plus"> </i> Add New
+                          </button>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-md-12">
+                          <table id="datatablex" class="table table-striped" style="width:100% !important;">
+                              <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>campaign</th>
+                                    <th>Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for i in mapping %}
+                                <tr>
+                                    <td>{{i.user}}</td>
+                                    <td>{{i.campaign.campaign}} ({{i.campaign.user}})</td>
+                                    <td>
+                                        <form action="/pbireport/delete-mapping" method="POST" enctype="multipart/form-data">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="id" value="{{i.id}}">
+                                            <button type="submit" onclick="return confirmm();" class="btn btn-sm btn-danger">
+                                              <i class="fa fa-trash"> </i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                              </tbody>
+                          </table>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+</div>
+
+
+<div class="modal fade" id="add" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Add New</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="modal-body">
+              <div class="row">
+                  <div class="col-md-12">
+                      <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label for="emp">Employee <span class="required">*</span></label>
+                            <select name="user" id="emp" class="form-control select2" required>
+                                <option value="" disabled selected> -- Please Select -- </option>
+                                {% for i in profiles %}
+                                <option value="{{i.user}}">{{i.campaign}} ({{i.user}})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="type">Campaign <span class="required">*</span></label>
+                            <select name="campaign" id="type" class="form-control select2" required>
+                                <option value="" disabled selected> -- Please Select -- </option>
+                                {% for i in campaigns %}
+                                <option value="{{i.campaignid}}">{{i.campaign}} ({{i.campaignid}})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- /page content -->
+
+{% endblock %}

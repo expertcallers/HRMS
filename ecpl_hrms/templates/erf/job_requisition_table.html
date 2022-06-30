@@ -1,0 +1,1873 @@
+{% extends 'erf/common_base.html' %}
+
+{% block main %}
+  {% load static %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+
+
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card-base">
+                <div class="card-icon">
+                  <span class="imagecard widgetCardIcon">
+                    {% if type == "open" %}
+                    <i class="fa fa-user-times"></i>
+                    {% elif type == "closed" %}
+                    <i class="fa fa-thumbs-up"></i>
+                    {% elif type == "all" %}
+                    <i class="fa fa-database"></i>
+                    {% elif type == "dead-line" %}
+                    <i class="fa fa-exclamation-triangle"></i>
+                    {% elif type == "waiting" %}
+                    <i class="fa fa-hourglass-half"></i>
+                    {% else %}
+                    <i class="fas fa-clipboard-list-check"></i>
+                    {% endif %}
+                  </span>
+                  <div class="card-data widgetCardData" style="padding-bottom: 40px; background: #fff;">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="page-title">
+                          <div class="title_left" style="text-align:left !important; padding-left: 10px;">
+                            {% if type == "open" %}
+                            <h3>Open Employee Requisitions</h3>
+                            {% elif type == "closed" %}
+                            <h3>Completed Employee Requisitions</h3>
+                            {% elif type == "all" %}
+                            <h3>All Employee Requisitions</h3>
+                            {% elif type == "dead-line" %}
+                            <h3>Requisitions Crossed Dead Line</h3>
+                            {% elif type == "waiting" %}
+                            <h3>Requisitions Waiting for Manager's Approval</h3>
+                            {% else %}
+                            <h3>Employee Requisitions</h3>
+                            {% endif %}
+                          </div>
+                        </div>
+                        <table  id="datatablex" class="table table-striped" style="max-width: 100% !important;">
+                          <thead>
+                            <tr>
+                              <th>Request ID</th>
+                              <th>Requested Date</th>
+                              <th>HC</th>
+                              <th>Request Raised By</th>
+                              <th>Department</th>
+                              <th>Designation</th>
+                              <th>Process</th>
+                              <th>Request Status</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tfoot>
+                            <tr>
+                              <th>Request ID</th>
+                              <th>Requested Date</th>
+                              <th>HC</th>
+                              <th>Request Raised By</th>
+                              <th>Department</th>
+                              <th>Designation</th>
+                              <th>Process</th>
+                              <th>Request Status</th>
+                              <th>Action</th>
+                            </tr>
+                          </tfoot>
+                          <tbody>
+                          {% for i in job %}
+                            <tr>
+                                <td>{{i.id}}</td>
+                                <td>{{i.edited_date}}</td>
+                                <td>{{i.hc_req}}</td>
+                                <td>{{i.req_raised_by}}</td>
+                                <td>{{i.department}}</td>
+                                <td>{{i.designation}}</td>
+                                <td>{{i.campaign}}</td>
+                                <td>{{i.request_status}}</td>
+                                <td>
+                                  <div style="display: inline-flex;">
+                                    <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#view_{{i.id}}">View</button>
+                                    {% if i.initial_status == False and i.deletion == False and i.ticket_status == True %}
+                                        {% if request.user.profile.emp_desi in editaccess %}
+                                        <a href="/erf/job-requisition-edit/{{i.id}}">
+                                          <button class="btn btn-primary btn-sm">Update</button>
+                                        </a>
+                                        {% endif %}
+                                    {% endif %}
+                                    {% if i.final_status == False and request.user.profile.emp_desi in manager and i.initial_status == True %}
+                                        <button class="btn btn-dark btn-sm" data-toggle="modal" data-target="#approval_{{i.id}}">Approve</button>
+                                    {% endif %}
+                                    {% if i.final_status == False and i.deletion == False and i.initial_status == False and request.user.profile.emp_id == i.created_by_id %}
+                                        <form action="/erf/edit-requisition" method="POST" enctype="multipart/form-data">
+                                          {% csrf_token %}
+                                          <input type="hidden" name="id" value="{{i.id}}">
+                                          <input type="hidden" name="by" value="{{i.created_by_id}}">
+                                          <button class="btn btn-info btn-sm">Edit</button>
+                                        </form>
+                                    {% endif %}
+                                    {% if i.final_status == False and i.deletion == False and i.initial_status == False and request.user.profile.emp_id == i.created_by_id and i.ticket_status == True %}
+                                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#delete_{{i.id}}">Delete</button>
+                                    {% endif %}
+                                    {% if i.manager_approval == False and request.user.profile.emp_desi in manager and i.created_by_rm1_id == request.user.profile.emp_id %}
+                                        <button class="btn btn-dark btn-sm" data-toggle="modal" data-target="#create_approval_{{i.id}}">Approve</button>
+                                    {% endif %}
+                                    {% if request.user.profile.emp_desi in editaccess and i.deletion == True and i.ticket_status == True %}
+                                        <button class="btn btn-dark btn-sm" data-toggle="modal" data-target="#delete_approval_{{i.id}}">Approve</button>
+                                    {% endif %}
+                                    {% if request.user.profile.emp_desi in editaccess and i.ticket_status == True %}
+                                        <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#history_{{i.id}}">History</button>
+                                    {% endif %}
+                                  </div>
+                                </td>
+                            </tr>
+                          {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="space"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- /page content -->
+
+
+<!-- Delete Approval Pop-Up -->
+{% for i in job %}
+  {% if request.user.profile.emp_desi in editaccess and i.ticket_status == True %}
+        <div class="modal fade" id="history_{{i.id}}" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="hist_approval">History of Request ID: {{i.id}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-12">
+                    <textarea disabled rows="15" class="form-control">{{i.ticket_id.edited_by}}</textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+  {% endif %}
+{% endfor %}
+
+<!-- Delete Approval Pop-Up -->
+
+
+<!-- Delete Approval Pop-Up -->
+{% for i in job %}
+  {% if request.user.profile.emp_desi in editaccess and i.deletion == True and i.ticket_status == True %}
+        <div class="modal fade" id="delete_approval_{{i.id}}" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="delete_approval">Delete Request ID: {{i.id}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <form action="/erf/delete/approve" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="delete_approval{{i.id}}req_date">Requested Date</label>
+                        <input type="text" readonly value="{{i.edited_date}}" id="delete_approval{{i.id}}req_date" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="delete_approval{{i.id}}req_rais_by">Request Raised By</label>
+                        <input type="text" readonly value="{{i.req_raised_by}}" id="delete_approval{{i.id}}req_rais_by" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="delete_approval{{i.id}}hc_required">HC Required</label>
+                        <input type="text" readonly value="{{i.hc_req}}" id="delete_approval{{i.id}}hc_required" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="delete_approval{{i.id}}campaign">Campaign</label>
+                        <input type="text" readonly value="{{i.campaign}}" id="delete_approval{{i.id}}campaign" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="delete_approval{{i.id}}department">Department</label>
+                        <input type="text" readonly value="{{i.department}}" id="delete_approval{{i.id}}department" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="delete_approval{{i.id}}designation">Role/Designation</label>
+                        <input type="text" readonly value="{{i.designation}}" id="delete_approval{{i.id}}designation" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="delete_approval{{i.id}}Reason">Reason For Deleting</label>
+                        <textarea id="delete_approval{{i.id}}Reason" readonly name="reason" class="form-control">{{i.reason_for_deleting}}</textarea>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="delete_approval{{i.id}}Approval">Approval</label>
+                        <select id="delete_approval{{i.id}}Approval" name="response" required class="form-control">
+                          <option value="" selected disabled>Please Select</option>
+                          <option value="Approve">Approve</option>
+                          <option value="Reject">Reject</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-success">Submit</button>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+                <input type="hidden" name="id" value="{{i.id}}">
+              </form>
+            </div>
+          </div>
+        </div>
+  {% endif %}
+{% endfor %}
+
+<!-- Delete Approval Pop-Up -->
+
+<!-- Delete Pop-Up -->
+
+{% for i in job %}
+  {% if i.final_status == False and i.deletion == False and i.initial_status == False and request.user.profile.emp_id == i.created_by_id and i.ticket_status == True %}
+        <div class="modal fade" id="delete_{{i.id}}" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="Delete">Delete Request ID: {{i.id}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <form action="/erf/delete/request" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="delete_{{i.id}}req_date">Requested Date</label>
+                        <input type="text" readonly value="{{i.edited_date}}" id="delete_{{i.id}}req_date" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="delete_{{i.id}}req_rais_by">Request Raised By</label>
+                        <input type="text" readonly value="{{i.req_raised_by}}" id="delete_{{i.id}}req_rais_by" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="delete_{{i.id}}hc_required">HC Required</label>
+                        <input type="text" readonly value="{{i.hc_req}}" id="delete_{{i.id}}hc_required" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="delete_{{i.id}}campaign">Campaign</label>
+                        <input type="text" readonly value="{{i.campaign}}" id="delete_{{i.id}}campaign" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="delete_{{i.id}}department">Department</label>
+                        <input type="text" readonly value="{{i.department}}" id="delete_{{i.id}}department" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="delete_{{i.id}}designation">Role/Designation</label>
+                        <input type="text" readonly value="{{i.designation}}" id="delete_{{i.id}}designation" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="delete_{{i.id}}Reason">Reason For Deleting</label>
+                        <textarea id="delete_{{i.id}}Reason" required name="reason" class="form-control"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-success">Submit</button>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+                <input type="hidden" name="id" value="{{i.id}}">
+              </form>
+            </div>
+          </div>
+        </div>
+  {% endif %}
+{% endfor %}
+<!-- Delete Pop-Up -->
+
+
+<!-- Start approval on created by AM Pop-Up -->
+
+{% for i in job %}
+  {% if i.manager_approval == False and request.user.profile.emp_desi in manager and i.created_by_rm1_id == request.user.profile.emp_id %}
+        <div class="modal fade" id="create_approval_{{i.id}}" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="CreateApprove">Request ID: {{i.id}}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <form action="/erf/initial-approval" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="cre_app_{{i.id}}req_date">Requested Date</label>
+                        <input type="text" readonly value="{{i.edited_date}}" id="cre_app_{{i.id}}req_date" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="cre_app_{{i.id}}req_rais_by">Request Raised By</label>
+                        <input type="text" readonly value="{{i.req_raised_by}}" id="cre_app_{{i.id}}req_rais_by" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="cre_app_{{i.id}}hc_required">HC Required</label>
+                        <input type="text" readonly value="{{i.hc_req}}" id="cre_app_{{i.id}}hc_required" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="cre_app_{{i.id}}campaign">Campaign</label>
+                        <input type="text" readonly value="{{i.campaign}}" id="cre_app_{{i.id}}campaign" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="cre_app_{{i.id}}department">Department</label>
+                        <input type="text" readonly value="{{i.department}}" id="cre_app_{{i.id}}department" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="cre_app_{{i.id}}designation">Role/Designation</label>
+                        <input type="text" readonly value="{{i.designation}}" id="cre_app_{{i.id}}designation" required class="form-control">
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="cre_app_{{i.id}}Approval">Approval</label>
+                        <select id="cre_app_{{i.id}}Approval" name="response" required class="form-control">
+                          <option value="" selected disabled>Please Select</option>
+                          <option value="Approve">Approve</option>
+                          <option value="Reject">Reject</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-success">Submit</button>
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+                <input type="hidden" name="id" value="{{i.id}}">
+              </form>
+            </div>
+          </div>
+        </div>
+  {% endif %}
+{% endfor %}
+
+    <!-- End approval on created by AM Pop-Up -->
+
+<!-- Start approval Pop-Up -->
+
+{% for i in job %}
+    {% if i.final_status == False and request.user.profile.emp_desi in manager and i.initial_status == True %}
+          <div class="modal fade" id="approval_{{i.id}}" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="Approve">Request ID: {{i.id}}</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <form action="/erf/approval" method="POST" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <div class="modal-body">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="app_{{i.id}}req_date">Requested Date</label>
+                          <input type="text" readonly value="{{i.edited_date}}" id="app_{{i.id}}req_date" required class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="app_{{i.id}}req_rais_by">Request Raised By</label>
+                          <input type="text" readonly value="{{i.req_raised_by}}" id="app_{{i.id}}req_rais_by" required class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="app_{{i.id}}hc_required">HC Required</label>
+                          <input type="text" readonly value="{{i.hc_req}}" id="app_{{i.id}}hc_required" required class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="app_{{i.id}}campaign">Campaign</label>
+                          <input type="text" readonly value="{{i.campaign}}" id="app_{{i.id}}campaign" required class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="v_{{i.id}}department">Department</label>
+                          <input type="text" readonly value="{{i.department}}" id="app_{{i.id}}department" required class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="v_{{i.id}}designation">Role/Designation</label>
+                          <input type="text" readonly value="{{i.designation}}" id="app_{{i.id}}designation" required class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="app_{{i.id}}closedon">Closed on</label>
+                          <input type="text" readonly value="{{i.closure_date}}" id="app_{{i.id}}closedon" required class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="app_{{i.id}}closedby">Closed By</label>
+                          <input type="text" readonly value="{{i.closed_by}}" id="app_{{i.id}}closedby" required class="form-control">
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="app_{{i.id}}Approval">Approval</label>
+                          <select id="app_{{i.id}}Approval" name="response" required class="form-control">
+                            <option value="" selected disabled>Please Select</option>
+                            <option value="Approve">Approve</option>
+                            <option value="Reject">Reject</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+                  <input type="hidden" name="id" value="{{i.id}}">
+                </form>
+              </div>
+            </div>
+          </div>
+    {% endif %}
+{% endfor %}
+
+    <!-- End approval Pop-Up -->
+
+    <!-- Start View Pop-Up -->
+    {% for i in job %}
+      <div class="modal fade" id="view_{{i.id}}" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">View Requisition {{i.id}}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="card">
+                      <div class="card-body">
+                          <div class="row">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}req_date">Requested Date</label>
+                                <input type="text" readonly value="{{i.edited_date}}" id="v_{{i.id}}req_date" required class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}hc_required">HC Required</label>
+                                <input type="text" readonly value="{{i.hc_req}}" id="v_{{i.id}}hc_required" required class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}req_rais_by">Request Raised By</label>
+                                <input type="text" readonly value="{{i.req_raised_by}}" id="v_{{i.id}}req_rais_by" required class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}manager">Manager</label>
+                                <input type="text" readonly value="{{i.created_by_manager}}" id="v_{{i.id}}manager" required class="form-control">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}campaign">Campaign</label>
+                                <input type="text" readonly value="{{i.campaign}}" id="v_{{i.id}}campaign" required class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}pricing">Pricing</label>
+                                <input type="text" readonly value="{{i.pricing}}" id="v_{{i.id}}pricing" required class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}department">Department</label>
+                                <input type="text" readonly value="{{i.department}}" id="v_{{i.id}}department" required class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}designation">Role/Designation</label>
+                                <input type="text" readonly value="{{i.designation}}" id="v_{{i.id}}designation" required class="form-control">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}pro_type_1">Process Type 1</label>
+                                <input type="text" readonly value="{{i.process_type_one}}" id="v_{{i.id}}pro_type_1" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}pro_type_2">Process Type 2</label>
+                                <input type="text" readonly value="{{i.process_type_two}}" id="v_{{i.id}}pro_type_2" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}pro_type_3">Process Type 3</label>
+                                <input type="text" readonly value="{{i.process_type_three}}" id="v_{{i.id}}pro_type_3" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}salary">Salary Range</label>
+                                <div style="width:100%; display: inline-flex;">
+                                  <input type="text" readonly value="{{i.salary_rang_frm}}" id="v_{{i.id}}salary" class="form-control" placeholder="From">
+                                  <input type="text" readonly value="{{i.salary_rang_to}}" id="v_{{i.id}}salaryto" class="form-control" placeholder="To">
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}quali">Qualification</label>
+                                <input type="text" readonly value="{{i.qualification}}" id="v_{{i.id}}quali" class="form-control">
+                                <input type="text" readonly value="{{i.other_quali}}" id="v_{{i.id}}other_quali" class="form-control  mt-2" placeholder=" Please Enter Your Qualification">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}skills">Skills Set</label>
+                                <textarea class="form-control" readonly id="v_{{i.id}}skills" rows="3" placeholder="Please Enter your Skills Set and if multiple seperate by comma." required>{{i.skills_set}}</textarea>
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}lang">Languages</label>
+                                <textarea class="form-control" readonly id="v_{{i.id}}lang" rows="3" >{{i.languages}}</textarea>
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}shift">Shift Timing</label>
+                                <input type="text" readonly value="{{i.shift_timing}}" id="v_{{i.id}}shift" class="form-control">
+                              </div>
+                              <div id="v_{{i.id}}shift_time" style="width:100%; display: inline-flex;" class="mt-2 d-none">
+                                <input type="text" readonly id="v_{{i.id}}shift_from" readonly class="form-control" value="{{i.shift_timing_frm}}">
+                                <input type="text" readonly id="v_{{i.id}}shift_to" readonly class="form-control" value="{{i.shift_timing_to}}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}work_from">Working Days</label>
+                                <input type="text" readonly value="{{i.type_of_working}}" id="working_days" class="form-control">
+                                {% if i.working_from %}
+                                <div style="width:100%; display: inline-flex;" class="mt-2">
+                                  <input type="text" readonly value="{{i.working_from}}" id="v_{{i.id}}work_from" class="form-control" placeholder="From">
+                                  <input type="text" readonly value="{{i.working_to}}" id="v_{{i.id}}work_to" class="form-control" placeholder="To">
+                                </div>
+                                {% endif %}
+                              </div>
+                            </div>
+                            {% if i.week_no_days %}
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}off_from">Week Off</label>
+                                <input type="text" name="num_off" id="v_{{i.id}}num_off" value="{{i.week_no_days}}" class="form-control" readonly>
+                                <div id="v_{{i.id}}week_off" style="width:100%; display: inline-flex;" class="mt-2 d-none">
+                                  <input type="text" readonly value="{{i.week_from}}" id="v_{{i.id}}off_from" class="form-control" placeholder="From">
+                                  <input type="text" readonly value="{{i.week_to}}" id="v_{{i.id}}off_to" class="form-control" placeholder="To">
+                                </div>
+                              </div>
+                            </div>
+                            {% endif %}
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}req_type">Requisition Type</label>
+                                <input type="text" readonly value="{{i.requisition_type}}" id="v_{{i.id}}req_type" class="form-control">
+                              </div>
+                            </div>
+                            {% if i.reason_for_replace %}
+                            <div class="col-md-3 d-none" id="reason_RB_{{i.id}}">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}reason">Reason for Replacement / Buffer</label>
+                                <textarea disabled class="form-control" id="v_{{i.id}}reason">{{i.reason_for_replace}}</textarea>
+                              </div>
+                            </div>
+                            {% endif %}
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}dead_line">Dead Line</label>
+                                <input type="text" readonly value="{{i.dead_line}}" id="v_{{i.id}}dead_line" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-12">
+                              <hr>
+                            </div>
+                          </div>
+
+                          {% if i.hc_req >= 1 %}
+                          <div class="row d-none" id="candidate_1_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_1">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_1" class="form-control" value="{% if i.candidate_name_1 %}{{i.candidate_name_1}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_1">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer1}}" id="v_{{i.id}}inter_1" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_1">Source</label>
+                                <input type="text" readonly value="{{i.source_1}}" id="v_{{i.id}}source_1" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_1">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_1">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_1}} ({{i.source_internal_emp_id_1}})" id="v_{{i.id}}internal_emp_name_1" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_1}}" id="v_{{i.id}}internal_emp_id_1" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_1">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_1">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_1}}" id="v_{{i.id}}emp_name_1" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_1}}" id="v_{{i.id}}emp_id_1" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_1">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_1">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_1}}" id="v_{{i.id}}sol_me_1" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_1">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_1">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_1}}" id="v_{{i.id}}agency_1" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 2 %}
+                          <div class="row d-none" id="candidate_2_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_2">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_2" class="form-control" value="{% if i.candidate_name_2 %}{{i.candidate_name_2}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_2">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_2}}" id="v_{{i.id}}inter_2" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_2">Source</label>
+                                <input type="text" readonly value="{{i.source_2}}" id="v_{{i.id}}source_2" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_2">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_2">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_2}} ({{i.source_internal_emp_id_2}})" id="v_{{i.id}}internal_emp_name_2" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_2}}" id="v_{{i.id}}internal_emp_id_2" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_2">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_2">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_2}}" id="v_{{i.id}}emp_name_2" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_2}}" id="v_{{i.id}}emp_id_2" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_2">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_2">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_2}}" id="v_{{i.id}}sol_me_2" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_2">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_2">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_2}}" id="v_{{i.id}}agency_2" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+                          {% if i.hc_req >= 3 %}
+                          <div class="row d-none" id="candidate_3_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_3">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_3" class="form-control" value="{% if i.candidate_name_3 %}{{i.candidate_name_3}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_3">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_3}}" id="v_{{i.id}}inter_3" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_3">Source</label>
+                                <input type="text" readonly value="{{i.source_3}}" id="v_{{i.id}}source_3" class="form-control">
+                              </div>
+                            </div>
+
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_3">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_3}} ({{i.source_internal_emp_id_3}})" id="v_{{i.id}}internal_emp_name_3" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_3}}" id="v_{{i.id}}internal_emp_id_3" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_3">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_3}}" id="v_{{i.id}}emp_name_3" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_3}}" id="v_{{i.id}}emp_id_3" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_3">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_3}}" id="v_{{i.id}}sol_me_3" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_3">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_3}}" id="v_{{i.id}}agency_3" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 4 %}
+                          <div class="row d-none" id="candidate_4_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_4">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_4" class="form-control" value="{% if i.candidate_name_4 %}{{i.candidate_name_4}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_4">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_4}}" id="v_{{i.id}}inter_4" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_4">Source</label>
+                                <input type="text" readonly value="{{i.source_4}}" id="v_{{i.id}}source_4" class="form-control">
+                              </div>
+                            </div>
+
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_4">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_4">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_4}} ({{i.source_internal_emp_id_4}})" id="v_{{i.id}}internal_emp_name_4" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_4}}" id="v_{{i.id}}internal_emp_id_4" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_4">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_4">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_4}}" id="v_{{i.id}}emp_name_4" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_4}}" id="v_{{i.id}}emp_id_4" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_4">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_4">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_4}}" id="v_{{i.id}}sol_me_4" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_4">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_4">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_4}}" id="v_{{i.id}}agency_4" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 5 %}
+                          <div class="row d-none" id="candidate_5_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_5">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_5" class="form-control" value="{% if i.candidate_name_5 %}{{i.candidate_name_5}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_5">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_5}}" id="v_{{i.id}}inter_5" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_5">Source</label>
+                                <input type="text" readonly value="{{i.source_5}}" id="v_{{i.id}}source_5" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_5">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_5">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_5}} ({{i.source_internal_emp_id_5}})" id="v_{{i.id}}internal_emp_name_5" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_5}}" id="v_{{i.id}}internal_emp_id_5" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_5">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_5">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_5}}" id="v_{{i.id}}emp_name_5" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_5}}" id="v_{{i.id}}emp_id_5" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_5">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_5">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_5}}" id="v_{{i.id}}sol_me_5" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_5">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_5">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_5}}" id="v_{{i.id}}agency_5" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 6 %}
+                          <div class="row d-none" id="candidate_6_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_6">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_6" class="form-control" value="{% if i.candidate_name_6 %}{{i.candidate_name_6}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_6">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_6}}" id="v_{{i.id}}inter_6" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_6">Source</label>
+                                <input type="text" readonly value="{{i.source_6}}" id="v_{{i.id}}source_6" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_6">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_6">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_6}} ({{i.source_internal_emp_id_6}})" id="v_{{i.id}}internal_emp_name_6" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_6}}" id="v_{{i.id}}internal_emp_id_6" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_6">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_6">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_6}}" id="v_{{i.id}}emp_name_6" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_6}}" id="v_{{i.id}}emp_id_6" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_6">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_6">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_6}}" id="v_{{i.id}}sol_me_6" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_6">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_6">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_6}}" id="v_{{i.id}}agency_6" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 7 %}
+                          <div class="row d-none" id="candidate_7_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_7">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_7" class="form-control" value="{% if i.candidate_name_7 %}{{i.candidate_name_7}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_7">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_7}}" id="v_{{i.id}}inter_7" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_7">Source</label>
+                                <input type="text" readonly value="{{i.source_7}}" id="v_{{i.id}}source_7" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_7">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_7">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_7}} ({{i.source_internal_emp_id_7}})" id="v_{{i.id}}internal_emp_name_7" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_7}}" id="v_{{i.id}}internal_emp_id_7" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_7">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_7">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_7}}" id="v_{{i.id}}emp_name_7" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_7}}" id="v_{{i.id}}emp_id_7" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_7">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_7">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_7}}" id="v_{{i.id}}sol_me_7" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_7">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_7">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_7}}" id="v_{{i.id}}agency_7" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 8 %}
+                          <div class="row d-none" id="candidate_8_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_8">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_8" class="form-control" value="{% if i.candidate_name_8 %}{{i.candidate_name_8}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_8">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_8}}" id="v_{{i.id}}inter_8" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_8">Source</label>
+                                <input type="text" readonly value="{{i.source_8}}" id="v_{{i.id}}source_8" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_8">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_8">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_8}} ({{i.source_internal_emp_id_8}})" id="v_{{i.id}}internal_emp_name_8" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_8}}" id="v_{{i.id}}internal_emp_id_8" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_8">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_8">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_8}}" id="v_{{i.id}}emp_name_8" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_8}}" id="v_{{i.id}}emp_id_8" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_8">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_8">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_8}}" id="v_{{i.id}}sol_me_8" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_8">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_8">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_8}}" id="v_{{i.id}}agency_8" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 9 %}
+                          <div class="row d-none" id="candidate_9_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_9">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_9" class="form-control" value="{% if i.candidate_name_9 %}{{i.candidate_name_9}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_9">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_9}}" id="v_{{i.id}}inter_9" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_9">Source</label>
+                                <input type="text" readonly value="{{i.source_9}}" id="v_{{i.id}}source_9" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_9">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_9">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_9}} ({{i.source_internal_emp_id_9}})" id="v_{{i.id}}internal_emp_name_9" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_9}}" id="v_{{i.id}}internal_emp_id_9" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_9">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_9">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_9}}" id="v_{{i.id}}emp_name_9" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_9}}" id="v_{{i.id}}emp_id_9" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_9">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_9">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_9}}" id="v_{{i.id}}sol_me_9" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_9">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_9">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_9}}" id="v_{{i.id}}agency_9" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 10 %}
+                          <div class="row d-none" id="candidate_10_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_10">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_10" class="form-control" value="{% if i.candidate_name_10 %}{{i.candidate_name_10}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_10">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_10}}" id="v_{{i.id}}inter_10" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_10">Source</label>
+                                <input type="text" readonly value="{{i.source_10}}" id="v_{{i.id}}source_10" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_10">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_10">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_10}} ({{i.source_internal_emp_id_10}})" id="v_{{i.id}}internal_emp_name_10" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_10}}" id="v_{{i.id}}internal_emp_id_10" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_10">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_10">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_10}}" id="v_{{i.id}}emp_name_10" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_10}}" id="v_{{i.id}}emp_id_10" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_10">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_10">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_10}}" id="v_{{i.id}}sol_me_10" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_10">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_10">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_10}}" id="v_{{i.id}}agency_10" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 11 %}
+                          <div class="row d-none" id="candidate_11_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_11">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_11" class="form-control" value="{% if i.candidate_name_11 %}{{i.candidate_name_11}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_11">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_11}}" id="v_{{i.id}}inter_11" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_11">Source</label>
+                                <input type="text" readonly value="{{i.source_11}}" id="v_{{i.id}}source_11" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_11">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_11">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_11}} ({{i.source_internal_emp_id_11}})" id="v_{{i.id}}internal_emp_name_11" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_11}}" id="v_{{i.id}}internal_emp_id_11" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_11">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_11">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_11}}" id="v_{{i.id}}emp_name_11" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_11}}" id="v_{{i.id}}emp_id_11" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_11">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_11">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_11}}" id="v_{{i.id}}sol_me_11" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_11">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_11">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_11}}" id="v_{{i.id}}agency_11" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 12 %}
+                          <div class="row d-none" id="candidate_12_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_12">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_12" class="form-control" value="{% if i.candidate_name_12 %}{{i.candidate_name_12}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_12">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_12}}" id="v_{{i.id}}inter_12" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_12">Source</label>
+                                <input type="text" readonly value="{{i.source_12}}" id="v_{{i.id}}source_12" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_12">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_12">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_12}} ({{i.source_internal_emp_id_12}})" id="v_{{i.id}}internal_emp_name_12" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_12}}" id="v_{{i.id}}internal_emp_id_12" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_12">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_12">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_12}}" id="v_{{i.id}}emp_name_12" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_12}}" id="v_{{i.id}}emp_id_12" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_12">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_12">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_12}}" id="v_{{i.id}}sol_me_12" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_12">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_12">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_12}}" id="v_{{i.id}}agency_12" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 13 %}
+                          <div class="row d-none" id="candidate_13_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_13">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_13" class="form-control" value="{% if i.candidate_name_13 %}{{i.candidate_name_13}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_13">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_13}}" id="v_{{i.id}}inter_13" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_13">Source</label>
+                                <input type="text" readonly value="{{i.source_13}}" id="v_{{i.id}}source_13" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_13">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_13">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_13}} ({{i.source_internal_emp_id_13}})" id="v_{{i.id}}internal_emp_name_13" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_13}}" id="v_{{i.id}}internal_emp_id_13" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_13">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_13">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_13}}" id="v_{{i.id}}emp_name_13" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_13}}" id="v_{{i.id}}emp_id_13" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_13">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_13">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_13}}" id="v_{{i.id}}sol_me_13" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_13">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_13">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_13}}" id="v_{{i.id}}agency_13" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 14 %}
+                          <div class="row d-none" id="candidate_14_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_14">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_14" class="form-control" value="{% if i.candidate_name_14 %}{{i.candidate_name_14}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_14">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_14}}" id="v_{{i.id}}inter_14" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_14">Source</label>
+                                <input type="text" readonly value="{{i.source_14}}" id="v_{{i.id}}source_14" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_14">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_14">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_14}} ({{i.source_internal_emp_id_14}})" id="v_{{i.id}}internal_emp_name_14" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_14}}" id="v_{{i.id}}internal_emp_id_14" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_14">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_14">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_14}}" id="v_{{i.id}}emp_name_14" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_14}}" id="v_{{i.id}}emp_id_14" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_14">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_14">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_14}}" id="v_{{i.id}}sol_me_14" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_14">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_14">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_14}}" id="v_{{i.id}}agency_14" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 15 %}
+                          <div class="row d-none" id="candidate_15_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_15">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_15" class="form-control" value="{% if i.candidate_name_15 %}{{i.candidate_name_15}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_15">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_15}}" id="v_{{i.id}}inter_15" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_15">Source</label>
+                                <input type="text" readonly value="{{i.source_15}}" id="v_{{i.id}}source_15" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_15">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_15">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_15}} ({{i.source_internal_emp_id_15}})" id="v_{{i.id}}internal_emp_name_15" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_15}}" id="v_{{i.id}}internal_emp_id_15" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_15">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_15">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_15}}" id="v_{{i.id}}emp_name_15" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_15}}" id="v_{{i.id}}emp_id_15" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_15">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_15">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_15}}" id="v_{{i.id}}sol_me_15" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_15">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_15">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_15}}" id="v_{{i.id}}agency_15" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 16 %}
+                          <div class="row d-none" id="candidate_16_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_16">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_16" class="form-control" value="{% if i.candidate_name_16 %}{{i.candidate_name_16}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_16">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_16}}" id="v_{{i.id}}inter_16" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_16">Source</label>
+                                <input type="text" readonly value="{{i.source_16}}" id="v_{{i.id}}source_16" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_16">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_16">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_16}} ({{i.source_internal_emp_id_16}})" id="v_{{i.id}}internal_emp_name_16" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_16}}" id="v_{{i.id}}internal_emp_id_16" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_16">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_16">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_16}}" id="v_{{i.id}}emp_name_16" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_16}}" id="v_{{i.id}}emp_id_16" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_16">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_16">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_16}}" id="v_{{i.id}}sol_me_16" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_16">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_16">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_16}}" id="v_{{i.id}}agency_16" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 17 %}
+                          <div class="row d-none" id="candidate_17_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_17">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_17" class="form-control" value="{% if i.candidate_name_17 %}{{i.candidate_name_17}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_17">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_17}}" id="v_{{i.id}}inter_17" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_17">Source</label>
+                                <input type="text" readonly value="{{i.source_17}}" id="v_{{i.id}}source_17" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_17">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_17">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_17}} ({{i.source_internal_emp_id_17}})" id="v_{{i.id}}internal_emp_name_17" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_17}}" id="v_{{i.id}}internal_emp_id_17" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_17">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_17">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_17}}" id="v_{{i.id}}emp_name_17" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_17}}" id="v_{{i.id}}emp_id_17" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_17">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_17">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_17}}" id="v_{{i.id}}sol_me_17" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_17">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_17">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_17}}" id="v_{{i.id}}agency_17" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 18 %}
+                          <div class="row d-none" id="candidate_18_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_18">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_18" class="form-control" value="{% if i.candidate_name_18 %}{{i.candidate_name_18}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_18">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_18}}" id="v_{{i.id}}inter_18" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_18">Source</label>
+                                <input type="text" readonly value="{{i.source_18}}" id="v_{{i.id}}source_18" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_18">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_18">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_18}} ({{i.source_internal_emp_id_18}})" id="v_{{i.id}}internal_emp_name_18" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_18}}" id="v_{{i.id}}internal_emp_id_18" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_18">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_18">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_18}}" id="v_{{i.id}}emp_name_18" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_18}}" id="v_{{i.id}}emp_id_18" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_18">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_18">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_18}}" id="v_{{i.id}}sol_me_18" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_18">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_18">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_18}}" id="v_{{i.id}}agency_18" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 19 %}
+                          <div class="row d-none" id="candidate_19_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_19">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_19" class="form-control" value="{% if i.candidate_name_19 %}{{i.candidate_name_19}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_19">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_19}}" id="v_{{i.id}}inter_19" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_19">Source</label>
+                                <input type="text" readonly value="{{i.source_19}}" id="v_{{i.id}}source_19" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_19">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_19">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_19}} ({{i.source_internal_emp_id_19}})" id="v_{{i.id}}internal_emp_name_19" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_19}}" id="v_{{i.id}}internal_emp_id_19" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_19">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_19">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_19}}" id="v_{{i.id}}emp_name_19" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_19}}" id="v_{{i.id}}emp_id_19" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_19">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_19">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_19}}" id="v_{{i.id}}sol_me_19" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_19">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_19">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_19}}" id="v_{{i.id}}agency_19" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+                          {% if i.hc_req >= 20 %}
+                          <div class="row d-none" id="candidate_20_{{i.id}}">
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}cand_name_20">Candidate Name</label>
+                                <input readonly id="v_{{i.id}}cand_name_20" class="form-control" value="{% if i.candidate_name_20 %}{{i.candidate_name_20}}{% endif %}">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}inter_20">Interviewer</label>
+                                <input type="text" readonly value="{{i.interviewer_20}}" id="v_{{i.id}}inter_20" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}source_20">Source</label>
+                                <input type="text" readonly value="{{i.source_20}}" id="v_{{i.id}}source_20" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}internal_20">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}internal_emp_name_20">Employee Details and Campaign</label>
+                                <input type="text" readonly value="{{i.source_internal_emp_name_20}} ({{i.source_internal_emp_id_20}})" id="v_{{i.id}}internal_emp_name_20" class="form-control">
+                                <input type="text" readonly value="{{i.source_internal_campaign_name_20}}" id="v_{{i.id}}internal_emp_id_20" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}emp_val_20">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}emp_name_20">Employee Referral</label>
+                                <input type="text" readonly value="{{i.source_emp_name_20}}" id="v_{{i.id}}emp_name_20" class="form-control">
+                                <input type="text" readonly value="{{i.source_emp_id_20}}" id="v_{{i.id}}emp_id_20" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}social_val_20">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}sol_me_20">Social Media</label>
+                                <input type="text" readonly value="{{i.source_social_20}}" id="v_{{i.id}}sol_me_20" class="form-control">
+                              </div>
+                            </div>
+                            <div class="col-md-3 d-none" id="v_{{i.id}}partner_val_20">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}agency_20">Partners (Agency)</label>
+                                <input type="text" readonly value="{{i.source_partners_20}}" id="v_{{i.id}}agency_20" class="form-control">
+                              </div>
+                            </div>
+                             <div class="col-md-12">
+                                <hr>
+                             </div>
+                          </div>
+                          {% endif %}
+
+
+
+                          <div class="row">
+                            {% if i.closure_date %}
+                            <div class="col-md-3">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}clos_date">Closure Date</label>
+                                <input type="text" readonly value="{{i.closure_date}}" id="v_{{i.id}}clos_date" class="form-control">
+                              </div>
+                            </div>
+                            {% endif %}
+                            {% if i.recruited_people %}
+                            <div class="col-md-3" id="v_{{i.id}}rec_popmain">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}rec_pop">No of people recruited</label>
+                                <input type="text" readonly value="{{i.recruited_people}}" id="v_{{i.id}}rec_pop" class="form-control">
+                              </div>
+                            </div>
+                            {% endif %}
+                            {% if i.candidate_remark %}
+                            <div class="col-md-3" id="v_{{i.id}}can_remarkmain">
+                              <div class="form-group">
+                                <label for="v_{{i.id}}can_remark">Candidates Remark</label>
+                                <textarea readonly id="v_{{i.id}}can_remark" class="form-control">{{i.candidate_remark}}</textarea>
+                              </div>
+                            </div>
+                            {% endif %}
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+    <!-- End View Pop-Up -->
+{% endblock %}
+
+{% block scripts %}
+{% for i in job %}
+    <script type="text/javascript">
+      var qu = document.getElementById('v_{{i.id}}quali').value;
+      if (qu == "Others") {
+        document.getElementById('v_{{i.id}}other_quali').classList.remove("d-none");
+      } else {
+        document.getElementById('v_{{i.id}}other_quali').classList.add("d-none");
+      }
+      {% if i.week_no_days %}
+      var e = document.getElementById('v_{{i.id}}num_off');
+      var week_off = document.getElementById('v_{{i.id}}week_off');
+      if (e.value > 1) {
+        week_off.classList.remove("d-none");
+      } else {
+        week_off.classList.add("d-none");
+      }
+      {% endif %}
+      var shift_time = document.getElementById('v_{{i.id}}shift_time');
+      var f = document.getElementById('v_{{i.id}}shift');
+      if (f.value == "Rotational - Timing"){
+        shift_time.classList.add("d-none");
+      } else {
+        shift_time.classList.remove("d-none");
+      }
+      var req_type_{{i.id}} = $("#v_{{i.id}}req_type").val()
+      if ( req_type_{{i.id}} != 'Budgeted' ) {
+        $("#reason_RB_{{i.id}}").removeClass("d-none")
+      }
+
+
+        {% if i.candidate_name_1 %}
+          $("#candidate_1_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_2 %}
+          $("#candidate_2_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_3 %}
+          $("#candidate_3_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_4 %}
+          $("#candidate_4_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_5 %}
+          $("#candidate_5_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_6 %}
+          $("#candidate_6_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_7 %}
+          $("#candidate_7_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_8 %}
+          $("#candidate_8_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_9 %}
+          $("#candidate_9_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_10 %}
+          $("#candidate_10_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_11 %}
+          $("#candidate_11_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_12 %}
+          $("#candidate_12_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_13 %}
+          $("#candidate_13_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_14 %}
+          $("#candidate_14_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_15 %}
+          $("#candidate_15_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_16 %}
+          $("#candidate_16_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_17 %}
+          $("#candidate_17_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_18 %}
+          $("#candidate_18_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_19 %}
+          $("#candidate_19_{{i.id}}").removeClass("d-none");
+        {% endif %}
+        {% if i.candidate_name_20 %}
+          $("#candidate_20_{{i.id}}").removeClass("d-none");
+        {% endif %}
+
+
+      {% for j in number %}
+         {% if i.hc_req >= j %}
+            $( document ).ready(function() {
+              var soc_{{j}} = document.getElementById('v_{{i.id}}source_{{j}}').value;
+              if (soc_{{j}} == "Employee Referral") {
+                document.getElementById('v_{{i.id}}emp_val_{{j}}').classList.remove("d-none");
+              }
+              if (soc_{{j}} == "Internal Movement") {
+                document.getElementById('v_{{i.id}}internal_{{j}}').classList.remove("d-none");
+              }
+              if ( soc_{{j}} == "Social") {
+                document.getElementById('v_{{i.id}}social_val_{{j}}').classList.remove("d-none");
+              }
+              if (soc_{{j}} == "Partners (Agency)") {
+                document.getElementById('v_{{i.id}}partner_val_{{j}}').classList.remove("d-none");
+              }
+            });
+         {% endif %}
+      {% endfor %}
+
+    </script>
+{% endfor %}
+
+{% endblock %}

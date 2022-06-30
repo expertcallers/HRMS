@@ -23,6 +23,7 @@
                   <table  id="datatablex" class="table table-striped" style="width: 100% !important;">
                     <thead>
                       <tr>
+                        <th>ID</th>
                         <th>PO No.</th>
                         <th>PO Date</th>
                         <th>Project</th>
@@ -34,6 +35,7 @@
                     </thead>
                     <tfoot>
                       <tr>
+                        <th>ID</th>
                         <th>PO No.</th>
                         <th>PO Date</th>
                         <th>Project</th>
@@ -46,6 +48,7 @@
                     <tbody>
                       {% for i in bills %}
                       <tr>
+                          <td>{{i.id}}</td>
                           <td>{{i.po_no}}</td>
                           <td>{{i.date}}</td>
                           <td>{{i.project}}</td>

@@ -1,32 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
   <head>
-    {% load static %}
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- Meta, title, CSS, favicons, etc. -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	 <link rel="icon" href="images/expertcallers-icon.png" type="image/ico" />
+	 <link rel="icon" href="{% static 'assets/images/expertcallers-icon.png' %}" type="image/ico" />
 
-    <title>ECPL Attendance Management | Dashboard</title>
+    <title>ECPL Employee Requisition System</title>
 
     <!-- Bootstrap -->
     <link href="{% static 'assets/vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="{% static 'assets/vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href=https://pro.fontawesome.com/releases/v5.10.0/css/all.css integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
     <!-- NProgress -->
-    <link href="{% static 'assets/vendors/nprogress/nprogress.css" rel="stylesheet' %}">
+    <link href="{% static 'assets/vendors/nprogress/nprogress.css' %}" rel="stylesheet">
     <!-- iCheck -->
-    <link href="{% static 'assets/vendors/iCheck/skins/flat/green.css" rel="stylesheet' %}">
-    <!-- Datatables -->
-    <link href="{% static 'assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}" rel="stylesheet">
-
+    <link href="{% static 'assets/vendors/iCheck/skins/flat/green.css' %}" rel="stylesheet">
 
     <!-- bootstrap-progressbar -->
     <link href="{% static 'assets/vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css' %}" rel="stylesheet">
@@ -35,49 +28,56 @@
     <!-- bootstrap-daterangepicker -->
     <link href="{% static 'assets/vendors/bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet">
 
+    <!-- Datatables -->
+    <link href="{% static 'assets/vendors/datatables.net-bs/css/dataTables.bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendors/datatables.net-buttons-bs/css/buttons.bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendors/datatables.net-fixedheader-bs/css/fixedHeader.bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendors/datatables.net-responsive-bs/css/responsive.bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendors/datatables.net-scroller-bs/css/scroller.bootstrap.min.css' %}" rel="stylesheet">
+
     <!-- Custom Theme Style -->
     <link href="{% static 'assets/build/css/custom.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'assets/css/monthly.css' %}">
 
-    <!-- The follwing two tags to be added Can be added to base file-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
-    <style>
-        .select2-container {
-            width: 100% !important;
-        }
-        .monthly-prev, .monthly-next{
-            display:none;
-          }
-    </style>
-{% block style %}
 
-{% endblock %}
+
+    <style type="text/css">
+      .select2-container {
+        width: 100% !important;
+      }
+      body {
+        overflow-x: hidden;
+      }
+	</style>
+          {% block style %}
+          {% endblock %}
   </head>
+
   <body class="nav-md">
-  <div class="container body">
+    <div class="container body">
       <div class="main_container">
         <div class="col-md-3 left_col">
           <div class="left_col scroll-view">
             <div class="navbar nav_title clearfix" style="border: 0; background-color: #fff;">
-              <a href="" class="site_title">
+              <div class="site_title">
                 <img src="{% static 'assets/images/ecpl-logo-new.png' %}" class="imgmd" style="width: 100%">
                 <img src="{% static 'assets/images/expertcallers-icon.png' %}" class="imgsm" style="width: 100%">
-              </a>
+              </div>
             </div>
 
             <div class="clearfix"></div>
+
             <!-- menu profile quick info -->
             <div class="profile clearfix">
               <div class="profile_pic mb-2">
-                <img src="{{request.user.profile.img.url}}" alt="..." class="img-circle profile_img">
+                <img src="{% static 'assets/images/user.png' %}" alt="..." class="img-circle profile_img">
               </div>
-                <div class="profile_info">
-                    <h2><i class="fa fa-user"></i><span>Name</span><br>{{request.user.profile.emp_name}}</h2>
-                    <h2><i class="fa fa-id-card"></i><span>Employee ID</span><br> {{request.user.profile.emp_id}}</h2>
-                    <h2><i class="fa fa-headset"></i><span>Designation</span><br> {{request.user.profile.emp_desi}}</h2>
-                    <h2><i class="fa fa-users"></i><span>Team</span><br>{{request.user.profile.emp_process}}</h2>
-                </div>
+              <div class="profile_info">
+                <h2><i class="fa fa-user"></i><span>Name</span><br>{{request.user.profile.emp_name}}</h2>
+                <h2><i class="fa fa-id-card"></i><span>Employee ID</span><br> {{request.user.profile.emp_id}}</h2>
+                <h2><i class="fa fa-headset"></i><span>Designation</span><br> {{request.user.profile.emp_desi}}</h2>
+                <h2><i class="fa fa-users"></i><span>Team</span><br>{{request.user.profile.emp_process}}</h2>
+              </div>
             </div>
             <!-- /menu profile quick info -->
 
@@ -87,37 +87,18 @@
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
               <div class="menu_section">
                 <ul class="nav side-menu">
-                  <li><a href="/ams/dashboard-redirect"><i class="fa fa-home"></i> Dashboard</a></li>
-                  <li><a><i class="fa fa-clock-o"></i>Attendance <span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="/ams/ams-update-attendance">Mark Attendance</a></li>
-                        <li><a href="/ams/team-attendance">Team Attendance</a></li>
-                        <li><a href="/ams/week-attendance">Week Report</a></li>
-                        <li><a href="/ams/attendance-correction">Attendance Correction</a></li>
-                      <!--<li><a href="all_emp.html">Active Employees</a></li>-->
-                    </ul>
-                  </li>
-                  <li><a><i class="fa fa-check-square-o"></i>Leave Management<span class="fa fa-chevron-down"></span></a>
-                    <ul class="nav child_menu">
-                      <li><a href="/ams/leave-history"> Agent Leave History</a></li>
-                      <li><a href="/ams/ams-apply_leave">Your Leaves</a></li>
-                    </ul>
-                  </li>
-                  <li><a href="/ams/attendance-calendar"><i class="fa fa-calendar"></i> Attendance Calendar</a></li>
-                  {% if request.user.profile.emp_id in admin_list %}
-                  {% include 'ams/admin_urls.html' %}
-                  {% endif %}
+                  <li><a href="/ams/dashboard-redirect"><i class="fa fa-arrow-left"></i>Back to AMS</a></li>
+                  <li><a href="/erf/manager-dashboard"><i class="fa fa-home"></i>ERF Dashboard</a></li>
 
-                  {% if request.user.profile.emp_id in administration_list %}
-                  {% include 'ams/administration_urls.html' %}
-                  {% endif %}
-                    <li><a href="/ams/rm-mapping-index"><i class="fa fa-user"></i> Mapping</a></li>
-                  <li><a href="/pbireport/management-dashboard"><i class="fa fa-file"></i> PowerBi Reports</a></li>
-                  <li><a href="/erf/login"><i class="fa">&#x1F4CB;</i> ERF</a></li>
-                  <li><a href="/ams/rm-settings"><i class="fa fa-gears"></i> Settings</a></li>
-                    <!--<li><a href="/ams/add-new-job"><i class="fa fa-check-square-o"></i> Job Requisition Form</a></li>-->
+                  <li><a><i class="fa fa-users"></i> Employee Requisition  <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="/erf/job-requisition">Add New</a></li>
+                      <li><a href="/erf/job-requisition-table/all">View Submissions</a></li>
+                    </ul>
+                  </li>
                 </ul>
               </div>
+
             </div>
             <!-- /sidebar menu -->
 
@@ -142,30 +123,37 @@
               <ul class=" navbar-right">
                 <li class="nav-item dropdown open" style="padding-left: 15px;">
                   <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{{request.user.profile.img.url}}" alt="">{{request.user.profile.emp_name}}
+                    <img src="{% static 'assets/images/img.jpg' %}" alt=""> {{request.user.profile.emp_name}}
                   </a>
                   <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item"  href="/ams/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
                   </div>
+                </li>
+                <li style="margin-top:5px !important;">
+                  Your Email: {{request.user.profile.emp_email}}
                 </li>
               </ul>
             </nav>
           </div>
         </div>
         <!-- /top navigation -->
-{% block main %}
 
-{% endblock %}
-        <!-- footer content -->
-        <footer>
-          <div class="text-center">
-            ECPL CC Team
-          </div>
-          <div class="clearfix"></div>
-        </footer>
-        <!-- /footer content -->
+
+          {% block main %}
+          {% endblock %}
+
+
+
+
+
       </div>
     </div>
+
+
+
+
+    <!-- jQuery -->
+    <script src="{% static 'assets/vendors/jquery/dist/jquery.min.js' %}"></script>
     <!-- Bootstrap -->
     <script src="{% static 'assets/vendors/bootstrap/dist/js/bootstrap.bundle.min.js' %}"></script>
     <!-- FastClick -->
@@ -201,7 +189,6 @@
     <!-- bootstrap-daterangepicker -->
     <script src="{% static 'assets/vendors/moment/min/moment.min.js' %}"></script>
     <script src="{% static 'assets/vendors/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
-
     <!-- Datatables -->
     <script src="{% static 'assets/vendors/datatables.net/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'assets/vendors/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
@@ -216,111 +203,114 @@
     <script src="{% static 'assets/vendors/datatables.net-responsive-bs/js/responsive.bootstrap.js' %}"></script>
     <script src="{% static 'assets/vendors/datatables.net-scroller/js/dataTables.scroller.min.js' %}"></script>
     <script src="{% static 'assets/vendors/jszip/dist/jszip.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/pdfmake/build/pdfmake.min.js' %}"></script>
-    <script src="{% static 'assets/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
+
+    <!-- Custom Theme Scripts -->
+    <script src="{% static 'assets/build/js/custom.js' %}"></script>
 
     <!-- The follwing two tags to be added Can be added to base file-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     <script>
       $('.select2').select2();
+      function confirmm() {
+        var con = confirm('Are you sure you want to continue?');
+          if (con == true) {
+              return true
+            } else {
+              return false
+            }
+      }
+
     </script>
-    <!-- Custom Theme Scripts -->
-    <script src="{% static 'assets/build/js/custom.min.js' %}"></script>
+    <script type="text/javascript">
+    $(document).ready(function () {
+        // Setup - add a text input to each footer cell
+        $('#datatablex tfoot tr')
+            .clone(true)
+            .addClass('filters')
+            .appendTo('#datatablex tfoot');
+
+        var table = $('#datatablex').DataTable({
+            orderCellsTop: true,
+            fixedHeader: true,
+            initComplete: function () {
+                var api = this.api();
+
+                // For each column
+                api
+                    .columns()
+                    .eq(0)
+                    .each(function (colIdx) {
+                        // Set the header cell to contain the input element
+                        var cell = $('.filters th').eq(
+                            $(api.column(colIdx).header()).index()
+                        );
+                        var title = $(cell).text();
+                        $(cell).html('<input type="text" placeholder="' + title + '" />');
+
+                        // On every keypress in this input
+                        $(
+                            'input',
+                            $('.filters th').eq($(api.column(colIdx).header()).index())
+                        )
+                            .off('keyup change')
+                            .on('keyup change', function (e) {
+                                e.stopPropagation();
+
+                                // Get the search value
+                                $(this).attr('title', $(this).val());
+                                var regexr = '({search})'; //$(this).parents('th').find('select').val();
+
+                                var cursorPosition = this.selectionStart;
+                                // Search the column for that value
+                                api
+                                    .column(colIdx)
+                                    .search(
+                                        this.value != ''
+                                            ? regexr.replace('{search}', '(((' + this.value + ')))')
+                                            : '',
+                                        this.value != '',
+                                        this.value == ''
+                                    )
+                                    .draw();
+
+                                $(this)
+                                    .focus()[0]
+                                    .setSelectionRange(cursorPosition, cursorPosition);
+                            });
+                    });
+            },
+            buttons: [
+                    {
+                        extend: "copy",
+                        className: "btn btn-success btn-sm ml-1"
+                    },
+                    {
+                        extend: "csv",
+                        className: "btn btn-success btn-sm ml-1"
+                    },
+                    {
+                        extend: "excel",
+                        className: "btn btn-success btn-sm ml-1"
+                    },
+                ],
+              dom: '<"row"<"col-md-2"l><"col-md-6"B><"col-md-4"fr>>tip',
+              responsive: true
+        });
+    });
+
+  </script>
+
+          {% block scripts %}
+
+          {% endblock %}
 
 
-    <script type="text/javascript" src="{% static 'assets/js/monthly.js' %}"></script>
-<script type="text/javascript">
-  $(document).ready(function() {
-      $('#datatablex').DataTable({
-        "bPaginate": true,
-        "bLengthChange": true,
-        "bFilter": true,
-        "bInfo": true,
-        "order": [[ 0, "desc" ]],
-          dom: 'lBfrtip',
-          buttons: [
-                {
-                    extend: "copy",
-                    className: "btn btn-success btn-sm ml-1"
-                },
-                {
-                    extend: "csv",
-                    className: "btn btn-success btn-sm ml-1"
-                },
-                {
-                    extend: "excel",
-                    className: "btn btn-success btn-sm ml-1"
-                },
-            ],
-            responsive: true
-      } );
-  } );
-  $('#datatable').DataTable( {
-      responsive: true
-  } );
-  $('#datatable_two').DataTable( {
-      responsive: true
-  } );
-  $('#datatable_three').DataTable( {
-      responsive: true
-  } );
-</script>
-<script type="text/javascript">
-  $today = new Date();
-  $today = moment($today).format('YYYY-MM-DD');
-  $('#end_date').attr("max", $today);
-  $('#start_date').attr("max", $today);
-  function mydate(e) {
-    $start = $('#start_date').val();
-    $end = $('#end_date');
-    $end.attr("min", $start);
-  }
-</script>
-
-
-<script>
-  function confirmm(){
-      var c = confirm("Are you sure you want to proceed?");
-      if (c==true){
-        return true;
-      } else {
-        return false;
-      }
-  }
-  document.onkeydown = function(e) {
-      if(event.keyCode == 123) {
-         alert("F12 is blocked");
-         return false;
-      }
-      if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
-         alert("Inspect is blocked");
-         return false;
-      }
-      if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) {
-         alert("ctrl+shift+C is blocked");
-         return false;
-      }
-      if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
-         alert("Console is blocked");
-         return false;
-      }
-      if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
-         alert("Source code is blocked");
-         return false;
-      }
-    }
-</script>
-
-<script>
-  {% if messages %}
-      {% for m in messages %}
-        alert('{{m}}');
-      {% endfor %}
-  {% endif %}
-</script>
-{% block script %}
-
-{% endblock %}
-
+{% if messages %}
+	<script>
+			{% for m in messages %}
+				alert("{{m}}");
+			{% endfor %}
+	</script>
+{% endif %}
   </body>
 </html>
