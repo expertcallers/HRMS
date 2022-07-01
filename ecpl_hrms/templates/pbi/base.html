@@ -71,16 +71,16 @@
             </div>
 
             <div class="clearfix"></div>
+
             <!-- menu profile quick info -->
             <div class="profile clearfix">
-              <div class="profile_pic mb-2">
+              <div class="profile_pic">
                 <img src="{{request.user.profile.img.url}}" alt="..." class="img-circle profile_img">
               </div>
                 <div class="profile_info">
-                    <h2><i class="fa fa-user"></i><span>Name</span><br>{{request.user.profile.emp_name}}</h2>
-                    <h2><i class="fa fa-id-card"></i><span>Employee ID</span><br> {{request.user.profile.emp_id}}</h2>
-                    <h2><i class="fa fa-headset"></i><span>Designation</span><br> {{request.user.profile.emp_desi}}</h2>
-                    <h2><i class="fa fa-users"></i><span>Team</span><br>{{request.user.profile.emp_process}}</h2>
+                    <h2 style="font-weight: 600; color: #1ABB9C;">{{request.user.profile.emp_name}}</h2>
+                    <h2 style="font-weight: 600; font-size:14px; color: #fff;">{{request.user.profile.emp_id}}</h2>
+                    <h2 style="font-size:14px; color: #fff;">{{request.user.profile.emp_desi}}</h2>
                 </div>
             </div>
             <!-- /menu profile quick info -->
