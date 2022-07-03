@@ -25,4 +25,4 @@ class InterSearch(admin.ModelAdmin):
 
 admin.site.register(JobRequisition, JobSearch)
 admin.site.register(Tickets, TicketSearch)
-admin.site.register(LoginHistory)
+
