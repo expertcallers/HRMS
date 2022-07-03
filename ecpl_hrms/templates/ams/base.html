@@ -100,59 +100,6 @@
     <script src="{% static 'assets/vendors/pdfmake/build/vfs_fonts.js' %}"></script>
 
 
-                      <script type="text/javascript" src="{% static 'assets/js/monthly.js' %}"></script>
-                      <script type="text/javascript">
-                          var sampleEvents = {
-                          "monthly": [
-                              {% for c in month_cal %}
-                              {
-                                  "id": 1,
-                                  "name": "{{c.st}}",
-                                  "startdate": "{{c.dt}}",
-                                  "enddate": "",
-                                  "starttime": "",
-                                  "endtime": "",
-                                  {% if c.st == 'Unmarked' %}
-                                  "color": "grey",
-                                  {% elif c.st == 'Week OFF' %}
-                                  "color": "#000000",
-                                  {% elif c.st == 'Comp OFF' %}
-                                  "color": "#FF8FFF",
-                                  {% elif c.st == 'Absent' %}
-                                  "color": "#FF0000",
-                                  {% elif c.st == 'present' %}
-                                  "color": "#008C00",
-                                  {% elif c.st == 'SL' %}
-                                  "color": "#FF0000",
-                                  {% elif c.st == 'PL' %}
-                                  "color": "#FF0000",
-                                  {% elif c.st == 'Training' %}
-                                  "color": "#6990CE",
-                                  {% elif c.st == 'Half Day' %}
-                                  "color": "#0000FF",
-                                  {% elif c.st == 'Client OFF' %}
-                                  "color": "#FF8FFF",
-                                  {% else %}
-                                  "color": "#B52E2E",
-                                  {% endif %}
-                                  "url": ""
-                              },
-                              {% endfor %}
-                          ]
-                          };
-
-                          $(window).load( function() {
-                              $('#mycalendar').monthly({
-                                  mode: 'event',
-                                  dataType: 'json',
-                                  jsonURL: '',
-                                  weekStart:'Mon',
-                                  events: sampleEvents
-                              });
-                          });
-                      </script>
-
-
     <!-- Custom Theme Scripts -->
     <script src="{% static 'assets/build/js/custom.min.js' %}"></script>
 

@@ -1923,20 +1923,6 @@ def applyCorrection(request):  # Test1
         date = request.POST['date']
         reason = request.POST['reason']
         emp_id = request.POST['emp_id']
-        # if att_new == 'Half Day':
-        #     leave_bal = EmployeeLeaveBalance.objects.get(emp_id=emp_id)
-        #     if leave_bal.pl_balance >= 0.5:
-        #         leave_bal.pl_balance -= 0.5
-        #         leave_bal.save()
-        #         today = datetime.now().date()
-        #         leaveHistory.objects.create(
-        #             emp_id=emp_id, date=today, leave_type='PL',
-        #             transaction='Half day deduction', no_days=0.5,
-        #             total=leave_bal.pl_balance+leave_bal.sl_balance
-        #         )
-        #     else:
-        #         messages.info(request, "Not enough leave balance to mark half day. kindly mark as absent!")
-        #         return redirect(request.META.get('HTTP_REFERER'))
         emp_obj = Profile.objects.get(emp_id=emp_id)
         cal = EcplCalander.objects.get(id=id)
         emp_name = cal.emp_name
