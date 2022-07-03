@@ -7,9 +7,9 @@ from import_export.admin import ImportExportModelAdmin
 class ProfileSearch(admin.ModelAdmin):
     search_fields = ('emp_name','emp_id',"emp_desi")
     list_display = ('emp_name','emp_id', 'emp_desi','emp_process',"emp_rm1","emp_rm2","emp_rm3")
-class JobSearch(admin.ModelAdmin):
-    search_fields = ('req_raised_by','created_by_id')
-    list_display = ("id",'req_raised_by','created_by_id', 'requisition_date','hc_req',"initial_status","final_status","manager_approval")
+# class JobSearch(admin.ModelAdmin):
+#     search_fields = ('req_raised_by','created_by_id')
+#     list_display = ("id",'req_raised_by','created_by_id', 'requisition_date','hc_req',"initial_status","final_status","manager_approval")
 
 class TicketSearch(admin.ModelAdmin):
     search_fields = ("job_requisition_id", 'created_by', 'created_by_id')
