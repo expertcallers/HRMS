@@ -117,9 +117,9 @@
                   {% if request.user.profile.emp_id in administration_list %}
                   {% include 'ams/administration_urls.html' %}
                   {% endif %}
-                  <li><a href="/pbireport/management-dashboard"><i class="fa fa-file"></i> PowerBi Reports</a></li>
+                  <!--<li><a href="/pbireport/management-dashboard"><i class="fa fa-file"></i> PowerBi Reports</a></li>-->
                   {% if request.user.profile.emp_desi != 'Team Leader' %}
-                  <li><a href="/erf/login"><i style="font-style: unset !important;">&#x1F4CB;</i>ERF</a></li>
+                  <!--<li><a href="/erf/login"><i style="font-style: unset !important;">&#x1F4CB;</i>ERF</a></li>-->
                   {% endif %}
                   <li><a href="/ams/rm-settings"><i class="fa fa-gears"></i> Settings</a></li>
                   <!--<li><a><i class="fa fa-briefcase"></i> Job Requisition <span class="fa fa-chevron-down"></span></a>
