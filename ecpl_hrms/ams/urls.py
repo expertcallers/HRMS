@@ -98,6 +98,8 @@ urlpatterns = [
     path('admin-attendance-correction-submit', AttendanceCorrectionSubmitAdmin),
     path('mapping-correction', getMapping),
     path('mapping-correction-submit', changeMapping),
+    path('lists', AdminLists),
+    path('remove-list', RemoveFromList),
 
     # PO for Administration
     path('print-bill/<int:pk>', PrintBill),

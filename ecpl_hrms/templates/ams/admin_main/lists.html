@@ -1,0 +1,101 @@
+{% extends 'ams/admin_main/base.html' %}
+{% block style %}
+<style>
+  body {
+    overflow-x: hidden;
+  }
+</style>
+{% endblock %}
+{% block main %}
+  {% load static %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>LISTS</h3>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <form method="POST" action="" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="form-group">
+                          <label for="list">Select List</label>
+                          <select name="list" id="list" class="form-control select2" required>
+                            <option value="" selected disabled>Please select</option>
+                            <option value="ta">TA List</option>
+                            <option value="tl-am">TL-AM List</option>
+                            <option value="manager">Manager List</option>
+                            <option value="management">Management List</option>
+                            <option value="hr">HR List</option>
+                            <option value="agent">Agent List</option>
+                            <option value="rm">RM List</option>
+                            <option value="hr-tl">HR TL AM List</option>
+                            <option value="hr-om">HR OM List</option>
+                            <option value="admin">Admin List</option>
+                            <option value="administration">Administration List</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-12" align="center">
+                        <button type="submit" class="form-control mt-4 btn btn-success btn-lg">Submit</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% if mylist %}
+          <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-body">
+                  <form action="/ams/remove-list" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                      <div class="col-md-12 mb-4">
+                        <textarea class="form-control" disabled rows="6">{{mylist}}</textarea>
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <label for="item">Select the Item to Remove:</label>
+                        <select id="item" name="item" class="form-control select2" required>
+                          <option value="" selected disabled>-- Please Select --</option>
+                          {% for i in mylist %}
+                          <option value="{{i}}">{{i}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div class="col-md-6 form-group">
+                        <button type="submit" class="mt-4 form-control btn btn-success" onclick="return confirmm();">Submit</button>
+                      </div>
+                    </div>
+                    <input type="hidden" name="list" value="{{list}}">
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        <!-- /page content -->
+
+
+  {% endblock %}
+{% block script %}
+<script>
+  $today = new Date();
+  $today = moment($today).format('YYYY-MM-DD');
+  $('#end').attr("max", $today);
+  $('#start').attr("max", $today);
+  function mydate(e) {
+    $start = $('#start').val();
+    $end = $('#end');
+    $end.attr("min", $start);
+  }
+</script>
+{% endblock %}

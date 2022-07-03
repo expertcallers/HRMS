@@ -802,7 +802,7 @@ def job_requisition_manager_edit(request):
         elif new_weekday == 6:
             edited_date = (datetime.datetime.today() + datetime.timedelta(days=1)).replace(hour=9, minute=0, second=0, microsecond=0)
         else:
-            edited_date = edited_date.replace(hour=9, minute=0, second=0, microsecond=0)
+            edited_date = edited_date
 
         hc_req = request.POST["hc_required"]
         req_raised_by = request.POST["req_rais_by"]

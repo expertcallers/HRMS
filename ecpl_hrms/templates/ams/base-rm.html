@@ -69,25 +69,23 @@
             <div class="clearfix"></div>
             <!-- menu profile quick info -->
             <div class="profile clearfix">
-              <div class="profile_pic mb-2">
+              <div class="profile_pic">
                 <img src="{{request.user.profile.img.url}}" alt="..." class="img-circle profile_img">
               </div>
                 <div class="profile_info">
-                    <h2><i class="fa fa-user"></i><span>Name</span><br>{{request.user.profile.emp_name}}</h2>
-                    <h2><i class="fa fa-id-card"></i><span>Employee ID</span><br> {{request.user.profile.emp_id}}</h2>
-                    <h2><i class="fa fa-headset"></i><span>Designation</span><br> {{request.user.profile.emp_desi}}</h2>
-                    <h2><i class="fa fa-users"></i><span>Team</span><br>{{request.user.profile.emp_process}}</h2>
+                    <h2 style="font-weight: 600; color: #1ABB9C;">{{request.user.profile.emp_name}}</h2>
+                    <h2 style="font-weight: 600; font-size:14px; color: #fff;">{{request.user.profile.emp_id}}</h2>
+                    <h2 style="font-size:14px; color: #fff;">{{request.user.profile.emp_desi}}</h2>
                 </div>
             </div>
             <!-- /menu profile quick info -->
 
-            <br />
 
             <!-- sidebar menu -->
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
               <div class="menu_section">
                 <ul class="nav side-menu">
-                  <li><a href="/ams/dashboard-redirect"><i class="fa fa-home"></i> Dashboard</a></li>
+                  <li><a href="/ams/dashboard-redirect"><i class="fa fa-home"></i>Dashboard</a></li>
                   <li><a><i class="fa fa-clock-o"></i>Attendance <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="/ams/ams-update-attendance">Mark Attendance</a></li>
@@ -121,7 +119,7 @@
                   {% endif %}
                   <li><a href="/pbireport/management-dashboard"><i class="fa fa-file"></i> PowerBi Reports</a></li>
                   {% if request.user.profile.emp_desi != 'Team Leader' %}
-                  <li><a href="/erf/login"><i class="fa">&#x1F4CB;</i> ERF</a></li>
+                  <li><a href="/erf/login"><i style="font-style: unset !important;">&#x1F4CB;</i>ERF</a></li>
                   {% endif %}
                   <li><a href="/ams/rm-settings"><i class="fa fa-gears"></i> Settings</a></li>
                   <!--<li><a><i class="fa fa-briefcase"></i> Job Requisition <span class="fa fa-chevron-down"></span></a>

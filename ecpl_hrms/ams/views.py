@@ -48,6 +48,7 @@ hr_om_list = []
 admin_list = []
 administration_list = []
 
+ta_list = []
 
 # Create your views here.
 def loginPage(request):  # Test1 Test2
@@ -62,6 +63,7 @@ def view_403(request, exception=None):
     return redirect('/ams/')
 
 def loginAndRedirect(request):  # Test1 Test2
+
     for i in AccessControl.objects.all():
         if i.access == 'Administration':
             if i.emp_id not in administration_list:
@@ -69,9 +71,14 @@ def loginAndRedirect(request):  # Test1 Test2
         elif i.access == 'Admin':
             if i.emp_id not in admin_list:
                 admin_list.append(i.emp_id)
+    for i in Designation.objects.filter(category__in=['TA', 'TA - TL - AM']):
+        if i.name not in ta_list:
+            ta_list.append(i.name)
+
     for i in Designation.objects.filter(category='TL AM'):
         if i.name not in tl_am_list:
             tl_am_list.append(i.name)
+
     for i in Designation.objects.filter(Q(category='Manager List') | Q(category='Management List')):
         if i.name not in manager_list:
             manager_list.append(i.name)
@@ -112,17 +119,8 @@ def loginAndRedirect(request):  # Test1 Test2
             if request.user.profile.agent_status == "Active":
                 if request.user.profile.pc == False:
                     return redirect('/ams/change-password')
-                if request.user.profile.emp_desi in tl_am_list:
-                    return redirect('/ams/tl-dashboard')
-                elif request.user.profile.emp_desi in manager_list:
-                    return redirect('/ams/manager-dashboard')
-                elif request.user.profile.emp_desi in hr_list:
-                    return redirect('/ams/hr-dashboard')
-                elif request.user.profile.emp_desi in agent_list:
-                    return redirect('/ams/agent-dashboard')
                 else:
-                    messages.info(request, 'Something Went Wrong! Contact CC Team.')
-                    return redirect('/ams/')
+                    return redirect('/ams/dashboard-redirect')
             else:
                 messages.info(request, 'You are Inactive. Please contact HR.')
                 return redirect("/ams/")
@@ -378,7 +376,7 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
         e.manager_status = manager_status
         e.status = status
         e.save()
-        return redirect('/ams/tl-dashboard')
+        return redirect('/ams/dashboard-redirect')
     else:
 
         emp_id = request.user.profile.emp_id
@@ -452,7 +450,7 @@ def hrDashboard(request):  # Test1
                 "leave_esc_count": leave_esc_count, "att_requests_count": att_requests_count,
                 "hr_tl_am_list": hr_tl_am_list, "hr_om_list": hr_om_list,
                 "leave_req_count_final": leave_req_count_final, 'admin_list': admin_list,
-                'administration_list': administration_list, 'team': teams,}
+                'administration_list': administration_list, 'team': teams, 'ta': ta_list}
         return render(request, 'ams/hr_dashboard.html', data)
     else:
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
@@ -1249,7 +1247,7 @@ def viewTeamAttendance(request):  # Test1
         return render(request, 'ams/agent-calander-status.html', data)
     else:
         messages.info(request, "Invalid Request!")
-        return redirect('/ams/tl-dashboard')
+        return redirect('/ams/dashboard-redirect')
 
 
 @login_required
@@ -1384,8 +1382,14 @@ def agentSettings(request):  # Test1
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     form = PasswordChangeForm(request.user)
-    data = {'emp': emp, 'form': form}
-    return render(request, 'ams/agent-settings.html', data)
+    try:
+        onboard = OnboardingnewHRC.objects.get(emp_id=emp_id)
+        on = True
+    except OnboardingnewHRC.DoesNotExist:
+        onboard = ''
+        on = False
+    data = {'emp': emp, 'form': form, 'onboard': onboard, 'profile': emp, 'on': on}
+    return render(request, 'ams/settings.html', data)
 
 
 @login_required
@@ -1393,8 +1397,14 @@ def rmSettings(request):  # Test1
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     form = PasswordChangeForm(request.user)
-    data = {'emp': emp, 'form': form}
-    return render(request, 'ams/rm-settings.html', data)
+    try:
+        onboard = OnboardingnewHRC.objects.get(emp_id=emp_id)
+        on = True
+    except OnboardingnewHRC.DoesNotExist:
+        onboard = ''
+        on = False
+    data = {'emp': emp, 'form': form, 'onboard': onboard, 'profile': emp, 'on': on}
+    return render(request, 'ams/settings.html', data)
 
 def FAQ(request):
     faqs = FaqHRMS.objects.all()
@@ -1413,14 +1423,7 @@ def uploadImageToDB(request):  # Test1
         prof = Profile.objects.get(id=id)
         prof.img = user_image
         prof.save()
-        if request.user.profile.emp_desi in tl_am_list:
-            return redirect('/ams/tl-dashboard')
-        elif request.user.profile.emp_desi in hr_list:
-            return redirect('/ams/hr-dashboard')
-        elif request.user.profile.emp_desi in manager_list:
-            return redirect('/ams/manager-dashboard')
-        else:
-            return redirect('/ams/agent-dashboard')
+        return redirect('/ams/dashboard-redirect')
     else:
         pass
 
@@ -2190,7 +2193,7 @@ def AttendanceReportAdmin(request):
             return render(request, 'ams/admin_main/attendance-report.html', data)
     else:
         messages.info(request, 'Unauthorized Access')
-        return redirect('/ams/')
+        return redirect('/ams/dashboard-redirect')
 
 
 @login_required
@@ -2228,7 +2231,7 @@ def AttendanceCorrectionAdmin(request):
             return render(request, 'ams/admin_main/attendance-correction.html', data)
     else:
         messages.info(request, 'Unauthorized Access')
-        return redirect('/ams/')
+        return redirect('/ams/dashboard-redirect')
 
 
 @login_required
@@ -2326,10 +2329,10 @@ def AttendanceCorrectionSubmitAdmin(request):
             return redirect('/ams/admin-attendance-correction')
         else:
             messages.info(request, 'Unauthorized Access')
-            return redirect('/ams/')
+            return redirect('/ams/dashboard-redirect')
     else:
         messages.info(request, 'Unauthorized Access')
-        return redirect('/ams/')
+        return redirect('/ams/dashboard-redirect')
 
 
 @login_required
@@ -2354,7 +2357,83 @@ def getMapping(request):
             return render(request, 'ams/admin_main/mapping-correction.html', data)
     else:
         messages.info(request, 'Unauthorized Access')
-        return redirect('/ams/')
+        return redirect('/ams/dashboard-redirect')
+
+
+@login_required
+def AdminLists(request):
+    emp_id = request.user.profile.emp_id
+    if emp_id in admin_list:
+        if request.method == "POST":
+            list = request.POST["list"]
+            mylist = ''
+            if list == 'ta':
+                mylist = ta_list
+            elif list == 'tl-am':
+                mylist = tl_am_list
+            elif list == 'manager':
+                mylist = manager_list
+            elif list == 'management':
+                mylist = management_list
+            elif list == 'hr':
+                mylist = hr_list
+            elif list == 'agent':
+                mylist = agent_list
+            elif list == 'rm':
+                mylist = rm_list
+            elif list == 'hr-tl':
+                mylist = hr_tl_am_list
+            elif list == 'hr-om':
+                mylist = hr_om_list
+            elif list == 'admin':
+                mylist = admin_list
+            elif list == 'administration':
+                mylist = administration_list
+            data = {'mylist': mylist, 'list': list}
+            return render(request, 'ams/admin_main/lists.html', data)
+        else:
+            return render(request, 'ams/admin_main/lists.html')
+    else:
+        messages.info(request, 'Unauthorized Access')
+        return redirect('/ams/dashboard-redirect')
+
+@login_required
+def RemoveFromList(request):
+    emp_id = request.user.profile.emp_id
+    if emp_id in admin_list:
+        if request.method == "POST":
+            list = request.POST["list"]
+            item = request.POST["item"]
+            if list == 'ta':
+                ta_list.remove(item)
+            elif list == 'tl-am':
+                tl_am_list.remove(item)
+            elif list == 'manager':
+                manager_list.remove(item)
+            elif list == 'management':
+                management_list.remove(item)
+            elif list == 'hr':
+                hr_list.remove(item)
+            elif list == 'agent':
+                agent_list.remove(item)
+            elif list == 'rm':
+                rm_list.remove(item)
+            elif list == 'hr-tl':
+                hr_tl_am_list.remove(item)
+            elif list == 'hr-om':
+                hr_om_list.remove(item)
+            elif list == 'admin':
+                admin_list.remove(item)
+            elif list == 'administration':
+                administration_list.remove(item)
+            messages.info(request, 'Successfully Removed '+str(item))
+            return redirect('/ams/lists')
+        else:
+            messages.info(request, 'Unauthorized Access')
+            return redirect('/ams/dashboard-redirect')
+    else:
+        messages.info(request, 'Unauthorized Access')
+        return redirect('/ams/dashboard-redirect')
 
 
 @login_required
@@ -2396,7 +2475,7 @@ def changeMapping(request):
         return redirect(request.META.get('HTTP_REFERER'))
     else:
         messages.error(request, 'Bad Request!')
-        return redirect('/ams/')
+        return redirect('/ams/dashboard-redirect')
 
 
 @login_required
