@@ -61,7 +61,6 @@ def loginPage(request):  # Test1 Test2
 def view_403(request, exception=None):
     return redirect('/ams/')
 
-
 def loginAndRedirect(request):  # Test1 Test2
     for i in AccessControl.objects.all():
         if i.access == 'Administration':
@@ -176,28 +175,21 @@ def change_password(request):  # Test1 Test2
 
 
 @login_required
-def agentDashBoard(request):  # Test1 Test2
+def agentDashBoard(request):  # Test1 Test2 # Opt
     if request.user.profile.emp_desi in agent_list:
-        emp_id = request.user.profile.emp_id
-        emp = Profile.objects.get(emp_id=emp_id)
-        # Leave status
-        leave_hist = LeaveTable.objects.filter(Q(emp_id=emp_id), Q(leave_type__in=['SL', 'PL', 'ML'])).order_by(
-            '-id')[:5]
-
-        data = {'emp': emp, 'leave_hist': leave_hist, 'admin_list': admin_list,
-                'administration_list': administration_list}
+        emp = request.user.profile
+        leave_hist = LeaveTable.objects.filter(Q(emp_id=emp.emp_id), Q(leave_type__in=['SL', 'PL', 'ML'])).order_by('-id')[:5]
+        data = {'emp': emp, 'leave_hist': leave_hist, 'admin_list': admin_list,'administration_list': administration_list}
         return render(request, 'ams/agent-dashboard-new.html', data)
     else:
         return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
-
 
 @login_required
 def tlDashboard(request):  # Test1 Test2
     usr_desi = request.user.profile.emp_desi
     if usr_desi in tl_am_list:
-        emp_name = request.user.profile.emp_name
-        emp_id = request.user.profile.emp_id
-        prof = Profile.objects.get(emp_id=emp_id)
+        prof = request.user.profile
+        emp_id = prof.emp_id    
         # All Employees # Used in dropdown attendance report
         all_emp = Profile.objects.filter(Q(agent_status='Active'),Q(emp_id=emp_id) | Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
         # All Active Today
@@ -207,21 +199,6 @@ def tlDashboard(request):  # Test1 Test2
         att_details = EcplCalander.objects.filter(Q(date=today), Q(emp_id__in=emps))        
         # counts
         emp_count = all_emp.count()-1
-
-        # def allCounts(cat):
-        #     return EcplCalander.objects.filter(Q(rm1_id=emp_id) | Q(rm2_id=emp_id) | Q(rm3_id=emp_id), Q(date=today),Q(att_actual=cat)).count()
-        # present_count = allCounts('present')
-        # absent_count = allCounts('Absent')
-        # week_off_count = allCounts('Week OFF')
-        # comp_off_count = allCounts('Comp OFF')
-        # half_day_count = allCounts('Half Day')
-        # client_off_count = allCounts('Client OFF')
-        # sl_count = allCounts('SL')
-        # pl_count = allCounts('PL')
-        # attrition_count = allCounts('Attrition')
-        # training_count = allCounts('Training')
-        # unmarked_count = allCounts('Unmarked')
-
         # Mapping Tickets 
         map_tickets_counts = MappingTickets.objects.filter(new_rm3_id=emp_id, status=False).count()
         # Leaves
@@ -234,7 +211,7 @@ def tlDashboard(request):  # Test1 Test2
                 rm3 = "yes"
                 break
 
-        data = {'emp_name': emp_name, 'emp': prof, 'att_details': att_details, 'emp_count': emp_count,
+        data = {'emp': prof, 'att_details': att_details, 'emp_count': emp_count,
                 'map_tickets_counts': map_tickets_counts,'all_emp': all_emp, 'leave_req_count': leave_req_count,
                 "rm3": rm3, 'admin_list': admin_list, 'administration_list': administration_list}
         return render(request, 'ams/rm-dashboard-new.html', data)
@@ -252,10 +229,8 @@ def tlDashboard(request):  # Test1 Test2
 
 @login_required
 def managerDashboard(request):  # Test1 Test2
-    mgr_name = request.user.profile.emp_name
-    emp_id = request.user.profile.emp_id
-
-    emp = Profile.objects.get(emp_id=emp_id)
+    emp = request.user.profile
+    emp_id = emp.emp_id
     # Mapping Tickets
     map_tickets_counts = MappingTickets.objects.filter(new_rm3_id=emp_id, status=False).count()
     # Leave Requests
@@ -263,49 +238,21 @@ def managerDashboard(request):  # Test1 Test2
     # Leave Escalation Count
     leave_esc_count = LeaveTable.objects.filter(emp_rm3_id=emp_id, manager_approval=False, escalation=True).count()
     # Attendance
-    att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False, rm3_id=emp_id).count()
-    # Month view
-    month_days = []
-    todays_date = date.today()
-    year = todays_date.year
-    month = todays_date.month
-    a, num_days = calendar.monthrange(year, month)
-    start_date = date(year, month, 1)
-    end_date = date(year, month, num_days)
-    delta = timedelta(days=1)
-    while start_date <= end_date:
-        month_days.append(start_date.strftime("%Y-%m-%d"))
-        start_date += delta
-    month_cal = []
-    for i in month_days:
-        dict = {}
-        try:
-            st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id)).att_actual
-        except EcplCalander.DoesNotExist:
-            st = 'Unmarked'
-        dict['dt'] = i
-        dict['st'] = st
-        month_cal.append(dict)
+    att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False, rm3_id=emp_id).count()   
 
     if request.user.profile.emp_desi in management_list and request.user.profile.emp_desi in manager_list:
         # All Employees
-        # All Employees
-        all_emps = Profile.objects.filter(Q(agent_status='Active'),
-                                         Q(emp_id=emp_id) | Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(
-                                             emp_rm3_id=emp_id)).distinct()
+        all_emps = Profile.objects.filter(Q(agent_status='Active'),Q(emp_id=emp_id) | Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
         all_emps_under = []
         for i in all_emps:
             if i not in all_emps_under:
                 all_emps_under.append(i)
-                under = Profile.objects.filter(Q(agent_status='Active'),
-                                               Q(emp_rm1_id=i.emp_id) | Q(emp_rm2_id=i.emp_id) | Q(emp_rm3_id=i.emp_id))
+                under = Profile.objects.filter(Q(agent_status='Active'),Q(emp_rm1_id=i.emp_id) | Q(emp_rm2_id=i.emp_id) | Q(emp_rm3_id=i.emp_id))
                 for j in under:
                     if j not in all_emps_under:
                         all_emps_under.append(j)
-
         # count of all employees
         count_all_emps = len(all_emps_under)
-
         # TLS
         all_tls_under = []
         for i in all_emps_under:
@@ -320,15 +267,11 @@ def managerDashboard(request):  # Test1 Test2
             if i not in all_ams_under:
                 if i.emp_desi == 'Assistant Manager':
                     all_ams_under.append(i)
-
         # AMS Count
         all_ams_count = len(all_ams_under)
     elif request.user.profile.emp_desi in manager_list:
         # All Employees
-        # All Employees
-        all_emps = Profile.objects.filter(Q(agent_status='Active'),
-                                         Q(emp_id=emp_id) | Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(
-                                             emp_rm3_id=emp_id)).distinct()
+        all_emps = Profile.objects.filter(Q(agent_status='Active'),Q(emp_id=emp_id) | Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id)).distinct()
         all_emps_under = []
         for i in all_emps:
             if i not in all_emps_under:
@@ -336,18 +279,13 @@ def managerDashboard(request):  # Test1 Test2
         # count of all employees
         count_all_emps = all_emps.count()
         # TLS
-        all_tls = Profile.objects.filter(Q(agent_status='Active'),
-                                         Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id),
-                                         Q(emp_desi='Team Leader')).distinct()
+        all_tls = Profile.objects.filter(Q(agent_status='Active'),Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id),Q(emp_desi='Team Leader')).distinct()
         all_tls_under = list(all_tls)
 
         # TLS Count
         all_tls_count = all_tls.count()
         # AMS
-        all_ams = Profile.objects.filter(Q(agent_status='Active'),
-                                         Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id),
-                                         Q(emp_desi='Assistant Manager')).distinct()
-
+        all_ams = Profile.objects.filter(Q(agent_status='Active'),Q(emp_rm1_id=emp_id) | Q(emp_rm2_id=emp_id) | Q(emp_rm3_id=emp_id),Q(emp_desi='Assistant Manager')).distinct()
         all_ams_under = list(all_ams)
         # TLS Count
         all_ams_count = all_ams.count()
@@ -358,10 +296,9 @@ def managerDashboard(request):  # Test1 Test2
             'all_ams': all_ams_under, 'all_ams_count': all_ams_count,
             'map_tickets_counts': map_tickets_counts, 'att_requests_count': att_requests_count,
             'leave_req_count': leave_req_count, 'leave_esc_count': leave_esc_count, 'all_emp': all_emps_under,
-            'month_cal': month_cal, 'admin_list': admin_list, 'administration_list': administration_list
+            'admin_list': admin_list, 'administration_list': administration_list
             }
     return render(request, 'ams/manager-dashboard.html', data)
-
 
 @login_required
 def viewAndApproveLeaveRequestMgr(request):  # Test1
@@ -411,60 +348,6 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
                         emp_name=emp_name
                     )
                     cal.save()
-
-            # sandwich policy calculation    
-
-            # week_off = []
-            # last = ''
-            # if leave_type == 'SL':
-            #     start_date = e.start_date
-            #     sand_start_date = start_date - timedelta(days=1)
-            #     cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-            #     if cal == "Week OFF" or cal == "SL" or cal == "PL":
-            #         week_off.append(sand_start_date)
-            #         sand_start_date -= timedelta(days=1)
-            #         sand_end_date = start_date - timedelta(days=15)
-            #         while sand_start_date > sand_end_date:
-            #             cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-            #             if cal == "Week OFF":
-            #                 week_off.append(sand_start_date)
-            #             elif cal == 'SL' or cal == 'PL':
-            #                 last = sand_start_date
-            #                 break
-            #             else:
-            #                 break
-            #             sand_start_date -= timedelta(days=1)
-
-            # elif leave_type == 'PL':
-            #     start_date = e.start_date
-            #     sand_start_date = start_date - timedelta(days=1)
-            #     try:
-            #         cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-            #         if cal == "Week OFF" or cal == "PL" or cal == "SL":
-            #             week_off.append(sand_start_date)
-            #             sand_start_date -= timedelta(days=1)
-            #             sand_end_date = start_date - timedelta(days=15)
-            #             while sand_start_date > sand_end_date:
-            #                 cal = EcplCalander.objects.get(Q(date=sand_start_date), Q(emp_id=emp_id)).att_actual
-            #                 if cal == "Week OFF":
-            #                     week_off.append(sand_start_date)
-            #                 elif cal == 'SL' or cal == 'PL':
-            #                     last = sand_start_date
-            #                     break
-            #                 else:
-            #                     break
-            #                 sand_start_date -= timedelta(days=1)
-            #     except:
-            #         pass
-            # if last != '':
-            #     cal_list = []
-            #     last += timedelta(days=1)
-            #     while start_date > last:
-            #         start_date -= timedelta(days=1)
-            #         cal = EcplCalander.objects.get(Q(date=start_date), Q(emp_id=emp_id))
-            #         cal.att_actual = "Absent (Sandwich)"
-            #         cal_list.append(cal)
-            #     EcplCalander.objects.bulk_update(cal_list,['att_actual'])
 
         else:
             manager_approval = True
@@ -550,55 +433,26 @@ def viewallOMS(request, name):  # Test1
 def hrDashboard(request):  # Test1
     user_desi = request.user.profile.emp_desi
     if user_desi in hr_list:
-        emp_id = request.user.profile.emp_id
-        emp = Profile.objects.get(emp_id=emp_id)
+        emp = request.user.profile
+        emp_id = emp.emp_id
         all_users_count = Profile.objects.all().count()
         all_team_count = Campaigns.objects.all().count()
         teams = Campaigns.objects.all()
-        attrition_request_count = AgentActiveStatusHist.objects.all().count()
-        # Month view 
-        month_days = []
-        todays_date = date.today()
-        year = todays_date.year
-        month = todays_date.month
-        a, num_days = calendar.monthrange(year, month)
-        start_date = date(year, month, 1)
-        end_date = date(year, month, num_days)
-        delta = timedelta(days=1)
-        while start_date <= end_date:
-            month_days.append(start_date.strftime("%Y-%m-%d"))
-            start_date += delta
-        month_cal = []
-        for i in month_days:
-            dict = {}
-            try:
-                st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id)).att_actual
-            except EcplCalander.DoesNotExist:
-                st = 'Unmarked'
-            dict['dt'] = i
-            dict['st'] = st
-            month_cal.append(dict)
-
         # Leave Requests
         leave_req_count = LeaveTable.objects.filter(emp_rm1_id=emp_id, tl_approval=False).count()
-
-        leave_req_count_final = LeaveTable.objects.filter(emp_rm3_id=emp_id, tl_status='Approved',
-                                                          manager_approval=False).count()
+        leave_req_count_final = LeaveTable.objects.filter(emp_rm3_id=emp_id, tl_status='Approved',manager_approval=False).count()
         # Mapping Tickets
         map_tickets_counts = MappingTickets.objects.filter(Q(new_rm3_id=emp_id), Q(status=False)).count()
         # Leave Escalation Count
-        leave_esc_count = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id), Q(manager_approval=False),
-                                                    Q(escalation=True)).count()
+        leave_esc_count = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id), Q(manager_approval=False),Q(escalation=True)).count()
         # Attendance
         att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False, rm3_id=emp_id).count()
-
         data = {'emp': emp, 'all_users_count': all_users_count, 'all_team_count': all_team_count,
-                'attrition_request_count': attrition_request_count, 'month_cal': month_cal, 'team': teams,
                 "leave_req_count": leave_req_count, "map_tickets_counts": map_tickets_counts,
                 "leave_esc_count": leave_esc_count, "att_requests_count": att_requests_count,
                 "hr_tl_am_list": hr_tl_am_list, "hr_om_list": hr_om_list,
                 "leave_req_count_final": leave_req_count_final, 'admin_list': admin_list,
-                'administration_list': administration_list}
+                'administration_list': administration_list, 'team': teams,}
         return render(request, 'ams/hr_dashboard.html', data)
     else:
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
@@ -2891,7 +2745,7 @@ def autoApproveLeave(request):  # Test 1, 2
                     )
                 start_date += timedelta(days=1)
 
-        if days > 3:
+        if days > 2:
             if i.tl_approval == False:
                 i.tl_approval = True
                 i.tl_status = "Auto Approved" 
@@ -2977,7 +2831,64 @@ def addLeaveBalanceMonthly(request,a):
 
 
 def sandwichPolicy(request):
+    month_days = []  
+    year = 2022
+    month = 6
+    a, num_days = calendar.monthrange(year, month)
+    start_date = date(year, month, 1)
+    end_date = date(year, month, num_days)
+    delta = timedelta(days=1)
+    while start_date <= end_date:
+        month_days.append(start_date)
+        start_date += delta
+    ids = []
+    emps = EmployeeLeaveBalance.objects.filter(unique_id=6)
+    for i in emps:
+        ids.append(i.emp_id)
+
+    for j in ids: 
+        for d in month_days:           
+            tdycal = EcplCalander.objects.filter(emp_id=j,date=d, att_actual = 'Week OFF').count()
+            if tdycal>0:
+                yst = EcplCalander.objects.filter(emp_id=j,date=d-timedelta(days=1), att_actual__in = ['PL','SL','Absent']).count()
+                if yst > 0:
+                    tmr = EcplCalander.objects.filter(emp_id=j,date=d+timedelta(days=1),  att_actual__in = ['PL','SL','Absent']).count()
+                    if tmr >0 :
+                        cal = EcplCalander.objects.get(emp_id=j,date=d)
+                        cal.att_actual = 'Absent'
+                        cal.save()
+                        em = EmployeeLeaveBalance.objects.get(emp_id = j)
+                        em.unique_id = 7
+                        em.save()      
+                    tmrr = EcplCalander.objects.filter(emp_id=j,date=d+timedelta(days=1),  att_actual = 'Week OFF').count()
+                    if tmrr >0 :
+                        tmrrr = EcplCalander.objects.filter(emp_id=j,date=d+timedelta(days=2),  att_actual__in = ['PL','SL','Absent']).count()
+                        if tmrrr >0 :
+                            cal = EcplCalander.objects.filter(emp_id=j,date__in=[d,d+timedelta(days=1)])
+                            for i in cal:
+                                i.att_actual = 'Absent'
+                                i.save()
+                            em = EmployeeLeaveBalance.objects.get(emp_id = j)
+                            em.unique_id = 7
+                            em.save()
+                else:
+                    em = EmployeeLeaveBalance.objects.get(emp_id = j)
+                    em.unique_id = 7
+                    em.save()
+
     return redirect('/ams/')
+
+
+
+
+
+
+
+        
+  
+
+
+    # return redirect('/ams/')
 
 
 def TestFun(request):
