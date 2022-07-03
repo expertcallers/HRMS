@@ -10,7 +10,7 @@ class Tickets(models.Model):
     edited_by = models.TextField(null=True,blank=True)
 
 class JobRequisition(models.Model):
-    unique_id = models.CharField(max_length=500,null=True,blank=True)
+    unique_id = models.TextField(null=True,blank=True)
     manager_approval = models.BooleanField(default=False)
     created_by_rm1 = models.CharField(max_length=300,null=True,blank=True)
     created_by_rm1_id = models.CharField(max_length=30,null=True,blank=True)
