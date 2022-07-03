@@ -350,9 +350,3 @@ class JobRequisition(models.Model):
     ticket_id = models.OneToOneField(Tickets,null=True,blank=True,on_delete=models.CASCADE)
 
 
-class LoginHistory(models.Model):
-    emp_id = models.CharField(max_length=30)
-    emp_name = models.CharField(max_length=200)
-    ip = models.GenericIPAddressField()
-    system = models.CharField(max_length=200)
-    date_time = models.DateTimeField()
