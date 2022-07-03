@@ -23,6 +23,6 @@ class InterSearch(admin.ModelAdmin):
     search_fields = ('emp_name','emp_id')
     list_display = ('emp_name','emp_id')
 
-admin.site.register(JobRequisition, JobSearch)
+# admin.site.register(JobRequisition, JobSearch)
 admin.site.register(Tickets, TicketSearch)
 
