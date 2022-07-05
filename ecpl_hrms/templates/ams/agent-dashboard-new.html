@@ -1,4 +1,88 @@
 {% extends 'ams/base.html' %}
+
+{% block style %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+<style>
+.card-body::-webkit-scrollbar {
+width: 5px;
+}
+.card-body::-webkit-scrollbar-track {
+border-radius: 10px;
+}
+.card-body::-webkit-scrollbar-thumb {
+background: #1ABB9C;
+border-radius: 10px;
+}
+.card-body::-webkit-scrollbar {
+width: 5px;
+}
+.card .card-header {
+height: unset;
+padding: 0 10px;
+text-align: center;
+background: #fff;
+}
+.card .card-body {
+overflow-y: scroll;
+text-align: center;
+}
+  .sidebar {
+    cursor: pointer;
+  }
+  #sidebar {
+      padding: 10px;
+      width: 280px;
+      position: fixed;
+      top: 0;
+      right: -280px;
+      height: 100vh;
+      z-index: 999;
+      background: #1ABB9C;
+      color: #fff;
+      transition: all 0.3s;
+      box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  #sidebar.active {
+      right: 0;
+  }
+
+  #dismiss {
+      width: 35px;
+      height: 35px;
+      line-height: 35px;
+      text-align: center;
+      background: #000;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      cursor: pointer;
+      -webkit-transition: all 0.3s;
+      -o-transition: all 0.3s;
+      transition: all 0.3s;
+  }
+
+  #dismiss:hover {
+      background: #fff;
+      color: #7386D5;
+  }
+
+  .overlay {
+      display: none;
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 998;
+      opacity: 0;
+      transition: all 0.5s ease-in-out;
+  }
+  .overlay.active {
+      display: block;
+      opacity: 1;
+  }
+</style>
+{% endblock %}
 {% block main %}
 {% load static %}
 <style>
@@ -6,6 +90,19 @@
     display:none;
   }
 </style>
+<!-- Sidebar Profile -->
+<nav id="sidebar">
+    <div id="dismiss">
+        <i class="fas fa-times"></i>
+    </div>
+    <div class="row" style="margin-top: 45px;">
+      <div class="col-md-12" id="sidebar_data" align="center">
+
+      </div>
+    </div>
+</nav>
+<div class="overlay"></div>
+<!-- Sidebar Profile -->
     <div class="container body">
       <div class="main_container">
         <div class="col-md-3 left_col">
@@ -87,8 +184,9 @@
         <!-- /top navigation -->
 
         <!-- page content -->
+
         <div class="right_col" role="main">
-          <div class="row pb-3">
+          <div class="row mt-3 pb-3">
             <div class="col-md-6">
               <div class="row">
                 <div class="col-md-4">
@@ -227,5 +325,94 @@
         $end.attr("min", $start);
       }
     </script>
+<script>
+window.onscroll = function() {myFunction()};
+
+var navbar = document.getElementById("navbar");
+var sticky = navbar.offsetTop;
+
+function myFunction() {
+  if (window.pageYOffset >= sticky) {
+    navbar.classList.add("sticky")
+  } else {
+    navbar.classList.remove("sticky");
+  }
+}
+</script>
+<script>
+    {% if login == False %}
+    {% elif login == True %}
+    {% else %}
+    var countDownDate = new Date("{{login}}").getTime();
+    var x = setInterval(function() {
+      var now = new Date().getTime();
+      var distance = now - countDownDate ;
+      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      document.getElementById("login_duration_top").innerHTML = days + "d " + hours + "h "
+      + minutes + "m " + seconds + "s ";
+    }, 1000);
+    {% endif %}
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#dismiss, .overlay').on('click', function () {
+            $('#sidebar').removeClass('active');
+            $('.overlay').removeClass('active');
+        });
+
+        $('.sidebar').on('click', function () {
+            $csrf = $('[name="csrfmiddlewaretoken"]').val();
+            $.ajax({
+              type: "POST",
+              url: "get-emp",
+              data: {
+                emp_id: this.id,
+                csrfmiddlewaretoken: $csrf
+              },
+              success: function(data) {
+                var profile = eval('(' + data + ')');
+                options = "";
+                options += '<img src="/media/'+profile.img+'" alt="" style="width: 60%; border-radius: 30px;">';
+                options += "<h3>"+profile.emp_name+"</h3>";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                options += "";
+                $("#sidebar_data").html(options);
+              },
+              error:function(e){
+                  alert("something wrong "+ e) // this will alert an error
+              }
+            });
+            $('#sidebar').addClass('active');
+            $('.overlay').addClass('active');
+            $('.collapse.in').toggleClass('in');
+            $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+        });
+    });
+</script>
 {% endblock %}
 

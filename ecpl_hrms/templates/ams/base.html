@@ -38,8 +38,11 @@
     <!-- Custom Theme Style -->
     <link href="{% static 'assets/build/css/custom.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'assets/css/monthly.css' %}">
+
+{% block style %}
+{% endblock %}
   </head>
-  <body class="nav-md" oncontextmenu="alert('Right Click is Blocked'); return false">
+  <body class="nav-md" >
 {% block main %}
 
 {% endblock %}

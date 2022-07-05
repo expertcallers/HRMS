@@ -30,15 +30,16 @@ c = Calendar()
 from django.apps import apps
 
 Profile = apps.get_model('mapping', 'Profile')
+LoginHistory = apps.get_model('mapping', 'LoginHistory')
 
 # TL and AM List
-tl_am_list = []
+tl_am_list = ['Assistant Manager']
 # Manager List
 manager_list = []
 # HR List
 hr_list = []
 # Agent List
-agent_list = []
+agent_list = ['Web Developer']
 # Management List
 management_list = []
 
@@ -177,7 +178,8 @@ def agentDashBoard(request):  # Test1 Test2 # Opt
     if request.user.profile.emp_desi in agent_list:
         emp = request.user.profile
         leave_hist = LeaveTable.objects.filter(Q(emp_id=emp.emp_id), Q(leave_type__in=['SL', 'PL', 'ML'])).order_by('-id')[:5]
-        data = {'emp': emp, 'leave_hist': leave_hist, 'admin_list': admin_list,'administration_list': administration_list}
+        data = {'emp': emp, 'leave_hist': leave_hist, 'admin_list': admin_list,
+                'administration_list': administration_list}
         return render(request, 'ams/agent-dashboard-new.html', data)
     else:
         return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
@@ -208,10 +210,51 @@ def tlDashboard(request):  # Test1 Test2
             if i.emp_rm3_id == emp_id:
                 rm3 = "yes"
                 break
+        profile = request.user.profile
+        # Check in start
+        login = False
+        login_id = None
+        try:
+            login = LoginHistory.objects.filter(profile=profile, done=False).order_by('id')[:1]
+            if login:
+                for i in login:
+                    login_id = i.id
+                    login = str(i.login)
+            else:
+                login = False
+                login_id = None
+        except LoginHistory.DoesNotExist:
+            pass
+        try:
+            login = LoginHistory.objects.get(profile=profile, date=date.today(), done=True)
+            login_id = datetime.strptime(str(login.logout - login.login), "%H:%M:%S.%f")
+            login_id = (login_id).strftime("%H:%M:%S")
+            login = True
+        except LoginHistory.DoesNotExist:
+            pass
+
+        new_joins = Profile.objects.all().order_by('-id')[:5]
+
+        # Birthday Start
+        start = date.today()
+        end = start + timedelta(days=30)
+
+        # this_month = OnboardingnewHRC.objects.filter(
+        #     Q(emp_dob__month=end.month) | Q(emp_dob__month=start.month)).order_by('emp_dob')
+        this_month = OnboardingnewHRC.objects.filter(emp_dob__range=[start, end]).order_by('emp_dob')
+        birthdays = []
+        for i in this_month:
+            dic = {}
+            dic['profile'] = Profile.objects.get(emp_id=i.emp_id)
+            dic['dob'] = i.emp_dob
+            birthdays.append(dic)
+        print(birthdays)
+        # Birthday End
 
         data = {'emp': prof, 'att_details': att_details, 'emp_count': emp_count,
                 'map_tickets_counts': map_tickets_counts,'all_emp': all_emp, 'leave_req_count': leave_req_count,
-                "rm3": rm3, 'admin_list': admin_list, 'administration_list': administration_list}
+                "rm3": rm3, 'admin_list': admin_list, 'administration_list': administration_list,
+                'login': login, 'login_id': login_id, 'new_joins': new_joins, 'birthdays': birthdays}
         return render(request, 'ams/rm-dashboard-new.html', data)
 
     elif usr_desi in manager_list:
@@ -2721,6 +2764,40 @@ def ViewSuppliers(request):
     else:
         messages.error(request, 'Unauthorized Access!')
         return redirect('/ams/dashboard-redirect')
+
+
+@login_required
+def startLogin(request):
+    if request.method == "POST":
+        emp_id = request.POST['emp_id']
+        profile = Profile.objects.get(emp_id=emp_id)
+        try:
+            LoginHistory.objects.get(profile=profile, date=date.today())
+            messages.info(request, "Your had already Logged in and then Logged Out for Today! Can't Login again.")
+        except LoginHistory.DoesNotExist:
+            LoginHistory.objects.create(
+                profile=profile, date=date.today(), login=datetime.now()
+            )
+        return redirect('/ams/dashboard-redirect')
+    else:
+        messages.info(request, 'Invalid Request')
+        return redirect("/")
+
+
+@login_required
+def stopLogin(request):
+    if request.method == "POST":
+        id = request.POST['id']
+        login = LoginHistory.objects.get(id=id)
+        login.done = True
+        login.logout = datetime.now()
+        login.save()
+        return redirect('/ams/dashboard-redirect')
+    else:
+        messages.info(request, 'Invalid Request')
+        return redirect("/")
+
+
 
 def addAttendance(request):
     mydate = date.today()

@@ -1,63 +1,241 @@
 {% extends 'ams/base-rm.html' %}
+{% block style %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+<style>
+.card-body::-webkit-scrollbar {
+width: 5px;
+}
+.card-body::-webkit-scrollbar-track {
+border-radius: 10px;
+}
+.card-body::-webkit-scrollbar-thumb {
+background: #1ABB9C;
+border-radius: 10px;
+}
+.card-body::-webkit-scrollbar {
+width: 5px;
+}
+.card .card-header {
+height: unset;
+padding: 0 10px;
+text-align: center;
+background: #fff;
+}
+.card .card-body {
+overflow-y: scroll;
+text-align: center;
+}
+  .sidebar {
+    cursor: pointer;
+  }
+  #sidebar {
+      padding: 10px;
+      width: 280px;
+      position: fixed;
+      top: 0;
+      right: -280px;
+      height: 100vh;
+      z-index: 999;
+      background: #1ABB9C;
+      color: #fff;
+      transition: all 0.3s;
+      box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  #sidebar.active {
+      right: 0;
+  }
+
+  #dismiss {
+      width: 35px;
+      height: 35px;
+      line-height: 35px;
+      text-align: center;
+      background: #000;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      cursor: pointer;
+      -webkit-transition: all 0.3s;
+      -o-transition: all 0.3s;
+      transition: all 0.3s;
+  }
+
+  #dismiss:hover {
+      background: #fff;
+      color: #7386D5;
+  }
+
+  .overlay {
+      display: none;
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 998;
+      opacity: 0;
+      transition: all 0.5s ease-in-out;
+  }
+  .overlay.active {
+      display: block;
+      opacity: 1;
+  }
+</style>
+{% endblock %}
 {% block main %}
 {% load static %}
 
         <!-- page content -->
         <div class="right_col" role="main">
-          <div class="row">
+          {% if request.user.profile.emp_id == '5638' %}
+          <div class="row" id="navbar" style="background: #fff; border:1px solid #1ABB9C; padding: 5px 5px 0px 5px; border-radius: 30px;">
             <div class="col-md-12">
               <div class="welcome">
-                <p>Welcome</p>
-                <h3>{{request.user.profile.emp_name}}</h3>
+                <div class="row">
+                    <div class="col-md-4 col-sm-6" align="left" style="display: inline-flex;">
+                      {% if login == False %}
+                      <form action="/ams/start-login" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" value="{{request.user.profile.emp_id}}" name="emp_id">
+                        <button class="btn btn-sm btn-success" style="border-radius: 30px;" id="start_login_top">
+                          Check-In <i class="fa fa-clock"></i>
+                        </button>
+                      </form>
+                      {% elif login == True %}
+                      <div style="display: block;">
+                        <p>Your today's login time</p>
+                        <h5>{{login_id}}</h5>
+                      </div>
+                      {% else %}
+                      <h4 id="login_duration_top" style="margin-right: 10px"></h4>
+                      <form action="/ams/stop-login" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" value="{{login_id}}" name="id">
+                        <button class="btn btn-sm btn-danger" style="border-radius: 30px;" id="stop_login_top" onclick="return confirmm()">
+                          Check-Out <i class="fa fa-clock"></i>
+                        </button>
+                      </form>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-8 col-sm-6" align="right">
+                        <a class="btn btn-md btn-success" href="/ams-apply_leave" style="border-radius: 30px; float:right; padding:.375rem .75rem; font-size:0.8rem; ">
+                          Apply Leave
+                        </a>
+                    </div>
+                </div>
               </div>
             </div>
           </div>
+          {% endif %}
+
           <div class="row mt-3">
             <div class="col-md-12">
               <div class="row">
-                <div class="col-md-2">
-                  <div class="card topcards">
+
+                <div class="col-md-4 col-sm-6 mt-2">
+                  <div class="card max_height_320" style="height: 320px;">
                     <div class="card-header">
-                      <h2>RM1</h2>
-                    </div>      
-                    <div class="card-body">
-                      <h6>{{emp.emp_rm1}}</h6>
-                    </div>              
+                      <h2>Birthdays</h2>
+                    </div>
+                    <div class="card-body" style="overflow-y: scroll;">
+                      <div class="row">
+                        {% if birthdays %}
+                        {% for i in birthdays %}
+                        <div class="col-md-4 col-sm-6" align="center">
+                          <img src="/media/{{i.profile.img}}" height="80px" style="border-radius: 30px;">
+                          <h5 style="font-size: 16px;">{{i.profile.emp_name}}</h5>
+                          <p style="margin-top: -10px;">{{i.profile.emp_process}}</p>
+                          <p style="margin-top: -20px;">{{i.profile.emp_desi}}</p>
+                          <p style="margin-top: -20px;">({{i.dob}})</p>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="col-md-12" align="center">
+                          <h4 align="center">No birthdays this Month</h4>
+                        </div>
+                        {% endif %}
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div class="col-md-2">
-                  <div class="card topcards">
+                <div class="col-md-4 col-sm-6 mt-2">
+                  <div class="card max_height_320" style="height: 320px;">
                     <div class="card-header">
-                      <h2>RM2</h2>
-                    </div>      
-                    <div class="card-body">
-                      <h6>{{emp.emp_rm2}}</h6>
-                    </div>              
+                      <h2>New Hires</h2>
+                    </div>
+                    <div class="card-body" style="overflow-y: scroll;">
+                      {% if new_joins %}
+                      {% for i in new_joins %}
+                      <div class="row" align="center">
+                        <div class="col-md-12 p-1 sidebar" id="{{i.emp_id}}" >
+                          <div class="row">
+                            <div class="col-md-4" style=" padding: 8px 10px !important;">
+                              <img src="/media/{{i.img}}" width='80px' style="border-radius: 50%; border: 3px solid #fff; box-shadow: 2px 2px 10px grey;">
+                            </div>
+                            <div class="col-md-8" align="left">
+                              <p style="margin-bottom: 0;"><b>{{i.emp_name}} ({{i.emp_id}})</b></p>
+                              <p style="margin-bottom: 0;">{{i.emp_process}} - {{i.emp_desi}}</p>
+                              <p style="margin-bottom: 0;">DOJ: - {{i.doj}}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      {% endfor %}
+                      {% else %}
+                      <div class="row">
+                        <div class="col-md-12" align="center">
+                          <h4 align="center">No New Hires</h4>
+                        </div>
+                      </div>
+                      {% endif %}
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="card topcards">
-                    <div class="card-header">
-                      <h2>RM3</h2>
-                    </div>      
-                    <div class="card-body">
-                      <h6>{{emp.emp_rm3}}</h6>
-                    </div>              
+                <div class="col-md-4 col-sm-6 mt-2">
+                  <div class="col-md-6 mt-2">
+                    <div class="card topcards">
+                      <div class="card-header">
+                        <h2>RM1</h2>
+                      </div>
+                      <div class="card-body">
+                        <h6>{{emp.emp_rm1}}</h6>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="card topcards">
-                    <div class="card-header">
-                      <h2>Active Employees</h2>
-                    </div>      
-                    <div class="card-body">
-                      <a href="/ams/rm-mapping-index"><h1 style="margin: 0px !important;">{{emp_count}}</h1></a>
-                      <!--<a href="all_emp.html" class="btn btn-sm btn-dark">view all</a>-->
-                    </div>              
+                  <div class="col-md-6 mt-2">
+                    <div class="card topcards">
+                      <div class="card-header">
+                        <h2>RM2</h2>
+                      </div>
+                      <div class="card-body">
+                        <h6>{{emp.emp_rm2}}</h6>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mt-2">
+                    <div class="card topcards">
+                      <div class="card-header">
+                        <h2>RM3</h2>
+                      </div>
+                      <div class="card-body">
+                        <h6>{{emp.emp_rm3}}</h6>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6 mt-2">
+                    <div class="card topcards">
+                      <div class="card-header">
+                        <h2>Active Employees</h2>
+                      </div>
+                      <div class="card-body">
+                        <a href="/ams/rm-mapping-index"><h1 style="margin: 0px !important;">{{emp_count}}</h1></a>
+                        <!--<a href="all_emp.html" class="btn btn-sm btn-dark">view all</a>-->
+                      </div>
+                    </div>
                   </div>
                 </div>
                 {% if rm3 == "yes" %}
-                <div class="col-md-2">
+                <div class="col-md-2 mt-2">
                   <div class="card topcards">
                     <div class="card-header">
                       <h2>Mapping Tickets</h2>
@@ -69,7 +247,7 @@
                 </div>
                 {% endif %}
 
-                <div class="col-md-2">
+                <div class="col-md-2 mt-2">
                   <div class="card topcards">
                     <div class="card-header">
                       <h2>Leave Requests</h2>
@@ -80,44 +258,44 @@
                   </div>
                 </div>
 
+                <div class="col-md-4 mt-2">
+                  <div class="card">
+                    <div class="card-header">
+                      <h4>Attendance Report</h4>
+                    </div>
+                    <div class="card-body">
+                      <form action="/ams/view-emp-attendance" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                          <div class="col-md-12 form-group">
+                            <label for="emp_name">Employee Name</label>
+                            <select id="emp_name" name="emp_id" class="form-control select2" required>
+                              <option value="All">All</option>
+                              {% for i in all_emp %}
+                              <option value="{{i.emp_id}}">{{i.emp_name}} ({{i.emp_id}})</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                          <div class="col-md-6 form-group">
+                            <label for="start_date">Start Date</label>
+                            <input type="date" id="start_date" onchange="mydate(this);" name="start_date" required class="form-control" value="" />
+                          </div>
+                          <div class="col-md-6 form-group">
+                            <label for="end_date">End Date</label>
+                            <input type="date" id="end_date" onchange="mydate(this);" name="end_date" required class="form-control" value="" />
+                          </div>
+                          <div class="col-md-12 form-group">
+                            <button class="form-control btn btn-primary">Submit</button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
           <div class="row mt-3">
-            <div class="col-md-6">
-              <div class="card">
-                <div class="card-header">
-                  <h4>Attendance Report</h4>
-                </div>
-                <div class="card-body">
-                  <form action="/ams/view-emp-attendance" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="row">
-                      <div class="col-md-12 form-group">
-                        <label for="emp_name">Employee Name</label>
-                        <select id="emp_name" name="emp_id" class="form-control select2" required>
-                          <option value="All">All</option>
-                          {% for i in all_emp %}
-                          <option value="{{i.emp_id}}">{{i.emp_name}} ({{i.emp_id}})</option>
-                          {% endfor %}
-                        </select>
-                      </div>
-                      <div class="col-md-6 form-group">
-                        <label for="start_date">Start Date</label>
-                        <input type="date" id="start_date" onchange="mydate(this);" name="start_date" required class="form-control" value="" />
-                      </div>
-                      <div class="col-md-6 form-group">
-                        <label for="end_date">End Date</label>
-                        <input type="date" id="end_date" onchange="mydate(this);" name="end_date" required class="form-control" value="" />
-                      </div>
-                      <div class="col-md-12 form-group">
-                        <button class="form-control btn btn-primary">Submit</button>
-                      </div>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
           </div>
 
           <div class="row mt-3 pb-3">
@@ -186,4 +364,35 @@
 {% endblock %}
 {% block script %}
 <script src="{% static 'assets/vendors/echarts/dist/echarts.js' %}"></script>
+<script>
+window.onscroll = function() {myFunction()};
+
+var navbar = document.getElementById("navbar");
+var sticky = navbar.offsetTop;
+
+function myFunction() {
+  if (window.pageYOffset >= sticky) {
+    navbar.classList.add("sticky")
+  } else {
+    navbar.classList.remove("sticky");
+  }
+}
+</script>
+<script>
+    {% if login == False %}
+    {% elif login == True %}
+    {% else %}
+    var countDownDate = new Date("{{login}}").getTime();
+    var x = setInterval(function() {
+      var now = new Date().getTime();
+      var distance = now - countDownDate ;
+      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      document.getElementById("login_duration_top").innerHTML = days + "d " + hours + "h "
+      + minutes + "m " + seconds + "s ";
+    }, 1000);
+    {% endif %}
+</script>
 {% endblock %}

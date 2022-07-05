@@ -62,3 +62,10 @@ class NewData(models.Model):
 
     def __str__(self):
         return self.emp_name
+
+class LoginHistory(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.PROTECT)
+    date = models.DateField(null=True, blank=True)
+    login = models.DateTimeField(null=True, blank=True)
+    logout = models.DateTimeField(null=True, blank=True)
+    done = models.BooleanField(default=False)

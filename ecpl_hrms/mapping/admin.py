@@ -35,7 +35,13 @@ class DataSearch(ImportExportModelAdmin):
     list_display = ('emp_name', 'emp_id', 'emp_desi', 'emp_process', "emp_rm1", "emp_rm2", "emp_rm3")
     resource_class = DataSearchResource
 
+class LoginHistorySearch(admin.ModelAdmin):
+    search_fields = ('profile__emp_id', 'profile__emp_name', 'date')
+    list_display = ('profile', 'id', 'date', 'login', 'logout','done')
+    list_filter = ("date", 'done')
 
+
+admin.site.register(LoginHistory, LoginHistorySearch)
 admin.site.register(Profile, ProfileSearch)
 admin.site.register(MappingHistory, MappingSearch)
 admin.site.register(NewData, DataSearch)

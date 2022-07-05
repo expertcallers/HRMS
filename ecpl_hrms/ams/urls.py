@@ -29,6 +29,9 @@ urlpatterns = [
     path('faqs', FAQ),
     path('edit-employee-profile-status', editAgentStatus),
 
+    path('start-login', startLogin),
+    path('stop-login', stopLogin),
+
     # Dashboard Redirect
     path('dashboard-redirect', redirectTOAllDashBoards),
     path('agent-dashboard', agentDashBoard),
