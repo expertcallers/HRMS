@@ -190,9 +190,12 @@ def getEmp(request):
 def agentDashBoard(request):  # Test1 Test2 # Opt
     if request.user.profile.emp_desi in agent_list:
         emp = request.user.profile
+        birthdays = getBirthdays()
         leave_hist = LeaveTable.objects.filter(Q(emp_id=emp.emp_id), Q(leave_type__in=['SL', 'PL', 'ML'])).order_by('-id')[:5]
+
+        new_joins = Profile.objects.all().order_by('-id')[:5]
         data = {'emp': emp, 'leave_hist': leave_hist, 'admin_list': admin_list,
-                'administration_list': administration_list}
+                'administration_list': administration_list, 'birthdays': birthdays, 'new_joins': new_joins}
         return render(request, 'ams/agent-dashboard-new.html', data)
     else:
         return HttpResponse('<H1>You are not Authorised to view this page ! </H1>')
@@ -248,31 +251,13 @@ def tlDashboard(request):  # Test1 Test2
 
         new_joins = Profile.objects.all().order_by('-id')[:5]
 
-        # Birthday Start
-        start = date.today()
-        end = start + timedelta(days=30)
-        this_month = OnboardingnewHRC.objects.filter(emp_dob__month=start.month).order_by('emp_dob')
-        next_month = OnboardingnewHRC.objects.filter(emp_dob__month=end.month).order_by('emp_dob')
-        birthdays = []
-        def birthdayCreator(mnth,yr):
-            for i in mnth:
-                dic = {}
-                dic['profile'] = Profile.objects.filter(emp_id=i.emp_id).first()       
-                dic['dob'] = i.emp_dob.replace(year=yr)
-                birthdays.append(dic)
-        birthdayCreator(this_month,start.year)
-        birthdayCreator(next_month,end.year)
-        birthdays = sorted(birthdays, key=lambda x: x['dob'])
-        new_birthdays = []
-        for i in birthdays:
-            if i['dob'] >= date.today():
-                new_birthdays.append(i)
-        # Birthday End
+
+        birthdays = getBirthdays()
 
         data = {'emp': prof, 'att_details': att_details, 'emp_count': emp_count,
                 'map_tickets_counts': map_tickets_counts,'all_emp': all_emp, 'leave_req_count': leave_req_count,
                 "rm3": rm3, 'admin_list': admin_list, 'administration_list': administration_list,
-                'login': login, 'login_id': login_id, 'new_joins': new_joins, 'birthdays': new_birthdays}
+                'login': login, 'login_id': login_id, 'new_joins': new_joins, 'birthdays': birthdays}
         return render(request, 'ams/rm-dashboard-new.html', data)
 
     elif usr_desi in manager_list:
@@ -285,6 +270,30 @@ def tlDashboard(request):  # Test1 Test2
         messages.error(request, "You are not Authorised to view this page! You have been Logged Out! ")
         return redirect('/ams/')
 
+def getBirthdays():
+    # Birthday Start
+    start = date.today()
+    end = start + timedelta(days=30)
+    this_month = OnboardingnewHRC.objects.filter(emp_dob__month=start.month).order_by('emp_dob')
+    next_month = OnboardingnewHRC.objects.filter(emp_dob__month=end.month).order_by('emp_dob')
+    birthdays = []
+
+    def birthdayCreator(mnth, yr):
+        for i in mnth:
+            dic = {}
+            dic['profile'] = Profile.objects.filter(emp_id=i.emp_id).first()
+            dic['dob'] = i.emp_dob.replace(year=yr)
+            birthdays.append(dic)
+
+    birthdayCreator(this_month, start.year)
+    birthdayCreator(next_month, end.year)
+    birthdays = sorted(birthdays, key=lambda x: x['dob'])
+    new_birthdays = []
+    for i in birthdays:
+        if i['dob'] >= date.today():
+            new_birthdays.append(i)
+    return new_birthdays
+    # Birthday End
 
 @login_required
 def managerDashboard(request):  # Test1 Test2
@@ -351,11 +360,13 @@ def managerDashboard(request):  # Test1 Test2
     else:
         messages.error(request, "You are not Authorised to view this page! You have been Logged Out! ")
         return redirect('/ams')
+
+    birthdays = getBirthdays()
     data = {'emp': emp, 'count_all_emps': count_all_emps, 'all_tls': all_tls_under, 'all_tls_count': all_tls_count,
             'all_ams': all_ams_under, 'all_ams_count': all_ams_count,
             'map_tickets_counts': map_tickets_counts, 'att_requests_count': att_requests_count,
             'leave_req_count': leave_req_count, 'leave_esc_count': leave_esc_count, 'all_emp': all_emps_under,
-            'admin_list': admin_list, 'administration_list': administration_list
+            'admin_list': admin_list, 'administration_list': administration_list, 'birthdays': birthdays
             }
     return render(request, 'ams/manager-dashboard.html', data)
 
@@ -506,12 +517,14 @@ def hrDashboard(request):  # Test1
         leave_esc_count = LeaveTable.objects.filter(Q(emp_rm3_id=emp_id), Q(manager_approval=False),Q(escalation=True)).count()
         # Attendance
         att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False, rm3_id=emp_id).count()
+
+        birthdays = getBirthdays()
         data = {'emp': emp, 'all_users_count': all_users_count, 'all_team_count': all_team_count,
                 "leave_req_count": leave_req_count, "map_tickets_counts": map_tickets_counts,
                 "leave_esc_count": leave_esc_count, "att_requests_count": att_requests_count,
                 "hr_tl_am_list": hr_tl_am_list, "hr_om_list": hr_om_list,
                 "leave_req_count_final": leave_req_count_final, 'admin_list': admin_list,
-                'administration_list': administration_list, 'team': teams, 'ta': ta_list}
+                'administration_list': administration_list, 'team': teams, 'ta': ta_list, 'birthdays': birthdays}
         return render(request, 'ams/hr_dashboard.html', data)
     else:
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')

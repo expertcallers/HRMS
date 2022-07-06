@@ -1,4 +1,99 @@
 {% extends 'ams/base-manager.html' %}
+{% block style %}
+<style>
+  .monthly-prev, .monthly-next{
+    display:none;
+  }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+<style>
+.card-body::-webkit-scrollbar {
+width: 5px;
+}
+.card-body::-webkit-scrollbar-track {
+border-radius: 10px;
+}
+.card-body::-webkit-scrollbar-thumb {
+background: #A5A9AC;
+border-radius: 10px;
+}
+.card-body::-webkit-scrollbar {
+width: 5px;
+}
+.card .card-header {
+height: unset;
+padding: 0 10px;
+text-align: center;
+background: #fff;
+}
+.card .card-body {
+overflow-y: scroll;
+text-align: center;
+}
+  .sidebar {
+    cursor: pointer;
+  }
+  #sidebar {
+      padding: 10px;
+      width: 400px;
+      position: fixed;
+      top: 0;
+      right: -400px;
+      height: 100vh;
+      z-index: 999;
+      background: #2A3F54;
+      color: #fff;
+      transition: all 0.3s;
+      box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: 580px) {
+
+    #sidebar {
+        width: 300px;
+    }
+  }
+
+  #sidebar.active {
+      right: 0;
+  }
+
+  #dismiss {
+      width: 35px;
+      height: 35px;
+      line-height: 35px;
+      text-align: center;
+      background: #000;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      cursor: pointer;
+      -webkit-transition: all 0.3s;
+      -o-transition: all 0.3s;
+      transition: all 0.3s;
+  }
+
+  #dismiss:hover {
+      background: #fff;
+      color: #7386D5;
+  }
+
+  .overlay {
+      display: none;
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 998;
+      opacity: 0;
+      transition: all 0.5s ease-in-out;
+  }
+  .overlay.active {
+      display: block;
+      opacity: 1;
+  }
+</style>
+{% endblock %}
 {% block main %}
 {% load static %}
 
@@ -113,7 +208,7 @@
             <div class="col-md-2">
               <div class="card-base">
                 <div class="card-icon">
-                  <span title="Widgets" id="widgetCardIcon" class="imagecard">
+                  <span title="Widgets" class="imagecard widgetCardIcon">
                     <i class="fa fa-user"></i>
                   </span>
                   <div class="card-data widgetCardData">
@@ -127,43 +222,6 @@
                 <div class="space"></div>
               </div>
             </div>
-            <!--  
-            <div class="col-md-2">
-              <div class="card-base">
-                <div class="card-icon">
-                  <span title="Widgets" id="widgetCardIcon" class="imagecard">
-                    <i class="fa fa-level-down"></i>
-                  </span>
-                  <div class="card-data widgetCardData" style="background: #dcdcdc;">
-                    <h2 class="box-title mt-5" style="color: #2A3F54;">Attrition %</h2>
-                    <h1 id="attrition"><span style="font-size:18px">Coming Soon</span></h1>
-                    <a href="#" title="Style Builder" class="anchor btn btn-default disabled" style="background: #1ABB9C; color: #fff;">
-                      View All
-                    </a>
-                  </div>
-                </div>
-                <div class="space"></div>
-              </div>
-            </div>
-
-            <div class="col-md-3">
-              <div class="card-base">
-                <div class="card-icon">
-                  <span title="Widgets" id="widgetCardIcon" class="imagecard">
-                    <i class="fa fa-american-sign-language-interpreting"></i>
-                  </span>
-                  <div class="card-data widgetCardData" style="background: #dcdcdc;">
-                    <h2 class="box-title mt-5" style="color: #2A3F54;">Shrink %</h2>
-                     <h1 id="attrition"><span style="font-size:18px">Coming Soon</span></h1>
-                    <a href="#" title="Style Builder" class="anchor btn disabled btn-default" style="background: #1ABB9C; color: #fff;">
-                      View All
-                    </a>
-                  </div>
-                </div>
-                <div class="space"></div>
-              </div>
-            </div>
-          -->
             <div class="col-md-3">
               <div class="card-base">
                 <div class="card-icon">
@@ -188,7 +246,7 @@
             <div class="col-md-6">
               <div class="card">
                 <div class="card-header">
-                  <h4>Attendance Report</h4>
+                  <h2>Attendance Report</h2>
                 </div>
                 <div class="card-body">
                   <form action="/ams/view-emp-attendance" method="POST" enctype="multipart/form-data">

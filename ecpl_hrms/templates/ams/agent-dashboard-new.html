@@ -1,6 +1,11 @@
 {% extends 'ams/base.html' %}
 
 {% block style %}
+<style>
+  .monthly-prev, .monthly-next{
+    display:none;
+  }
+</style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
 <style>
 .card-body::-webkit-scrollbar {
@@ -10,7 +15,7 @@ width: 5px;
 border-radius: 10px;
 }
 .card-body::-webkit-scrollbar-thumb {
-background: #1ABB9C;
+background: #A5A9AC;
 border-radius: 10px;
 }
 .card-body::-webkit-scrollbar {
@@ -31,16 +36,23 @@ text-align: center;
   }
   #sidebar {
       padding: 10px;
-      width: 280px;
+      width: 400px;
       position: fixed;
       top: 0;
-      right: -280px;
+      right: -400px;
       height: 100vh;
       z-index: 999;
-      background: #1ABB9C;
+      background: #2A3F54;
       color: #fff;
       transition: all 0.3s;
       box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: 580px) {
+
+    #sidebar {
+        width: 300px;
+    }
   }
 
   #sidebar.active {
@@ -85,11 +97,6 @@ text-align: center;
 {% endblock %}
 {% block main %}
 {% load static %}
-<style>
-  .monthly-prev, .monthly-next{
-    display:none;
-  }
-</style>
 <!-- Sidebar Profile -->
 <nav id="sidebar">
     <div id="dismiss">
@@ -171,7 +178,7 @@ text-align: center;
               <ul class=" navbar-right">
                 <li class="nav-item dropdown open" style="padding-left: 15px;">
                   <a href="javascript:;" class="user-profile dropdown-toggle" aria-haspopup="true" id="navbarDropdown" data-toggle="dropdown" aria-expanded="false">
-                    <img src="{{user.profile.img.url}}" alt="">{{emp.emp_name}}
+                    <img src="{{user.profile.img.url}}" alt="">{{request.user.profile.emp_name}}
                   </a>
                   <div class="dropdown-menu dropdown-usermenu pull-right" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item"  href="/ams/logout"><i class="fa fa-sign-out pull-right"></i> Log Out</a>
@@ -187,43 +194,108 @@ text-align: center;
 
         <div class="right_col" role="main">
           <div class="row mt-3 pb-3">
-            <div class="col-md-6">
-              <div class="row">
-                <div class="col-md-4">
-                  <div class="card">
-                    <div class="card-header">
-                      <h2>RM1</h2>
-                    </div>      
-                    <div class="card-body">
-                      <h5>{{emp.emp_rm1}}</h5>
-                    </div>              
-                  </div>
+
+            <div class="col-md-4 col-sm-6 mt-2">
+              <div class="card max_height_320" style="height: 480px;box-shadow: rgba(26, 187, 156, 0.35) 0px 5px 15px;">
+                <div class="card-header" style="background: #26b99a; color: #fff;">
+                  <h2>Birthdays</h2>
                 </div>
-                <div class="col-md-4">
-                  <div class="card">
-                    <div class="card-header">
-                      <h2>RM2</h2>
-                    </div>      
-                    <div class="card-body">
-                      <h5>{{emp.emp_rm2}}</h5>
-                    </div>              
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="card">
-                    <div class="card-header">
-                      <h2>RM3</h2>
-                    </div>      
-                    <div class="card-body">
-                      <h5>{{emp.emp_rm3}}</h5>
-                    </div>              
+                <div class="card-body" style="overflow-y: scroll;">
+                  <div class="row">
+                    {% if birthdays %}
+                      {% for i in birthdays %}
+                        {% if i.profile %}
+                        <div class="col-md-4 col-sm-6" align="center" style="padding: 10px;"  onclick="getEmpID({{i.profile.emp_id}})">
+                          <div style="box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 15px; padding: 10px; height: 175px; border-radius: 10px;">
+                            <div class="align-middle mt-auto mb-auto">
+                              <img src="/media/{{i.profile.img}}" height="50px" style="border-radius: 30px;">
+                              <p style="font-size: 14px;"><b>{{i.profile.emp_name}} ({{i.profile.emp_id}})</b></p>
+                              <p style="margin-top: -20px;">({{i.dob}})</p>
+                            </div>
+                          </div>
+                        </div>
+                        {% endif %}
+                      {% endfor %}
+                    {% else %}
+                    <div class="col-md-12" align="center">
+                      <h4 align="center">No birthdays this Month</h4>
+                    </div>
+                    {% endif %}
                   </div>
                 </div>
               </div>
-              <div class="row mt-3">
+            </div>
+            <div class="col-md-4 col-sm-6 mt-2">
+              <div class="card max_height_320" style="height: 480px;box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                <div class="card-header" style="background: #26b99a; color: #fff;">
+                  <h2>New Hires</h2>
+                </div>
+                <div class="card-body" style="overflow-y: scroll;">
+                  {% if new_joins %}
+                  {% for i in new_joins %}
+                  <div class="row mb-2" align="center" style="border: 1px solid #26B99A; border-radius: 30px;">
+                    <div class="col-md-12 p-1 sidebar" onclick="getEmpID({{i.emp_id}})">
+                      <div class="row">
+                        <div class="col-md-4" style=" padding: 8px 10px !important;">
+                          <img src="/media/{{i.img}}" width='60px' style="border-radius: 50%; border: 3px solid #fff; box-shadow: 2px 2px 10px grey;">
+                        </div>
+                        <div class="col-md-8" align="left">
+                          <p style="margin-bottom: 0;"><b>{{i.emp_name}} ({{i.emp_id}})</b></p>
+                          <p style="margin-bottom: 0;">{{i.emp_process}} - {{i.emp_desi}}</p>
+                          <p style="margin-bottom: 0;">DOJ: - {{i.doj}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {% endfor %}
+                  {% else %}
+                  <div class="row">
+                    <div class="col-md-12" align="center">
+                      <h4 align="center">No New Hires</h4>
+                    </div>
+                  </div>
+                  {% endif %}
+                  </div>
+                </div>
+              </div>
+            
+            <div class="col-md-4 col-sm-6">
+              <div class="col-md-6 mt-2" onclick="getEmpID({{request.user.profile.emp_rm1_id}})">
+                <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                  <div class="card-header" style="background: #1C7BA8; color: #fff;">
+                    <h2>RM1</h2>
+                  </div>
+                  <div class="card-body">
+                    <h4 style="font-size: 18px;">{{request.user.profile.emp_rm1}}</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mt-2" onclick="getEmpID({{request.user.profile.emp_rm2_id}})">
+                <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                  <div class="card-header" style="background: #1C7BA8; color: #fff;">
+                    <h2>RM2</h2>
+                  </div>
+                  <div class="card-body">
+                    <h4 style="font-size: 18px;">{{request.user.profile.emp_rm2}}</h4>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6 mt-2" onclick="getEmpID({{request.user.profile.emp_rm3_id}})">
+                <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                  <div class="card-header" style="background: #1C7BA8; color: #fff;">
+                    <h2>RM3</h2>
+                  </div>
+                  <div class="card-body">
+                    <h4 style="font-size: 18px;">{{request.user.profile.emp_rm3}}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 col-sm-6 mt-3">
+              <div class="row">
                 <div class="col-md-12">
-                  <div class="card">
-                    <div class="card-header">
+                  <div class="card" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                    <div class="card-header" style="background: #26b99a; color: #fff;">
                       <h2>Attendance Report</h2>
                     </div>
                     <div class="card-body">
@@ -239,7 +311,7 @@ text-align: center;
                           <input type="date" id="end_date" onchange="mydate(this);" name="end_date" required class="form-control" value="" />
                         </div>
                         <div class="col-md-12 form-group">
-                          <button class="form-control btn btn-primary">Submit</button>
+                          <button class="form-control btn btn-success">Submit</button>
                         </div>
                       </form>
                     </div>
@@ -247,11 +319,11 @@ text-align: center;
                 </div>
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6 col-sm-6 mt-3">
               <div class="row">
                 <div class="col-md-12">
-                  <div class="card">
-                    <div class="card-header">
+                  <div class="card" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                    <div class="card-header" style="background: #1C7BA8; color: #fff;">
                       <h2>Leave Status</h2>
                     </div>
                     <div class="card-body">
@@ -363,56 +435,39 @@ function myFunction() {
             $('#sidebar').removeClass('active');
             $('.overlay').removeClass('active');
         });
-
-        $('.sidebar').on('click', function () {
-            $csrf = $('[name="csrfmiddlewaretoken"]').val();
-            $.ajax({
-              type: "POST",
-              url: "get-emp",
-              data: {
-                emp_id: this.id,
-                csrfmiddlewaretoken: $csrf
-              },
-              success: function(data) {
-                var profile = eval('(' + data + ')');
-                options = "";
-                options += '<img src="/media/'+profile.img+'" alt="" style="width: 60%; border-radius: 30px;">';
-                options += "<h3>"+profile.emp_name+"</h3>";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                options += "";
-                $("#sidebar_data").html(options);
-              },
-              error:function(e){
-                  alert("something wrong "+ e) // this will alert an error
-              }
-            });
-            $('#sidebar').addClass('active');
-            $('.overlay').addClass('active');
-            $('.collapse.in').toggleClass('in');
-            $('a[aria-expanded=true]').attr('aria-expanded', 'false');
-        });
     });
+    function getEmpID(id) {
+        $csrf = $('[name="csrfmiddlewaretoken"]').val();
+        $.ajax({
+          type: "POST",
+          url: "/ams/get-emp",
+          data: {
+            emp_id: id,
+            csrfmiddlewaretoken: $csrf
+          },
+          success: function(data) {
+            var profile = eval('(' + data + ')');
+            options = "";
+            options += '<img src="/media/'+profile.img+'" alt="" style="width: 60%; border-radius: 30px;">';
+            options += "<h3>"+profile.emp_name+"</h3>";
+            options += "<table border='1' style='width: 100%; border-color: #fff;'>";
+            options += "<tr><th style='padding: 5px;'>Emp ID</th><th style='padding: 5px;'>"+profile.emp_id+"</th></tr>";
+            options += "<tr><th style='padding: 5px;'>Emp Process</th><th style='padding: 5px;'>"+profile.emp_process+"</th></tr>";
+            options += "<tr><th style='padding: 5px;'>Emp Designation</th><th style='padding: 5px;'>"+profile.emp_desi+"</th></tr>";
+            options += "<tr><th style='padding: 5px;'>Emp DOJ</th><th style='padding: 5px;'>"+profile.doj+"</th></tr>";
+            options += "</table>";
+            options += "";
+            $("#sidebar_data").html(options);
+          },
+          error:function(e){
+              alert("something wrong "+ e) // this will alert an error
+          }
+        });
+        $('#sidebar').addClass('active');
+        $('.overlay').addClass('active');
+        $('.collapse.in').toggleClass('in');
+        $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+    }
 </script>
 {% endblock %}
 
