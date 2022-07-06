@@ -7,58 +7,14 @@
 
           <div class="page-title">
             <div class="title_left">
-              <h3>Employee Details</h3>
+              <h3>Profile</h3>
             </div>
           </div>
           <div class="row pb-4">
-            <div class="col-md-12">
+            <div class="col-md-9">
               <div class="card">
                 <div class="card-body">
-
-                  <div class="row pb-4">
-                    <div class="col-md-6">
-                      <div class="card">
-                        <div class="card-header">
-                          <h2>Change Password</h2>
-                        </div>
-                        <div class="card-body">
-                          {% load crispy_forms_tags %}
-                          <form method="post" action="/mapping/change-password" enctype="multipart/form-data">
-                              {% csrf_token %}
-                              {{ form|crispy }}
-                                <br><br>
-                              <button type="submit" class="btn btn-primary">Save changes</button>
-                            </form>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="card">
-                        <div class="card-header">
-                          <h2>Profile Image</h2>
-                        </div>
-                        <div class="card-body">
-                          <div class="row">
-                            <form action="/ams/upload-image" method="POST" style="width: 100%;" enctype="multipart/form-data">
-                              {% csrf_token %}
-                              <div class="col-md-8">
-                                <div class="form-group">
-                                  <label for="pimg">Select the Profile Picture:</label>
-                                  <input type="file" name="user-img" id="pimg" class="form-control uploadFile" accept=".png, .jpg, .jpeg" required>
-                                  <input type="hidden" name="id" value="{{user.profile.id}}">
-                                </div>
-                              </div>
-                              <div class="col-md-4 mt-4">
-                                <button type="submit" class="btn btn-dark form-control">Upload</button>
-                              </div>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <hr>
-                {% if on == True %}
+                  {% if on == True %}
                   <div class="row">
                     <div class="col-md-12">
                       <h4>Personal Details</h4>
@@ -640,6 +596,51 @@
 
                 </div>
               </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="row pb-4">
+                    <div class="col-md-12">
+                      <div class="card">
+                        <div class="card-header">
+                          <h2>Change Password</h2>
+                        </div>
+                        <div class="card-body">
+                          {% load crispy_forms_tags %}
+                          <form method="post" action="/mapping/change-password" enctype="multipart/form-data">
+                              {% csrf_token %}
+                              {{ form|crispy }}
+                                <br><br>
+                              <button type="submit" class="btn btn-primary">Save changes</button>
+                            </form>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-12 mt-2">
+                      <div class="card">
+                        <div class="card-header">
+                          <h2>Profile Image</h2>
+                        </div>
+                        <div class="card-body">
+                          <div class="row">
+                            <form action="/ams/upload-image" method="POST" style="width: 100%;" enctype="multipart/form-data">
+                              {% csrf_token %}
+                              <div class="col-md-8">
+                                <div class="form-group">
+                                  <label for="pimg">Select the Profile Picture:</label>
+                                  <input type="file" name="user-img" id="pimg" class="form-control uploadFile" accept=".png, .jpg, .jpeg" required>
+                                  <input type="hidden" name="id" value="{{user.profile.id}}">
+                                </div>
+                              </div>
+                              <div class="col-md-4 mt-4">
+                                <button type="submit" class="btn btn-dark form-control">Upload</button>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
             </div>
           </div>
 

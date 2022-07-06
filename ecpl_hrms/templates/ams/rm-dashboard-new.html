@@ -30,16 +30,23 @@ text-align: center;
   }
   #sidebar {
       padding: 10px;
-      width: 280px;
+      width: 400px;
       position: fixed;
       top: 0;
-      right: -280px;
+      right: -400px;
       height: 100vh;
       z-index: 999;
-      background: #1ABB9C;
+      background: #2A3F54;
       color: #fff;
       transition: all 0.3s;
       box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: 580px) {
+
+    #sidebar {
+        width: 300px;
+    }
   }
 
   #sidebar.active {
@@ -102,7 +109,7 @@ text-align: center;
         <!-- page content -->
         <div class="right_col" role="main">
           {% if request.user.profile.emp_id == '5638' %}
-          <div class="row" id="navbar" style="background: #fff; border:1px solid #1ABB9C; padding: 5px 5px 0px 5px; border-radius: 30px;">
+          <div class="row" id="navbar" style="background: #fff; border:2px solid #1ABB9C; padding: 5px 5px 0px 5px; border-radius: 30px;">
             <div class="col-md-12">
               <div class="welcome">
                 <div class="row">
@@ -147,8 +154,8 @@ text-align: center;
               <div class="row">
 
                 <div class="col-md-4 col-sm-6 mt-2">
-                  <div class="card max_height_320" style="height: 320px;">
-                    <div class="card-header">
+                  <div class="card max_height_320" style="height: 480px;box-shadow: rgba(26, 187, 156, 0.35) 0px 5px 15px;">
+                    <div class="card-header" style="background: #2a3f54; color: #fff;">
                       <h2>Birthdays</h2>
                     </div>
                     <div class="card-body" style="overflow-y: scroll;">
@@ -156,10 +163,14 @@ text-align: center;
                         {% if birthdays %}
                           {% for i in birthdays %}
                             {% if i.profile %}
-                            <div class="col-md-4 col-sm-6" align="center"  onclick="getEmpID({{i.profile.emp_id}})">
-                              <img src="/media/{{i.profile.img}}" height="50px" style="border-radius: 30px;">
-                              <p style="font-size: 14px;"><b>{{i.profile.emp_name}} ({{i.profile.emp_id}})</b></p>
-                              <p style="margin-top: -20px;">({{i.dob}})</p>
+                            <div class="col-md-4 col-sm-6" align="center" style="padding: 10px;"  onclick="getEmpID({{i.profile.emp_id}})">
+                              <div style="box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 15px; padding: 10px; height: 175px; border-radius: 10px;">
+                                <div class="align-middle mt-auto mb-auto">
+                                  <img src="/media/{{i.profile.img}}" height="50px" style="border-radius: 30px;">
+                                  <p style="font-size: 14px;"><b>{{i.profile.emp_name}} ({{i.profile.emp_id}})</b></p>
+                                  <p style="margin-top: -20px;">({{i.dob}})</p>
+                                </div>
+                              </div>
                             </div>
                             {% endif %}
                           {% endfor %}
@@ -173,8 +184,8 @@ text-align: center;
                   </div>
                 </div>
                 <div class="col-md-4 col-sm-6 mt-2">
-                  <div class="card max_height_320" style="height: 320px;">
-                    <div class="card-header">
+                  <div class="card max_height_320" style="height: 480px;box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                    <div class="card-header" style="background: #26B99A; color: #fff;">
                       <h2>New Hires</h2>
                     </div>
                     <div class="card-body" style="overflow-y: scroll;">
@@ -205,11 +216,79 @@ text-align: center;
                       </div>
                     </div>
                   </div>
+                  <div class="col-md-4 col-sm-6">
+                    <div class="col-md-6 mt-2">
+                    <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                      <div class="card-header" style="background: #2a3f54; color: #fff;">
+                        <h2>RM1</h2>
+                      </div>
+                      <div class="card-body">
+                        <h6>{{emp.emp_rm1}}</h6>
+                      </div>
+                    </div>
+                  </div>
+                    <div class="col-md-6 mt-2">
+                      <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                        <div class="card-header" style="background: #2a3f54; color: #fff;">
+                          <h2>RM2</h2>
+                        </div>
+                        <div class="card-body">
+                          <h6>{{emp.emp_rm2}}</h6>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mt-2">
+                      <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                        <div class="card-header" style="background: #2a3f54; color: #fff;">
+                          <h2>RM3</h2>
+                        </div>
+                        <div class="card-body">
+                          <h6>{{emp.emp_rm3}}</h6>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mt-2">
+                      <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                        <div class="card-header" style="background: #2a3f54; color: #fff;">
+                          <h2>Active Employees</h2>
+                        </div>
+                        <div class="card-body">
+                          <a href="/ams/rm-mapping-index"><h1 style="margin: 0px !important;">{{emp_count}}</h1></a>
+                          <!--<a href="all_emp.html" class="btn btn-sm btn-dark">view all</a>-->
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mt-2">
+                      <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                        <div class="card-header" style="background: #2a3f54; color: #fff;">
+                          <h2>Leave Requests</h2>
+                        </div>
+                        <div class="card-body">
+                          <a href="/ams/view-leave-list"><h1 style="margin: 0px !important;">{{leave_req_count}}</h1></a>
+                        </div>
+                      </div>
+                    </div>
+                  {% if rm3 == "yes" %}
+                  <div class="col-md-6 mt-2">
+                    <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                      <div class="card-header" style="background: #2a3f54; color: #fff;">
+                        <h2>Mapping Tickets</h2>
+                      </div>
+                      <div class="card-body">
+                        <a href="/ams/view-mapping-tickets"><h1 style="margin: 0px !important;">{{map_tickets_counts}}</h1></a>
+                      </div>
+                    </div>
+                  </div>
+                  {% endif %}
+                  </div>
 
-                <div class="col-md-4 col-sm-6 mt-2">
-                  <div class="card max_height_320" style="height: 320px;">
-                    <div class="card-header">
-                      <h4>Attendance Report</h4>
+
+
+
+                <div class="col-md-4 col-sm-6 mt-3">
+                  <div class="card max_height_320" style="height: 320px; box-shadow: rgba(26, 187, 156, 0.35) 0px 5px 15px;">
+                    <div class="card-header"  style="background: #26B99A; color: #fff;">
+                      <h4 style="padding-top: 10px;">Attendance Report</h4>
                     </div>
                     <div class="card-body">
                       <form action="/ams/view-emp-attendance" method="POST" enctype="multipart/form-data">
@@ -241,81 +320,10 @@ text-align: center;
                   </div>
                 </div>
 
-                  <div class="col-md-2 mt-2">
-                    <div class="card topcards">
-                      <div class="card-header">
-                        <h2>RM1</h2>
-                      </div>
-                      <div class="card-body">
-                        <h6>{{emp.emp_rm1}}</h6>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-2 mt-2">
-                    <div class="card topcards">
-                      <div class="card-header">
-                        <h2>RM2</h2>
-                      </div>
-                      <div class="card-body">
-                        <h6>{{emp.emp_rm2}}</h6>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-2 mt-2">
-                    <div class="card topcards">
-                      <div class="card-header">
-                        <h2>RM3</h2>
-                      </div>
-                      <div class="card-body">
-                        <h6>{{emp.emp_rm3}}</h6>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-2 mt-2">
-                    <div class="card topcards">
-                      <div class="card-header">
-                        <h2>Active Employees</h2>
-                      </div>
-                      <div class="card-body">
-                        <a href="/ams/rm-mapping-index"><h1 style="margin: 0px !important;">{{emp_count}}</h1></a>
-                        <!--<a href="all_emp.html" class="btn btn-sm btn-dark">view all</a>-->
-                      </div>
-                    </div>
-                  </div>
-                {% if rm3 == "yes" %}
-                <div class="col-md-2 mt-2">
-                  <div class="card topcards">
-                    <div class="card-header">
-                      <h2>Mapping Tickets</h2>
-                    </div>      
-                    <div class="card-body">
-                      <a href="/ams/view-mapping-tickets"><h1 style="margin: 0px !important;">{{map_tickets_counts}}</h1></a>
-                    </div>
-                  </div>
-                </div>
-                {% endif %}
 
-                <div class="col-md-2 mt-2">
-                  <div class="card topcards">
-                    <div class="card-header">
-                      <h2>Leave Requests</h2>
-                    </div>
-                    <div class="card-body">
-                      <a href="/ams/view-leave-list"><h1 style="margin: 0px !important;">{{leave_req_count}}</h1></a>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </div>
-          <div class="row mt-3">
-          </div>
-
-          <div class="row mt-3 pb-3">
-            <div class="col-md-12">
-              <div class="card">
-                <div class="card-header">
+              <div class="col-md-8 mt-3">
+              <div class="card" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                <div class="card-header" style="background: #2a3f54; color: #fff;">
                   <h2>Todays Report</h2>
                 </div>
                 <div class="card-body">
@@ -342,6 +350,14 @@ text-align: center;
                 </div>
               </div>
             </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+          </div>
+
+          <div class="row mt-3 pb-3">
             <div class="col-md-4">
               <!--<div class="card">
                 <div class="card-header">
