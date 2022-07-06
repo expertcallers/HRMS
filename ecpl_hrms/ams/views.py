@@ -238,17 +238,17 @@ def tlDashboard(request):  # Test1 Test2
         # Birthday Start
         start = date.today()
         end = start + timedelta(days=30)
-
-        # this_month = OnboardingnewHRC.objects.filter(
-        #     Q(emp_dob__month=end.month) | Q(emp_dob__month=start.month)).order_by('emp_dob')
-        this_month = OnboardingnewHRC.objects.filter(emp_dob__range=[start, end]).order_by('emp_dob')
+        this_month = OnboardingnewHRC.objects.filter(emp_dob__month=start.month).order_by('emp_dob')
+        next_month = OnboardingnewHRC.objects.filter(emp_dob__month=end.month).order_by('emp_dob')
         birthdays = []
-        for i in this_month:
-            dic = {}
-            dic['profile'] = Profile.objects.get(emp_id=i.emp_id)
-            dic['dob'] = i.emp_dob
-            birthdays.append(dic)
-        print(birthdays)
+        def birthdayCreator(mnth,yr):
+            for i in mnth:
+                dic = {}
+                dic['profile'] = Profile.objects.filter(emp_id=i.emp_id).first()       
+                dic['dob'] = i.emp_dob.replace(year=yr)
+                birthdays.append(dic)
+        birthdayCreator(this_month,start.year)
+        birthdayCreator(next_month,end.year)
         # Birthday End
 
         data = {'emp': prof, 'att_details': att_details, 'emp_count': emp_count,

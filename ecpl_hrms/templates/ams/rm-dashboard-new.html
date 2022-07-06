@@ -140,15 +140,17 @@ text-align: center;
                     <div class="card-body" style="overflow-y: scroll;">
                       <div class="row">
                         {% if birthdays %}
-                        {% for i in birthdays %}
-                        <div class="col-md-4 col-sm-6" align="center">
-                          <img src="/media/{{i.profile.img}}" height="80px" style="border-radius: 30px;">
-                          <h5 style="font-size: 16px;">{{i.profile.emp_name}}</h5>
-                          <p style="margin-top: -10px;">{{i.profile.emp_process}}</p>
-                          <p style="margin-top: -20px;">{{i.profile.emp_desi}}</p>
-                          <p style="margin-top: -20px;">({{i.dob}})</p>
-                        </div>
-                        {% endfor %}
+                          {% for i in birthdays %}
+                            {% if i.profile %}
+                            <div class="col-md-4 col-sm-6" align="center">
+                              <img src="/media/{{i.profile.img}}" height="80px" style="border-radius: 30px;">
+                              <p style="font-size: 14px;"><b>{{i.profile.emp_name}}</b></p>
+                              <p style="margin-top: -10px;">{{i.profile.emp_process}}</p>
+                              <p style="margin-top: -20px;">{{i.profile.emp_desi}}</p>
+                              <p style="margin-top: -20px;">({{i.dob}})</p>
+                            </div>
+                            {% endif %}
+                          {% endfor %}
                         {% else %}
                         <div class="col-md-12" align="center">
                           <h4 align="center">No birthdays this Month</h4>
