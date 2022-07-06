@@ -1,0 +1,9 @@
+HRMS Requirements/packages
+
+django
+django-crispy-forms
+django-import-export
+MonthDelta
+pytz
+num2words
+Pillow
