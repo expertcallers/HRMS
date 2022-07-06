@@ -85,6 +85,20 @@ text-align: center;
 {% block main %}
 {% load static %}
 
+<!-- Sidebar Profile -->
+<nav id="sidebar">
+    <div id="dismiss">
+        <i class="fas fa-times"></i>
+    </div>
+    <div class="row" style="margin-top: 45px;">
+      <div class="col-md-12" id="sidebar_data" align="center">
+
+      </div>
+    </div>
+</nav>
+<div class="overlay"></div>
+<!-- Sidebar Profile -->
+
         <!-- page content -->
         <div class="right_col" role="main">
           {% if request.user.profile.emp_id == '5638' %}
@@ -118,7 +132,7 @@ text-align: center;
                       {% endif %}
                     </div>
                     <div class="col-md-8 col-sm-6" align="right">
-                        <a class="btn btn-md btn-success" href="/ams-apply_leave" style="border-radius: 30px; float:right; padding:.375rem .75rem; font-size:0.8rem; ">
+                        <a class="btn btn-md btn-success" href="/ams/ams-apply_leave" style="border-radius: 30px; float:right; padding:.375rem .75rem; font-size:0.8rem; ">
                           Apply Leave
                         </a>
                     </div>
@@ -142,11 +156,9 @@ text-align: center;
                         {% if birthdays %}
                           {% for i in birthdays %}
                             {% if i.profile %}
-                            <div class="col-md-4 col-sm-6" align="center">
-                              <img src="/media/{{i.profile.img}}" height="80px" style="border-radius: 30px;">
-                              <p style="font-size: 14px;"><b>{{i.profile.emp_name}}</b></p>
-                              <p style="margin-top: -10px;">{{i.profile.emp_process}}</p>
-                              <p style="margin-top: -20px;">{{i.profile.emp_desi}}</p>
+                            <div class="col-md-4 col-sm-6" align="center"  onclick="getEmpID({{i.profile.emp_id}})">
+                              <img src="/media/{{i.profile.img}}" height="50px" style="border-radius: 30px;">
+                              <p style="font-size: 14px;"><b>{{i.profile.emp_name}} ({{i.profile.emp_id}})</b></p>
                               <p style="margin-top: -20px;">({{i.dob}})</p>
                             </div>
                             {% endif %}
@@ -169,7 +181,7 @@ text-align: center;
                       {% if new_joins %}
                       {% for i in new_joins %}
                       <div class="row" align="center">
-                        <div class="col-md-12 p-1 sidebar" id="{{i.emp_id}}" >
+                        <div class="col-md-12 p-1 sidebar" onclick="getEmpID({{i.emp_id}})">
                           <div class="row">
                             <div class="col-md-4" style=" padding: 8px 10px !important;">
                               <img src="/media/{{i.img}}" width='80px' style="border-radius: 50%; border: 3px solid #fff; box-shadow: 2px 2px 10px grey;">
@@ -193,75 +205,9 @@ text-align: center;
                       </div>
                     </div>
                   </div>
+
                 <div class="col-md-4 col-sm-6 mt-2">
-                  <div class="col-md-6 mt-2">
-                    <div class="card topcards">
-                      <div class="card-header">
-                        <h2>RM1</h2>
-                      </div>
-                      <div class="card-body">
-                        <h6>{{emp.emp_rm1}}</h6>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-6 mt-2">
-                    <div class="card topcards">
-                      <div class="card-header">
-                        <h2>RM2</h2>
-                      </div>
-                      <div class="card-body">
-                        <h6>{{emp.emp_rm2}}</h6>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-6 mt-2">
-                    <div class="card topcards">
-                      <div class="card-header">
-                        <h2>RM3</h2>
-                      </div>
-                      <div class="card-body">
-                        <h6>{{emp.emp_rm3}}</h6>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-6 mt-2">
-                    <div class="card topcards">
-                      <div class="card-header">
-                        <h2>Active Employees</h2>
-                      </div>
-                      <div class="card-body">
-                        <a href="/ams/rm-mapping-index"><h1 style="margin: 0px !important;">{{emp_count}}</h1></a>
-                        <!--<a href="all_emp.html" class="btn btn-sm btn-dark">view all</a>-->
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                {% if rm3 == "yes" %}
-                <div class="col-md-2 mt-2">
-                  <div class="card topcards">
-                    <div class="card-header">
-                      <h2>Mapping Tickets</h2>
-                    </div>      
-                    <div class="card-body">
-                      <a href="/ams/view-mapping-tickets"><h1 style="margin: 0px !important;">{{map_tickets_counts}}</h1></a>
-                    </div>
-                  </div>
-                </div>
-                {% endif %}
-
-                <div class="col-md-2 mt-2">
-                  <div class="card topcards">
-                    <div class="card-header">
-                      <h2>Leave Requests</h2>
-                    </div>
-                    <div class="card-body">
-                      <a href="/ams/view-leave-list"><h1 style="margin: 0px !important;">{{leave_req_count}}</h1></a>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="col-md-4 mt-2">
-                  <div class="card">
+                  <div class="card max_height_320" style="height: 320px;">
                     <div class="card-header">
                       <h4>Attendance Report</h4>
                     </div>
@@ -294,6 +240,72 @@ text-align: center;
                     </div>
                   </div>
                 </div>
+
+                  <div class="col-md-2 mt-2">
+                    <div class="card topcards">
+                      <div class="card-header">
+                        <h2>RM1</h2>
+                      </div>
+                      <div class="card-body">
+                        <h6>{{emp.emp_rm1}}</h6>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-2 mt-2">
+                    <div class="card topcards">
+                      <div class="card-header">
+                        <h2>RM2</h2>
+                      </div>
+                      <div class="card-body">
+                        <h6>{{emp.emp_rm2}}</h6>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-2 mt-2">
+                    <div class="card topcards">
+                      <div class="card-header">
+                        <h2>RM3</h2>
+                      </div>
+                      <div class="card-body">
+                        <h6>{{emp.emp_rm3}}</h6>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-2 mt-2">
+                    <div class="card topcards">
+                      <div class="card-header">
+                        <h2>Active Employees</h2>
+                      </div>
+                      <div class="card-body">
+                        <a href="/ams/rm-mapping-index"><h1 style="margin: 0px !important;">{{emp_count}}</h1></a>
+                        <!--<a href="all_emp.html" class="btn btn-sm btn-dark">view all</a>-->
+                      </div>
+                    </div>
+                  </div>
+                {% if rm3 == "yes" %}
+                <div class="col-md-2 mt-2">
+                  <div class="card topcards">
+                    <div class="card-header">
+                      <h2>Mapping Tickets</h2>
+                    </div>      
+                    <div class="card-body">
+                      <a href="/ams/view-mapping-tickets"><h1 style="margin: 0px !important;">{{map_tickets_counts}}</h1></a>
+                    </div>
+                  </div>
+                </div>
+                {% endif %}
+
+                <div class="col-md-2 mt-2">
+                  <div class="card topcards">
+                    <div class="card-header">
+                      <h2>Leave Requests</h2>
+                    </div>
+                    <div class="card-body">
+                      <a href="/ams/view-leave-list"><h1 style="margin: 0px !important;">{{leave_req_count}}</h1></a>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -396,5 +408,46 @@ function myFunction() {
       + minutes + "m " + seconds + "s ";
     }, 1000);
     {% endif %}
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#dismiss, .overlay').on('click', function () {
+            $('#sidebar').removeClass('active');
+            $('.overlay').removeClass('active');
+        });
+    });
+    function getEmpID(id) {
+        $csrf = $('[name="csrfmiddlewaretoken"]').val();
+        $.ajax({
+          type: "POST",
+          url: "/ams/get-emp",
+          data: {
+            emp_id: id,
+            csrfmiddlewaretoken: $csrf
+          },
+          success: function(data) {
+            var profile = eval('(' + data + ')');
+            options = "";
+            options += '<img src="/media/'+profile.img+'" alt="" style="width: 60%; border-radius: 30px;">';
+            options += "<h3>"+profile.emp_name+"</h3>";
+            options += "<table border='1' style='width: 100%; border-color: #fff;'>";
+            options += "<tr><th style='padding: 5px;'>Emp ID</th><th style='padding: 5px;'>"+profile.emp_id+"</th></tr>";
+            options += "<tr><th style='padding: 5px;'>Emp Process</th><th style='padding: 5px;'>"+profile.emp_process+"</th></tr>";
+            options += "<tr><th style='padding: 5px;'>Emp Designation</th><th style='padding: 5px;'>"+profile.emp_desi+"</th></tr>";
+            options += "<tr><th style='padding: 5px;'>Emp DOJ</th><th style='padding: 5px;'>"+profile.doj+"</th></tr>";
+            options += "</table>";
+            options += "";
+            $("#sidebar_data").html(options);
+          },
+          error:function(e){
+              alert("something wrong "+ e) // this will alert an error
+          }
+        });
+        $('#sidebar').addClass('active');
+        $('.overlay').addClass('active');
+        $('.collapse.in').toggleClass('in');
+        $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+    }
 </script>
 {% endblock %}

@@ -174,6 +174,19 @@ def change_password(request):  # Test1 Test2
 
 
 @login_required
+def getEmp(request):
+    emp_id = request.POST['emp_id']
+    profile = Profile.objects.get(emp_id=emp_id)
+    prof_dict = {}
+    prof_dict['emp_name'] = profile.emp_name
+    prof_dict['emp_id'] = profile.emp_id
+    prof_dict['emp_desi'] = profile.emp_desi
+    prof_dict['emp_process'] = profile.emp_process
+    prof_dict['img'] = str(profile.img)
+    prof_dict['doj'] = str(profile.doj)
+    return HttpResponse(json.dumps(prof_dict))
+
+@login_required
 def agentDashBoard(request):  # Test1 Test2 # Opt
     if request.user.profile.emp_desi in agent_list:
         emp = request.user.profile
@@ -249,12 +262,17 @@ def tlDashboard(request):  # Test1 Test2
                 birthdays.append(dic)
         birthdayCreator(this_month,start.year)
         birthdayCreator(next_month,end.year)
+        birthdays = sorted(birthdays, key=lambda x: x['dob'])
+        new_birthdays = []
+        for i in birthdays:
+            if i['dob'] >= date.today():
+                new_birthdays.append(i)
         # Birthday End
 
         data = {'emp': prof, 'att_details': att_details, 'emp_count': emp_count,
                 'map_tickets_counts': map_tickets_counts,'all_emp': all_emp, 'leave_req_count': leave_req_count,
                 "rm3": rm3, 'admin_list': admin_list, 'administration_list': administration_list,
-                'login': login, 'login_id': login_id, 'new_joins': new_joins, 'birthdays': birthdays}
+                'login': login, 'login_id': login_id, 'new_joins': new_joins, 'birthdays': new_birthdays}
         return render(request, 'ams/rm-dashboard-new.html', data)
 
     elif usr_desi in manager_list:

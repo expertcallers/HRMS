@@ -38,6 +38,7 @@ urlpatterns = [
     path('tl-dashboard', tlDashboard),
     path('manager-dashboard', managerDashboard),
     path('hr-dashboard', hrDashboard),
+    path('get-emp', getEmp),
 
     # Attendance
     path('ams-update-attendance', newSingleAttandance),
