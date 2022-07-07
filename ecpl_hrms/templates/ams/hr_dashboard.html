@@ -1,102 +1,269 @@
 {% extends 'ams/base_hr_new.html' %}
+
+{% block style %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+<style>
+.card-body::-webkit-scrollbar {
+width: 5px;
+}
+.card-body::-webkit-scrollbar-track {
+border-radius: 10px;
+}
+.card-body::-webkit-scrollbar-thumb {
+background: #A5A9AC;
+border-radius: 10px;
+}
+.card-body::-webkit-scrollbar {
+width: 5px;
+}
+.card .card-header {
+height: unset;
+padding: 0 10px;
+text-align: center;
+background: #fff;
+}
+.card .card-body {
+overflow-y: scroll;
+text-align: center;
+}
+  .sidebar {
+    cursor: pointer;
+  }
+  #sidebar {
+      padding: 10px;
+      width: 400px;
+      position: fixed;
+      top: 0;
+      right: -400px;
+      height: 100vh;
+      z-index: 999;
+      background: #2A3F54;
+      color: #fff;
+      transition: all 0.3s;
+      box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: 580px) {
+
+    #sidebar {
+        width: 300px;
+    }
+  }
+
+  #sidebar.active {
+      right: 0;
+  }
+
+  #dismiss {
+      width: 35px;
+      height: 35px;
+      line-height: 35px;
+      text-align: center;
+      background: #000;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      cursor: pointer;
+      -webkit-transition: all 0.3s;
+      -o-transition: all 0.3s;
+      transition: all 0.3s;
+  }
+
+  #dismiss:hover {
+      background: #fff;
+      color: #7386D5;
+  }
+
+  .overlay {
+      display: none;
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 998;
+      opacity: 0;
+      transition: all 0.5s ease-in-out;
+  }
+  .overlay.active {
+      display: block;
+      opacity: 1;
+  }
+</style>
+{% endblock %}
 {% block main %}
 {% load static %}
 
+<!-- Sidebar Profile -->
+<nav id="sidebar">
+    <div id="dismiss">
+        <i class="fas fa-times"></i>
+    </div>
+    <div class="row" style="margin-top: 45px;">
+      <div class="col-md-12" id="sidebar_data" align="center">
+
+      </div>
+    </div>
+</nav>
+<div class="overlay"></div>
+<!-- Sidebar Profile -->
 <!-- page content -->
         <div class="right_col pb-4" role="main">
           <div class="row mt-3">
             <div class="col-md-12">
               <div class="row">
-                <div class="col-md-2">
-                  <div class="card topcards">
-                    <div class="card-header">
-                      <h2>RM1</h2>
-                    </div>
-                    <div class="card-body">
-                      <h6>{{emp.emp_rm1}}</h6>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="card topcards">
-                    <div class="card-header">
-                      <h2>RM2</h2>
-                    </div>
-                    <div class="card-body">
-                      <h6>{{emp.emp_rm2}}</h6>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-2">
-                  <div class="card topcards">
-                    <div class="card-header">
-                      <h2>RM3</h2>
-                    </div>
-                    <div class="card-body">
-                      <h6>{{emp.emp_rm3}}</h6>
-                    </div>
-                  </div>
-                </div>
 
-
-              {% if request.user.profile.emp_desi in hr_tl_am_list %}
-                <div class="col-md-2">
-                  <div class="card topcards">
-                    <div class="card-header">
-                      {% if request.user.profile.emp_desi in hr_om_list %}
-                      <h2>Initial Leave Requests</h2>
+                <div class="col-md-4 col-sm-6 mt-2">
+                  <div class="card max_height_320" style="height: 480px;box-shadow: rgba(26, 187, 156, 0.35) 0px 5px 15px;">
+                    <div class="card-header" style="background: #26b99a; color: #fff;">
+                      <h2>Birthdays</h2>
+                    </div>
+                    <div class="card-body" style="overflow-y: scroll;">
+                      <div class="row">
+                        {% if birthdays %}
+                          {% for i in birthdays %}
+                            {% if i.profile %}
+                            <div class="col-md-4 col-sm-6" align="center" style="padding: 10px;"  onclick="getEmpID({{i.profile.emp_id}})">
+                              <div style="box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 15px; padding: 10px; height: 175px; border-radius: 10px;">
+                                <div class="align-middle mt-auto mb-auto">
+                                  <img src="/media/{{i.profile.img}}" height="50px" style="border-radius: 30px;">
+                                  <p style="font-size: 14px;"><b>{{i.profile.emp_name}} ({{i.profile.emp_id}})</b></p>
+                                  <p style="margin-top: -20px;">({{i.dob}})</p>
+                                </div>
+                              </div>
+                            </div>
+                            {% endif %}
+                          {% endfor %}
+                        {% else %}
+                        <div class="col-md-12" align="center">
+                          <h4 align="center">No birthdays this Month</h4>
+                        </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4 col-sm-6 mt-2">
+                  <div class="card max_height_320" style="height: 480px;box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                    <div class="card-header" style="background: #26b99a; color: #fff;">
+                      <h2>New Hires</h2>
+                    </div>
+                    <div class="card-body" style="overflow-y: scroll;">
+                      {% if new_joins %}
+                      {% for i in new_joins %}
+                      <div class="row mb-2" align="center" style="border: 1px solid #26B99A; border-radius: 30px;">
+                        <div class="col-md-12 p-1 sidebar" onclick="getEmpID({{i.emp_id}})">
+                          <div class="row">
+                            <div class="col-md-4" style=" padding: 8px 10px !important;">
+                              <img src="/media/{{i.img}}" width='60px' style="border-radius: 50%; border: 3px solid #fff; box-shadow: 2px 2px 10px grey;">
+                            </div>
+                            <div class="col-md-8" align="left">
+                              <p style="margin-bottom: 0;"><b>{{i.emp_name}} ({{i.emp_id}})</b></p>
+                              <p style="margin-bottom: 0;">{{i.emp_process}} - {{i.emp_desi}}</p>
+                              <p style="margin-bottom: 0;">DOJ: - {{i.doj}}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      {% endfor %}
                       {% else %}
-                      <h2>Leave Requests</h2>
+                      <div class="row">
+                        <div class="col-md-12" align="center">
+                          <h4 align="center">No New Hires</h4>
+                        </div>
+                      </div>
                       {% endif %}
-                    </div>
-                    <div class="card-body">
-                      <a href="/ams/view-leave-list"><h1 style="margin: 0px !important;">{{leave_req_count}}</h1></a>
+                      </div>
                     </div>
                   </div>
-                </div>
-              {% endif %}
-              {% if request.user.profile.emp_desi in hr_om_list %}
-                <div class="col-md-2">
-                  <div class="card topcards">
-                    <div class="card-header">
-                      <h2>Mapping Tickets</h2>
-                    </div>
-                    <div class="card-body">
-                      <a href="/ams/view-mapping-tickets"><h1 style="margin: 0px !important;">{{map_tickets_counts}}</h1></a>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="col-md-2">
-                  <div class="card topcards">
-                    <div class="card-header">
-                      <h2> Final Leave Requests</h2>
-                    </div>
-                    <div class="card-body">
-                      <a href="/ams/view-leave-request-mgr"><h1 style="margin: 0px !important;">{{leave_req_count_final}}</h1></a>
+                <div class="col-md-4 col-sm-6">
+                  <div class="col-md-6 mt-2" onclick="getEmpID({{request.user.profile.emp_rm1_id}})">
+                    <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                      <div class="card-header" style="background: #1C7BA8; color: #fff;">
+                        <h2>RM1</h2>
+                      </div>
+                      <div class="card-body">
+                        <h6>{{emp.emp_rm1}}</h6>
+                      </div>
                     </div>
                   </div>
-                </div>
-
-                <div class="col-md-2">
-                  <div class="card topcards">
-                    <div class="card-header">
-                      <h2>Leave Appeal</h2>
-                    </div>
-                    <div class="card-body">
-                      <a href="/ams/view-leave-escalation-mgr"><h1 style="margin: 0px !important;">{{leave_esc_count}}</h1></a>
+                  <div class="col-md-6 mt-2" onclick="getEmpID({{request.user.profile.emp_rm2_id}})">
+                    <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                      <div class="card-header" style="background: #1C7BA8; color: #fff;">
+                        <h2>RM2</h2>
+                      </div>
+                      <div class="card-body">
+                        <h6>{{emp.emp_rm2}}</h6>
+                      </div>
                     </div>
                   </div>
+                  <div class="col-md-6 mt-2" onclick="getEmpID({{request.user.profile.emp_rm3_id}})">
+                    <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                      <div class="card-header" style="background: #1C7BA8; color: #fff;">
+                        <h2>RM3</h2>
+                      </div>
+                      <div class="card-body">
+                        <h6>{{emp.emp_rm3}}</h6>
+                      </div>
+                    </div>
+                  </div>
+                  {% if request.user.profile.emp_desi in hr_om_list %}
+                    <div class="col-md-6 mt-2">
+                      <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                        <div class="card-header" style="background: #1C7BA8; color: #fff;">
+                          <h2>Mapping Tickets</h2>
+                        </div>
+                        <div class="card-body">
+                          <a href="/ams/view-mapping-tickets"><h1 style="margin: 0px !important;">{{map_tickets_counts}}</h1></a>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mt-2">
+                      <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                        <div class="card-header" style="background: #1C7BA8; color: #fff;">
+                          <h2> Final Leave Requests</h2>
+                        </div>
+                        <div class="card-body">
+                          <a href="/ams/view-leave-request-mgr"><h1 style="margin: 0px !important;">{{leave_req_count_final}}</h1></a>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mt-2">
+                      <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                        <div class="card-header" style="background: #1C7BA8; color: #fff;">
+                          <h2>Leave Appeal</h2>
+                        </div>
+                        <div class="card-body">
+                          <a href="/ams/view-leave-escalation-mgr"><h1 style="margin: 0px !important;">{{leave_esc_count}}</h1></a>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
                 </div>
-              {% endif %}
               </div>
             </div>
           </div>
-          <div class="row mt-4">
-            <div class="col-md-2">
+          <div class="row mt-3 pb-3">
+
+            {% if request.user.profile.emp_desi in hr_tl_am_list %}
+              <div class="col-md-2 mt-2">
+                <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                  <div class="card-header" style="background: #1C7BA8; color: #fff;">
+                    {% if request.user.profile.emp_desi in hr_om_list %}
+                    <h2>Initial Leave Requests</h2>
+                    {% else %}
+                    <h2>Leave Requests</h2>
+                    {% endif %}
+                  </div>
+                  <div class="card-body">
+                    <a href="/ams/view-leave-list"><h1 style="margin: 0px !important;">{{leave_req_count}}</h1></a>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+            <div class="col-md-2 mt-2">
               <div class="card-base">
                 <div class="card-icon">
-                  <span title="Total Users" id="widgetCardIcon" class="imagecard">
+                  <span title="Total Users" class="imagecard widgetCardIcon">
                     <i class="fa fa-user"></i>
                   </span>
                   <div class="card-data widgetCardData">
@@ -110,10 +277,10 @@
                 <div class="space"></div>
               </div>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-2 mt-2">
               <div class="card-base">
                 <div class="card-icon">
-                  <span title="Total Teams" id="widgetCardIcon" class="imagecard">
+                  <span title="Total Teams" class="imagecard widgetCardIcon">
                     <i class="fa fa-users"></i>
                   </span>
                   <div class="card-data widgetCardData">
@@ -129,10 +296,10 @@
             </div>
 
             {% if request.user.profile.emp_desi in hr_om_list %}
-            <div class="col-md-2">
+            <div class="col-md-2 mt-2">
               <div class="card-base">
                 <div class="card-icon">
-                  <span title="Attendance Requests" id="widgetCardIcon" class="imagecard">
+                  <span title="Attendance Requests" class="imagecard widgetCardIcon">
                     <i class="fa fa-calendar-alt"></i>
                   </span>
                   <div class="card-data widgetCardData">
@@ -149,9 +316,9 @@
             {% endif %}
 
             <div class="col-md-4">
-              <div class="card">
-                <div class="card-header">
-                  <h4>Attendance Report</h4>
+              <div class="card" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                <div class="card-header" style="background: #1C7BA8; color: #fff;">
+                  <h2>Attendance Report</h2>
                 </div>
                 <div class="card-body">
                   <form action="/ams/team-attendance-report" method="POST" enctype="multipart/form-data">
@@ -189,10 +356,47 @@
 
         </div>
         <!-- /page content -->
-<script>
-  function runn(){
-    alert("Coming Soon");
-  }
-</script>
 
+{% endblock %}
+{% block script %}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#dismiss, .overlay').on('click', function () {
+            $('#sidebar').removeClass('active');
+            $('.overlay').removeClass('active');
+        });
+    });
+    function getEmpID(id) {
+        $csrf = $('[name="csrfmiddlewaretoken"]').val();
+        $.ajax({
+          type: "POST",
+          url: "/ams/get-emp",
+          data: {
+            emp_id: id,
+            csrfmiddlewaretoken: $csrf
+          },
+          success: function(data) {
+            var profile = eval('(' + data + ')');
+            options = "";
+            options += '<img src="/media/'+profile.img+'" alt="" style="width: 60%; border-radius: 30px;">';
+            options += "<h3>"+profile.emp_name+"</h3>";
+            options += "<table border='1' style='width: 100%; border-color: #fff;'>";
+            options += "<tr><th style='padding: 5px;'>Emp ID</th><th style='padding: 5px;'>"+profile.emp_id+"</th></tr>";
+            options += "<tr><th style='padding: 5px;'>Emp Process</th><th style='padding: 5px;'>"+profile.emp_process+"</th></tr>";
+            options += "<tr><th style='padding: 5px;'>Emp Designation</th><th style='padding: 5px;'>"+profile.emp_desi+"</th></tr>";
+            options += "<tr><th style='padding: 5px;'>Emp DOJ</th><th style='padding: 5px;'>"+profile.doj+"</th></tr>";
+            options += "</table>";
+            options += "";
+            $("#sidebar_data").html(options);
+          },
+          error:function(e){
+              alert("something wrong "+ e) // this will alert an error
+          }
+        });
+        $('#sidebar').addClass('active');
+        $('.overlay').addClass('active');
+        $('.collapse.in').toggleClass('in');
+        $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+    }
+</script>
 {% endblock %}

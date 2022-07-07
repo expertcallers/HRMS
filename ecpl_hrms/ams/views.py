@@ -362,11 +362,13 @@ def managerDashboard(request):  # Test1 Test2
         return redirect('/ams')
 
     birthdays = getBirthdays()
+    new_joins = Profile.objects.all().order_by('-id')[:5]
     data = {'emp': emp, 'count_all_emps': count_all_emps, 'all_tls': all_tls_under, 'all_tls_count': all_tls_count,
             'all_ams': all_ams_under, 'all_ams_count': all_ams_count,
             'map_tickets_counts': map_tickets_counts, 'att_requests_count': att_requests_count,
             'leave_req_count': leave_req_count, 'leave_esc_count': leave_esc_count, 'all_emp': all_emps_under,
-            'admin_list': admin_list, 'administration_list': administration_list, 'birthdays': birthdays
+            'admin_list': admin_list, 'administration_list': administration_list, 'birthdays': birthdays,
+            'new_joins': new_joins
             }
     return render(request, 'ams/manager-dashboard.html', data)
 
@@ -519,12 +521,15 @@ def hrDashboard(request):  # Test1
         att_requests_count = AttendanceCorrectionHistory.objects.filter(status=False, rm3_id=emp_id).count()
 
         birthdays = getBirthdays()
+
+        new_joins = Profile.objects.all().order_by('-id')[:5]
         data = {'emp': emp, 'all_users_count': all_users_count, 'all_team_count': all_team_count,
                 "leave_req_count": leave_req_count, "map_tickets_counts": map_tickets_counts,
                 "leave_esc_count": leave_esc_count, "att_requests_count": att_requests_count,
                 "hr_tl_am_list": hr_tl_am_list, "hr_om_list": hr_om_list,
                 "leave_req_count_final": leave_req_count_final, 'admin_list': admin_list,
-                'administration_list': administration_list, 'team': teams, 'ta': ta_list, 'birthdays': birthdays}
+                'administration_list': administration_list, 'team': teams, 'ta': ta_list, 'birthdays': birthdays,
+                'new_joins': new_joins}
         return render(request, 'ams/hr_dashboard.html', data)
     else:
         return HttpResponse('<h1>*** You are not authorised to view this page ***</h1>')
