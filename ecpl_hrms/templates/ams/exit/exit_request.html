@@ -1,0 +1,86 @@
+{% extends 'ams/exit/base.html' %}
+{% block main %}
+{% load static %}
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>Exit Request</h3>
+            </div>
+          </div>
+          <div class="row pb-3">
+            <div class="col-md-12">
+              <div class="card">
+                {% if requested %}
+                <div class="card-header">
+                  <h4>Exit Requested on {{requested.date}}</h4>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                  {% if requested %}
+                    <div class="row">
+                      <div class="col-md-12 form-group">
+                        <label for="exit_reason">Your Reason</label>
+                        <textarea id="exit_reason" rows="10" class="form-control" disabled>{{requested.reason}}</textarea>
+                      </div>
+                      {% if requested.rm1_approval %}
+                        <div class="col-md-12 form-group">
+                          <label for="rm1_comments">RM1 Comments</label>
+                          <textarea rows="5" id="rm1_comments" class="form-control" disabled>{{requested.rm1_comment}}</textarea>
+                        </div>
+                      {% endif %}
+                      {% if requested.rm2_approval %}
+                        <div class="col-md-12 form-group">
+                          <label for="rm1_comments">RM2 Comments</label>
+                          <textarea rows="5" id="rm2_comments" class="form-control" disabled>{{requested.rm2_comment}}</textarea>
+                        </div>
+                      {% endif %}
+                      {% if requested.rm3_approval %}
+                        <div class="col-md-12 form-group">
+                          <label for="rm3_comments">RM3 Comments</label>
+                          <textarea rows="5" id="rm3_comments" class="form-control" disabled>{{requested.rm3_comment}}</textarea>
+                        </div>
+                      {% endif %}
+                      {% if requested.admin_approval %}
+                        <div class="col-md-12 form-group">
+                          <label for="admin_comments">RM3 Comments</label>
+                          <textarea rows="5" id="admin_comments" class="form-control" disabled>{{requested.admin_comments}}</textarea>
+                        </div>
+                      {% endif %}
+                      {% if requested.hr_approval %}
+                        <div class="col-md-12 form-group">
+                          <label for="hr_comments">HR Comments</label>
+                          <textarea rows="5" id="hr_comments" class="form-control" disabled>{{requested.hr_comments}}</textarea>
+                        </div>
+                      {% endif %}
+                      <div class="col-md-12 form-group">
+                        <label for="status">Status</label>
+                        <input id="status" class="form-control" value="{{requested.status}}" disabled>
+                      </div>
+                    </div>
+                  {% else %}
+                    <form action="" method="POST" enctype="multipart/form-data" style="width: 100%">
+                      {% csrf_token %}
+                      <div class="row">
+                        <div class="col-md-12 form-group">
+                          <label for="reason">Reason for Exit?</label>
+                          <textarea rows="10" id="reason" name="reason" class="form-control" required></textarea>
+                        </div>
+                        <div class="col-md-12 form-group">
+                          <button class="btn btn-success form-control" onclick="return confirmm();">Submit</button>
+                        </div>
+                      </div>
+                    </form>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}

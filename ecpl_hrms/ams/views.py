@@ -31,6 +31,7 @@ from django.apps import apps
 
 Profile = apps.get_model('mapping', 'Profile')
 LoginHistory = apps.get_model('mapping', 'LoginHistory')
+EmpSeparation = apps.get_model('mapping', 'EmpSeparation')
 
 # TL and AM List
 tl_am_list = ['Assistant Manager']
@@ -254,10 +255,14 @@ def tlDashboard(request):  # Test1 Test2
 
         birthdays = getBirthdays()
 
+        exit_req_count = EmpSeparation.objects.filter(
+            Q(profile__emp_rm1_id=emp_id) | Q(profile__emp_rm2_id=emp_id) | Q(profile__emp_rm3_id=emp_id)).count()
+
         data = {'emp': prof, 'att_details': att_details, 'emp_count': emp_count,
                 'map_tickets_counts': map_tickets_counts,'all_emp': all_emp, 'leave_req_count': leave_req_count,
                 "rm3": rm3, 'admin_list': admin_list, 'administration_list': administration_list,
-                'login': login, 'login_id': login_id, 'new_joins': new_joins, 'birthdays': birthdays}
+                'login': login, 'login_id': login_id, 'new_joins': new_joins, 'birthdays': birthdays,
+                'exit_req_count': exit_req_count,}
         return render(request, 'ams/rm-dashboard-new.html', data)
 
     elif usr_desi in manager_list:
@@ -363,12 +368,15 @@ def managerDashboard(request):  # Test1 Test2
 
     birthdays = getBirthdays()
     new_joins = Profile.objects.all().order_by('-id')[:5]
+    exit_req_count = EmpSeparation.objects.filter(
+        Q(profile__emp_rm1_id=emp_id) | Q(profile__emp_rm2_id=emp_id) | Q(profile__emp_rm3_id=emp_id)).count()
+
     data = {'emp': emp, 'count_all_emps': count_all_emps, 'all_tls': all_tls_under, 'all_tls_count': all_tls_count,
             'all_ams': all_ams_under, 'all_ams_count': all_ams_count,
             'map_tickets_counts': map_tickets_counts, 'att_requests_count': att_requests_count,
             'leave_req_count': leave_req_count, 'leave_esc_count': leave_esc_count, 'all_emp': all_emps_under,
             'admin_list': admin_list, 'administration_list': administration_list, 'birthdays': birthdays,
-            'new_joins': new_joins
+            'new_joins': new_joins, 'exit_req_count': exit_req_count,
             }
     return render(request, 'ams/manager-dashboard.html', data)
 
@@ -2801,6 +2809,72 @@ def ViewSuppliers(request):
         messages.error(request, 'Unauthorized Access!')
         return redirect('/ams/dashboard-redirect')
 
+@login_required
+def ExitRequest(request):
+    profile = request.user.profile
+    if request.method == 'POST':
+        reason = request.POST['reason']
+        EmpSeparation.objects.create(
+            profile=profile, date=date.today(), reason=reason, status='Applied and waiting for RM1 Approval'
+        )
+        return redirect('/ams/separation-request')
+    else:
+        requested = EmpSeparation.objects.filter(profile=profile).first()
+        data = {'requested': requested}
+        return render(request, 'ams/exit/exit_request.html', data)
+
+@login_required
+def ViewExitRequest(request):
+    profile = request.user.profile
+    if request.method == 'POST':
+        id = request.POST['id']
+        rm = request.POST['rm']
+        comments = request.POST['comments']
+        approval = request.POST['approval']
+        e = EmpSeparation.objects.get(id=id)
+        if rm == 'rm1':
+            e.rm1_comment = comments
+            if approval == 'Approved':
+                e.rm1_approval = True
+                e.status = 'Approved by RM1 and waiting for RM2 Approval'
+            else:
+                e.status = 'Rejected by RM1'
+        if rm == 'rm2':
+            e.rm2_comment = comments
+            if approval == 'Approved':
+                e.rm2_approval = True
+                e.status = 'Approved by RM2 and waiting for RM3 Approval'
+            else:
+                e.status = 'Rejected by RM2'
+        if rm == 'rm3':
+            e.rm3_comment = comments
+            if approval == 'Approved':
+                e.rm3_approval = True
+                e.status = 'Approved by RM3 and waiting for Admin team Approval'
+            else:
+                e.status = 'Rejected by RM3'
+        e.save()
+        return redirect('/ams/view-exit-request-rm')
+
+    else:
+        all_requests = EmpSeparation.objects.filter(
+            Q(profile__emp_rm1_id=profile.emp_id) | Q(profile__emp_rm2_id=profile.emp_id) | Q(profile__emp_rm3_id=profile.emp_id)
+        )
+        requests = []
+        for i in all_requests:
+            rm = ''
+            dic = {}
+            if i.profile.emp_rm1_id == profile.emp_id and i.rm1_approval == False:
+                rm = 'rm1'
+            elif i.profile.emp_rm2_id == profile.emp_id and i.rm2_approval == False:
+                rm = 'rm2'
+            elif i.profile.emp_rm3_id == profile.emp_id and i.rm3_approval == False:
+                rm = 'rm3'
+            dic['request'] = i
+            dic['rm'] = rm
+            requests.append(dic)
+        data = {'requests': requests}
+        return render(request, 'ams/exit/view_requests.html', data)
 
 @login_required
 def startLogin(request):

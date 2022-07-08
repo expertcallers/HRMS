@@ -113,4 +113,8 @@ urlpatterns = [
     path('view-bills', ViewBill),
     path('view-suppliers', ViewSuppliers),
 
+    # Exit Policy
+    path('separation-request', ExitRequest),
+    path('view-exit-request-rm', ViewExitRequest),
+
 ]

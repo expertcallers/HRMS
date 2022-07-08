@@ -1,0 +1,200 @@
+{% extends 'ams/exit/base.html' %}
+{% block main %}
+{% load static %}
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>Exit Request</h3>
+            </div>
+          </div>
+          <div class="row pb-3">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="row p-4">
+                  <div class="col-md-12">
+                    <table  id="datatablex" class="table table-striped" style="width: 100% !important;">
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Emp Name</th>
+                          <th>Emp ID</th>
+                          <th>Applied On</th>
+                          <th>Status</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tfoot>
+                        <tr>
+                          <th>ID</th>
+                          <th>Emp Name</th>
+                          <th>Emp ID</th>
+                          <th>Applied On</th>
+                          <th>Status</th>
+                          <th>Action</th>
+                        </tr>
+                      </tfoot>
+                      <tbody>
+                      {% for i in requests %}
+                        <tr>
+                          <td>{{i.request.id}}</td>
+                          <td>{{i.request.profile.emp_name}}</td>
+                          <td>{{i.request.profile.emp_id}}</td>
+                          <td>{{i.request.date}}</td>
+                          <td>{{i.request.status}}</td>
+                          <td>
+                            <button class="btn btn-sm btn-success" data-toggle="modal" data-target="#view_{{i.id}}">View / Approve</button>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+
+
+{% for i in requests %}
+<div class="modal fade" id="view_{{i.id}}" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">View Request {{i.id}}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          {% if not requested %}
+            <div class="row p-3">
+              <div class="col-md-12 form-group">
+                <label for="exit_reason">Employee Reason</label>
+                <textarea id="exit_reason" rows="5" class="form-control" disabled>{{i.request.reason}}</textarea>
+              </div>
+              {% if i.rm == 'rm1' and i.request.rm1_approval == False %}
+              <form action="" method="POST" enctype="multipart/form-data" style="width: 100%">
+                {% csrf_token %}
+                <div class="row">
+                  <div class="col-md-12 form-group">
+                    <label for="rm1_reason">RM1 Comments</label>
+                    <textarea rows="5" id="rm1_reason" name="comments" class="form-control" required>{% if i.request.rm1_comment %}{{i.request.rm1_comment}}{% endif %}</textarea>
+                  </div>
+                  <div class="col-md-6 form-group">
+                    <label for="rm1_approval">Response</label>
+                    <select id="rm1_approval" name="approval" class="form-control" required>
+                      <option value="" selected disabled>-- Please Select --</option>
+                      <option value="Approved">Approve</option>
+                      <option value="Rejected">Reject</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 form-group">
+                    <button class="btn btn-success form-control" onclick="return confirmm();">Submit</button>
+                  </div>
+                </div>
+                <input type="hidden" name="rm" value="{{i.rm}}">
+                <input type="hidden" name="id" value="{{i.request.id}}">
+              </form>
+              {% endif %}
+              {% if i.request.rm1_approval %}
+                <div class="col-md-12 form-group">
+                  <label for="rm1_comments">RM1 Comments</label>
+                  <textarea rows="5" id="rm1_comments" class="form-control" disabled>{{i.request.rm1_comment}}</textarea>
+                </div>
+              {% endif %}
+              {% if i.rm == 'rm2' and i.request.rm2_approval == False and i.request.rm1_approval == True %}
+              <form action="" method="POST" enctype="multipart/form-data" style="width: 100%">
+                {% csrf_token %}
+                <div class="row">
+                  <div class="col-md-12 form-group">
+                    <label for="rm2_reason">RM2 Comments</label>
+                    <textarea rows="5" id="rm2_reason" name="comments" class="form-control" required>{% if i.request.rm2_comment %}{{i.request.rm2_comment}}{% endif %}</textarea>
+                  </div>
+                  <div class="col-md-6 form-group">
+                    <label for="rm2_approval">Response</label>
+                    <select id="rm2_approval" name="approval" class="form-control" required>
+                      <option value="" selected disabled>-- Please Select --</option>
+                      <option value="Approved">Approve</option>
+                      <option value="Rejected">Reject</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 form-group">
+                    <button class="btn btn-success form-control" onclick="return confirmm();">Submit</button>
+                  </div>
+                </div>
+                <input type="hidden" name="rm" value="{{i.rm}}">
+                <input type="hidden" name="id" value="{{i.request.id}}">
+              </form>
+              {% endif %}
+              {% if i.request.rm2_approval %}
+                <div class="col-md-12 form-group">
+                  <label for="rm1_comments">RM2 Comments</label>
+                  <textarea rows="5" id="rm2_comments" class="form-control" disabled>{{i.request.rm2_comment}}</textarea>
+                </div>
+              {% endif %}
+
+              {% if i.rm == 'rm3' and i.request.rm3_approval == False and i.request.rm2_approval == True and i.request.rm1_approval == True %}
+              <form action="" method="POST" enctype="multipart/form-data" style="width: 100%">
+                {% csrf_token %}
+                <div class="row">
+                  <div class="col-md-12 form-group">
+                    <label for="rm3_reason">RM3 Comments</label>
+                    <textarea rows="5" id="rm3_reason" name="comments" class="form-control" required>{% if i.request.rm3_comment %}{{i.request.rm3_comment}}{% endif %}</textarea>
+                  </div>
+                  <div class="col-md-6 form-group">
+                    <label for="rm3_approval">Response</label>
+                    <select id="rm3_approval" name="approval" class="form-control" required>
+                      <option value="" selected disabled>-- Please Select --</option>
+                      <option value="Approved">Approve</option>
+                      <option value="Rejected">Reject</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 form-group">
+                    <button class="btn btn-success form-control" onclick="return confirmm();">Submit</button>
+                  </div>
+                </div>
+                <input type="hidden" name="rm" value="{{i.rm}}">
+                <input type="hidden" name="id" value="{{i.request.id}}">
+              </form>
+              {% endif %}
+              {% if i.request.rm3_approval %}
+                <div class="col-md-12 form-group">
+                  <label for="rm3_comments">RM3 Comments</label>
+                  <textarea rows="5" id="rm3_comments" class="form-control" disabled>{{i.request.rm3_comment}}</textarea>
+                </div>
+              {% endif %}
+              {% if i.request.admin_approval %}
+                <div class="col-md-12 form-group">
+                  <label for="admin_comments">RM3 Comments</label>
+                  <textarea rows="5" id="admin_comments" class="form-control" disabled>{{i.request.admin_comments}}</textarea>
+                </div>
+              {% endif %}
+              {% if requested.hr_approval %}
+                <div class="col-md-12 form-group">
+                  <label for="hr_comments">HR Comments</label>
+                  <textarea rows="5" id="hr_comments" class="form-control" disabled>{{i.request.hr_comments}}</textarea>
+                </div>
+              {% endif %}
+              <div class="col-md-12 form-group">
+                <label for="status">Status</label>
+                <input id="status" class="form-control" value="{{i.request.status}}" disabled>
+              </div>
+            </div>
+          {% endif %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}

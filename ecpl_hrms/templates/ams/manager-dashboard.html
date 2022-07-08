@@ -211,6 +211,7 @@ text-align: center;
                       </div>
                     </div>
                   </div>
+                  {% if map_tickets_counts > 0 %}
                   <div class="col-md-6 mt-2">
                     <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
                       <div class="card-header" style="background: #1C7BA8; color: #fff;">
@@ -221,6 +222,8 @@ text-align: center;
                       </div>
                     </div>
                   </div>
+                  {% endif %}
+                  {% if leave_req_count > 0 %}
                   <div class="col-md-6 mt-2">
                     <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
                       <div class="card-header" style="background: #1C7BA8; color: #fff;">
@@ -231,6 +234,8 @@ text-align: center;
                       </div>
                     </div>
                   </div>
+                  {% endif %}
+                  {% if leave_esc_count > 0 %}
                   <div class="col-md-6 mt-2">
                     <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
                       <div class="card-header" style="background: #1C7BA8; color: #fff;">
@@ -241,6 +246,19 @@ text-align: center;
                       </div>
                     </div>
                   </div>
+                  {% endif %}
+                  {% if exit_req_count > 0 %}
+                    <div class="col-md-6 mt-2">
+                      <div class="card topcards" style="box-shadow: rgba(42, 63, 84, 0.35) 0px 5px 15px;">
+                        <div class="card-header" style="background: #1C7BA8; color: #fff;">
+                          <h2>Exit Requests</h2>
+                        </div>
+                        <div class="card-body">
+                          <a href="/ams/view-exit-request-rm"><h1 style="margin: 0px !important;">{{exit_req_count}}</h1></a>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
                 </div>
               </div>
             </div>
