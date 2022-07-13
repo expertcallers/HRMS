@@ -279,8 +279,12 @@ def getBirthdays():
     # Birthday Start
     start = date.today()
     end = start + timedelta(days=30)
-    this_month = OnboardingnewHRC.objects.filter(emp_dob__month=start.month).order_by('emp_dob')
-    next_month = OnboardingnewHRC.objects.filter(emp_dob__month=end.month).order_by('emp_dob')
+    emps = Profile.objects.exclude(agent_status__in=['Attrition', 'Attrition Duplicate', 'NCNS'])
+    emp_ids = []
+    for i in emps:
+        emp_ids.append(i.emp_id)
+    this_month = OnboardingnewHRC.objects.filter(emp_id__in=emp_ids, emp_dob__month=start.month)
+    next_month = OnboardingnewHRC.objects.filter(emp_id__in=emp_ids, emp_dob__month=end.month)
     birthdays = []
 
     def birthdayCreator(mnth, yr):
@@ -295,7 +299,7 @@ def getBirthdays():
     birthdays = sorted(birthdays, key=lambda x: x['dob'])
     new_birthdays = []
     for i in birthdays:
-        if i['dob'] >= date.today():
+        if i['dob'] >= date.today() and i['dob'] <= date.today()+timedelta(days=30):
             new_birthdays.append(i)
     return new_birthdays
     # Birthday End
@@ -417,6 +421,7 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
                     cal.att_actual = att_actual
                     cal.appoved_by = request.user.profile.emp_name
                     cal.approved_on = now
+                    cal.unique_id = 'Leave Approval'
                     cal.save()
                 except EcplCalander.DoesNotExist:
                     cal = EcplCalander.objects.create(
@@ -425,7 +430,7 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
                         rm1=rm1, rm2=rm2, rm3=rm3,
                         rm1_id=e.emp_rm1_id, rm2_id=e.emp_rm2_id, rm3_id=e.emp_rm3_id,
                         approved_on=now, emp_desi=emp_desi, appoved_by=request.user.profile.emp_name,
-                        emp_name=emp_name
+                        emp_name=emp_name, unique_id='Leave Approval',
                     )
                     cal.save()
 
@@ -455,6 +460,7 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
 
         e.manager_approval = manager_approval
         e.manager_reason = om_reason
+        e.manager_date = datetime.now()
         e.manager_status = manager_status
         e.status = status
         e.save()
@@ -1416,6 +1422,7 @@ def attendanceCalendar(request):
         month_days.append(start_date.strftime("%Y-%m-%d"))
         start_date += delta
     month_cal = []
+
     for i in month_days:
         dict = {}
         try:
@@ -1532,7 +1539,7 @@ def createMappingTicket(request):  # Test1
     if request.method == "POST":
         usr_name = request.user.profile.emp_name
         usr_id = request.user.profile.emp_id
-        dt = date.today()
+        dt = datetime.now()
         emp_id = request.POST["emp_id"]
         prof = Profile.objects.get(emp_id=emp_id)
         new_rm1_id = request.POST["new_rm1_id"]
@@ -1586,7 +1593,7 @@ def approveMappingTicket(request):  # Test1
         id = request.POST['id']
         action = request.POST['action']
         reason = request.POST.get('reason')
-        td = date.today()
+        td = datetime.now()
         ticket = MappingTickets.objects.get(id=id)
         ticket.action = action
         ticket.reason = reason
@@ -1705,6 +1712,9 @@ def applyLeave(request):  # Test1
                     "%d %B, %Y")) + ' and ' + str(
                 datetime.strptime(str(date.today() + monthdelta.monthdelta(1)), '%Y-%m-%d').strftime("%d %B, %Y")))
             return redirect('/ams/ams-apply_leave')
+        if check_start_date < date(date.today().year, date.today().month, 1):
+            messages.error(request, "You cannot apply leave for previous month. Please select current month dates.")
+            return redirect('/ams/ams-apply_leave')
         list_start_date = datetime.strptime(start_date,
                                             '%Y-%m-%d').date()  # To Convert type of start_date from string to date
         list_end_date = datetime.strptime(end_date,
@@ -1741,9 +1751,11 @@ def applyLeave(request):  # Test1
             if rm1_desi in manager_list or rm1_desi in hr_om_list:
                 e.tl_status = 'Approved'
                 e.tl_approval = True
+                e.tl_date = datetime.now()
                 e.tl_reason = 'OM as TL'
             if emp_desi in manager_list or emp_desi in tl_am_list or emp_desi in hr_tl_am_list or emp_desi in hr_om_list:
                 e.tl_status = 'Approved'
+                e.tl_date = datetime.now()
                 e.tl_approval = True
                 e.tl_reason = 'Self Approved'
             e.save()
@@ -1843,6 +1855,7 @@ def approveLeaveRM1(request):  # Test1
         e.tl_approval = tl_approval
         e.tl_reason = tl_reason
         e.tl_status = tl_status
+        e.tl_date = datetime.now()
         e.status = status
         e.save()
         return redirect('/ams/view-leave-list')
@@ -2050,6 +2063,7 @@ def approveAttendanceRequest(request):  # test1
             cal.att_actual = hist.att_new
             cal.approved_on = datetime.now()
             cal.appoved_by = emp.emp_name
+            cal.unique_id = 'Attendance Correction'
             cal.save()
             att_actual = hist.att_new
             old_att = hist.att_old
@@ -2112,6 +2126,7 @@ def approveAttendanceRequest(request):  # test1
         hist.status = True
         hist.comments = comments
         hist.approved_by = request.user.profile.emp_name
+        hist.approved_on = datetime.now()
         hist.om_response = om_resp
         hist.save()
         return redirect('/ams/approve-att-correction-req')
@@ -2361,7 +2376,7 @@ def AttendanceCorrectionSubmitAdmin(request):
                                 cal.appoved_by = "CC Team"
                             cal_update.append(cal)
                             att_his = AttendanceCorrectionHistory(
-                                applied_by=emp_name, applied_by_id=emp_id, applied_date=date.today(),
+                                applied_by=emp_name, applied_by_id=request.user.profile.emp_id, applied_date=date.today(),
                                 date_for=cal.date, att_old=old_att, att_new=new_att,
                                 emp_name=emp.emp_name, emp_id=emp.emp_id, rm3_name=emp.emp_rm3,
                                 rm3_id=emp.emp_rm3_id, approved_by='CC TEAM', status=True, cal_id=cal.id,
@@ -2388,7 +2403,7 @@ def AttendanceCorrectionSubmitAdmin(request):
                                 )
                                 cal.save()
                             att_his = AttendanceCorrectionHistory(
-                                applied_by=emp_name, applied_by_id=emp_id, applied_date=date.today(),
+                                applied_by=emp_name, applied_by_id=request.user.profile.emp_id, applied_date=date.today(),
                                 date_for=cal.date, att_old=None, att_new=new_att,
                                 emp_name=emp.emp_name, emp_id=emp.emp_id, rm3_name=emp.emp_rm3,
                                 rm3_id=emp.emp_rm3_id, approved_by='CC TEAM', status=True, cal_id=cal.id,
