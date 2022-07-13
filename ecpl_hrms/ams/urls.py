@@ -92,7 +92,7 @@ urlpatterns = [
     path('add-leave-balance/<str:a>', addLeaveBalanceMonthly),
     path('auto-approve-leave', autoApproveLeave),
     path('add-attendance', addAttendance),
-    path('sandwich', sandwichPolicy),
+    path('sandwich', newsandwichpolicy),
     path('maternity-leave', maternityLeave),
 
 

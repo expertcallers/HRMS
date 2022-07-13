@@ -3131,6 +3131,81 @@ def sandwichPolicy(request):
     return redirect('/ams/')
 
 
+def newsandwichpolicy(request):
+    month_days = []  
+    year = 2022
+    month = 6
+    a, num_days = calendar.monthrange(year, month)
+    start_date = date(year, month, 1)
+    end_date = date(year, month, num_days)
+    delta = timedelta(days=1)
+    while start_date <= end_date:
+        month_days.append(start_date)
+        start_date += delta
+    ids = []
+    emps = EmployeeLeaveBalance.objects.filter(unique_id=6)
+    for i in emps:
+        ids.append(i.emp_id)
+
+    leaves_list= []
+    leaves = EcplCalander.objects.filter(Q(att_actual__in = ['PL','SL','Absent']),Q(date__month=6))
+    for i in leaves:
+        d = {}
+      
+        d['date']= i.date
+        d['emp_id'] = i.emp_id
+        leaves_list.append(d)
+
+    off_list = []
+    offs = EcplCalander.objects.filter(Q(att_actual__in=['Week OFF']),Q(date__month=6))
+    for i in offs:
+        d={}
+        d['date']=i.date
+        d['emp_id']=i.emp_id
+        off_list.append(d)
+    
+    print(leaves_list)
+
+    for i in leaves_list:
+        eid = i['emp_id']
+        edate = i['date']
+        nextdate = edate + timedelta(days=1)     
+        
+        for j in off_list:
+            while j['date'] == nextdate and j['emp_id']== eid:
+                nextdate = nextdate + timedelta(days=1)
+                
+        d = nextdate
+        print(d)
+
+        for j in leaves_list:
+            if j['emp_id'] == eid and j['date']== d:
+                print('sandwich on ', d)
+            else:     
+                leaves_list.remove(j)
+    
+  
+        print(leaves_list)
+
+                   
+
+
+
+            
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
 
 
 

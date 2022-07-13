@@ -50,4 +50,4 @@ admin.site.register(LoginHistory, LoginHistorySearch)
 admin.site.register(Profile, ProfileSearch)
 admin.site.register(MappingHistory, MappingSearch)
 admin.site.register(NewData, DataSearch)
-admin.site.register(EmpSeparation, SeperationSearch)
+
