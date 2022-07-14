@@ -3150,20 +3150,20 @@ def newsandwichpolicy(request):
     # data = [{'id': 0, 'price': 20}, {'id': 1, 'price': 10}]
     # Match.objects.bulk_update([Match(**kv) for kv in data], ['price'])
 
-    month_days = []  
-    year = 2022
-    month = 6
-    a, num_days = calendar.monthrange(year, month)
-    start_date = date(year, month, 1)
-    end_date = date(year, month, num_days)
-    delta = timedelta(days=1)
-    while start_date <= end_date:
-        month_days.append(start_date)
-        start_date += delta
-    ids = []
-    emps = EmployeeLeaveBalance.objects.filter(unique_id=6)
-    for i in emps:
-        ids.append(i.emp_id)
+    # month_days = []  
+    # year = 2022
+    # month = 6
+    # a, num_days = calendar.monthrange(year, month)
+    # start_date = date(year, month, 1)
+    # end_date = date(year, month, num_days)
+    # delta = timedelta(days=1)
+    # while start_date <= end_date:
+    #     month_days.append(start_date)
+    #     start_date += delta
+    # ids = []
+    # emps = EmployeeLeaveBalance.objects.filter(unique_id=6)
+    # for i in emps:
+    #     ids.append(i.emp_id)
 
     leaves_list= []
     leaves = EcplCalander.objects.filter(Q(att_actual__in = ['PL','SL','Absent']),Q(date__month=6))
@@ -3207,46 +3207,15 @@ def newsandwichpolicy(request):
                 print('sandwich between/emp_id ', edate,d,eid)
             else:     
                 pass
-    print(sand)
+    # data = {'sand':sand}
+    # return render(request,'ams/sandwich.html',data)
+    
     for i in sand:
         cal = EcplCalander.objects.filter(emp_id=i['emp_id'], date__gt =i['start'],date__lt=i['end'])
         for j in cal:
-            print(j.att_actual,j.emp_id, j.date)
-
-
-
-
-        
-
-                   
-
-
-
-            
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-  
-
-
-    # return redirect('/ams/')
+            j.att_actual = 'Absent'
+            j.save()
+    return redirect('/ams/')
 
 
 def TestFun(request):
