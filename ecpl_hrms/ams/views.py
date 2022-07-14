@@ -3147,6 +3147,9 @@ def sandwichPolicy(request):
 
 
 def newsandwichpolicy(request):
+    # data = [{'id': 0, 'price': 20}, {'id': 1, 'price': 10}]
+    # Match.objects.bulk_update([Match(**kv) for kv in data], ['price'])
+
     month_days = []  
     year = 2022
     month = 6
@@ -3178,9 +3181,9 @@ def newsandwichpolicy(request):
         d['date']=i.date
         d['emp_id']=i.emp_id
         off_list.append(d)
-    
-    print(leaves_list)
 
+    # Sandwich master list
+    sand = []
     for i in leaves_list:
         eid = i['emp_id']
         edate = i['date']
@@ -3191,16 +3194,29 @@ def newsandwichpolicy(request):
                 nextdate = nextdate + timedelta(days=1)
                 
         d = nextdate
-        print(d)
-
         for j in leaves_list:
             if j['emp_id'] == eid and j['date']== d:
-                print('sandwich on ', d)
+                di = {}
+                
+                di['start'] = edate
+                di['end'] = d
+                di['emp_id'] = eid
+
+                sand.append(di)
+
+                print('sandwich between/emp_id ', edate,d,eid)
             else:     
-                leaves_list.remove(j)
-    
-  
-        print(leaves_list)
+                pass
+    print(sand)
+    for i in sand:
+        cal = EcplCalander.objects.filter(emp_id=i['emp_id'], date__gt =i['start'],date__lt=i['end'])
+        for j in cal:
+            print(j.att_actual,j.emp_id, j.date)
+
+
+
+
+        
 
                    
 
