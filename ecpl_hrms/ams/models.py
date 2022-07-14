@@ -187,25 +187,25 @@ class LeaveTable(models.Model):
 
 
 # Attendance correction history - send - approve ++
-class AttendanceCorrectionHistory(models.Model):
-    unique_id = models.CharField(max_length=150, null=True, blank=True)
-    applied_by = models.CharField(max_length=30, null=True, blank=True)
-    applied_by_id = models.CharField(max_length=30, null=True, blank=True)
-    applied_date = models.DateField()
-    date_for = models.DateField()
-    att_old = models.CharField(max_length=30, null=True, blank=True)
-    att_new = models.CharField(max_length=30, null=True, blank=True)
-    emp_name = models.CharField(max_length=30, null=True, blank=True)
-    emp_id = models.CharField(max_length=30, null=True, blank=True)
-    rm3_name = models.CharField(max_length=50)
-    rm3_id = models.CharField(max_length=50)
-    approved_by = models.CharField(max_length=30, null=True, blank=True)
-    approved_on = models.DateTimeField(null=True, blank=True)
-    status = models.BooleanField(default=False)
-    cal_id = models.IntegerField()
-    om_response = models.CharField(max_length=150, default='Pending by OM')
-    comments = models.TextField(null=True, blank=True)
-    reason = models.TextField(null=True, blank=True)
+# class AttendanceCorrectionHistory(models.Model):
+#     unique_id = models.CharField(max_length=150, null=True, blank=True)
+#     applied_by = models.CharField(max_length=30, null=True, blank=True)
+#     applied_by_id = models.CharField(max_length=30, null=True, blank=True)
+#     applied_date = models.DateField()
+#     date_for = models.DateField()
+#     att_old = models.CharField(max_length=30, null=True, blank=True)
+#     att_new = models.CharField(max_length=30, null=True, blank=True)
+#     emp_name = models.CharField(max_length=30, null=True, blank=True)
+#     emp_id = models.CharField(max_length=30, null=True, blank=True)
+#     rm3_name = models.CharField(max_length=50)
+#     rm3_id = models.CharField(max_length=50)
+#     approved_by = models.CharField(max_length=30, null=True, blank=True)
+#     approved_on = models.DateTimeField(null=True, blank=True)
+#     status = models.BooleanField(default=False)
+#     cal_id = models.IntegerField()
+#     om_response = models.CharField(max_length=150, default='Pending by OM')
+#     comments = models.TextField(null=True, blank=True)
+#     reason = models.TextField(null=True, blank=True)
 
 
 # Agent status change history - att - ben - training +
