@@ -32,14 +32,14 @@ class JobRequisition(models.Model):
 
     other_quali = models.CharField(max_length=150,null=True,blank=True)
 
-    skills_set = models.TextField()
-    languages = models.TextField()
+    skills_set = models.TextField(null=True,blank=True)
+    languages = models.TextField(null=True,blank=True)
 
-    shift_timing = models.CharField(max_length=20)
+    shift_timing = models.CharField(max_length=20,null=True,blank=True)
     shift_timing_frm = models.CharField(max_length=20,null=True,blank=True)
     shift_timing_to = models.CharField(max_length=20,null=True,blank=True)
 
-    type_of_working = models.CharField(max_length=100)
+    type_of_working = models.CharField(max_length=100,null=True,blank=True)
 
     working_from = models.CharField(max_length=20,null=True,blank=True)
     working_to = models.CharField(max_length=20,null=True,blank=True)
@@ -48,7 +48,7 @@ class JobRequisition(models.Model):
     week_from = models.CharField(max_length=20,null=True,blank=True)
     week_to = models.CharField(max_length=20,null=True,blank=True)
 
-    requisition_type = models.CharField(max_length=50)
+    requisition_type = models.CharField(max_length=50,null=True,blank=True)
     reason_for_replace = models.TextField(null=True,blank=True)
     closure_date = models.DateField(null=True, blank=True)
 
