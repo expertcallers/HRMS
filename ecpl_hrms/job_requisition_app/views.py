@@ -1260,16 +1260,6 @@ def jobRequisitionEditUpdate(request):
             e.interviewer_8 = interviewer_8
             e.interviewer_9 = interviewer_9
             e.interviewer_10 = interviewer_10
-            e.interviewer_11 = interviewer_11
-            e.interviewer_12 = interviewer_12
-            e.interviewer_13 = interviewer_13
-            e.interviewer_14 = interviewer_14
-            e.interviewer_15 = interviewer_15
-            e.interviewer_16 = interviewer_16
-            e.interviewer_17 = interviewer_17
-            e.interviewer_18 = interviewer_18
-            e.interviewer_19 = interviewer_19
-            e.interviewer_20 = interviewer_20
             e.interviewer_id_1 = interviewer_id_1
             e.interviewer_id_2 = interviewer_id_2
             e.interviewer_id_3 = interviewer_id_3
@@ -1280,16 +1270,6 @@ def jobRequisitionEditUpdate(request):
             e.interviewer_id_8 = interviewer_id_8
             e.interviewer_id_9 = interviewer_id_9
             e.interviewer_id_10 = interviewer_id_10
-            e.interviewer_id_11 = interviewer_id_11
-            e.interviewer_id_12 = interviewer_id_12
-            e.interviewer_id_13 = interviewer_id_13
-            e.interviewer_id_14 = interviewer_id_14
-            e.interviewer_id_15 = interviewer_id_15
-            e.interviewer_id_16 = interviewer_id_16
-            e.interviewer_id_17 = interviewer_id_17
-            e.interviewer_id_18 = interviewer_id_18
-            e.interviewer_id_19 = interviewer_id_19
-            e.interviewer_id_20 = interviewer_id_20
             e.unique_id = unique
             if request_status == "Waiting For Manager Approval":
                 e.initial_status = True
@@ -1409,116 +1389,6 @@ def jobRequisitionEditUpdate(request):
                 e.source_internal_campaign_name_10 = source_internal_campaign_name_10
                 e.source_social_10 = social_10
                 e.source_partners_10 = partner_10
-            if candidate_name_11:
-                e.candidate_name_11 = candidate_name_11
-                e.source_11 = source_11
-                e.source_emp_name_11 = referral_emp_name_11
-                e.source_emp_id_11 = referral_emp_id_11
-                if source_internal_emp_id_11:
-                    e.source_internal_emp_name_11 = source_internal_emp_name_11
-                e.source_internal_emp_id_11 = source_internal_emp_id_11
-                e.source_internal_campaign_name_11 = source_internal_campaign_name_11
-                e.source_social_11 = social_11
-                e.source_partners_11 = partner_11
-            if candidate_name_12:
-                e.candidate_name_12 = candidate_name_12
-                e.source_12 = source_12
-                e.source_emp_name_12 = referral_emp_name_12
-                e.source_emp_id_12 = referral_emp_id_12
-                if source_internal_emp_id_12:
-                    e.source_internal_emp_name_12 = source_internal_emp_name_12
-                e.source_internal_emp_id_12 = source_internal_emp_id_12
-                e.source_internal_campaign_name_12 = source_internal_campaign_name_12
-                e.source_social_12 = social_12
-                e.source_partners_12 = partner_12
-            if candidate_name_13:
-                e.candidate_name_13 = candidate_name_13
-                e.source_13 = source_13
-                e.source_emp_name_13 = referral_emp_name_13
-                e.source_emp_id_13 = referral_emp_id_13
-                if source_internal_emp_id_13:
-                    e.source_internal_emp_name_13 = source_internal_emp_name_13
-                e.source_internal_emp_id_13 = source_internal_emp_id_13
-                e.source_internal_campaign_name_13 = source_internal_campaign_name_13
-                e.source_social_13 = social_13
-                e.source_partners_13 = partner_13
-            if candidate_name_14:
-                e.candidate_name_14 = candidate_name_14
-                e.source_14 = source_14
-                e.source_emp_name_14 = referral_emp_name_14
-                e.source_emp_id_14 = referral_emp_id_14
-                if source_internal_emp_id_14:
-                    e.source_internal_emp_name_14 = source_internal_emp_name_14
-                e.source_internal_emp_id_14 = source_internal_emp_id_14
-                e.source_internal_campaign_name_14 = source_internal_campaign_name_14
-                e.source_social_14 = social_14
-                e.source_partners_14 = partner_14
-            if candidate_name_15:
-                e.candidate_name_15 = candidate_name_15
-                e.source_15 = source_15
-                e.source_emp_name_15 = referral_emp_name_15
-                e.source_emp_id_15 = referral_emp_id_15
-                if source_internal_emp_id_15:
-                    e.source_internal_emp_name_15 = source_internal_emp_name_15
-                e.source_internal_emp_id_15 = source_internal_emp_id_15
-                e.source_internal_campaign_name_15 = source_internal_campaign_name_15
-                e.source_social_15 = social_15
-                e.source_partners_15 = partner_15
-            if candidate_name_16:
-                e.candidate_name_16 = candidate_name_16
-                e.source_16 = source_16
-                e.source_emp_name_16 = referral_emp_name_16
-                e.source_emp_id_16 = referral_emp_id_16
-                if source_internal_emp_id_16:
-                    e.source_internal_emp_name_16 = source_internal_emp_name_16
-                e.source_internal_emp_id_16 = source_internal_emp_id_16
-                e.source_internal_campaign_name_16 = source_internal_campaign_name_16
-                e.source_social_16 = social_16
-                e.source_partners_16 = partner_16
-            if candidate_name_17:
-                e.candidate_name_17 = candidate_name_17
-                e.source_17 = source_17
-                e.source_emp_name_17 = referral_emp_name_17
-                e.source_emp_id_17 = referral_emp_id_17
-                if source_internal_emp_id_17:
-                    e.source_internal_emp_name_17 = source_internal_emp_name_17
-                e.source_internal_emp_id_17 = source_internal_emp_id_17
-                e.source_internal_campaign_name_17 = source_internal_campaign_name_17
-                e.source_social_17 = social_17
-                e.source_partners_17 = partner_17
-            if candidate_name_18:
-                e.candidate_name_18 = candidate_name_18
-                e.source_18 = source_18
-                e.source_emp_name_18 = referral_emp_name_18
-                e.source_emp_id_18 = referral_emp_id_18
-                if source_internal_emp_id_18:
-                    e.source_internal_emp_name_18 = source_internal_emp_name_18
-                e.source_internal_emp_id_18 = source_internal_emp_id_18
-                e.source_internal_campaign_name_18 = source_internal_campaign_name_18
-                e.source_social_18 = social_18
-                e.source_partners_18 = partner_18
-            if candidate_name_19:
-                e.candidate_name_19 = candidate_name_19
-                e.source_19 = source_19
-                e.source_emp_name_19 = referral_emp_name_19
-                e.source_emp_id_19 = referral_emp_id_19
-                if source_internal_emp_id_19:
-                    e.source_internal_emp_name_19 = source_internal_emp_name_19
-                e.source_internal_emp_id_19 = source_internal_emp_id_19
-                e.source_internal_campaign_name_19 = source_internal_campaign_name_19
-                e.source_social_19 = social_19
-                e.source_partners_19 = partner_19
-            if candidate_name_20:
-                e.candidate_name_20 = candidate_name_20
-                e.source_20 = source_20
-                e.source_emp_name_20 = referral_emp_name_20
-                e.source_emp_id_20 = referral_emp_id_20
-                if source_internal_emp_id_20:
-                    e.source_internal_emp_name_20 = source_internal_emp_name_20
-                e.source_internal_emp_id_20 = source_internal_emp_id_20
-                e.source_internal_campaign_name_20 = source_internal_campaign_name_20
-                e.source_social_20 = social_20
-                e.source_partners_20 = partner_20
 
             e.recruited_people = recruited_people
             e.request_status = request_status
