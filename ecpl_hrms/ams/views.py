@@ -31,7 +31,7 @@ from django.apps import apps
 
 Profile = apps.get_model('mapping', 'Profile')
 LoginHistory = apps.get_model('mapping', 'LoginHistory')
-EmpSeparation = apps.get_model('mapping', 'EmpSeparation')
+# EmpSeparation = apps.get_model('mapping', 'EmpSeparation')
 
 # TL and AM List
 tl_am_list = ['Assistant Manager']
