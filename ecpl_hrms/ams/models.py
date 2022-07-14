@@ -341,6 +341,6 @@ class ItemDescriptionAdministration(models.Model):
     amount = models.FloatField()
 
 
-# class AccessControl(models.Model):
-#     emp_id = models.CharField(max_length=30)
-#     access = models.CharField(max_length=200)
+class AccessControl(models.Model):
+    emp_id = models.CharField(max_length=30)
+    access = models.CharField(max_length=200)
