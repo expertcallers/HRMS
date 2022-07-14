@@ -40,10 +40,10 @@ class LoginHistorySearch(admin.ModelAdmin):
     list_display = ('profile', 'id', 'date', 'login', 'logout','done')
     list_filter = ("date", 'done')
 
-# class SeperationSearch(admin.ModelAdmin):
-#     search_fields = ('profile__emp_id', 'profile__emp_name', 'date')
-#     list_display = ('profile', 'id', 'date', 'reason', 'rm1_approval', 'rm2_approval', 'rm3_approval',
-#                     'admin_approval', 'hr_approval', 'status')
+class SeperationSearch(admin.ModelAdmin):
+    search_fields = ('profile__emp_id', 'profile__emp_name', 'date')
+    list_display = ('profile', 'id', 'date', 'reason', 'rm1_approval', 'rm2_approval', 'rm3_approval',
+                    'admin_approval', 'hr_approval', 'status')
 
 
 admin.site.register(LoginHistory, LoginHistorySearch)
