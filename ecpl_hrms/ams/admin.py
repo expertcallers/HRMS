@@ -45,11 +45,11 @@ class AgentActiveStatusHistSearch(admin.ModelAdmin):
     'emp_name', 'emp_id', 'current_status', 'new_status', 'date', 'changed_by', 'approved_by', 'ticket_status')
 
 
-# class AttendanceCorrectionHistorySearch(admin.ModelAdmin):
-#     search_fields = ('emp_name', 'emp_id')
-#     list_display = (
-#     'emp_name', 'emp_id', 'applied_by', 'date_for', 'att_old', 'att_new', 'reason', 'om_response', 'approved_by',
-#     'status')
+class AttendanceCorrectionHistorySearch(admin.ModelAdmin):
+    search_fields = ('emp_name', 'emp_id')
+    list_display = (
+    'emp_name', 'emp_id', 'applied_by', 'date_for', 'att_old', 'att_new', 'reason', 'om_response', 'approved_by',
+    'status')
 
 
 class LeaveTableSearch(admin.ModelAdmin):
@@ -156,7 +156,7 @@ admin.site.register(LeaveTable, LeaveTableSearch)
 admin.site.register(AddAttendanceMonths, AddAttendanceMonthsSearch)
 admin.site.register(leaveHistory, LeaveHistorySearch)
 admin.site.register(DaysForAttendance, DateStatus)
-# admin.site.register(AttendanceCorrectionHistory, AttendanceCorrectionHistorySearch)
+admin.site.register(AttendanceCorrectionHistory, AttendanceCorrectionHistorySearch)
 admin.site.register(MappingTickets, MappingSearch)
 admin.site.register(LastEmpId)
 admin.site.register(NoticeECPL)
