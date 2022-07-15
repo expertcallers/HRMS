@@ -405,35 +405,38 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
         om_response = request.POST['tl_response']
         om_reason = request.POST['tl_reason']
         if om_response == 'Approve':
-            manager_approval = True
-            manager_status = 'Approved'
-            status = 'Approved'
-            month_days = []
-            start_date = start_date
-            end_date = end_date
-            delta = timedelta(days=1)
-            while start_date <= end_date:
-                month_days.append(start_date.strftime("%Y-%m-%d"))
-                start_date += delta
-            for i in month_days:
-                try:
-                    cal = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id))
-                    cal.att_actual = att_actual
-                    cal.appoved_by = request.user.profile.emp_name
-                    cal.approved_on = now
-                    cal.unique_id = 'Leave Approval'
-                    cal.save()
-                except EcplCalander.DoesNotExist:
-                    cal = EcplCalander.objects.create(
-                        team=team, date=i, emp_id=emp_id,
-                        att_actual=att_actual,
-                        rm1=rm1, rm2=rm2, rm3=rm3,
-                        rm1_id=e.emp_rm1_id, rm2_id=e.emp_rm2_id, rm3_id=e.emp_rm3_id,
-                        approved_on=now, emp_desi=emp_desi, appoved_by=request.user.profile.emp_name,
-                        emp_name=emp_name, unique_id='Leave Approval',
-                    )
-                    cal.save()
-
+            if e.start_date < date(date.today().year, date.today().month, 1):
+                messages.error(request, 'Previous Month Leaves cannot be approved in this month.')
+                return redirect('/ams/view-leave-request-mgr')
+            else:
+                manager_approval = True
+                manager_status = 'Approved'
+                status = 'Approved'
+                month_days = []
+                start_date = start_date
+                end_date = end_date
+                delta = timedelta(days=1)
+                while start_date <= end_date:
+                    month_days.append(start_date.strftime("%Y-%m-%d"))
+                    start_date += delta
+                for i in month_days:
+                    try:
+                        cal = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id))
+                        cal.att_actual = att_actual
+                        cal.appoved_by = request.user.profile.emp_name
+                        cal.approved_on = now
+                        cal.unique_id = 'Leave Approval'
+                        cal.save()
+                    except EcplCalander.DoesNotExist:
+                        cal = EcplCalander.objects.create(
+                            team=team, date=i, emp_id=emp_id,
+                            att_actual=att_actual,
+                            rm1=rm1, rm2=rm2, rm3=rm3,
+                            rm1_id=e.emp_rm1_id, rm2_id=e.emp_rm2_id, rm3_id=e.emp_rm3_id,
+                            approved_on=now, emp_desi=emp_desi, appoved_by=request.user.profile.emp_name,
+                            emp_name=emp_name, unique_id='Leave Approval',
+                        )
+                        cal.save()
         else:
             manager_approval = True
             manager_status = 'Rejected'
@@ -1826,9 +1829,13 @@ def approveLeaveRM1(request):  # Test1
         tl_response = request.POST['tl_response']
         tl_reason = request.POST['tl_reason']
         if tl_response == 'Approve':
-            tl_approval = True
-            tl_status = 'Approved'
-            status = 'Pending'
+            if e.start_date < date(date.today().year, date.today().month, 1):
+                messages.error(request, 'Previous Month Leaves cannot be approved in this month.')
+                return redirect('/ams/view-leave-list')
+            else:
+                tl_approval = True
+                tl_status = 'Approved'
+                status = 'Pending'
         else:
             tl_approval = True
             tl_status = 'Rejected'
