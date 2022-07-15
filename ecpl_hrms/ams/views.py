@@ -1695,16 +1695,24 @@ def applyLeave(request):  # Test1
                 i.start_date += timedelta(days=1)
         new_leave_dates = []
         check_start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
-        if check_start_date < date.today() - monthdelta.monthdelta(
-                1) or check_start_date > date.today() + monthdelta.monthdelta(1):
-            messages.error(request, "Correct the selected dates. "
-                                    "Selected dates must be between " + str(
-                datetime.strptime(str(date.today() - monthdelta.monthdelta(1)), '%Y-%m-%d').strftime(
-                    "%d %B, %Y")) + ' and ' + str(
-                datetime.strptime(str(date.today() + monthdelta.monthdelta(1)), '%Y-%m-%d').strftime("%d %B, %Y")))
+        check_end_date = date(date.today().year, date.today().month, 1) + monthdelta.monthdelta(1)
+        check_end_date = check_end_date - timedelta(days=1)
+        if check_start_date < date(date.today().year, date.today().month, 1) or check_start_date > date.today() + monthdelta.monthdelta(1):
+            if leave_type == 'SL':
+                messages.error(request, "Correct the selected dates. "
+                                        "Selected dates must be between " + str(
+                    datetime.strptime(str(date(date.today().year, date.today().month, 1)), '%Y-%m-%d').strftime(
+                        "%d %B, %Y")) + ' and ' + str(
+                    datetime.strptime(str(date.today()), '%Y-%m-%d').strftime("%d %B, %Y")))
+            else:
+                messages.error(request, "Correct the selected dates. "
+                                        "Selected dates must be between " + str(
+                    datetime.strptime(str(date.today()), '%Y-%m-%d').strftime(
+                        "%d %B, %Y")) + ' and ' + str(
+                    datetime.strptime(str(check_end_date), '%Y-%m-%d').strftime("%d %B, %Y")))
             return redirect('/ams/ams-apply_leave')
         if check_start_date < date(date.today().year, date.today().month, 1):
-            messages.error(request, "You cannot apply leave for previous month. Please select current month dates.")
+            messages.error(request, "You cannot apply leave for previous months. Please select current month dates.")
             return redirect('/ams/ams-apply_leave')
         list_start_date = datetime.strptime(start_date,
                                             '%Y-%m-%d').date()  # To Convert type of start_date from string to date
