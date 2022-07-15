@@ -3211,8 +3211,7 @@ def newsandwichpolicy(request):
 
                 sand.append(di)
 
-                print('sandwich between/emp_id ', edate,d,eid)
-            else:     
+            else:
                 pass
     # data = {'sand':sand}
     # return render(request,'ams/sandwich.html',data)
