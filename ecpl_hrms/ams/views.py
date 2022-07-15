@@ -2067,32 +2067,18 @@ def approveAttendanceRequest(request):  # test1
         hist = AttendanceCorrectionHistory.objects.get(id=id)
         cal = EcplCalander.objects.get(id=cal_id)
         if om_resp == 'Approved':
-            cal.att_actual = hist.att_new
-            cal.approved_on = datetime.now()
-            cal.appoved_by = emp.emp_name
-            cal.unique_id = 'Attendance Correction'
-            cal.save()
-            att_actual = hist.att_new
-            old_att = hist.att_old
-            if att_actual == 'Attrition' or att_actual == 'Bench':
-                usr = Profile.objects.get(emp_id=cal.emp_id)
-                usr.agent_status = att_actual
-                usr.save()
-                calendar = []
-                for i in EcplCalander.objects.filter(emp_id=cal.emp_id, date__gt=cal.date).exclude(att_actual__in=['PL', 'SL', 'ML']):
-                    i.att_actual = att_actual
-                    calendar.append(i)
-                EcplCalander.objects.bulk_update(calendar, ['att_actual'])
-            if att_actual == 'NCNS':
-                today = cal.date
-                yesterday = today - timedelta(days=1)
-                dby_date = yesterday - timedelta(days=1)
-                tmr = today + timedelta(days=1)
-                daftmr = tmr + timedelta(days=1)
-                date_range = [dby_date, today]
-                ncns_count = EcplCalander.objects.filter(emp_id=cal.emp_id, date__range=date_range,
-                                                         att_actual='NCNS').count()
-                if ncns_count >= 3:
+            if cal.date_for < date(date.today().year, date.today().month, 1):
+                messages.error(request, 'Previous Month Request cannot be approved in this month.')
+                return redirect('/ams/approve-att-correction-req')
+            else:
+                cal.att_actual = hist.att_new
+                cal.approved_on = datetime.now()
+                cal.appoved_by = emp.emp_name
+                cal.unique_id = 'Attendance Correction'
+                cal.save()
+                att_actual = hist.att_new
+                old_att = hist.att_old
+                if att_actual == 'Attrition' or att_actual == 'Bench':
                     usr = Profile.objects.get(emp_id=cal.emp_id)
                     usr.agent_status = att_actual
                     usr.save()
@@ -2101,24 +2087,42 @@ def approveAttendanceRequest(request):  # test1
                         i.att_actual = att_actual
                         calendar.append(i)
                     EcplCalander.objects.bulk_update(calendar, ['att_actual'])
-            if old_att == 'PL':
-                leave = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
-                leave.pl_balance += 1
-                leave.save()
-                leaveHistory.objects.create(
-                    emp_id=cal.emp_id, date=date.today(), leave_type='PL',
-                    transaction='Attendance Correction, Leave Refund which was applied on ' + str(cal.date), no_days=1,
-                    total=leave.pl_balance + leave.sl_balance
-                )
-            if old_att == 'SL':
-                leave = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
-                leave.sl_balance += 1
-                leave.save()
-                leaveHistory.objects.create(
-                    emp_id=cal.emp_id, date=date.today(), leave_type='PL',
-                    transaction='Attendance Correction, Leave Refund which was applied on ' + str(cal.date), no_days=1,
-                    total=leave.pl_balance + leave.sl_balance
-                )
+                if att_actual == 'NCNS':
+                    today = cal.date
+                    yesterday = today - timedelta(days=1)
+                    dby_date = yesterday - timedelta(days=1)
+                    tmr = today + timedelta(days=1)
+                    daftmr = tmr + timedelta(days=1)
+                    date_range = [dby_date, today]
+                    ncns_count = EcplCalander.objects.filter(emp_id=cal.emp_id, date__range=date_range,
+                                                             att_actual='NCNS').count()
+                    if ncns_count >= 3:
+                        usr = Profile.objects.get(emp_id=cal.emp_id)
+                        usr.agent_status = att_actual
+                        usr.save()
+                        calendar = []
+                        for i in EcplCalander.objects.filter(emp_id=cal.emp_id, date__gt=cal.date).exclude(att_actual__in=['PL', 'SL', 'ML']):
+                            i.att_actual = att_actual
+                            calendar.append(i)
+                        EcplCalander.objects.bulk_update(calendar, ['att_actual'])
+                if old_att == 'PL':
+                    leave = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
+                    leave.pl_balance += 1
+                    leave.save()
+                    leaveHistory.objects.create(
+                        emp_id=cal.emp_id, date=date.today(), leave_type='PL',
+                        transaction='Attendance Correction, Leave Refund which was applied on ' + str(cal.date), no_days=1,
+                        total=leave.pl_balance + leave.sl_balance
+                    )
+                if old_att == 'SL':
+                    leave = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
+                    leave.sl_balance += 1
+                    leave.save()
+                    leaveHistory.objects.create(
+                        emp_id=cal.emp_id, date=date.today(), leave_type='PL',
+                        transaction='Attendance Correction, Leave Refund which was applied on ' + str(cal.date), no_days=1,
+                        total=leave.pl_balance + leave.sl_balance
+                    )
         # if om_resp == 'Rejected':
         #     if hist.att_new == 'Half Day':
         #         leave_bal = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
