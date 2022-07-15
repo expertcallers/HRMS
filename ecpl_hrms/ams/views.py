@@ -727,9 +727,7 @@ def on_boarding(request):  # Test1
 @login_required
 def viewOnBoarding(request):  # Test1
     profiles = Profile.objects.filter(~Q(on_id=None))
-    onboard = []
-    for i in profiles:
-        onboard.append({"onboard": OnboardingnewHRC.objects.get(id=i.on_id), 'profile': i})
+    onboard = OnboardingnewHRC.objects.all()
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     data = {'onboard': onboard, 'emp': emp, 'hr_om_list': hr_om_list, 'hr_tl_am_list': hr_tl_am_list}
