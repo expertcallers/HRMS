@@ -1411,7 +1411,6 @@ import csv
 
 @login_required
 def attendanceCalendar(request):
-    print(datetime.now(), 'Start')
     emp_id = request.user.profile.emp_id
     # Month view
     year = date.today().year
@@ -1427,7 +1426,6 @@ def attendanceCalendar(request):
         dict['st'] = i.att_actual
         month_cal.append(dict)
     data = {'month_cal': month_cal}
-    print(datetime.now(), 'End')
     return render(request, 'ams/attendance-calendar.html', data)
 
 
