@@ -2067,7 +2067,7 @@ def approveAttendanceRequest(request):  # test1
         hist = AttendanceCorrectionHistory.objects.get(id=id)
         cal = EcplCalander.objects.get(id=cal_id)
         if om_resp == 'Approved':
-            if cal.date_for < date(date.today().year, date.today().month, 1):
+            if hist.date_for < date(date.today().year, date.today().month, 1):
                 messages.error(request, 'Previous Month Request cannot be approved in this month.')
                 return redirect('/ams/approve-att-correction-req')
             else:
