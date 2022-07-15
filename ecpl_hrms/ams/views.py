@@ -405,35 +405,38 @@ def viewAndApproveLeaveRequestMgr(request):  # Test1
         om_response = request.POST['tl_response']
         om_reason = request.POST['tl_reason']
         if om_response == 'Approve':
-            manager_approval = True
-            manager_status = 'Approved'
-            status = 'Approved'
-            month_days = []
-            start_date = start_date
-            end_date = end_date
-            delta = timedelta(days=1)
-            while start_date <= end_date:
-                month_days.append(start_date.strftime("%Y-%m-%d"))
-                start_date += delta
-            for i in month_days:
-                try:
-                    cal = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id))
-                    cal.att_actual = att_actual
-                    cal.appoved_by = request.user.profile.emp_name
-                    cal.approved_on = now
-                    cal.unique_id = 'Leave Approval'
-                    cal.save()
-                except EcplCalander.DoesNotExist:
-                    cal = EcplCalander.objects.create(
-                        team=team, date=i, emp_id=emp_id,
-                        att_actual=att_actual,
-                        rm1=rm1, rm2=rm2, rm3=rm3,
-                        rm1_id=e.emp_rm1_id, rm2_id=e.emp_rm2_id, rm3_id=e.emp_rm3_id,
-                        approved_on=now, emp_desi=emp_desi, appoved_by=request.user.profile.emp_name,
-                        emp_name=emp_name, unique_id='Leave Approval',
-                    )
-                    cal.save()
-
+            if e.start_date < date(date.today().year, date.today().month, 1):
+                messages.error(request, 'Previous Month Leaves cannot be approved in this month.')
+                return redirect('/ams/view-leave-request-mgr')
+            else:
+                manager_approval = True
+                manager_status = 'Approved'
+                status = 'Approved'
+                month_days = []
+                start_date = start_date
+                end_date = end_date
+                delta = timedelta(days=1)
+                while start_date <= end_date:
+                    month_days.append(start_date.strftime("%Y-%m-%d"))
+                    start_date += delta
+                for i in month_days:
+                    try:
+                        cal = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id))
+                        cal.att_actual = att_actual
+                        cal.appoved_by = request.user.profile.emp_name
+                        cal.approved_on = now
+                        cal.unique_id = 'Leave Approval'
+                        cal.save()
+                    except EcplCalander.DoesNotExist:
+                        cal = EcplCalander.objects.create(
+                            team=team, date=i, emp_id=emp_id,
+                            att_actual=att_actual,
+                            rm1=rm1, rm2=rm2, rm3=rm3,
+                            rm1_id=e.emp_rm1_id, rm2_id=e.emp_rm2_id, rm3_id=e.emp_rm3_id,
+                            approved_on=now, emp_desi=emp_desi, appoved_by=request.user.profile.emp_name,
+                            emp_name=emp_name, unique_id='Leave Approval',
+                        )
+                        cal.save()
         else:
             manager_approval = True
             manager_status = 'Rejected'
@@ -724,9 +727,7 @@ def on_boarding(request):  # Test1
 @login_required
 def viewOnBoarding(request):  # Test1
     profiles = Profile.objects.filter(~Q(on_id=None))
-    onboard = []
-    for i in profiles:
-        onboard.append({"onboard": OnboardingnewHRC.objects.get(id=i.on_id), 'profile': i})
+    onboard = OnboardingnewHRC.objects.all()
     emp_id = request.user.profile.emp_id
     emp = Profile.objects.get(emp_id=emp_id)
     data = {'onboard': onboard, 'emp': emp, 'hr_om_list': hr_om_list, 'hr_tl_am_list': hr_tl_am_list}
@@ -1410,27 +1411,17 @@ import csv
 def attendanceCalendar(request):
     emp_id = request.user.profile.emp_id
     # Month view
-    month_days = []
-    todays_date = date.today()
-    year = todays_date.year
-    month = todays_date.month
+    year = date.today().year
+    month = date.today().month
     a, num_days = calendar.monthrange(year, month)
-    start_date = date(year, month, 1)
+    start_date = date(year, month, 1) - monthdelta.monthdelta(1)
     end_date = date(year, month, num_days)
-    delta = timedelta(days=1)
-    while start_date <= end_date:
-        month_days.append(start_date.strftime("%Y-%m-%d"))
-        start_date += delta
+    cal = EcplCalander.objects.filter(Q(date__lte=end_date), Q(emp_id=emp_id))
     month_cal = []
-
-    for i in month_days:
+    for i in cal:
         dict = {}
-        try:
-            st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id)).att_actual
-        except EcplCalander.DoesNotExist:
-            st = 'Unmarked'
-        dict['dt'] = i
-        dict['st'] = st
+        dict['dt'] = str(i.date)
+        dict['st'] = i.att_actual
         month_cal.append(dict)
     data = {'month_cal': month_cal}
     return render(request, 'ams/attendance-calendar.html', data)
@@ -1826,9 +1817,13 @@ def approveLeaveRM1(request):  # Test1
         tl_response = request.POST['tl_response']
         tl_reason = request.POST['tl_reason']
         if tl_response == 'Approve':
-            tl_approval = True
-            tl_status = 'Approved'
-            status = 'Pending'
+            if e.start_date < date(date.today().year, date.today().month, 1):
+                messages.error(request, 'Previous Month Leaves cannot be approved in this month.')
+                return redirect('/ams/view-leave-list')
+            else:
+                tl_approval = True
+                tl_status = 'Approved'
+                status = 'Pending'
         else:
             tl_approval = True
             tl_status = 'Rejected'
@@ -2060,32 +2055,18 @@ def approveAttendanceRequest(request):  # test1
         hist = AttendanceCorrectionHistory.objects.get(id=id)
         cal = EcplCalander.objects.get(id=cal_id)
         if om_resp == 'Approved':
-            cal.att_actual = hist.att_new
-            cal.approved_on = datetime.now()
-            cal.appoved_by = emp.emp_name
-            cal.unique_id = 'Attendance Correction'
-            cal.save()
-            att_actual = hist.att_new
-            old_att = hist.att_old
-            if att_actual == 'Attrition' or att_actual == 'Bench':
-                usr = Profile.objects.get(emp_id=cal.emp_id)
-                usr.agent_status = att_actual
-                usr.save()
-                calendar = []
-                for i in EcplCalander.objects.filter(emp_id=cal.emp_id, date__gt=cal.date).exclude(att_actual__in=['PL', 'SL', 'ML']):
-                    i.att_actual = att_actual
-                    calendar.append(i)
-                EcplCalander.objects.bulk_update(calendar, ['att_actual'])
-            if att_actual == 'NCNS':
-                today = cal.date
-                yesterday = today - timedelta(days=1)
-                dby_date = yesterday - timedelta(days=1)
-                tmr = today + timedelta(days=1)
-                daftmr = tmr + timedelta(days=1)
-                date_range = [dby_date, today]
-                ncns_count = EcplCalander.objects.filter(emp_id=cal.emp_id, date__range=date_range,
-                                                         att_actual='NCNS').count()
-                if ncns_count >= 3:
+            if hist.date_for < date(date.today().year, date.today().month, 1):
+                messages.error(request, 'Previous Month Request cannot be approved in this month.')
+                return redirect('/ams/approve-att-correction-req')
+            else:
+                cal.att_actual = hist.att_new
+                cal.approved_on = datetime.now()
+                cal.appoved_by = emp.emp_name
+                cal.unique_id = 'Attendance Correction'
+                cal.save()
+                att_actual = hist.att_new
+                old_att = hist.att_old
+                if att_actual == 'Attrition' or att_actual == 'Bench':
                     usr = Profile.objects.get(emp_id=cal.emp_id)
                     usr.agent_status = att_actual
                     usr.save()
@@ -2094,24 +2075,42 @@ def approveAttendanceRequest(request):  # test1
                         i.att_actual = att_actual
                         calendar.append(i)
                     EcplCalander.objects.bulk_update(calendar, ['att_actual'])
-            if old_att == 'PL':
-                leave = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
-                leave.pl_balance += 1
-                leave.save()
-                leaveHistory.objects.create(
-                    emp_id=cal.emp_id, date=date.today(), leave_type='PL',
-                    transaction='Attendance Correction, Leave Refund which was applied on ' + str(cal.date), no_days=1,
-                    total=leave.pl_balance + leave.sl_balance
-                )
-            if old_att == 'SL':
-                leave = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
-                leave.sl_balance += 1
-                leave.save()
-                leaveHistory.objects.create(
-                    emp_id=cal.emp_id, date=date.today(), leave_type='PL',
-                    transaction='Attendance Correction, Leave Refund which was applied on ' + str(cal.date), no_days=1,
-                    total=leave.pl_balance + leave.sl_balance
-                )
+                if att_actual == 'NCNS':
+                    today = cal.date
+                    yesterday = today - timedelta(days=1)
+                    dby_date = yesterday - timedelta(days=1)
+                    tmr = today + timedelta(days=1)
+                    daftmr = tmr + timedelta(days=1)
+                    date_range = [dby_date, today]
+                    ncns_count = EcplCalander.objects.filter(emp_id=cal.emp_id, date__range=date_range,
+                                                             att_actual='NCNS').count()
+                    if ncns_count >= 3:
+                        usr = Profile.objects.get(emp_id=cal.emp_id)
+                        usr.agent_status = att_actual
+                        usr.save()
+                        calendar = []
+                        for i in EcplCalander.objects.filter(emp_id=cal.emp_id, date__gt=cal.date).exclude(att_actual__in=['PL', 'SL', 'ML']):
+                            i.att_actual = att_actual
+                            calendar.append(i)
+                        EcplCalander.objects.bulk_update(calendar, ['att_actual'])
+                if old_att == 'PL':
+                    leave = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
+                    leave.pl_balance += 1
+                    leave.save()
+                    leaveHistory.objects.create(
+                        emp_id=cal.emp_id, date=date.today(), leave_type='PL',
+                        transaction='Attendance Correction, Leave Refund which was applied on ' + str(cal.date), no_days=1,
+                        total=leave.pl_balance + leave.sl_balance
+                    )
+                if old_att == 'SL':
+                    leave = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
+                    leave.sl_balance += 1
+                    leave.save()
+                    leaveHistory.objects.create(
+                        emp_id=cal.emp_id, date=date.today(), leave_type='PL',
+                        transaction='Attendance Correction, Leave Refund which was applied on ' + str(cal.date), no_days=1,
+                        total=leave.pl_balance + leave.sl_balance
+                    )
         # if om_resp == 'Rejected':
         #     if hist.att_new == 'Half Day':
         #         leave_bal = EmployeeLeaveBalance.objects.get(emp_id=cal.emp_id)
@@ -3026,7 +3025,7 @@ def autoApproveLeave(request):  # Test 1, 2
             else:                
                 if i.tl_status == "Rejected":
                     i.manager_status = "Auto Rejected"
-                    i.manager_reason = "Rejected by TL"
+                    i.manager_reason = "Rejected by RM1"
                     i.status = "Rejected"
                     i.manager_approval = True
                     leave_list.append(i)
