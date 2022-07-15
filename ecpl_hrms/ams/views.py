@@ -3194,25 +3194,23 @@ def newsandwichpolicy(request):
     for i in leaves_list:
         eid = i['emp_id']
         edate = i['date']
-        nextdate = edate + timedelta(days=1)     
-        
-        for j in off_list:
-            while j['date'] == nextdate and j['emp_id']== eid:
-                nextdate = nextdate + timedelta(days=1)
-                
+        nextdate = edate + timedelta(days=1)
         d = nextdate
-        for j in leaves_list:
-            if j['emp_id'] == eid and j['date']== d:
-                di = {}
-                
-                di['start'] = edate
-                di['end'] = d
-                di['emp_id'] = eid
+        for j in off_list:
+            while j['date'] == d and j['emp_id']== eid:
+                d = d + timedelta(days=1)
 
-                sand.append(di)
-
-            else:
-                pass
+        if (d-edate).days >1:
+            for j in leaves_list:
+                if j['emp_id'] == eid and j['date']== d:
+                    di = {}
+                    di['start'] = edate
+                    di['end'] = d
+                    di['emp_id'] = eid
+                    sand.append(di)
+                    print('sandwich between/emp_id ', edate,d,eid)
+                else:
+                    pass
     # data = {'sand':sand}
     # return render(request,'ams/sandwich.html',data)
     
@@ -3222,7 +3220,6 @@ def newsandwichpolicy(request):
             j.att_actual = 'Absent'
             j.save()
     return redirect('/ams/')
-
 
 def TestFun(request):
     return redirect("/ams/")

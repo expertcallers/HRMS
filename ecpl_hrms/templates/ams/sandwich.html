@@ -1,0 +1,15 @@
+{% extends 'ams/base_hr_new.html' %}
+{% block main %}
+  {% load static %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="container">
+              {% for s in sand %}
+                <p>{{s.emp_id}} - {{s.start}} - {{s.end}}</p>
+              {% endfor %}
+          </div> 
+        </div>
+        <!-- /page content -->
+
+
+  {% endblock %}
