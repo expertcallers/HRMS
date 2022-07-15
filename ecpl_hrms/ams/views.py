@@ -1411,31 +1411,23 @@ import csv
 
 @login_required
 def attendanceCalendar(request):
+    print(datetime.now(), 'Start')
     emp_id = request.user.profile.emp_id
     # Month view
-    month_days = []
-    todays_date = date.today()
-    year = todays_date.year
-    month = todays_date.month
+    year = date.today().year
+    month = date.today().month
     a, num_days = calendar.monthrange(year, month)
-    start_date = date(year, month, 1)
+    start_date = date(year, month, 1) - monthdelta.monthdelta(1)
     end_date = date(year, month, num_days)
-    delta = timedelta(days=1)
-    while start_date <= end_date:
-        month_days.append(start_date.strftime("%Y-%m-%d"))
-        start_date += delta
+    cal = EcplCalander.objects.filter(Q(date__lte=end_date), Q(emp_id=emp_id))
     month_cal = []
-
-    for i in month_days:
+    for i in cal:
         dict = {}
-        try:
-            st = EcplCalander.objects.get(Q(date=i), Q(emp_id=emp_id)).att_actual
-        except EcplCalander.DoesNotExist:
-            st = 'Unmarked'
-        dict['dt'] = i
-        dict['st'] = st
+        dict['dt'] = str(i.date)
+        dict['st'] = i.att_actual
         month_cal.append(dict)
     data = {'month_cal': month_cal}
+    print(datetime.now(), 'End')
     return render(request, 'ams/attendance-calendar.html', data)
 
 
