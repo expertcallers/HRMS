@@ -3150,21 +3150,6 @@ def newsandwichpolicy(request):
     # data = [{'id': 0, 'price': 20}, {'id': 1, 'price': 10}]
     # Match.objects.bulk_update([Match(**kv) for kv in data], ['price'])
 
-    # month_days = []  
-    # year = 2022
-    # month = 6
-    # a, num_days = calendar.monthrange(year, month)
-    # start_date = date(year, month, 1)
-    # end_date = date(year, month, num_days)
-    # delta = timedelta(days=1)
-    # while start_date <= end_date:
-    #     month_days.append(start_date)
-    #     start_date += delta
-    # ids = []
-    # emps = EmployeeLeaveBalance.objects.filter(unique_id=6)
-    # for i in emps:
-    #     ids.append(i.emp_id)
-
     leaves_list= []
     leaves = EcplCalander.objects.filter(Q(att_actual__in = ['PL','SL','Absent']),Q(date__month=6))
     for i in leaves:
@@ -3188,25 +3173,22 @@ def newsandwichpolicy(request):
         eid = i['emp_id']
         edate = i['date']
         nextdate = edate + timedelta(days=1)     
-        
-        for j in off_list:
-            while j['date'] == nextdate and j['emp_id']== eid:
-                nextdate = nextdate + timedelta(days=1)
-                
         d = nextdate
-        for j in leaves_list:
-            if j['emp_id'] == eid and j['date']== d:
-                di = {}
-                
-                di['start'] = edate
-                di['end'] = d
-                di['emp_id'] = eid
+        for j in off_list:            
+            while j['date'] == d and j['emp_id']== eid:
+                d = d + timedelta(days=1)
 
-                sand.append(di)
-
-                print('sandwich between/emp_id ', edate,d,eid)
-            else:     
-                pass
+        if (d-edate).days >1:
+            for j in leaves_list:
+                if j['emp_id'] == eid and j['date']== d:
+                    di = {}                    
+                    di['start'] = edate
+                    di['end'] = d
+                    di['emp_id'] = eid
+                    sand.append(di)
+                    print('sandwich between/emp_id ', edate,d,eid)
+                else:     
+                    pass
     # data = {'sand':sand}
     # return render(request,'ams/sandwich.html',data)
     
@@ -3216,7 +3198,6 @@ def newsandwichpolicy(request):
             j.att_actual = 'Absent'
             j.save()
     return redirect('/ams/')
-
 
 def TestFun(request):
     return redirect("/ams/")
