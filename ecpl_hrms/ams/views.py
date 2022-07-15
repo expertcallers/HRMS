@@ -3037,7 +3037,7 @@ def autoApproveLeave(request):  # Test 1, 2
             else:                
                 if i.tl_status == "Rejected":
                     i.manager_status = "Auto Rejected"
-                    i.manager_reason = "Rejected by TL"
+                    i.manager_reason = "Rejected by RM1"
                     i.status = "Rejected"
                     i.manager_approval = True
                     leave_list.append(i)
