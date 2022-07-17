@@ -3095,71 +3095,21 @@ def addLeaveBalanceMonthly(request,a):
         messages.success(request, "Unauthorized Access")
         return redirect('/ams/')
 
-
-def sandwichPolicy(request):
-    month_days = []  
-    year = 2022
-    month = 6
-    a, num_days = calendar.monthrange(year, month)
-    start_date = date(year, month, 1)
-    end_date = date(year, month, num_days)
-    delta = timedelta(days=1)
-    while start_date <= end_date:
-        month_days.append(start_date)
-        start_date += delta
-    ids = []
-    emps = EmployeeLeaveBalance.objects.filter(unique_id=6)
-    for i in emps:
-        ids.append(i.emp_id)
-
-    for j in ids: 
-        for d in month_days:           
-            tdycal = EcplCalander.objects.filter(emp_id=j,date=d, att_actual = 'Week OFF').count()
-            if tdycal>0:
-                yst = EcplCalander.objects.filter(emp_id=j,date=d-timedelta(days=1), att_actual__in = ['PL','SL','Absent']).count()
-                if yst > 0:
-                    tmr = EcplCalander.objects.filter(emp_id=j,date=d+timedelta(days=1),  att_actual__in = ['PL','SL','Absent']).count()
-                    if tmr >0 :
-                        cal = EcplCalander.objects.get(emp_id=j,date=d)
-                        cal.att_actual = 'Absent'
-                        cal.save()
-                        em = EmployeeLeaveBalance.objects.get(emp_id = j)
-                        em.unique_id = 7
-                        em.save()      
-                    tmrr = EcplCalander.objects.filter(emp_id=j,date=d+timedelta(days=1),  att_actual = 'Week OFF').count()
-                    if tmrr >0 :
-                        tmrrr = EcplCalander.objects.filter(emp_id=j,date=d+timedelta(days=2),  att_actual__in = ['PL','SL','Absent']).count()
-                        if tmrrr >0 :
-                            cal = EcplCalander.objects.filter(emp_id=j,date__in=[d,d+timedelta(days=1)])
-                            for i in cal:
-                                i.att_actual = 'Absent'
-                                i.save()
-                            em = EmployeeLeaveBalance.objects.get(emp_id = j)
-                            em.unique_id = 7
-                            em.save()
-                else:
-                    em = EmployeeLeaveBalance.objects.get(emp_id = j)
-                    em.unique_id = 7
-                    em.save()
-
-    return redirect('/ams/')
-
-
 def newsandwichpolicy(request):
-    # data = [{'id': 0, 'price': 20}, {'id': 1, 'price': 10}]
-    # Match.objects.bulk_update([Match(**kv) for kv in data], ['price'])
+
+    import datetime as dt
+    previous_month = (dt.date.today().replace(day=1) - dt.timedelta(days=1)).month
 
     leaves_list= []
-    leaves = EcplCalander.objects.filter(Q(att_actual__in = ['PL','SL','Absent']),Q(date__month=6))
+    leaves = EcplCalander.objects.filter(Q(att_actual__in = ['PL','SL','Absent','Unmarked']),Q(date__month=previous_month))
     for i in leaves:
-        d = {}
-      
+        d = {}      
         d['date']= i.date
         d['emp_id'] = i.emp_id
         leaves_list.append(d)
 
     off_list = []
-    offs = EcplCalander.objects.filter(Q(att_actual__in=['Week OFF']),Q(date__month=6))
+    offs = EcplCalander.objects.filter(Q(att_actual__in=['Week OFF','Comp OFF']),Q(date__month=6))
     for i in offs:
         d={}
         d['date']=i.date
@@ -3185,7 +3135,7 @@ def newsandwichpolicy(request):
                     di['end'] = d
                     di['emp_id'] = eid
                     sand.append(di)
-                    print('sandwich between/emp_id ', edate,d,eid)
+                    # print('sandwich between/emp_id ', edate,d,eid)
                 else:     
                     pass
     # data = {'sand':sand}
