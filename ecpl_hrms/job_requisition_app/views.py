@@ -90,16 +90,16 @@ def AddEmail(request):
             e.otp = OTP
             e.otp_time = datetime.datetime.now()
             e.save()
-            # subject = "Your OTP for ERF"
-            # email_template = "Your OTP for ERF is <b>" + str(OTP) + "</b> Valid only for 5 Minutes.<br><br>"
-            # to = [email]
-            # email_msg = EmailMessage(subject,
-            #                          email_template, 'erf@expertcallers.com',
-            #                          to,
-            #                          reply_to=['erf@expertcallers.com'])
-            # email_msg.content_subtype = 'html'
-            # email_msg.send(fail_silently=False)
-            # messages.info(request, "OTP is sent to your email ID Entered. Please Verify it.")
+            subject = "Your OTP for ERF"
+            email_template = "Your OTP for ERF is <b>" + str(OTP) + "</b> Valid only for 5 Minutes.<br><br>"
+            to = [email]
+            email_msg = EmailMessage(subject,
+                                     email_template, 'erf@expertcallers.com',
+                                     to,
+                                     reply_to=['erf@expertcallers.com'])
+            email_msg.content_subtype = 'html'
+            email_msg.send(fail_silently=False)
+            messages.info(request, "OTP is sent to your email ID Entered. Please Verify it.")
             return redirect("/erf/verify-email")
     else:
         messages.info(request, 'Please add your Email ID')
@@ -139,15 +139,15 @@ def VerifyEmail(request):
             e.otp = OTP
             e.otp_time = datetime.datetime.now()
             e.save()
-            # subject = "Your OTP for ERF"
-            # email_template = "Your OTP for ERF is <b>" + str(OTP) + "</b> Valid only for 5 Minutes.<br><br>"
-            # to = [request.user.profile.emp_email]
-            # email_msg = EmailMessage(subject,
-            #                          email_template, 'erf@expertcallers.com',
-            #                          to,
-            #                          reply_to=['erf@expertcallers.com'])
-            # email_msg.content_subtype = 'html'
-            # email_msg.send(fail_silently=False)
+            subject = "Your OTP for ERF"
+            email_template = "Your OTP for ERF is <b>" + str(OTP) + "</b> Valid only for 5 Minutes.<br><br>"
+            to = [request.user.profile.emp_email]
+            email_msg = EmailMessage(subject,
+                                     email_template, 'erf@expertcallers.com',
+                                     to,
+                                     reply_to=['erf@expertcallers.com'])
+            email_msg.content_subtype = 'html'
+            email_msg.send(fail_silently=False)
             return redirect("/erf/verify-email")
     else:
         data = {"profile":e}
@@ -181,15 +181,15 @@ def EditEmail(request):
                 e.email_verify = False
                 e.otp_time = datetime.datetime.now()
                 e.save()
-                # subject = "Your OTP for ERF"
-                # email_template = "Your OTP for ERF is <b>" + str(OTP) + "</b> Valid only for 5 Minutes.<br><br>"
-                # to = [email]
-                # email_msg = EmailMessage(subject,
-                #                          email_template, 'erf@expertcallers.com',
-                #                          to,
-                #                          reply_to=['erf@expertcallers.com'])
-                # email_msg.content_subtype = 'html'
-                # email_msg.send(fail_silently=False)
+                subject = "Your OTP for ERF"
+                email_template = "Your OTP for ERF is <b>" + str(OTP) + "</b> Valid only for 5 Minutes.<br><br>"
+                to = [email]
+                email_msg = EmailMessage(subject,
+                                         email_template, 'erf@expertcallers.com',
+                                         to,
+                                         reply_to=['erf@expertcallers.com'])
+                email_msg.content_subtype = 'html'
+                email_msg.send(fail_silently=False)
                 messages.info(request, "OTP is sent to your email ID Entered. Please Verify it.")
                 return redirect("/erf/verify-email")
     else:
@@ -217,17 +217,17 @@ def forgotPassword(request):
                     profile.otp = OTP
                     profile.otp_time = datetime.datetime.now()
                     profile.save()
-                    # subject = "Password Reset Link of ERF"
-                    # email_template = "Click on the link Below to reset your password. Remember it is valid only for " \
-                    #                  "5 Min<br><br><a href='http://dashboard.ecpl/erf/reset-password/"+emp_id+"/"+OTP+"'>" \
-                    #                  "http://dashboard.ecpl/erf/reset-password/"+emp_id+"/"+OTP+"</a><br><br>"
-                    # to = [email]
-                    # email_msg = EmailMessage(subject,
-                    #                          email_template, 'erf@expertcallers.com',
-                    #                          to,
-                    #                          reply_to=['erf@expertcallers.com'])
-                    # email_msg.content_subtype = 'html'
-                    # email_msg.send(fail_silently=False)
+                    subject = "Password Reset Link of ERF"
+                    email_template = "Click on the link Below to reset your password. Remember it is valid only for " \
+                                     "5 Min<br><br><a href='http://dashboard.ecpl/erf/reset-password/"+emp_id+"/"+OTP+"'>" \
+                                     "http://dashboard.ecpl/erf/reset-password/"+emp_id+"/"+OTP+"</a><br><br>"
+                    to = [email]
+                    email_msg = EmailMessage(subject,
+                                             email_template, 'erf@expertcallers.com',
+                                             to,
+                                             reply_to=['erf@expertcallers.com'])
+                    email_msg.content_subtype = 'html'
+                    email_msg.send(fail_silently=False)
                     m = "Link to reset the password is sent to your email. ("+email+") Please check your mail " \
                                                                                     "and reset it from there."
                     messages.info(request, m)
@@ -276,17 +276,17 @@ def resetPassword(request,emp_id,otp):
             profile.otp = OTP
             profile.otp_time = datetime.datetime.now()
             profile.save()
-            # subject = "Password Reset Link of ERF"
-            # email_template = "Click on the link Below to reset your password. Remember it is valid only for " \
-            #                  "5 Min<br><br><a href='http://127.0.0.1:8000/erf/reset-password/" + emp_id + "/" + OTP + "'>" \
-            #                  "http://127.0.0.1:8000/erf/reset-password</a><br><br>"
-            # to = [profile.emp_email]
-            # email_msg = EmailMessage(subject,
-            #                          email_template, 'erf@expertcallers.com',
-            #                          to,
-            #                          reply_to=['erf@expertcallers.com'])
-            # email_msg.content_subtype = 'html'
-            # email_msg.send(fail_silently=False)
+            subject = "Password Reset Link of ERF"
+            email_template = "Click on the link Below to reset your password. Remember it is valid only for " \
+                             "5 Min<br><br><a href='http://hrms.ecpl.com/erf/reset-password/" + emp_id + "/" + OTP + "'>" \
+                             "http://hrms.ecpl.com/erf/reset-password</a><br><br>"
+            to = [profile.emp_email]
+            email_msg = EmailMessage(subject,
+                                     email_template, 'erf@expertcallers.com',
+                                     to,
+                                     reply_to=['erf@expertcallers.com'])
+            email_msg.content_subtype = 'html'
+            email_msg.send(fail_silently=False)
             return redirect("/erf/")
 
 
@@ -498,46 +498,46 @@ def job_requisition(request):
             messages.info(request, "Employee Requisition Added Successfully !!")
             if user.emp_desi != "Assistant Manager":
                 action = "Created"
-                # subject = action + " - Employee Requisition [" + str(e.id) + "]"
-                # html_path = 'erf/email.html'
-                # data = {'id': e.id, "created_date": edited_date, "hc": hc_req, "department": department,
-                #         "position": designation,
-                #         "deadline": dead_line, "campaign": campaign, "user": user.emp_name, "action": action,
-                #         "status": "Pending"}
-                # email_template = get_template(html_path).render(data)
-                # manager_email = Profile.objects.get(emp_id=manager_id).emp_email
-                # try:
-                #     rm1_email = Profile.objects.get(emp_id=user.emp_rm1_id).emp_email
-                # except Profile.DoesNotExist:
-                #     rm1_email = request.user.profile.emp_email
-                # to = [request.user.profile.emp_email, rm1_email]
-                # email_msg = EmailMessage(subject,
-                #                          email_template, 'erf@expertcallers.com',
-                #                          to,
-                #                          reply_to=['erf@expertcallers.com'])
-                # email_msg.content_subtype = 'html'
-                # email_msg.send(fail_silently=False)
+                subject = action + " - Employee Requisition [" + str(e.id) + "]"
+                html_path = 'erf/email.html'
+                data = {'id': e.id, "created_date": edited_date, "hc": hc_req, "department": department,
+                        "position": designation,
+                        "deadline": dead_line, "campaign": campaign, "user": user.emp_name, "action": action,
+                        "status": "Pending"}
+                email_template = get_template(html_path).render(data)
+                manager_email = Profile.objects.get(emp_id=manager_id).emp_email
+                try:
+                    rm1_email = Profile.objects.get(emp_id=user.emp_rm1_id).emp_email
+                except Profile.DoesNotExist:
+                    rm1_email = request.user.profile.emp_email
+                to = [request.user.profile.emp_email, rm1_email]
+                email_msg = EmailMessage(subject,
+                                         email_template, 'erf@expertcallers.com',
+                                         to,
+                                         reply_to=['erf@expertcallers.com'])
+                email_msg.content_subtype = 'html'
+                email_msg.send(fail_silently=False)
             else:
                 action = "Created"
-                # subject = action + " - Employee Requisition [" + str(e.id) +"]"
-                # html_path = 'erf/email.html'
-                # data = {'id': e.id, "created_date": edited_date, "hc": hc_req, "department": department,
-                #         "position": designation,
-                #         "deadline": dead_line, "campaign": campaign, "user": user.emp_name, "action": action,
-                #         "status": "Pending"}
-                # email_template = get_template(html_path).render(data)
-                # manager_email = Profile.objects.get(emp_id=manager_id).emp_email
-                # try:
-                #     rm1_email = Profile.objects.get(emp_id=user.emp_rm1_id).emp_email
-                # except Profile.DoesNotExist:
-                #     rm1_email = request.user.profile.emp_email
-                # to = [request.user.profile.emp_email, "ta@expertcallers.com","dina@expertcallers.com","joseph@expertcallers.com", manager_email, rm1_email]
-                # email_msg = EmailMessage(subject,
-                #                          email_template, 'erf@expertcallers.com',
-                #                          to,
-                #                          reply_to=['erf@expertcallers.com'])
-                # email_msg.content_subtype = 'html'
-                # email_msg.send(fail_silently=False)
+                subject = action + " - Employee Requisition [" + str(e.id) +"]"
+                html_path = 'erf/email.html'
+                data = {'id': e.id, "created_date": edited_date, "hc": hc_req, "department": department,
+                        "position": designation,
+                        "deadline": dead_line, "campaign": campaign, "user": user.emp_name, "action": action,
+                        "status": "Pending"}
+                email_template = get_template(html_path).render(data)
+                manager_email = Profile.objects.get(emp_id=manager_id).emp_email
+                try:
+                    rm1_email = Profile.objects.get(emp_id=user.emp_rm1_id).emp_email
+                except Profile.DoesNotExist:
+                    rm1_email = request.user.profile.emp_email
+                to = [request.user.profile.emp_email, "ta@expertcallers.com","dina@expertcallers.com","joseph@expertcallers.com", manager_email, rm1_email]
+                email_msg = EmailMessage(subject,
+                                         email_template, 'erf@expertcallers.com',
+                                         to,
+                                         reply_to=['erf@expertcallers.com'])
+                email_msg.content_subtype = 'html'
+                email_msg.send(fail_silently=False)
             return redirect("/erf/dashboard")
 
     else:
@@ -947,25 +947,25 @@ def job_requisition_manager_edit(request):
             messages.info(request, "Requisition Updated Successfully !!")
 
             action = "Edited"
-            # subject = action + " - Employee Requisition [" + str(e.id) +"]"
-            # html_path = 'erf/email.html'
-            # data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
-            #         "position": e.designation,
-            #         "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
-            #         "action": action, "status": e.request_status,"content":content}
-            # email_template = get_template(html_path).render(data)
-            # manager_email = Profile.objects.get(emp_id=manager_id).emp_email
-            # try:
-            #     rm1_email = Profile.objects.get(emp_id=e.created_by_rm1_id).emp_email
-            # except Profile.DoesNotExist:
-            #     rm1_email = request.user.profile.emp_email
-            # to = [request.user.profile.emp_email, "ta@expertcallers.com","dina@expertcallers.com","joseph@expertcallers.com", manager_email, rm1_email]
-            # email_msg = EmailMessage(subject,
-            #                          email_template, 'erf@expertcallers.com',
-            #                          to,
-            #                          reply_to=['erf@expertcallers.com'])
-            # email_msg.content_subtype = 'html'
-            # email_msg.send(fail_silently=False)
+            subject = action + " - Employee Requisition [" + str(e.id) +"]"
+            html_path = 'erf/email.html'
+            data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
+                    "position": e.designation,
+                    "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
+                    "action": action, "status": e.request_status,"content":content}
+            email_template = get_template(html_path).render(data)
+            manager_email = Profile.objects.get(emp_id=manager_id).emp_email
+            try:
+                rm1_email = Profile.objects.get(emp_id=e.created_by_rm1_id).emp_email
+            except Profile.DoesNotExist:
+                rm1_email = request.user.profile.emp_email
+            to = [request.user.profile.emp_email, "ta@expertcallers.com","dina@expertcallers.com","joseph@expertcallers.com", manager_email, rm1_email]
+            email_msg = EmailMessage(subject,
+                                     email_template, 'erf@expertcallers.com',
+                                     to,
+                                     reply_to=['erf@expertcallers.com'])
+            email_msg.content_subtype = 'html'
+            email_msg.send(fail_silently=False)
             designation = request.user.profile.emp_desi
             if designation in hr_list:
                 return redirect("/erf/hr-dashboard")
@@ -1406,28 +1406,28 @@ def jobRequisitionEditUpdate(request):
             messages.info(request, "Requisition Updated Successfully !!")
 
             action = "Updated"
-            # subject = action + " - Employee Requisition [" + str(e.id) +"]"
-            # html_path = 'erf/email.html'
-            # data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
-            #         "position": e.designation,
-            #         "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
-            #         "action": action, "status": e.request_status}
-            # email_template = get_template(html_path).render(data)
-            # creater_id = e.created_by_id
-            # creater_email = Profile.objects.get(emp_id=creater_id).emp_email
-            # manager_id = e.created_by_manager_id
-            # manager_email = Profile.objects.get(emp_id=manager_id).emp_email
-            # try:
-            #     rm1_email = Profile.objects.get(emp_id=e.created_by_rm1_id).emp_email
-            # except Profile.DoesNotExist:
-            #     rm1_email = creater_email
-            # to = [request.user.profile.emp_email, "ta@expertcallers.com","dina@expertcallers.com","joseph@expertcallers.com", creater_email, manager_email, rm1_email]
-            # email_msg = EmailMessage(subject,
-            #                          email_template, 'erf@expertcallers.com',
-            #                          to,
-            #                          reply_to=['erf@expertcallers.com'])
-            # email_msg.content_subtype = 'html'
-            # email_msg.send(fail_silently=False)
+            subject = action + " - Employee Requisition [" + str(e.id) +"]"
+            html_path = 'erf/email.html'
+            data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
+                    "position": e.designation,
+                    "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
+                    "action": action, "status": e.request_status}
+            email_template = get_template(html_path).render(data)
+            creater_id = e.created_by_id
+            creater_email = Profile.objects.get(emp_id=creater_id).emp_email
+            manager_id = e.created_by_manager_id
+            manager_email = Profile.objects.get(emp_id=manager_id).emp_email
+            try:
+                rm1_email = Profile.objects.get(emp_id=e.created_by_rm1_id).emp_email
+            except Profile.DoesNotExist:
+                rm1_email = creater_email
+            to = [request.user.profile.emp_email, "ta@expertcallers.com","dina@expertcallers.com","joseph@expertcallers.com", creater_email, manager_email, rm1_email]
+            email_msg = EmailMessage(subject,
+                                     email_template, 'erf@expertcallers.com',
+                                     to,
+                                     reply_to=['erf@expertcallers.com'])
+            email_msg.content_subtype = 'html'
+            email_msg.send(fail_silently=False)
 
             if request.user.profile.emp_desi in hr_list:
                 return redirect("/erf/hr-dashboard")
@@ -1505,26 +1505,26 @@ def approval(request):
             a.save()
             messages.info(request, message)
 
-            # subject = action + " - Employee Requisition [" + str(e.id) + "]"
-            # html_path = 'erf/email.html'
-            # data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
-            #         "position": e.designation,
-            #         "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
-            #         "action": action, "status": e.request_status}
-            # email_template = get_template(html_path).render(data)
-            # creater_id = e.created_by_id
-            # creater_email = Profile.objects.get(emp_id=creater_id).emp_email
-            # try:
-            #     rm1_email = Profile.objects.get(emp_id=e.created_by_rm1_id).emp_email
-            # except Profile.DoesNotExist:
-            #     rm1_email = creater_email
-            # to = [request.user.profile.emp_email, "ta@expertcallers.com","dina@expertcallers.com","joseph@expertcallers.com", creater_email, rm1_email]
-            # email_msg = EmailMessage(subject,
-            #                          email_template, 'erf@expertcallers.com',
-            #                          to,
-            #                          reply_to=['erf@expertcallers.com'])
-            # email_msg.content_subtype = 'html'
-            # email_msg.send(fail_silently=False)
+            subject = action + " - Employee Requisition [" + str(e.id) + "]"
+            html_path = 'erf/email.html'
+            data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
+                    "position": e.designation,
+                    "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
+                    "action": action, "status": e.request_status}
+            email_template = get_template(html_path).render(data)
+            creater_id = e.created_by_id
+            creater_email = Profile.objects.get(emp_id=creater_id).emp_email
+            try:
+                rm1_email = Profile.objects.get(emp_id=e.created_by_rm1_id).emp_email
+            except Profile.DoesNotExist:
+                rm1_email = creater_email
+            to = [request.user.profile.emp_email, "ta@expertcallers.com","dina@expertcallers.com","joseph@expertcallers.com", creater_email, rm1_email]
+            email_msg = EmailMessage(subject,
+                                     email_template, 'erf@expertcallers.com',
+                                     to,
+                                     reply_to=['erf@expertcallers.com'])
+            email_msg.content_subtype = 'html'
+            email_msg.send(fail_silently=False)
             if request.user.profile.emp_desi in hr_list:
                 return redirect("/erf/hr-dashboard")
             elif request.user.profile.emp_desi in am_mgr_list:
@@ -1653,23 +1653,23 @@ def CreationApproval(request):
             a.save()
             messages.info(request, message)
 
-            # subject = action + " - Employee Requisition [" + str(e.id) + "]"
-            # html_path = 'erf/email.html'
-            # data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
-            #         "position": e.designation,
-            #         "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
-            #         "action": action, "status": e.request_status}
-            # email_template = get_template(html_path).render(data)
-            # creater_id = e.created_by_id
-            # creater_email = Profile.objects.get(emp_id=creater_id).emp_email
-            # manager_email = Profile.objects.get(emp_id=e.created_by_manager_id).emp_email
-            # to = [request.user.profile.emp_email, "ta@expertcallers.com","dina@expertcallers.com","joseph@expertcallers.com", creater_email, manager_email]
-            # email_msg = EmailMessage(subject,
-            #                          email_template, 'erf@expertcallers.com',
-            #                          to,
-            #                          reply_to=['erf@expertcallers.com'])
-            # email_msg.content_subtype = 'html'
-            # email_msg.send(fail_silently=False)
+            subject = action + " - Employee Requisition [" + str(e.id) + "]"
+            html_path = 'erf/email.html'
+            data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
+                    "position": e.designation,
+                    "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
+                    "action": action, "status": e.request_status}
+            email_template = get_template(html_path).render(data)
+            creater_id = e.created_by_id
+            creater_email = Profile.objects.get(emp_id=creater_id).emp_email
+            manager_email = Profile.objects.get(emp_id=e.created_by_manager_id).emp_email
+            to = [request.user.profile.emp_email, "ta@expertcallers.com","dina@expertcallers.com","joseph@expertcallers.com", creater_email, manager_email]
+            email_msg = EmailMessage(subject,
+                                     email_template, 'erf@expertcallers.com',
+                                     to,
+                                     reply_to=['erf@expertcallers.com'])
+            email_msg.content_subtype = 'html'
+            email_msg.send(fail_silently=False)
             if request.user.profile.emp_desi in hr_list:
                 return redirect("/erf/hr-dashboard")
             elif request.user.profile.emp_desi in am_mgr_list:
@@ -1725,26 +1725,26 @@ def DeteleRequest(request, type):
                 adding = previous + ",\n" + edited_by
                 a.edited_by = adding
                 a.save()
-                # subject = action + " - Employee Requisition [" + str(e.id) +"]"
-                # html_path = 'erf/email.html'
-                # data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
-                #         "position": e.designation,
-                #         "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
-                #         "action": action, "status": e.request_status}
-                # email_template = get_template(html_path).render(data)
-                # creater_email = Profile.objects.get(emp_id=e.created_by_id).emp_email
-                # manager_email = Profile.objects.get(emp_id=e.created_by_manager_id).emp_email
-                # try:
-                #     rm1_email = Profile.objects.get(emp_id=e.created_by_rm1_id).emp_email
-                # except Profile.DoesNotExist:
-                #     rm1_email = creater_email
-                # to = [request.user.profile.emp_email, "ta@expertcallers.com","dina@expertcallers.com","joseph@expertcallers.com", creater_email, manager_email, rm1_email]
-                # email_msg = EmailMessage(subject,
-                #                          email_template, 'erf@expertcallers.com',
-                #                          to,
-                #                          reply_to=['erf@expertcallers.com'])
-                # email_msg.content_subtype = 'html'
-                # email_msg.send(fail_silently=False)
+                subject = action + " - Employee Requisition [" + str(e.id) +"]"
+                html_path = 'erf/email.html'
+                data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
+                        "position": e.designation,
+                        "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
+                        "action": action, "status": e.request_status}
+                email_template = get_template(html_path).render(data)
+                creater_email = Profile.objects.get(emp_id=e.created_by_id).emp_email
+                manager_email = Profile.objects.get(emp_id=e.created_by_manager_id).emp_email
+                try:
+                    rm1_email = Profile.objects.get(emp_id=e.created_by_rm1_id).emp_email
+                except Profile.DoesNotExist:
+                    rm1_email = creater_email
+                to = [request.user.profile.emp_email, "ta@expertcallers.com","dina@expertcallers.com","joseph@expertcallers.com", creater_email, manager_email, rm1_email]
+                email_msg = EmailMessage(subject,
+                                         email_template, 'erf@expertcallers.com',
+                                         to,
+                                         reply_to=['erf@expertcallers.com'])
+                email_msg.content_subtype = 'html'
+                email_msg.send(fail_silently=False)
                 messages.info(request, message)
                 if request.user.profile.emp_desi in hr_list:
                     return redirect("/erf/hr-dashboard")
@@ -1789,26 +1789,26 @@ def DeteleRequest(request, type):
                 a.edited_by = adding
                 a.save()
                 action = "Requested for Deletion"
-                # subject = action + " - Employee Requisition [" + str(e.id) +"]"
-                # html_path = 'erf/email.html'
-                # data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
-                #         "position": e.designation,
-                #         "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
-                #         "action": action, "status": e.request_status}
-                # email_template = get_template(html_path).render(data)
-                # creater_email = Profile.objects.get(emp_id=e.created_by_id).emp_email
-                # manager_email = Profile.objects.get(emp_id=e.created_by_manager_id).emp_email
-                # try:
-                #     rm1_email = Profile.objects.get(emp_id=e.created_by_rm1_id).emp_email
-                # except Profile.DoesNotExist:
-                #     rm1_email = creater_email
-                # to = [request.user.profile.emp_email, "ta@expertcallers.com","dina@expertcallers.com","joseph@expertcallers.com", creater_email, manager_email, rm1_email]
-                # email_msg = EmailMessage(subject,
-                #                          email_template, 'erf@expertcallers.com',
-                #                          to,
-                #                          reply_to=['erf@expertcallers.com'])
-                # email_msg.content_subtype = 'html'
-                # email_msg.send(fail_silently=False)
+                subject = action + " - Employee Requisition [" + str(e.id) +"]"
+                html_path = 'erf/email.html'
+                data = {'id': e.id, "created_date": e.edited_date, "hc": e.hc_req, "department": e.department,
+                        "position": e.designation,
+                        "deadline": e.dead_line, "campaign": e.campaign, "user": request.user.profile.emp_name,
+                        "action": action, "status": e.request_status}
+                email_template = get_template(html_path).render(data)
+                creater_email = Profile.objects.get(emp_id=e.created_by_id).emp_email
+                manager_email = Profile.objects.get(emp_id=e.created_by_manager_id).emp_email
+                try:
+                    rm1_email = Profile.objects.get(emp_id=e.created_by_rm1_id).emp_email
+                except Profile.DoesNotExist:
+                    rm1_email = creater_email
+                to = [request.user.profile.emp_email, "ta@expertcallers.com","dina@expertcallers.com","joseph@expertcallers.com", creater_email, manager_email, rm1_email]
+                email_msg = EmailMessage(subject,
+                                         email_template, 'erf@expertcallers.com',
+                                         to,
+                                         reply_to=['erf@expertcallers.com'])
+                email_msg.content_subtype = 'html'
+                email_msg.send(fail_silently=False)
                 messages.info(request, "Deletion Request Successful!")
                 if request.user.profile.emp_desi in hr_list:
                     return redirect("/erf/hr-dashboard")
@@ -1829,15 +1829,15 @@ def SendMail(request):
     oldcampaign = request.POST["oldcampaign"]
     send = request.POST["send"]
     name = AllAgents.objects.get(emp_id=emp_id).emp_name
-    # subject = "New Internal Movement"
-    # email_template = "Name: "+name+"<br> Emp ID: "+emp_id+"<br> Old Campaign: "+oldcampaign+"<br> New Campaign: "+newcampaign+"<br><br>"
-    # to = ["ta@expertcallers.com","dina@expertcallers.com","joseph@expertcallers.com"]
-    # email_msg = EmailMessage(subject,
-    #                          email_template, 'erf@expertcallers.com',
-    #                          to,
-    #                          reply_to=['erf@expertcallers.com'])
-    # email_msg.content_subtype = 'html'
-    # email_msg.send(fail_silently=False)
+    subject = "New Internal Movement"
+    email_template = "Name: "+name+"<br> Emp ID: "+emp_id+"<br> Old Campaign: "+oldcampaign+"<br> New Campaign: "+newcampaign+"<br><br>"
+    to = ["ta@expertcallers.com","dina@expertcallers.com","joseph@expertcallers.com"]
+    email_msg = EmailMessage(subject,
+                             email_template, 'erf@expertcallers.com',
+                             to,
+                             reply_to=['erf@expertcallers.com'])
+    email_msg.content_subtype = 'html'
+    email_msg.send(fail_silently=False)
 
     job = JobRequisition.objects.get(id=id)
     if send == "send_mail_1":
