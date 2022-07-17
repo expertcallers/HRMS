@@ -1695,16 +1695,24 @@ def applyLeave(request):  # Test1
                 i.start_date += timedelta(days=1)
         new_leave_dates = []
         check_start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
-        if check_start_date < date.today() - monthdelta.monthdelta(
-                1) or check_start_date > date.today() + monthdelta.monthdelta(1):
-            messages.error(request, "Correct the selected dates. "
-                                    "Selected dates must be between " + str(
-                datetime.strptime(str(date.today() - monthdelta.monthdelta(1)), '%Y-%m-%d').strftime(
-                    "%d %B, %Y")) + ' and ' + str(
-                datetime.strptime(str(date.today() + monthdelta.monthdelta(1)), '%Y-%m-%d').strftime("%d %B, %Y")))
+        check_end_date = date(date.today().year, date.today().month, 1) + monthdelta.monthdelta(1)
+        check_end_date = check_end_date - timedelta(days=1)
+        if check_start_date < date(date.today().year, date.today().month, 1) or check_start_date > date.today() + monthdelta.monthdelta(1):
+            if leave_type == 'SL':
+                messages.error(request, "Correct the selected dates. "
+                                        "Selected dates must be between " + str(
+                    datetime.strptime(str(date(date.today().year, date.today().month, 1)), '%Y-%m-%d').strftime(
+                        "%d %B, %Y")) + ' and ' + str(
+                    datetime.strptime(str(date.today()), '%Y-%m-%d').strftime("%d %B, %Y")))
+            else:
+                messages.error(request, "Correct the selected dates. "
+                                        "Selected dates must be between " + str(
+                    datetime.strptime(str(date.today()), '%Y-%m-%d').strftime(
+                        "%d %B, %Y")) + ' and ' + str(
+                    datetime.strptime(str(check_end_date), '%Y-%m-%d').strftime("%d %B, %Y")))
             return redirect('/ams/ams-apply_leave')
         if check_start_date < date(date.today().year, date.today().month, 1):
-            messages.error(request, "You cannot apply leave for previous month. Please select current month dates.")
+            messages.error(request, "You cannot apply leave for previous months. Please select current month dates.")
             return redirect('/ams/ams-apply_leave')
         list_start_date = datetime.strptime(start_date,
                                             '%Y-%m-%d').date()  # To Convert type of start_date from string to date
@@ -3100,6 +3108,21 @@ def newsandwichpolicy(request):
     import datetime as dt
     previous_month = (dt.date.today().replace(day=1) - dt.timedelta(days=1)).month
 
+    # month_days = []  
+    # year = 2022
+    # month = 6
+    # a, num_days = calendar.monthrange(year, month)
+    # start_date = date(year, month, 1)
+    # end_date = date(year, month, num_days)
+    # delta = timedelta(days=1)
+    # while start_date <= end_date:
+    #     month_days.append(start_date)
+    #     start_date += delta
+    # ids = []
+    # emps = EmployeeLeaveBalance.objects.filter(unique_id=6)
+    # for i in emps:
+    #     ids.append(i.emp_id)
+
     leaves_list= []
     leaves = EcplCalander.objects.filter(Q(att_actual__in = ['PL','SL','Absent','Unmarked']),Q(date__month=previous_month))
     for i in leaves:
@@ -3121,16 +3144,16 @@ def newsandwichpolicy(request):
     for i in leaves_list:
         eid = i['emp_id']
         edate = i['date']
-        nextdate = edate + timedelta(days=1)     
+        nextdate = edate + timedelta(days=1)
         d = nextdate
-        for j in off_list:            
+        for j in off_list:
             while j['date'] == d and j['emp_id']== eid:
                 d = d + timedelta(days=1)
 
         if (d-edate).days >1:
             for j in leaves_list:
                 if j['emp_id'] == eid and j['date']== d:
-                    di = {}                    
+                    di = {}
                     di['start'] = edate
                     di['end'] = d
                     di['emp_id'] = eid
