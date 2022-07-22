@@ -117,4 +117,7 @@ urlpatterns = [
     path('separation-request', ExitRequest),
     path('view-exit-request-rm', ViewExitRequest),
 
+    # SOP
+    path('add-sop', addSOP)
+
 ]

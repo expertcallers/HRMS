@@ -90,3 +90,32 @@ class EmpSeparation(models.Model):
     hr_comment = models.TextField(null=True, blank=True)
     last_working = models.DateField(null=True, blank=True)
     status = models.CharField(default='Applied', max_length=150)
+
+class SOP(models.Model):
+    created_by = models.CharField(max_length=200)
+    created_id = models.CharField(max_length=30)
+    created_date = models.DateTimeField()
+    campaign_name = models.CharField(max_length=200)
+    type = models.CharField(max_length=50)
+    category = models.CharField(max_length=100)
+    process_1 = models.CharField(max_length=100)
+    process_2 = models.CharField(max_length=100)
+    process_3 = models.CharField(max_length=100)
+    report_format = models.TextField()
+    other_info = models.TextField()
+    status = models.CharField(max_length=50)
+
+class SOPAgent(models.Model):
+    sop = models.ForeignKey(SOP, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+
+class SOPLeader(models.Model):
+    sop = models.ForeignKey(SOP, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+
+class SOPDataSource(models.Model):
+    sop = models.ForeignKey(SOP, on_delete=models.CASCADE)
+    source = models.CharField(max_length=50)
+    location = models.TextField(null=True, blank=True)
+    username = models.CharField(max_length=200)
+    password = models.CharField(max_length=200)

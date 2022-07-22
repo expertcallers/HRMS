@@ -32,6 +32,10 @@ from django.apps import apps
 Profile = apps.get_model('mapping', 'Profile')
 LoginHistory = apps.get_model('mapping', 'LoginHistory')
 EmpSeparation = apps.get_model('mapping', 'EmpSeparation')
+SOP = apps.get_model('mapping', 'SOP')
+SOPAgent = apps.get_model('mapping', 'SOPAgent')
+SOPLeader = apps.get_model('mapping', 'SOPLeader')
+SOPDataSource = apps.get_model('mapping', 'SOPDataSource')
 
 # TL and AM List
 tl_am_list = ['Assistant Manager']
@@ -2930,6 +2934,15 @@ def stopLogin(request):
         return redirect("/")
 
 
+def addSOP(request):
+    if request.method == "POST":
+        pass
+    else:
+        profiles = Profile.objects.filter(agent_status='Active')
+        tl_above = Profile.objects.filter(Q(emp_desi__in=manager_list) | Q(emp_desi__in=tl_am_list), agent_status='Active')
+        data = {'profiles': profiles, 'tl_above': tl_above}
+        return render(request, 'ams/sop/add_sop.html', data)
+
 
 def addAttendance(request):
     mydate = date.today()
@@ -3170,6 +3183,9 @@ def newsandwichpolicy(request):
             j.att_actual = 'Absent'
             j.save()
     return redirect('/ams/')
+
+
+
 
 def TestFun(request):
     return redirect("/ams/")

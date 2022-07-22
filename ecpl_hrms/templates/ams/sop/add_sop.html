@@ -1,0 +1,240 @@
+{% extends 'ams/sop/base.html' %}
+{% block main %}
+  {% load static %}
+        <!-- page content -->
+        <div class="right_col" role="main">
+
+          <div class="page-title">
+            <div class="title_left">
+              <h3>Add New Report</h3>
+            </div>
+          </div>
+          <div class="row">
+              <div class="col-md-12">
+                <div class="card">
+                  <div class="card-body">
+                    <form method="POST" action="" enctype="multipart/form-data">
+                      {% csrf_token %}
+                      <div class="row border-bottom">
+
+                        <div class="col-md-12 mt-2">
+                          <div class="form-group">
+                            <h5>Campaign Details</h5>
+                          </div>
+                        </div>
+                        <div class="col-md-3 mt-2">
+                          <div class="form-group">
+                            <label for="campaign_name"> Campaign Name</label>
+                            <input type="text" name="campaign_name" class='form-control' id="campaign_name" required>
+                          </div>
+                        </div>
+                        <div class="col-md-3 mt-2">
+                          <div class="form-group">
+                            <label> Campaign Type
+                                <a href="https://app.powerbi.com/view?r=eyJrIjoiZDg0NzQ5YjQtNmFkMi00YmFmLWI4N2UtZGU4NTlmYTg3Y2JjIiwidCI6IjlkODBmZDUwLTc1YWQtNDIxNS05ZjFiLWE2MzBmYWIxNDk1NCJ9" style="color: blue;" target="_blank">
+                                    <small>(Click here to view sample Standard Outbound Report)</small>
+                                </a>
+                            </label>
+                            <select class='form-control' name="campaign_type" required >
+                                <option value="" selected disabled> Select Campaign Type</option>
+                                <option value="Inbound">Inbound</option>
+                                <option value="Outbound">Outbound</option>
+                                <option value="Outbound Standard">Outbound Standard</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-md-3 mt-2">
+                          <div class="form-group">
+                            <label>Category</label>
+                            <select class='form-control' name="category" required>
+                                <option value="" selected disabled>Select Category</option>
+                                <option value="Domestic">Domestic</option>
+                                <option value="International">International</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-md-3 mt-2">
+                          <div class="form-group">
+                            <label>Process1</label>
+                            <select class='form-control' name="process1" required>
+                                <option value="" selected disabled>Select Process1</option>
+                                <option value="Voice">Voice</option>
+                                <option value="Non Voice">Non Voice</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-md-3 mt-2">
+                          <div class="form-group">
+                            <label>Process2</label>
+                            <select class='form-control' name="process2" required>
+                                <option value="" selected disabled>Select Process2</option>
+                                <option value="Call">Call</option>
+                                <option value="Chat">Chat</option>
+                                <option value="Email">Email</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-md-3 mt-2">
+                          <div class="form-group">
+                             <label> Process3</label>
+                              <select class='form-control' name="process3" required>
+                                  <option value="" selected disabled>Select Process3</option>
+                                  <option value="Sales">Sales</option>
+                                  <option value="CS">CS</option>
+                                  <option value="Tech">Tech Support</option>
+                              </select>
+                          </div>
+                        </div>
+                        <div class="col-md-3 mt-2">
+                          <div class="form-group">
+                             <label>select Employee Name</label>
+                              <select class='form-control select2' name="emp_name" multiple required>
+                                  {% for i in profiles %}
+                                  <option value="{{i.id}}">{{i.emp_name}} ({{i.emp_id}})</option>
+                                  {% endfor %}
+                              </select>
+                          </div>
+                        </div>
+                        <div class="col-md-3 mt-2">
+                          <div class="form-group">
+                             <label> Select RM's </label>
+                                <select class='form-control select2' name="leaders" multiple required>
+                                    {% for j in tl_above %}
+                                    <option value="{{j.id}}">{{j.emp_name}} ({{j.emp_id}})</option>
+                                    {% endfor %}
+                                </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="container border-bottom" id="data_source">
+                          <div class="row">
+                            <div class="col-md-12 mt-2">
+                              <div class="form-group">
+                                <h5>Data Source</h5>
+                              </div>
+                            </div>
+                            <div class="col-md-3 mt-2">
+                              <div class="form-group">
+                                  <label for="source_1">Source</label>
+                                  <select class='form-control' name="source_1" id="source_1">
+                                      <option value="" selected>Select Source</option>
+                                      <option value="Client Portal">Client Portal</option>
+                                      <option value="Dialer">Dialer</option>
+                                      <option value="Dumps">Dumps</option>
+                                      <option value="Email">Email</option>
+                                      <option value="Google Doc">Google Doc</option>
+                                  </select>
+                              </div>
+                            </div>
+                            <div class="col-md-3 mt-2">
+                              <div class="form-group">
+                                  <label for="location_1">Location</label>
+                                  <input class='form-control' type="text" name="location_1" id="location_1" required>
+                              </div>
+                            </div>
+                            <div class="col-md-3 mt-2">
+                              <div class="form-group">
+                                  <label for="username_1">Username</label>
+                                  <input class='form-control' type="text" name="username_1" id="username_1" required>
+                              </div>
+                            </div>
+                            <div class="col-md-3 mt-2">
+                              <div class="form-group">
+                                  <label for="password_1">Password</label>
+                                  <input class='form-control' type="text" name="password_1" id="password_1" required>
+                              </div>
+                            </div>
+                          </div>
+
+                        <input type="hidden" id="num_source" name="num_source">
+                      </div>
+                      <div class="col-md-12 mt-2" align="center">
+                        <div class="form-group">
+                            <button type="button" onclick="AddNewSource()" class="btn btn-warning btn-sm">Add More</button>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="removeDescription()">Remove Last</button>
+                        </div>
+                      </div>
+                      <div class="row border-bottom">
+                        <div class="col-md-12 mt-2">
+                          <div class="form-group">
+                            <h5>Report Format</h5>
+                            <textarea name="report_format" class="richtext" ></textarea>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-12 mt-2">
+                          <div class="form-group">
+                            <h5>Other Info</h5>
+                            <textarea name="other_info" class='form-control' rows="8"></textarea>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-12 mt-2" align="center">
+                          <div class="form-group">
+                              <button type="submit" class="btn btn-success btn-lg">Submit</button>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+          </div>
+
+        </div>
+        <!-- /page content -->
+{% endblock %}
+
+{% block script %}
+<script>
+  n = 1
+  function AddNewSource() {
+    n = n + 1;
+    desc = '<div class="row" id="item_'+n+'">'
+    desc += '<div class="col-md-3 mt-2">';
+    desc += '<div class="form-group">';
+    desc += '<label for="source_'+n+'">Source</label>';
+    desc += '<select class="form-control" name="source_'+n+'" id="source_'+n+'">';
+    desc += '<option value="" selected>Select Source</option>';
+    desc += '<option value="Client Portal">Client Portal</option>';
+    desc += '<option value="Dialer">Dialer</option>';
+    desc += '<option value="Dumps">Dumps</option>';
+    desc += '<option value="Email">Email</option>';
+    desc += '<option value="Google Doc">Google Doc</option>';
+    desc += '</select>';
+    desc += '</div>';
+    desc += '</div>';
+    desc += '<div class="col-md-3 mt-2">';
+    desc += '<div class="form-group">';
+    desc += '<label for="location_'+n+'">Location</label>';
+    desc += '<input class="form-control" type="text" name="location_'+n+'" id="location_'+n+'" required>';
+    desc += '</div>';
+    desc += '</div>';
+    desc += '<div class="col-md-3 mt-2">';
+    desc += '<div class="form-group">';
+    desc += '<label for="username_'+n+'">Username</label>';
+    desc += '<input class="form-control" type="text" name="username_'+n+'" id="username_'+n+'" required>';
+    desc += '</div>';
+    desc += '</div>';
+    desc += '<div class="col-md-3 mt-2">';
+    desc += '<div class="form-group">';
+    desc += '<label for="password_'+n+'">Password</label>';
+    desc += '<input class="form-control" type="text" name="password_'+n+'" id="password_'+n+'" required>';
+    desc += '</div>';
+    desc += '</div>';
+    desc += '</div>';
+
+    $('#data_source').append(desc);
+    $('#num_source').val(n);
+  }
+  function removeDescription() {
+    if ($('#item_'+n+'').html()) {
+      item = $('#item_'+n+'').remove();
+      n = n - 1;
+      $('#num_of_desc').val(n);
+    }
+  }
+</script>
+{% endblock %}
