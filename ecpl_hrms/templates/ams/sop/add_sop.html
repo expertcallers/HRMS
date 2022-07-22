@@ -116,7 +116,7 @@
                             <div class="col-md-3 mt-2">
                               <div class="form-group">
                                   <label for="source_1">Source</label>
-                                  <select class='form-control' name="source_1" id="source_1">
+                                  <select class='form-control' onchange="SourceData(this)" name="source_1" id="source_1">
                                       <option value="" selected>Select Source</option>
                                       <option value="Client Portal">Client Portal</option>
                                       <option value="Dialer">Dialer</option>
@@ -132,13 +132,13 @@
                                   <input class='form-control' type="text" name="location_1" id="location_1" required>
                               </div>
                             </div>
-                            <div class="col-md-3 mt-2">
+                            <div class="col-md-3 mt-2" id="loginuser_1">
                               <div class="form-group">
                                   <label for="username_1">Username</label>
                                   <input class='form-control' type="text" name="username_1" id="username_1" required>
                               </div>
                             </div>
-                            <div class="col-md-3 mt-2">
+                            <div class="col-md-3 mt-2" id="loginpass_1">
                               <div class="form-group">
                                   <label for="password_1">Password</label>
                                   <input class='form-control' type="text" name="password_1" id="password_1" required>
@@ -196,7 +196,7 @@
     desc += '<div class="col-md-3 mt-2">';
     desc += '<div class="form-group">';
     desc += '<label for="source_'+n+'">Source</label>';
-    desc += '<select class="form-control" name="source_'+n+'" id="source_'+n+'">';
+    desc += '<select class="form-control" onchange="SourceData(this)" name="source_'+n+'" id="source_'+n+'">';
     desc += '<option value="" selected>Select Source</option>';
     desc += '<option value="Client Portal">Client Portal</option>';
     desc += '<option value="Dialer">Dialer</option>';
@@ -212,13 +212,13 @@
     desc += '<input class="form-control" type="text" name="location_'+n+'" id="location_'+n+'" required>';
     desc += '</div>';
     desc += '</div>';
-    desc += '<div class="col-md-3 mt-2">';
+    desc += '<div class="col-md-3 mt-2" id="loginuser_'+n+'">';
     desc += '<div class="form-group">';
     desc += '<label for="username_'+n+'">Username</label>';
     desc += '<input class="form-control" type="text" name="username_'+n+'" id="username_'+n+'" required>';
     desc += '</div>';
     desc += '</div>';
-    desc += '<div class="col-md-3 mt-2">';
+    desc += '<div class="col-md-3 mt-2" id="loginpass_'+n+'">';
     desc += '<div class="form-group">';
     desc += '<label for="password_'+n+'">Password</label>';
     desc += '<input class="form-control" type="text" name="password_'+n+'" id="password_'+n+'" required>';
@@ -234,6 +234,18 @@
       item = $('#item_'+n+'').remove();
       n = n - 1;
       $('#num_of_desc').val(n);
+    }
+  }
+  function SourceData(e) {
+    var num = e.id.match(/\d+/);
+    if (e.value == 'Client Portal') {
+        $('#username_'+num+'').attr('required', '');
+        $('#loginuser_'+num+'').removeClass('d-none');
+        $('#loginpass_'+num+'').removeClass('d-none');
+    } else {
+        $('#username_'+num+'').removeAttr('required');
+        $('#loginuser_'+num+'').addClass('d-none');
+        $('#loginpass_'+num+'').addClass('d-none');
     }
   }
 </script>
